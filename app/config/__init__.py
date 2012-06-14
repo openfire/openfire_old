@@ -46,7 +46,7 @@ _config['webapp2'] = {
 
 _config['webapp2_extras.sessions'] = {
 
-    'secret_key': 'ASDLKJOVIBBVC*@()#HD)(VH$(*GC@(E*C(CBDCS))))',
+    'secret_key': 'vbvyfb(&!B(&#bcoubcoo2n38b7cb73v2B^C1iv(&&X',
     'default_backend': 'securecookie',
     'cookie_name':     'appsession',
     'session_max_age': None,
@@ -95,7 +95,9 @@ _config['apptools.system'] = {
     },
 
     'include': [  # Extended configuration files to include
-        ('fatcatmap', 'config.project'),  # Project config
+		('layer9', 'config.layer9'),  # layer9 hosting configuration
+        ('project', 'config.project'),  # Project config
+        ('openfire', 'config.openfire'),  # Openfire config
         ('services', 'config.services'),  # Global + site services (RPC/API) config
         ('assets', 'config.assets')       # Asset manangement layer config
     ]
