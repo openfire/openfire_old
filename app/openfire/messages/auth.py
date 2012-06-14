@@ -12,7 +12,8 @@ class Session(messages.Message):
 
     ''' User session message. '''
 
-    username = messages.StringField(1)
+    sid = messages.StringField(1)
+    csrf = messages.StringField(2)
 
 
 class Request(messages.Message):
