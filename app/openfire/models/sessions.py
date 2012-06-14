@@ -28,3 +28,4 @@ class SessionData(ndb.Model):
 	user = ndb.KeyProperty('u', required=False, indexed=True, default=None)
 	authenticated = ndb.BooleanProperty('ath', default=False, indexed=True)
 	events = ndb.KeyProperty('e', repeated=True, indexed=True)
+	established = ndb.DateTimeProperty('e', auto_now_add=True, indexed=False)
