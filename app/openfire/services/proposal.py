@@ -1,37 +1,62 @@
+from google.appengine.ext import ndb
 from apptools.services.builtin import Echo
 from protorpc import message_types, remote
 from openfire.services import RemoteService
-from openfire.messages import proposal, common
+from openfire.messages import proposal as proposal_messages
+from openfire.messages import common as common_messages
+from openfire.models.project import Proposal
 
 class ProposalService(RemoteService):
 
     ''' Proposal service api. '''
 
-    @remote.method(message_types.VoidMessage, proposal.Proposals)
+    @remote.method(message_types.VoidMessage, proposal_messages.Proposals)
     def list(self, request):
 
         ''' Returns a list of proposals. '''
 
-        return proposal.Proposals()
+        proposals = Proposal.query().fetch()
+        messages = []
+        for proposal in proposals:
+            messages.append(proposal.to_message())
+        return proposal_messages.Proposals(proposals=messages)
 
 
-    @remote.method(proposal.ProposalRequest, proposal.Proposal)
+    @remote.method(proposal_messages.ProposalRequest, proposal_messages.Proposal)
     def get(self, request):
 
-        ''' Return, create, or edit a proposal. '''
+        ''' Return a proposal. '''
 
-        return proposal.Proposal()
+        proposal_key = ndb.Key('Proposal', request.slug)
+        proposal = proposal_key.get()
+        return proposal.to_message()
 
 
-    @remote.method(proposal.ProposalRequest, proposal.Proposal)
+    @remote.method(proposal_messages.Proposal, proposal_messages.Proposal)
     def put(self, request):
 
-        ''' Return, create, or edit a proposal. '''
+        ''' Create a new or or edit an existing proposal. '''
 
-        return proposal.Proposal()
+        if not request.key:
+            # Create a new proposal.
+            proposal = Proposal(key=ndb.Key('Proposal', request.slug))
+        else:
+            # Get the proposal to edit.
+            proposal_key = ndb.Key('Proposal', request.slug)
+            proposal = proposal_key.get()
+
+        if not proposal:
+            # TODO: What to do on error?
+            return proposal_messages.Proposal()
+
+        # Update the proposal.
+        proposal.mutate_from_message(request)
+        proposal.put()
+
+        return proposal.to_message()
 
 
-    @remote.method(common.Comment, Echo)
+    @remote.method(common_messages.Comment, Echo)
     def comment(self, request):
 
         ''' Comment/iterate on a proposal. '''
@@ -39,15 +64,15 @@ class ProposalService(RemoteService):
         return Echo('You have commented on a proposal.')
 
 
-    @remote.method(message_types.VoidMessage, common.Comments)
+    @remote.method(message_types.VoidMessage, common_messages.Comments)
     def comments(self, request):
 
         ''' Comments for a proposal. '''
 
-        return common.Comments()
+        return common_messages.Comments()
 
 
-    @remote.method(proposal.Promote, Echo)
+    @remote.method(proposal_messages.Promote, Echo)
     def promote(self, request):
 
         ''' Promote a proposal to become a project. '''
@@ -55,7 +80,7 @@ class ProposalService(RemoteService):
         return Echo('')
 
 
-    @remote.method(proposal.SuspendProposal, Echo)
+    @remote.method(proposal_messages.SuspendProposal, Echo)
     def suspend(self, request):
 
         ''' Suspend a proposal. '''
@@ -63,7 +88,7 @@ class ProposalService(RemoteService):
         return Echo('')
 
 
-    @remote.method(proposal.RejectProposal, Echo)
+    @remote.method(proposal_messages.RejectProposal, Echo)
     def reject(self, request):
 
         ''' Reject a proposal. '''

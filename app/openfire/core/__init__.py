@@ -1,0 +1,4 @@
+
+
+class CoreAPI(object):
+	pass

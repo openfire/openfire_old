@@ -1,5 +1,31 @@
 from protorpc import messages
 
+
+class CategoryRequest(messages.Message):
+
+    ''' A request for a category by slug. '''
+
+    slug = messages.StringField(1)
+
+
+class Category(messages.Message):
+
+    ''' A project or proposal category. '''
+
+    key = messages.StringField(1)
+    slug = messages.StringField(2)
+    name = messages.StringField(3)
+    description = messages.StringField(4)
+    # TODO: Fill in remaining category items.
+
+
+class Categories(messages.Message):
+
+    ''' A list of categories. '''
+
+    categories = messages.MessageField(Category, 1, repeated=True)
+
+
 class Goal(messages.Message):
 
     ''' Common to proposals and projects, defines a funding goal. '''

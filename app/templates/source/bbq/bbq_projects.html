@@ -1,0 +1,8 @@
+<h2>Projects!</h2>
+<ul>
+    {% for project in projects %}
+    <li>{{ project.name }}</li>
+    {% else %}
+    <li>No projects yet!</li>
+    {% endfor %}
+</ul>

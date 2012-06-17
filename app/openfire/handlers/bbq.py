@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from openfire.handlers import WebHandler
+from openfire.models.project import Category, Proposal, Project
 
 
 class Moderate(WebHandler):
@@ -10,5 +11,8 @@ class Moderate(WebHandler):
 
         ''' Render moderate.html. '''
 
-        self.render('bbq/moderate.html')
+        categories = Category.query().fetch()
+        proposals = Proposal.query().fetch()
+        projects = Project.query().fetch()
+        self.render('bbq/moderate.html', categories=categories, proposals=proposals, projects=projects)
         return

@@ -33,7 +33,7 @@ class MessageConverterMixin(ModelMixin):
     @classmethod
     def from_message(cls, message, key=None, **kwargs):
 
-        if hasattr(message, 'key') and key is None:
+        if (hasattr(message, 'key') and message.key) and key is None:
             obj = cls(key=ndb.key.Key(urlsafe=message.key), **kwargs)
         elif key is not None and isinstance(key, ndb.key.Key):
             obj = cls(key=ndb.key.Key(urlsafe=key.urlsafe()), **kwargs)
@@ -62,3 +62,32 @@ class MessageConverterMixin(ModelMixin):
 
 
         return obj
+
+
+    def mutate_from_message(self, message):
+
+        ''' Copy all the attributes except the key from message to this object. '''
+
+        for k in [f.name for f in message.all_fields()]:
+            if k == 'key':
+                continue
+            if hasattr(self, k) and getattr(message, k):
+                try:
+                    setattr(self, str(k), getattr(message, k))
+                except TypeError:
+                    if k is not None and k not in [False, True, '']:
+                        try:
+                            setattr(self, str(k), str(getattr(message, k)))
+                        except TypeError:
+                            continue
+
+                except:
+                    # TODO: Handle other errors here?
+                    try:
+                        key = ndb.key.Key(urlsafe=getattr(message, k))
+                        setattr(self, str(k), key)
+                    except TypeError:
+                        continue
+                else:
+                    continue
+        return self

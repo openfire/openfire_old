@@ -609,6 +609,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									'--join', fixpath(js_prefix, 'static', 'apptools', 'base.js'),
 									'--compile', fixpath(js_prefix, 'source', 'apptools', '_milk.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_core.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'util.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'dev.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'model.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'events.coffee'),
@@ -620,6 +621,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'push.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'render.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', '_core.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'modal.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 	out.spawn 'coffee', node_bin, [ coffee_bin,

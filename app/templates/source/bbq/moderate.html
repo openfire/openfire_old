@@ -1,7 +1,105 @@
 {% extends "layout/bbq.html" %}
 
 {% block moderate %}
-    <div>
-        <p>We decide all!</p>
-    </div>
+<div>
+    <h1>We decide all!</h1>
+    {% include "bbq/bbq_categories.html" %}
+
+    {% include "bbq/bbq_proposals.html" %}
+
+    {% include "bbq/bbq_projects.html" %}
+</div>
+{% endblock %}
+
+{% block postsouth %}
+<script type="text/javascript">
+    /*
+     * TODO: Refactor and move all this code to assests.
+     */
+
+    $(document).ready(function() {
+
+        function lightGrill() {
+            $("#show-new-category-btn").click(function() {
+                $("#new-category-inline").show();
+                $("#show-new-category-btn").hide();
+            });
+
+            $("#cancel-new-category-btn").click(function() {
+                $("#new-category-inline").hide();
+                $("#show-new-category-btn").show();
+            });
+
+            $("#save-new-category-btn").click(function() {
+                var categoryDict = {
+                    name: $("#new-category-name-input").val(),
+                    slug: $("#new-category-url-input").val(),
+                    description: $("#new-category-description-input").val()
+                };
+                var request = $.apptools.api.category.put(categoryDict);
+                request.fulfill({
+                    success: function(obj, objType, rawResponse) {
+                        document.location.reload();
+                    },
+                    error: function(err) {
+                        alert("There was an error when you just tried to add the category just then.");
+                    }
+                });
+            });
+
+            $(".delete-category-btn").click(function() {
+                var categorySlug = this.id.match(/delete-category-(\w+)/)[1],
+                    request = $.apptools.api.category.delete({slug: categorySlug});
+                request.fulfill({
+                    success: function(obj, objType, rawResponse) {
+                        document.location.reload();
+                    },
+                    error: function(err) {
+                        alert("There was an error when you tried to delete that category.");
+                    }
+                });
+            });
+
+            $(".start-edit-category-btn").click(function() {
+                var categorySlug = this.id.match(/start-edit-category-(\w+)/)[1];
+                $("#start-edit-category-" + categorySlug).hide();
+                $("#save-edit-category-" + categorySlug).show();
+                $("#cancel-edit-category-" + categorySlug).show();
+                $("#category-display-" + categorySlug).hide();
+                $("#category-inputs-" + categorySlug).show();
+            });
+
+            $(".cancel-edit-category-btn").click(function() {
+                var categorySlug = this.id.match(/cancel-edit-category-(\w+)/)[1];
+                $("#start-edit-category-" + categorySlug).show();
+                $("#save-edit-category-" + categorySlug).hide();
+                $("#cancel-edit-category-" + categorySlug).hide();
+                $("#category-display-" + categorySlug).show();
+                $("#category-inputs-" + categorySlug).hide();
+            });
+
+            $(".save-edit-category-btn").click(function() {
+                var categorySlug = this.id.match(/save-edit-category-(\w+)/)[1],
+                    categoryDict = {
+                        key: $("#category-inputs-" + categorySlug + " .slug-input").val(),
+                        slug: $("#category-inputs-" + categorySlug + " .slug-input").val(),
+                        name: $("#category-inputs-" + categorySlug + " .name-input").val(),
+                        description: $("#category-inputs-" + categorySlug + " .description-input").val()
+                    },
+                    request = $.apptools.api.category.put(categoryDict);
+                request.fulfill({
+                    success: function(obj, objType, rawResponse) {
+                        document.location.reload();
+                    },
+                    error: function(err) {
+                        alert("There was an error when you tried to delete that category.");
+                    }
+                });
+            });
+
+        }
+
+        lightGrill();
+    });
+</script>
 {% endblock %}

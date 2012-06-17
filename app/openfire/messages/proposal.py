@@ -6,19 +6,19 @@ class Proposal(messages.Message):
 
     ''' Contains all proposal fields for users. Can be request or response. '''
 
-    slug = messages.StringField(1)
-    name = messages.StringField(2)
-    status = messages.StringField(3)
-    category = messages.StringField(4)
-    summary = messages.StringField(5)
-    pitch = messages.IntegerField(6)
-    tech = messages.StringField(7)
-    keywords = messages.StringField(8, repeated=True)
-    creator = messages.StringField(9)
-    owners = messages.StringField(10, repeated=True)
-    goals = messages.MessageField(Goal, 11, repeated=True)
-    tiers = messages.MessageField(Tier, 12, repeated=True)
-    key = messages.StringField(13)
+    key = messages.StringField(1)
+    slug = messages.StringField(2)
+    name = messages.StringField(3)
+    status = messages.StringField(4)
+    category = messages.StringField(5)
+    summary = messages.StringField(6)
+    pitch = messages.StringField(7)
+    tech = messages.StringField(8)
+    keywords = messages.StringField(9, repeated=True)
+    creator = messages.StringField(10)
+    owners = messages.StringField(11, repeated=True)
+    goals = messages.MessageField(Goal, 12, repeated=True)
+    tiers = messages.MessageField(Tier, 13, repeated=True)
 
 
 class Proposals(messages.Message):
@@ -32,9 +32,7 @@ class ProposalRequest(messages.Message):
 
     ''' Request proposal info, or, if proposal is populated, edit profile. '''
 
-    proposal_id = messages.StringField(1)
-    proposal = messages.MessageField(Proposal, 2)
-    is_new = messages.BooleanField(3, default=False)
+    slug = messages.StringField(1)
 
 
 class Promote(messages.Message):

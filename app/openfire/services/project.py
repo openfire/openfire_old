@@ -33,8 +33,8 @@ class ProjectService(RemoteService):
         is_owner = False
         is_admin = True
 
-        project_key = ndb.Key('Project', request.project_id)
-        project = project_key.get(use_memcache=False)
+        project_key = ndb.Key('Project', request.slug)
+        project = project_key.get()
 
         if not project:
             # Project not found.
@@ -47,12 +47,24 @@ class ProjectService(RemoteService):
         return project.to_message()
 
 
-    @remote.method(project_messages.ProjectRequest, project_messages.Project)
+    @remote.method(project_messages.Project, project_messages.Project)
     def put(self, request):
 
-        ''' Create or edit a project. '''
+        ''' Edit a project. Projects are created when proposals are promoted. '''
 
-        return project_messages.Project()
+        if not request.key:
+            # Cannot create a project through this service.
+            # TODO: How to return error?
+            return project_messages.Project()
+
+        project_key = ndb.Key('Project', request.key)
+        project = project_key.get()
+
+        # Update the project.
+        project.mutate_from_message(request)
+        project.put()
+
+        return project.to_message()
 
 
     @remote.method(common_messages.Comment, Echo)

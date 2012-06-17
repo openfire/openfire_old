@@ -111,6 +111,19 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Category API - provides structured information about openfire categories
+        'category': {
+            'enabled': True,
+            'service': 'openfire.services.category.CategoryService',
+            'methods': ['get', 'list', 'put', 'delete'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## Project API - provides structured information about openfire projects
         'project': {
             'enabled': True,
@@ -129,6 +142,19 @@ config['apptools.project.services'] = {
             'enabled': True,
             'service': 'openfire.services.proposal.ProposalService',
             'methods': ['get', 'list', 'put', 'comment', 'comments', 'promote', 'suspend', 'reject'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
+        ## Activity API - general and personal site activity.
+        'activity': {
+            'enabled': True,
+            'service': 'openfire.services.activity.ActivityService',
+            'methods': ['site_metrics', 'known_backers', 'known_followers'],
 
             'config': {
                 'caching': 'none',

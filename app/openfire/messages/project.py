@@ -5,19 +5,19 @@ class Project(messages.Message):
 
     ''' Contains all project fields for users. Can be request or response. '''
 
-    slug = messages.StringField(1)
-    name = messages.StringField(2)
-    status = messages.StringField(3)
-    category = messages.StringField(4)
-    summary = messages.StringField(5)
-    pitch = messages.StringField(6)
-    tech = messages.StringField(7)
-    keywords = messages.StringField(8, repeated=True)
-    creator = messages.StringField(9)
-    owners = messages.StringField(10, repeated=True)
-    goals = messages.MessageField(Goal, 11, repeated=True)
-    tiers = messages.MessageField(Tier, 12, repeated=True)
-    key = messages.StringField(13)
+    key = messages.StringField(1)
+    slug = messages.StringField(2)
+    name = messages.StringField(3)
+    status = messages.StringField(4)
+    category = messages.StringField(5)
+    summary = messages.StringField(6)
+    pitch = messages.StringField(7)
+    tech = messages.StringField(8)
+    keywords = messages.StringField(9, repeated=True)
+    creator = messages.StringField(10)
+    owners = messages.StringField(11, repeated=True)
+    goals = messages.MessageField(Goal, 12, repeated=True)
+    tiers = messages.MessageField(Tier, 13, repeated=True)
 
 
 class Projects(messages.Message):
@@ -29,10 +29,9 @@ class Projects(messages.Message):
 
 class ProjectRequest(messages.Message):
 
-    ''' Request project info or edit if project is populated. '''
+    ''' Request a project by slug. '''
 
-    project_id = messages.StringField(1)
-    project = messages.MessageField(Project, 2)
+    slug = messages.StringField(1)
 
 
 class Backers(messages.Message):

@@ -1,0 +1,8 @@
+<h2>Proposals!</h2>
+<ul>
+    {% for proposal in proposals %}
+    <li>{{ proposal.name }}</li>
+    {% else %}
+    <li>No proposals yet!</li>
+    {% endfor %}
+</ul>

@@ -32,6 +32,10 @@ class HomepageTestCase(unittest.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
 
     def test_homepage(self):
         generic_view_success_test(self, '/')
@@ -45,6 +49,10 @@ class AboutPagesTestCase(unittest.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
 
     def test_about_page(self):
         generic_view_success_test(self, '/about')
@@ -67,6 +75,10 @@ class UserPageTestCase(unittest.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
 
     def test_users_page(self):
         generic_view_success_test(self, '/users')
@@ -86,6 +98,10 @@ class ProposalPageTestCase(unittest.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
 
     def test_propose_page(self):
         generic_view_success_test(self, '/propose')
@@ -105,6 +121,10 @@ class ProjectPageTestCase(unittest.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
 
     def test_projects_page(self):
         generic_view_success_test(self, '/projects')
@@ -121,6 +141,10 @@ class BBQPageTestCase(unittest.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
 
     def test_projects_page(self):
         generic_view_success_test(self, '/bbq')
