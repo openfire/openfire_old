@@ -801,6 +801,10 @@ section.newsfeed ul.feed li.feed-item .datetime {
   position: fixed;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .dropshadow {
   box-shadow: 2px 2px 3px #333333;
 }
@@ -815,7 +819,7 @@ section.newsfeed ul.feed li.feed-item .datetime {
 
 a.mod,
 #modal-title,
-#mod-close {
+#modal-close {
   font-family: "Karla", sans-serif;
   font-size: 11px;
   font-weight: 700;
@@ -865,7 +869,7 @@ a.mod:active {
   padding: 3px;
 }
 
-#mod-close {
+#modal-close {
   color: #393939;
   right: 5px;
   bottom: 3px;
@@ -874,7 +878,7 @@ a.mod:active {
   cursor: pointer;
   opacity: 0.4;
 }
-#mod-close:hover {
+#modal-close:hover {
   background-color: #e3e3e3;
   opacity: 1;
 }
