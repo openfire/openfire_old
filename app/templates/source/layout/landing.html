@@ -28,58 +28,28 @@
 
             <h2>Projects</h2>
             <div class='section-wrap'>
-
-                <!-- Project Card -->
-                <div class='project-card'>
-                    <div class='project-icon' data-name='fat cat map' data-description='real-life gps for politics.'>
-                        <a href="{{ link('project/home', customurl='fatcatmap') }}">
-                            <img src="http://placehold.it/140x120" />
+            {% if projects %}
+                {% for project in projects %}
+                    <!-- project card for {{ project.slug }} -->
+                    <div class='project-card' data-project='{{ project.slug }}'>
+                        <a href="{{ link('project/home', customurl=project.key.id()) }}">
+                            <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
+                                {% if project.avatar %}
+                                    <img src="{{ asset.image('projects/cardstock', project.avatar) }}" title="{{ project.name }} - {{ project.summary }}" />
+                                {% else %}
+                                    <img src="http://placehold.it/140x120" />
+                                {% endif %}
+                            </div>
                         </a>
-                    </div>
-                    <div class='project-progress' style='width: 92%'>
-                    </div>
+                        <div class='project-progress' style='width: {{ util.random.randint(1, 100) }}%'>
+                        </div>
+                    </div> <!-- end project card for {{ project.slug }} -->
+                {% endfor %}
+            {% else %}
+                <div class='ohnoes'>
+                    Oh noez, no projects!
                 </div>
-
-                <div class='project-card'>
-                    <div class='project-icon' data-name='seasteading'>
-                        <img src="http://placehold.it/140x120" />
-                    </div>
-                    <div class='project-progress' style='width: 83%'>
-                    </div>
-                </div>
-
-                <div class='project-card'>
-                    <div class='project-icon' data-name='time banking'>
-                        <img src="http://placehold.it/140x120" />
-                    </div>
-                    <div class='project-progress' style='width: 69%'>
-                    </div>
-                </div>
-
-                <div class='project-card'>
-                    <div class='project-icon' data-name='global village initiative'>
-                        <img src="http://placehold.it/140x120" />
-                    </div>
-                    <div class='project-progress' style='width: 42%'>
-                    </div>
-                </div>
-
-                <div class='project-card'>
-                    <div class='project-icon' data-name='seed banking'>
-                        <img src="http://placehold.it/140x120" />
-                    </div>
-                    <div class='project-progress' style='width: 21%'>
-                    </div>
-                </div>
-
-                <div class='project-card'>
-                    <div class='project-icon' data-name='new democracy'>
-                        <img src="http://placehold.it/140x120" />
-                    </div>
-                    <div class='project-progress' style='width: 8%'>
-                    </div>
-                </div>
-
+            {% endif %}
             </div>
 
         </section><!-- #projects -->

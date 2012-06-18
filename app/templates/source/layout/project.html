@@ -15,19 +15,36 @@
 
             <div id='welcomebox'>
                 {% block media %}
-                    <img src="http://placehold.it/640x390/222222&text=bigvid" />
+                    {% if video %}
+                        <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                    {% else %}
+                        <img src="http://placehold.it/640x360/222222&text=video" />
+                    {% endif %}
                 {% endblock media %}
             </div>
 
             <div id='sidebar'>
-                <div id='title' class='fancy'><h1>{{ project.name }}</h1></div>
-                <div class='contentwrap'>
+                <header>
+                    <div id='sidetitle' class='fancy title'><h1>{{ project.name }}</h1></div>
+                    <div id='sidebuttons' class='buttons'>
+                        <form class='rpctrigger' action="#" method="POST">
+                            <button id='follow'>Follow</button>
+                        </form>
+                    </div>
+                </header>
+                <section id='quickinfo'>
                     {% block right %}
-                        <div>
-                            <p>Created by {{ project.creator.id() }}</p>
-                        </div>
+                        <b>project owners:</b>
+                        <ul>
+                            {% for owner in project.owners %}
+                                <li>{{ owner.id() }}</li>
+                            {% endfor %}
+                        </ul>
+                        <br />
+                        <b>technology:</b>
+                        <p>{{ project.tech }}
                     {% endblock %}
-                </div>
+                </section>
             </div>
 
             <article id='deets'>
@@ -48,3 +65,12 @@
     </div>
 
 {% endblock %}
+
+{% block postsouth %}
+<script type='text/javascript'>
+
+$(document).ready(function () {
+});
+
+</script>
+{% endblock postsouth %}

@@ -389,8 +389,8 @@ p {
 #main #content::before {
   display: block;
   content: "";
-  width: 100%;
   height: 5px;
+  margin-top: -5px;
   background: -webkit-gradient(linear, 50% 100%, 50% 0%, color-stop(0%, #cfcfcf), color-stop(100%, #dddddd));
   background: -webkit-linear-gradient(bottom, #cfcfcf, #dddddd);
   background: -moz-linear-gradient(bottom, #cfcfcf, #dddddd);
@@ -421,16 +421,32 @@ p {
   right: 5%;
   top: 75px;
   border-radius: 12px;
-  background-color: #ffb246;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220));
+  background: -webkit-linear-gradient(top center, #f79331, #f57220);
+  background: -moz-linear-gradient(top center, #f79331, #f57220);
+  background: -o-linear-gradient(top center, #f79331, #f57220);
+  background: -ms-linear-gradient(top center, #f79331, #f57220);
+  background: linear-gradient(top center, #f79331, #f57220);
   text-align: right;
 }
 #main #masthead #how-it-works-button:hover {
-  background-color: #f57220;
+  cursor: pointer;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffd468), color-stop(100%, #ffb246));
+  background: -webkit-linear-gradient(top center, #ffd468, #ffb246);
+  background: -moz-linear-gradient(top center, #ffd468, #ffb246);
+  background: -o-linear-gradient(top center, #ffd468, #ffb246);
+  background: -ms-linear-gradient(top center, #ffd468, #ffb246);
+  background: linear-gradient(top center, #ffd468, #ffb246);
+}
+#main #masthead #how-it-works-button:active {
+  margin-top: 2px;
+  margin-right: 2px;
 }
 #main #masthead #how-it-works-button a,
 #main #masthead #how-it-works-button a:link,
 #main #masthead #how-it-works-button a:visited,
 #main #masthead #how-it-works-button a:active {
+  cursor: pointer;
   display: block;
   line-height: 120px;
   vertical-align: middle;
@@ -727,7 +743,7 @@ p {
   padding: 10px;
   margin: 20px 0px 20px 20px;
   float: left;
-  box-shadow: 2px 2px 3px #e0e0e0;
+  box-shadow: 2px 2px 2px #cdcdcd;
 }
 .project-card:hover {
   box-shadow: 2px 2px 2px #bfbfbf;
@@ -737,6 +753,12 @@ p {
   color: #666666;
 }
 .project-card:hover .project-progress {
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffb246), color-stop(100%, #f57220));
+  background: -webkit-linear-gradient(top center, #ffb246, #f57220);
+  background: -moz-linear-gradient(top center, #ffb246, #f57220);
+  background: -o-linear-gradient(top center, #ffb246, #f57220);
+  background: -ms-linear-gradient(top center, #ffb246, #f57220);
+  background: linear-gradient(top center, #ffb246, #f57220);
   opacity: 0.75;
 }
 .project-card .project-icon::after {
@@ -756,6 +778,9 @@ p {
   text-transform: uppercase;
   overflow: hidden;
 }
+.project-card .project-icon:hover {
+  cursor: pointer;
+}
 .project-card .project-icon:hover::after {
   text-decoration: underline;
 }
@@ -766,17 +791,19 @@ p {
   border: none !important;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  background: -webkit-gradient(linear, 0% 0%, 100% 100%, color-stop(0%, #ffb246), color-stop(25%, #ffb246), color-stop(25%, #f57220), color-stop(50%, #f57220), color-stop(50%, #ffb246), color-stop(75%, #ffb246), color-stop(75%, #f57220), color-stop(100%, #f57220));
-  background: -webkit-linear-gradient(top left, #ffb246 0%, #ffb246 25%, #f57220 25%, #f57220 50%, #ffb246 50%, #ffb246 75%, #f57220 75%, #f57220 100%);
-  background: -moz-linear-gradient(top left, #ffb246 0%, #ffb246 25%, #f57220 25%, #f57220 50%, #ffb246 50%, #ffb246 75%, #f57220 75%, #f57220 100%);
-  background: -o-linear-gradient(top left, #ffb246 0%, #ffb246 25%, #f57220 25%, #f57220 50%, #ffb246 50%, #ffb246 75%, #f57220 75%, #f57220 100%);
-  background: -ms-linear-gradient(top left, #ffb246 0%, #ffb246 25%, #f57220 25%, #f57220 50%, #ffb246 50%, #ffb246 75%, #f57220 75%, #f57220 100%);
-  background: linear-gradient(top left, #ffb246 0%, #ffb246 25%, #f57220 25%, #f57220 50%, #ffb246 50%, #ffb246 75%, #f57220 75%, #f57220 100%);
-  background-size: 9px 9px;
+  background-color: #f57220;
+  background-size: 9px 10px;
   opacity: 0.5;
 }
 .project-card .project-progress:hover {
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffb246), color-stop(100%, #f57220));
+  background: -webkit-linear-gradient(top center, #ffb246, #f57220);
+  background: -moz-linear-gradient(top center, #ffb246, #f57220);
+  background: -o-linear-gradient(top center, #ffb246, #f57220);
+  background: -ms-linear-gradient(top center, #ffb246, #f57220);
+  background: linear-gradient(top center, #ffb246, #f57220);
   opacity: 1;
+  cursor: pointer;
 }
 
 section.newsfeed ul.feed {
@@ -826,21 +853,24 @@ section.newsfeed ul.feed li.feed-item .datetime {
 }
 
 .overlay {
+  position: fixed;
   background-color: white;
   bottom: 0px;
   left: 0px;
   right: 0px;
-  z-index: 998;
+  top: 0px;
+  z-index: 990;
 }
 
 a.mod,
-#modal-title,
-#modal-close {
+.modal-title,
+.modal-close {
   font-family: "Karla", sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 10px;
+  line-height: 12px;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 a.mod {
@@ -860,14 +890,14 @@ a.mod:active {
   color: #161616;
 }
 
-.modal {
+.modal-dialog {
   background-color: white;
   padding: 10px;
   border: 1px solid #dadada;
-  z-index: 990;
+  z-index: 998;
 }
 
-#modal-ui {
+.modal-ui {
   left: 0px;
   bottom: 0px;
   width: 100%;
@@ -877,7 +907,7 @@ a.mod:active {
   border-bottom-right-radius: 7px;
 }
 
-#modal-title {
+.modal-title {
   color: #5e5e5e;
   max-width: 400px;
   left: 5px;
@@ -885,44 +915,63 @@ a.mod:active {
   padding: 3px;
 }
 
-#modal-close {
+.modal-close {
   color: #393939;
   right: 5px;
   bottom: 3px;
   padding: 3px;
   border-radius: 2px;
-  cursor: pointer;
   opacity: 0.4;
 }
-#modal-close:hover {
+.modal-close:hover {
+  cursor: pointer;
   background-color: #e3e3e3;
   opacity: 1;
 }
 
 #welcomebox {
+  z-index: 800;
   position: absolute;
   left: 5%;
-  top: -75px;
+  top: -85px;
 }
 
 #sidebar {
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  z-index: 900;
   position: absolute;
   background: #cccccc;
   width: 300px;
   height: 600px;
   right: 5%;
   top: -150px;
-  border: 1px solid #333333;
 }
-#sidebar #title {
-  width: 100%;
-  height: 80px;
+#sidebar header #sidetitle {
+  margin-left: 20px;
+  text-align: left;
+}
+#sidebar header #sidetitle h1 {
+  font-family: "Karla";
+  font-size: 240%;
+  color: black;
+}
+#sidebar header #sidebuttons {
+  display: inline;
+  position: absolute;
+  right: 20px;
+  top: 30px;
+  width: 90px;
   text-align: center;
 }
-#sidebar #title h1 {
-  font-family: "Karla";
-  font-size: 260%;
-  color: black;
+#sidebar #quickinfo {
+  background: transparent !important;
+  width: 90% !important;
+  padding: 0 20px;
+  margin: 0 !important;
 }
 
 .contentwrap {
@@ -930,6 +979,7 @@ a.mod:active {
 }
 
 #project {
+  z-index: 700;
   position: relative;
   height: 100%;
   width: 85%;
@@ -951,6 +1001,9 @@ a.mod:active {
   font-size: 32pt;
   margin-top: 15px;
   margin-bottom: 10px;
+}
+#project #deets #intro {
+  background: transparent !important;
 }
 #project #deets #intro p {
   padding: 0;

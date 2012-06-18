@@ -1,29 +1,17 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source/projects/project_home.html'
+    name = '/source\\projects\\project_home.html'
 
     def root(context, environment=environment):
         parent_template = None
         if 0: yield None
-        parent_template = environment.get_template('layout/project.html', '/source/projects/project_home.html')
+        parent_template = environment.get_template('layout/project.html', '/source\\projects\\project_home.html')
         for name, parent_block in parent_template.blocks.iteritems():
             context.blocks.setdefault(name, []).append(parent_block)
         for event in parent_template.root_render_func(context):
             yield event
 
-    def block_media(context, environment=environment):
-        if 0: yield None
-        yield u'\n    <div>\n        <p>Video or slideshow</p>\n    </div>\n'
-
-    def block_right(context, environment=environment):
-        if 0: yield None
-        yield u'\n    <div>\n        <p>Right bar</p>\n    </div>\n'
-
-    def block_description(context, environment=environment):
-        if 0: yield None
-        yield u'\n    <div>\n        <p>Everything else!</p>\n    </div>\n'
-
-    blocks = {'media': block_media, 'right': block_right, 'description': block_description}
-    debug_info = '1=9&9=15&3=19&15=23'
+    blocks = {}
+    debug_info = '1=9'
     return locals()

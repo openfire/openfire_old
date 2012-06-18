@@ -1,35 +1,59 @@
 @import "../main"
 
 #welcomebox
+	z-index: 800
 	position: absolute
 	left: 5%
-	top: -75px
+	top: -85px
 
 #sidebar
+
+	border-radius: 10px
+	-moz-border-radius: 10px
+	-webkit-border-radius: 10px
+	-ms-border-radius: 10px
+	-o-border-radius: 10px
+	z-index: 900
 	position: absolute
 	background: #CCC
 	width: 300px
 	height: 600px
 	right: 5%
 	top: -150px
-	border: 1px solid #333
 
-	#title
-		width: 100%
-		height: 80px
-		text-align: center
+	header
 
-		h1
-			font:
-				family: 'Karla'
-				size: 260%
-			color: black
+		#sidetitle
+			margin-left: 20px
+			text-align: left
+
+			h1
+				font:
+					family: 'Karla'
+					size: 240%
+				color: black
+
+		#sidebuttons
+			display: inline
+			position: absolute
+			right: 20px
+			top: 30px
+			width: 90px
+			text-align: center
+
+	#quickinfo
+		background: transparent !important
+		width: 90% !important
+		padding: 0 20px
+		margin: 0 !important
+
 
 .contentwrap
 	padding: 20px
 
 #project
 
+	z-index: 700
 	position: relative
 	height: 100%
 	width: 85%
@@ -54,6 +78,7 @@
 			margin-bottom: 10px
 
 		#intro
+			background: transparent !important
 			p
 				padding: 0
 				margin: 0

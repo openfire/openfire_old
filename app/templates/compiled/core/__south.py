@@ -1,7 +1,7 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source/core/__south.html'
+    name = '/source\\core\\__south.html'
 
     def root(context, environment=environment):
         l_util = context.resolve('util')
@@ -41,10 +41,10 @@ def run(environment):
         if 0: yield None
         if environment.getattr(l_page, 'services'):
             if 0: yield None
-            included_template = environment.get_template('macros/page_object.js', '/source/core/__south.html').module
+            included_template = environment.get_template('macros/page_object.js', '/source\\core\\__south.html').module
             l_build_page_object = getattr(included_template, 'build_page_object', missing)
             if l_build_page_object is missing:
-                l_build_page_object = environment.undefined("the template %r (imported on line 25 in '/source/core/__south.html') does not export the requested name 'build_page_object'" % included_template.__name__, name='build_page_object')
+                l_build_page_object = environment.undefined("the template %r (imported on line 25 in '/source\\\\core\\\\__south.html') does not export the requested name 'build_page_object'" % included_template.__name__, name='build_page_object')
             yield u'\n\t'
             yield to_string(context.call(l_build_page_object, environment.getattr(environment.getattr(l_page, 'services'), 'services_manifest'), environment.getattr(environment.getattr(l_page, 'services'), 'config'), l_page))
 
@@ -57,10 +57,10 @@ def run(environment):
             if 0: yield None
             if environment.getattr(l_page, 'analytics'):
                 if 0: yield None
-                included_template = environment.get_template('macros/page_analytics.js', '/source/core/__south.html').module
+                included_template = environment.get_template('macros/page_analytics.js', '/source\\core\\__south.html').module
                 l_google_analytics_async = getattr(included_template, 'google_analytics_async', missing)
                 if l_google_analytics_async is missing:
-                    l_google_analytics_async = environment.undefined("the template %r (imported on line 33 in '/source/core/__south.html') does not export the requested name 'google_analytics_async'" % included_template.__name__, name='google_analytics_async')
+                    l_google_analytics_async = environment.undefined("the template %r (imported on line 33 in '/source\\\\core\\\\__south.html') does not export the requested name 'google_analytics_async'" % included_template.__name__, name='google_analytics_async')
                 yield u'\n\t\t'
                 yield to_string(context.call(l_google_analytics_async, environment.getattr(l_page, 'analytics')))
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from openfire.models import user
+from openfire.models import assets
 from openfire.models import project
 from openfire.handlers import WebHandler
 
@@ -26,27 +27,14 @@ class ProjectHome(WebHandler):
 
         ''' Render project_home.html. '''
 
-        p = project.Project.get_by_id(customurl)
-        if p is None:
-            ## make up a project real quick
-            p = project.Project(**{
+        p = ndb.Key(project.Project, customurl)
+        a = ndb.Key(assets.Avatar, 'current', parent=p)
+        v = ndb.Key(assets.Video, 'mainvideo', parent=p)
 
-                    'key': ndb.Key(project.Project, 'fatcatmap'),
-                    'slug': 'fatcatmap',
-                    'name': 'fat cat map',
-                    'status': 'o',
-                    'proposal': ndb.Key(project.Proposal, 'cool'),
-                    'category': ndb.Key(project.Category, 'politics'),
-                    'summary': 'ever wonder who your local congressman gets his money from? fatcatmap answers that question, with data.',
-                    'pitch': 'Cool beans pitch.',
-                    'tech': 'Google App Engine, Amazon Web Services, Layer9, AppTools',
-                    'keywords': ['politics', 'influence', 'money', 'corruption', 'congress'],
-                    'creator': ndb.Key(user.User, 'sam'),
-                    'owners': [ndb.Key(user.User, 'sam'), ndb.Key(user.User, 'david')],
-                    'public': True,
-                    'viewers': []
+        models = ndb.get_multi([p, a, v], use_cache=True, use_memcache=True, use_datastore=True)
 
-                })
-
-        self.render('projects/project_home.html', project_slug=customurl, project=p)
-        return
+        if models[0] is None:
+            return self.error(404)
+        else:
+            self.render('projects/project_home.html', project_slug=customurl, project=models[0], video=models[2], avatar=models[1])
+            return

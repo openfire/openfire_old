@@ -17,6 +17,9 @@ rules = [
         Route('/', name='landing', handler='main.Landing'),
         Route('/offline', name='offline', handler='main.Offline'),
 
+        ## Temporary dev URLS
+        Route('/_dev/data', name='default/data', handler='dev.DevModels'),
+
         ## === About URLs === ##
         HandlerPrefixRoute('about.', [
             Route('/about', name='about', handler='About'),

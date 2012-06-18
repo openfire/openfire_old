@@ -1,7 +1,7 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source/core/__base.html'
+    name = '/source\\core\\__base.html'
 
     def root(context, environment=environment):
         if 0: yield None
@@ -25,6 +25,9 @@ def run(environment):
             yield event
         for event in context.blocks['north'][0](context):
             yield event
+        for event in context.blocks['stylesheets'][0](context):
+            yield event
+        yield u'\n\t\t'
         for event in context.blocks['postnorth'][0](context):
             yield event
         yield u'\n\n\t\t<title>'
@@ -34,7 +37,7 @@ def run(environment):
 
     def block_north(context, environment=environment):
         if 0: yield None
-        template = environment.get_template('core/__north.html', '/source/core/__base.html')
+        template = environment.get_template('core/__north.html', '/source\\core\\__base.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
 
@@ -56,12 +59,21 @@ def run(environment):
                 context.call(environment.getattr(l_asset, 'image'), 'mobile/ios', 'apple-touch-icon.png'), 
             )
 
+    def block_presouth(context, environment=environment):
+        if 0: yield None
+
+    def block_postsouth(context, environment=environment):
+        if 0: yield None
+
     def block_opengraph(context, environment=environment):
         l_page = context.resolve('page')
         if 0: yield None
         yield u'\n\t\t<!-- OpenGraph -->\n\t\t<meta property="og:title" content="" />\n\t\t<meta property="og:type" content="website" />\n\t\t<meta property="og:determiner" content="" />\n\t\t<meta propert="og:locale" content="en_US" />\n\t\t<meta property="og:url" content="%s" />\n\t\t<meta property="og:description" content="" />\n\t\t<meta property="og:image" content="" />\n\t\t<meta property="og:image:width" content="298" />\n\t\t<meta property="og:image:height" content="298" />\n\t\t<meta property="og:site_name" content="" />\n\t\t<meta property="fb:app_id" content="" />\n\n\t\t<!-- Location/Geo -->\n\t\t<meta property="og:latitude" content="">\n\t\t<meta property="og:longitude" content="">\n\t\t<meta property="og:street-address" content="">\n\t\t<meta property="og:locality" content="">\n\t\t<meta property="og:region" content="">\n\t\t<meta property="og:postal-code" content="">\n\t\t<meta property="og:country-name" content="">\n\t\t<meta property="og:email" content="">\n\t\t<meta property="og:phone_number" content="">\n\t\t' % (
             environment.getattr(l_page, 'url'), 
         )
+
+    def block_stylesheets(context, environment=environment):
+        if 0: yield None
 
     def block_meta(context, environment=environment):
         l_page = context.resolve('page')
@@ -105,14 +117,20 @@ def run(environment):
         for event in context.blocks['body'][0](context):
             yield event
         yield u'\n\n'
-        template = environment.get_template('core/__south.html', '/source/core/__base.html')
+        for event in context.blocks['presouth'][0](context):
+            yield event
+        yield u'\n'
+        template = environment.get_template('core/__south.html', '/source\\core\\__base.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
+            yield event
+        yield u'\n'
+        for event in context.blocks['postsouth'][0](context):
             yield event
         yield u'\n</body>\n</html>'
 
     def block_postnorth(context, environment=environment):
         if 0: yield None
 
-    blocks = {'prenorth': block_prenorth, 'body': block_body, 'head': block_head, 'north': block_north, 'title': block_title, 'mobile': block_mobile, 'opengraph': block_opengraph, 'meta': block_meta, '_tpl_root': block__tpl_root, 'postnorth': block_postnorth}
-    debug_info = '2=9&93=12&109=15&20=19&21=22&93=24&94=26&97=28&99=31&94=35&95=37&99=41&72=45&73=50&80=53&81=54&82=55&83=56&46=59&52=63&21=66&29=71&30=74&46=77&72=79&88=82&2=85&3=88&11=94&12=95&13=96&14=97&15=98&16=99&20=102&109=105&112=108&97=113'
+    blocks = {'prenorth': block_prenorth, 'body': block_body, 'head': block_head, 'north': block_north, 'title': block_title, 'mobile': block_mobile, 'presouth': block_presouth, 'postsouth': block_postsouth, 'opengraph': block_opengraph, 'stylesheets': block_stylesheets, 'meta': block_meta, '_tpl_root': block__tpl_root, 'postnorth': block_postnorth}
+    debug_info = '2=9&93=12&110=15&20=19&21=22&93=24&94=26&97=28&98=31&100=34&94=38&95=40&100=44&72=48&73=53&80=56&81=57&82=58&83=59&113=62&115=65&46=68&52=72&97=75&21=78&29=83&30=86&46=89&72=91&88=94&2=97&3=100&11=106&12=107&13=108&14=109&15=110&16=111&20=114&110=117&113=120&114=123&115=127&98=131'
     return locals()
