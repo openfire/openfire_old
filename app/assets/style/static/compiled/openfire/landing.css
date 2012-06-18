@@ -427,10 +427,7 @@ p {
 #main #masthead #how-it-works-button:hover {
   background-color: #f57220;
 }
-#main #masthead #how-it-works-button a,
-#main #masthead #how-it-works-button a:link,
-#main #masthead #how-it-works-button a:visited,
-#main #masthead #how-it-works-button a:active {
+#main #masthead #how-it-works-button a, #main #masthead #how-it-works-button a:link, #main #masthead #how-it-works-button a:visited, #main #masthead #how-it-works-button a:active {
   display: block;
   line-height: 120px;
   vertical-align: middle;
@@ -443,10 +440,7 @@ p {
   text-decoration: none;
   text-transform: uppercase;
 }
-#main #masthead #how-it-works-button a:hover,
-#main #masthead #how-it-works-button a:link:hover,
-#main #masthead #how-it-works-button a:visited:hover,
-#main #masthead #how-it-works-button a:active:hover {
+#main #masthead #how-it-works-button a:hover, #main #masthead #how-it-works-button a:link:hover, #main #masthead #how-it-works-button a:visited:hover, #main #masthead #how-it-works-button a:active:hover {
   color: white;
 }
 

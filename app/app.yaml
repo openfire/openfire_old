@@ -34,8 +34,8 @@ libraries:
 
 
 #### ===== Builtin SDK Includes
-#builtins:
-#- appstats: on
+builtins:
+- appstats: on
 #- deferred: on
 #- mapreduce: on
 #- remote_api: on
@@ -119,11 +119,11 @@ handlers:
   auth_fail_action: unauthorized
 
 # AppStats: RPC profiling
-- url: /_ah/appstats.*
-  script: google.appengine.ext.appstats.ui.app
-  login: admin
-  secure: always
-  auth_fail_action: unauthorized
+#- url: /_ah/appstats.*
+#  script: google.appengine.ext.appstats.ui.app
+#  login: admin
+#  secure: always
+#  auth_fail_action: unauthorized
 
 # AppEngine Pipelines
 - url: /_ah/pipeline.*

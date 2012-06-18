@@ -22,5 +22,5 @@ class ProjectHome(WebHandler):
 
         ''' Render project_home.html. '''
 
-        self.render('projects/project_home.html')
+        self.render('projects/project_home.html', project_slug=customurl)
         return

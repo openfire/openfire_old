@@ -1,23 +1,51 @@
 {% extends "layout/layout_base.html" %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset.style('project', 'openfire') }}">
+{% endblock stylesheets %}
+
 {% block main %}
 
-    {% block right %}
-        <div>
-          <h1>openfire project RIGHT</h1>
-        </div>
-    {% endblock %}
+    <!-- Main Masthead -->
+    <div id='masthead'>
 
-    {% block media%}
-        <div>
-          <h1>openfire project MEDIA</h1>
+        <div id='welcomebox'>
+            {% block media %}
+                <img src="http://placehold.it/640x390/222222&text=bigvid" />
+            {% endblock media %}
         </div>
-    {% endblock %}
 
-    {% block description %}
-        <div>
-          <h1>openfire project DESCRIPTION</h1>
+    </div><!-- #masthead -->
+
+    <div id='sidebar'>
+        <div id='title' class='fancy'><h1>{{ project_slug }}</h1></div>
+        <div class='contentwrap'>
+            {% block right %}
+                <div>
+                    <p>Right sidebar for {{ project_slug }}</p>
+                </div>
+            {% endblock %}
         </div>
-    {% endblock %}
+    </div>
+
+    <div id='content'>
+
+        <article id='project'>
+
+            <!-- project title -->
+            <h1>{{ project_slug }}</h1>
+
+            <!-- intro/pitch -->
+            <section id='intro'>
+                {% block description %}
+                    <div>
+                      <p>Normally, this would have some text relating to {{ project_slug }}.</p>
+                    </div>
+                {% endblock %}
+            </section><!-- end #intro -->
+
+        </article><!-- end #project -->
+
+    </div><!-- end #content -->
 
 {% endblock %}

@@ -129,7 +129,7 @@ config['apptools.project.assets'] = {
         },
 
         # Content-section specific stylesheets
-        ('site', 'compiled/site'): {
+        ('openfire', 'compiled/openfire'): {
 
             'config': {
                 'min': True,
@@ -137,6 +137,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
+                'landing': {'version': 0.2},  # styles for the landing
+                'project': {'version': 0.1}    # styles for the project page
             }
 
         },

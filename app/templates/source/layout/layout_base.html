@@ -1,12 +1,40 @@
 {% extends "core/base_web.html" %}
 
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
+{% endblock stylesheets %}
+
 {% block header %}
+{% block tinylogo %}
+<div id='tinylogo'>
+	<img src='{{ asset.image("branding/oflogo", "of_small_transparent.png") }}' />
+</div>
+{% endblock tinylogo %}
+
 <nav role="navigation">
-	<ul class='right'>
-		{# <li class='profiletab'><a href="/me" title='Profile'>John Doe</a></li> #}
-		<li><a href="/signup" title="Sign Up">Sign Up</a></li>
-		<li><a href="/login" title="Log In">Log In</a></li>
+
+	{% block leftnav %}
+	<ul class='left'>
+		<li><a href="{{ link('landing') }}" title="openfire home">Home</a></li>
+		<li><a href="{{ link('project/landing') }}" title="browse projects">Projects</a></li>
 	</ul>
+	{% endblock leftnav %}
+
+	{% block rightnav %}
+	<ul class='right'>
+
+		{% if api.users.get_current_user() != none %}  {# if the user is logged in... @TODO #}
+			<li class='profiletab'>
+				<a href="/me" title='Profile'>John Doe</a>
+				<img src="http://www.gravatar.com/avatar/{{ util.converters.hashlib.md5(api.users.get_current_user().email()).hexdigest() }}.jpg?s=32&d=http://placehold.it/32/ffffff.png" />
+			</li>
+		{% else %}
+			<li><a href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>
+			<li><a href="{{ link('auth/login') }}" title="Log In">Log In</a></li>
+		{% endif %}
+
+	</ul>
+	{% endblock rightnav %}
 </nav>
 {% endblock %}
 

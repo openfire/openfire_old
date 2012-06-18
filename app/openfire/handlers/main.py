@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 
 
@@ -10,7 +11,6 @@ class Landing(WebHandler):
 
         ''' Render landing.html or landing_noauth.html. '''
 
-        # TODO: How to determine logged in?
         if False:
             self.render('main/landing_noauth.html')
         else:
