@@ -8,44 +8,43 @@
 
     <!-- Main Masthead -->
     <div id='masthead'>
-
-        <div id='welcomebox'>
-            {% block media %}
-                <img src="http://placehold.it/640x390/222222&text=bigvid" />
-            {% endblock media %}
-        </div>
-
     </div><!-- #masthead -->
 
-    <div id='sidebar'>
-        <div id='title' class='fancy'><h1>{{ project_slug }}</h1></div>
-        <div class='contentwrap'>
-            {% block right %}
-                <div>
-                    <p>Right sidebar for {{ project_slug }}</p>
-                </div>
-            {% endblock %}
-        </div>
-    </div>
-
     <div id='content'>
+        <div id='project'>
 
-        <article id='project'>
+            <div id='welcomebox'>
+                {% block media %}
+                    <img src="http://placehold.it/640x390/222222&text=bigvid" />
+                {% endblock media %}
+            </div>
 
-            <!-- project title -->
-            <h1>{{ project_slug }}</h1>
+            <div id='sidebar'>
+                <div id='title' class='fancy'><h1>{{ project.name }}</h1></div>
+                <div class='contentwrap'>
+                    {% block right %}
+                        <div>
+                            <p>Created by {{ project.creator.id() }}</p>
+                        </div>
+                    {% endblock %}
+                </div>
+            </div>
 
-            <!-- intro/pitch -->
-            <section id='intro'>
-                {% block description %}
-                    <div>
-                      <p>Normally, this would have some text relating to {{ project_slug }}.</p>
-                    </div>
-                {% endblock %}
-            </section><!-- end #intro -->
+            <article id='deets'>
 
-        </article><!-- end #project -->
+                <!-- project title -->
+                <h1>{{ project.name }}</h1>
 
-    </div><!-- end #content -->
+                <!-- intro/pitch -->
+                <section id='intro'>
+                    {% block description %}
+                      <p>{{ project.summary }}</p>
+                    {% endblock %}
+                </section><!-- end #intro -->
+
+            </article><!-- end #project -->
+
+        </div><!-- end #content -->
+    </div>
 
 {% endblock %}

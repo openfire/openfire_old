@@ -900,9 +900,9 @@ a.mod:active {
 }
 
 #welcomebox {
-  position: relative;
-  left: 10%;
-  top: 160px;
+  position: absolute;
+  left: 5%;
+  top: -75px;
 }
 
 #sidebar {
@@ -910,8 +910,8 @@ a.mod:active {
   background: #cccccc;
   width: 300px;
   height: 600px;
-  right: 10%;
-  bottom: 230px;
+  right: 5%;
+  top: -150px;
   border: 1px solid #333333;
 }
 #sidebar #title {
@@ -924,25 +924,36 @@ a.mod:active {
   font-size: 260%;
   color: black;
 }
-#sidebar .contentwrap {
+
+.contentwrap {
   padding: 20px;
 }
 
-#content article section {
+#project {
+  position: relative;
+  height: 100%;
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1120px;
+}
+#project article section {
   width: 100% !important;
   margin: 0 !important;
 }
-#content #project {
+#project #deets {
   width: 640px;
-  left: 10%;
-  top: 260px;
+  left: 5%;
+  top: 300px;
   position: relative;
 }
-#content #project h1 {
-  font-size: 28pt;
-  margin-top: 20px;
-  margin-bottom: 0;
+#project #deets h1 {
+  font-size: 32pt;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
-#content #project #intro {
+#project #deets #intro p {
+  padding: 0;
+  margin: 0;
   display: inline;
 }

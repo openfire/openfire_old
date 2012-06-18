@@ -61,7 +61,7 @@ class Permissions(ndb.Model):
 ######## ======== 3rd Party Account Models ======== ########
 
 ## External Acocunt
-class SocialAccount(polymodel.Polymodel):
+class SocialAccount(polymodel.PolyModel):
 
     ''' Describes an account from a 3rd party platform that an openfire user has attached. '''
 
