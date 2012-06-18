@@ -17,7 +17,7 @@
             <h1 id="title"><span class='lightorange'>momentum for</span> <span class='darkorange'>positive disruption</span></h1>
         </div>
         <div id="how-it-works-button" class="right">
-            <a href id="a-how-it-works-modal">How it works&nbsp;&nbsp;&gt;</a>
+            <a href id="a-how-it-works">How it works&nbsp;&nbsp;&gt;</a>
         </div>
 
     </div><!-- #masthead -->
@@ -32,9 +32,11 @@
                 <!-- Project Card -->
                 <div class='project-card'>
                     <div class='project-icon' data-name='fat cat map' data-description='real-life gps for politics.'>
-                        <img src="http://placehold.it/140x120" />
+                        <a href="{{ link('project/home', customurl='fatcatmap') }}">
+                            <img src="http://placehold.it/140x120" />
+                        </a>
                     </div>
-                    <div class='project-progress' style='width: 93%'>
+                    <div class='project-progress' style='width: 92%'>
                     </div>
                 </div>
 
@@ -99,7 +101,7 @@
 
      </div><!-- #content -->
 
-<div class="pre-modal" id="how-it-works-modal" data-title="How it works!" data-options='{"ratio":{"x":0.7,"y":0.7}}'>
+<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options='{"ratio":{"x":0.7,"y":0.7}}'>
     <h1>How it works!</h1>
     <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>
 </div>

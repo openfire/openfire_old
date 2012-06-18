@@ -63,8 +63,8 @@ p
         &::before
             display: block
             content: ''
-            width: 100%
             height: 5px
+            margin-top: -5px
             +background(linear-gradient(bottom, #cfcfcf, #ddd))
 
     #masthead
@@ -90,16 +90,22 @@ p
             right: 5%
             top: 75px
             border-radius: 12px
-            background-color: #ffb246
+            +background(linear-gradient(top center, #f79331, #f57220))
             text-align: right
 
             &:hover
-                background-color: #f57220
+                cursor: pointer
+                +background(linear-gradient(top center, #ffd468, #ffb246))
+
+            &:active
+                margin-top: 2px
+                margin-right: 2px
 
             a,
             a:link,
             a:visited,
             a:active
+                cursor: pointer
                 display: block
                 line-height: 120px
                 vertical-align: middle
@@ -155,17 +161,17 @@ p
     padding: 10px
     margin: 20px 0px 20px 20px
     float: left
-    box-shadow: 2px 2px 3px #e0e0e0
+    box-shadow: 2px 2px 2px #cdcdcd
 
     &:hover
         box-shadow: 2px 2px 2px #bfbfbf
-
         .project-icon
             &::after
                 background-color: #eee
                 color: #666
 
         .project-progress
+            +background(linear-gradient(top center, #ffb246, #f57220))
             opacity: 0.75
 
     .project-icon
@@ -188,6 +194,7 @@ p
             overflow: hidden
 
         &:hover
+            cursor: pointer
             &::after
                 text-decoration: underline
 
@@ -198,12 +205,14 @@ p
         border: none !important
         border-top-left-radius: 5px
         border-bottom-left-radius: 5px
-        +background(linear-gradient(top left, #ffb246 0%, #ffb246 25%, #f57220 25%, #f57220 50%, #ffb246 50%, #ffb246 75%, #f57220 75%, #f57220 100%))
-        background-size: 9px 9px
+        background-color: #f57220
+        background-size: 9px 10px
         opacity: 0.5
 
         &:hover
+            +background(linear-gradient(top center, #ffb246, #f57220))
             opacity: 1
+            cursor: pointer
 
 section.newsfeed
     ul.feed
@@ -243,21 +252,24 @@ section.newsfeed
     box-shadow: 2px 2px 3px #333333
 
 .overlay
+    position: fixed
     background-color: white
     bottom: 0px
     left: 0px
     right: 0px
-    z-index: 998
+    top: 0px
+    z-index: 990
 
 a.mod,
-#modal-title,
-#modal-close
+.modal-title,
+.modal-close
     font:
         family: 'Karla', sans-serif
-        size: 11px
+        size: 13px
         weight: 700
-    line-height: 10px
+    line-height: 12px
     text-transform: uppercase
+    cursor: pointer
 
 a.mod
     color: #393939
@@ -275,13 +287,13 @@ a.mod
     &:active
         color: #161616
 
-.modal
+.modal-dialog
     background-color: white
     padding: 10px
     border: 1px solid #dadada
-    z-index: 990
+    z-index: 998
 
-#modal-ui
+.modal-ui
     left: 0px
     bottom: 0px
     width: 100%
@@ -290,22 +302,22 @@ a.mod
     border-bottom-left-radius: 7px
     border-bottom-right-radius: 7px
 
-#modal-title
+.modal-title
     color: #5e5e5e
     max-width: 400px
     left: 5px
     bottom: 3px
     padding: 3px
 
-#modal-close
+.modal-close
     color: #393939
     right: 5px
     bottom: 3px
     padding: 3px
     border-radius: 2px
-    cursor: pointer
     opacity: 0.4
 
     &:hover
+        cursor: pointer
         background-color: #e3e3e3
         opacity: 1
