@@ -4,18 +4,6 @@
 class Key extends Model
     constructor: () ->
 
-# a comment
-class Comment extends Model
-
-    username: String()
-    text: String()
-
-# a content post
-class Post extends Model
-
-    username: String()
-    text: String()
-
 # A single project card
 class ProjectCard extends Model
 
@@ -25,13 +13,60 @@ class ProjectCard extends Model
     backer_count: Number()
     met: Boolean()
 
-
-# a feed item (activity, etc)
-class FeedItem extends Model
+# an activity feed item
+class ActivityItem extends Model
 
     timestamp: Date()
     project: Key()
-    data: Object()
+
+## project activities
+class Follow extends ActivityItem
+
+    username: String()
+    project: Key()
+    timestamp: Date()
+
+class Back extends ActivityItem
+
+    username: String()
+    project: Key()
+    timestamp: Date()
+
+class Update extends ActivityItem
+
+    username: String()
+    text: String()
+    timestamp: Date()
+    project: Key()
+
+## project updates
+class MediaUpdate extends Update
+
+class GoalReached extends Update
+
+class ThresholdReached extends Update
+
+class ProjectOpened extends Update
+
+class ProjectClosed extends Update
+
+
+## proposal activities
+class CreateProposal extends ActivityItem
+
+class ProposalPromoted extends Update
+
+class ProposalDenied extends Update
+
+class ProposalReturned extends Update
+
+## common activities
+class AddUserRole extends ActivityItem # project or proposal
+
+class Comment extends ActivityItem
+
+    username: String()
+    text: String()
 
 # Login dialogue - does sam want to fill these out?
 class Login extends Model

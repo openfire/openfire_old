@@ -5,11 +5,12 @@
 <!-- <script src="{{ asset.script('modernizr', 'core') }}"></script> -->
 <script src="{{ asset.script('underscore', 'core') }}"></script>
 <script src="{{ asset.script('backbone', 'core') }}"></script>
+<script src="/assets/js/static/core/jquery/easing.min.js"></script>
 
 <!-- Base Scripts -->
 <script src="/_ah/channel/jsapi"></script>
 {%- if util.api.users.is_current_user_admin() -%}
-<script src="{{ asset.script('admin', 'apptools') }}"></script> {# include admin tools if the user is logged in and is an app admin #}
+<script src="/assets/js/static/apptools/base.admin.js"></script> {# include admin tools if the user is logged in and is an app admin #}
 {%- else -%}
 <script src="{{ asset.script('base', 'apptools') }}"></script>
 {%- endif -%}
