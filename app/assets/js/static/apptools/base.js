@@ -2496,23 +2496,50 @@
             y: 0.4
           },
           template: ['<div id="modal-dialog" style="opacity: 0;" class="fixed dropshadow">', '<div id="modal-fade" style="opacity: 0">', '<div id="modal-content">&nbsp;</div>', '<div id="modal-ui" class="absolute">', '<div id="modal-title" class="absolute"></div>', '<div id="modal-close" class="absolute">X</div>', '</div>', '</div>', '</div>'].join('\n'),
-          rounded: true
+          rounded: true,
+          padding: null
         }
       };
       this._state.config = Util.extend(true, this._state.config, JSON.parse(target.getAttribute('data-options')));
-      this.calc = function() {
-        var css, dH, dW, r, wH, wW;
-        css = {};
-        r = _this._state.config.ratio;
-        wW = window.innerWidth;
-        wH = window.innerHeight;
-        dW = Math.floor(r.x * wW);
-        dH = Math.floor(r.y * wH);
-        css.width = dW + 'px';
-        css.height = dH + 'px';
-        css.left = Math.floor((wW - dW) / 2);
-        css.top = Math.floor((wH - dH) / 2);
-        return css;
+      this.internal = {
+        calc: function() {
+          var css, dH, dW, r, wH, wW;
+          css = {};
+          r = _this._state.config.ratio;
+          wW = window.innerWidth;
+          wH = window.innerHeight;
+          dW = Math.floor(r.x * wW);
+          dH = Math.floor(r.y * wH);
+          css.width = dW + 'px';
+          css.height = dH + 'px';
+          css.left = Math.floor((wW - dW) / 2);
+          css.top = Math.floor((wH - dH) / 2);
+          return css;
+        },
+        classify: function(element, method) {
+          var ecl;
+          if (method === 'close' || !(method != null)) {
+            if (Util.in_array('dropshadow', (ecl = element.classList))) {
+              ecl.remove('dropshadow');
+            }
+            if (Util.in_array('rounded', ecl)) {
+              ecl.remove('rounded');
+            }
+            element.style.padding = '0px';
+            return element;
+          } else if (method === 'open') {
+            if (!Util.in_array('dropshadow', (ecl = element.classList))) {
+              ecl.add('dropshadow');
+            }
+            if (!Util.in_array('rounded', ecl) && _this._state.config.rounded) {
+              ecl.add('rounded');
+            }
+            element.style.padding = '10px';
+            return element;
+          } else if (!(element != null)) {
+            return false;
+          }
+        }
       };
       this.make = function() {
         var close_x, content, d, dialog, doc, fade, id, prop, range, t, template, title, ui, val, _ref;
@@ -2540,7 +2567,7 @@
         }
         content.classList.add(content.getAttribute('id'));
         content.setAttribute('id', id + '-modal-content');
-        content.style.height = _this.calc().height;
+        content.style.height = _this.internal.calc().height;
         content.innerHTML = (t = Util.get(id)).innerHTML;
         title.classList.add(title.getAttribute('id'));
         title.setAttribute('id', id + '-modal-title');
@@ -2562,18 +2589,19 @@
         _this._state.active = true;
         overlay = _this._state.overlay || _this.prepare_overlay('modal');
         _this._state.overlay = overlay;
-        if (!Util.get(overlay)) {
+        if (!(overlay.parentNode != null)) {
           document.body.appendChild(overlay);
         }
         fade_animation = _this.animation;
         dialog_animation = _this.animation;
         overlay_animation = _this.animation;
         dialog_animation.complete = function() {
+          _this.internal.classify(dialog, 'open');
           return $('#' + id + '-modal-fade').animate({
             opacity: 1
           }, fade_animation);
         };
-        final = _this.calc();
+        final = _this.internal.calc();
         final.opacity = 1;
         dialog.style.display = 'block';
         overlay.style.display = 'block';
@@ -2585,10 +2613,10 @@
         return dialog;
       };
       this.close = function() {
-        var dialog, id, midpoint, overlay;
+        var d_id, dialog, id, midpoint, overlay;
         id = _this._state.cached_id;
-        _this._state.active = false;
         overlay = _this._state.overlay;
+        d_id = '#' + _this._state.element_id;
         dialog = Util.get(_this._state.element_id);
         Util.unbind([Util.get(id + '-modal-close'), overlay], 'mousedown');
         midpoint = Util.extend({}, _this._state.config.initial, {
@@ -2600,13 +2628,11 @@
         }, {
           duration: 300,
           complete: function() {
-            dialog.classList.remove('dropshadow');
-            dialog.classList.remove('rounded');
-            dialog.style.padding = '0px';
-            return $(dialog).animate(midpoint, {
-              duration: 300,
+            _this.internal.classify(dialog, 'close');
+            return $(d_id).animate(midpoint, {
+              duration: 200,
               complete: function() {
-                return $(dialog).animate({
+                return $(d_id).animate({
                   opacity: 0
                 }, {
                   duration: 250,
@@ -2623,7 +2649,8 @@
                     }, {
                       duration: 300,
                       complete: function() {
-                        return _this._state.overlay.style.display = 'none';
+                        _this._state.overlay.style.display = 'none';
+                        return _this._state.active = false;
                       }
                     });
                   }
