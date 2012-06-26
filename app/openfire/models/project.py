@@ -69,9 +69,10 @@ class Proposal(ndb.Model, MessageConverterMixin):
 
 
 ## Projects
-class Project(polymodel.PolyModel, MessageConverterMixin):
+class Project(ndb.Model, MessageConverterMixin):
 
     ''' An openfire project, also known as a `spark` :) '''
+
     _message_class = ProjectMessage
 
     # Naming/Status/Ancestry
@@ -94,6 +95,12 @@ class Project(polymodel.PolyModel, MessageConverterMixin):
     # Privacy
     public = ndb.BooleanProperty('pp', indexed=True, default=False)
     viewers = ndb.KeyProperty('pv', indexed=True, repeated=True)
+
+    # Progress
+    backers = ndb.IntegerProperty('b', default=0)
+    followers = ndb.IntegerProperty('f', default=0)
+    money = ndb.IntegerProperty('mn', default=0)
+    progress = ndb.IntegerProperty('pr', default=0, choices=set(range(0, 100)))
 
     def is_private(self):
         return self.status == 'p'
