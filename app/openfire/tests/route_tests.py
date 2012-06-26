@@ -14,6 +14,8 @@ from apptools import dispatch
 
 import webapp2
 
+import test_db_loader as db_loader
+
 
 def generic_view_success_test(test_case, url):
     """ A generic success test for a given url.
@@ -100,6 +102,9 @@ class ProposalPageTestCase(unittest.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
 
+        # Create a proposal with token 'proposaltoken'.
+        db_loader.create_proposal(slug='proposaltoken')
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -110,7 +115,7 @@ class ProposalPageTestCase(unittest.TestCase):
         generic_view_success_test(self, '/apply')
 
     def test_proposal_page(self):
-        generic_view_success_test(self, '/project/proposaltoken')
+        generic_view_success_test(self, '/proposal/proposaltoken')
 
 
 class ProjectPageTestCase(unittest.TestCase):
@@ -122,6 +127,9 @@ class ProjectPageTestCase(unittest.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+
+        # Create a project called 'fakeproject'.
+        db_loader.create_project(slug='fakeproject')
 
     def tearDown(self):
         self.testbed.deactivate()

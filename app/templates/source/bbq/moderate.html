@@ -19,84 +19,142 @@
 
     $(document).ready(function() {
 
+        function fulfillBbqRequest(request, errMsg) {
+            request.fulfill({
+                success: function(obj, objType, rawResponse) {
+                    document.location.reload();
+                },
+                error: function(err) {
+                    alert("There was an error: " + errMsg);
+                }
+            });
+        }
+
         function lightGrill() {
-            $("#show-new-category-btn").click(function() {
-                $("#new-category-inline").show();
-                $("#show-new-category-btn").hide();
+            /*
+             * New objects.
+             */
+
+            $(".show-new-inline").click(function() {
+                var self = $(this);
+                self.hide();
+                self.next(".inline-form").show();
             });
 
-            $("#cancel-new-category-btn").click(function() {
-                $("#new-category-inline").hide();
-                $("#show-new-category-btn").show();
+            $(".cancel-new-inline").click(function() {
+                var self = $(this);
+                self.parents(".inline-form").hide();
+                self.parents(".inline-form").prev(".show-new-inline").show();
             });
 
-            $("#save-new-category-btn").click(function() {
-                var categoryDict = {
-                    name: $("#new-category-name-input").val(),
-                    slug: $("#new-category-url-input").val(),
-                    description: $("#new-category-description-input").val()
-                };
-                var request = $.apptools.api.category.put(categoryDict);
-                request.fulfill({
-                    success: function(obj, objType, rawResponse) {
-                        document.location.reload();
-                    },
-                    error: function(err) {
-                        alert("There was an error when you just tried to add the category just then.");
-                    }
-                });
-            });
-
-            $(".delete-category-btn").click(function() {
-                var categorySlug = this.id.match(/delete-category-(\w+)/)[1],
-                    request = $.apptools.api.category.delete({slug: categorySlug});
-                request.fulfill({
-                    success: function(obj, objType, rawResponse) {
-                        document.location.reload();
-                    },
-                    error: function(err) {
-                        alert("There was an error when you tried to delete that category.");
-                    }
-                });
-            });
-
-            $(".start-edit-category-btn").click(function() {
-                var categorySlug = this.id.match(/start-edit-category-(\w+)/)[1];
-                $("#start-edit-category-" + categorySlug).hide();
-                $("#save-edit-category-" + categorySlug).show();
-                $("#cancel-edit-category-" + categorySlug).show();
-                $("#category-display-" + categorySlug).hide();
-                $("#category-inputs-" + categorySlug).show();
-            });
-
-            $(".cancel-edit-category-btn").click(function() {
-                var categorySlug = this.id.match(/cancel-edit-category-(\w+)/)[1];
-                $("#start-edit-category-" + categorySlug).show();
-                $("#save-edit-category-" + categorySlug).hide();
-                $("#cancel-edit-category-" + categorySlug).hide();
-                $("#category-display-" + categorySlug).show();
-                $("#category-inputs-" + categorySlug).hide();
-            });
-
-            $(".save-edit-category-btn").click(function() {
-                var categorySlug = this.id.match(/save-edit-category-(\w+)/)[1],
-                    categoryDict = {
-                        key: $("#category-inputs-" + categorySlug + " .slug-input").val(),
-                        slug: $("#category-inputs-" + categorySlug + " .slug-input").val(),
-                        name: $("#category-inputs-" + categorySlug + " .name-input").val(),
-                        description: $("#category-inputs-" + categorySlug + " .description-input").val()
-                    },
+            $(".save-new-inline").click(function() {
+                var reqeust = null;
+                switch (this.id) {
+                case "save-new-category-btn":
+                    var categoryDict = {
+                        name: $("#new-category-name-input").val(),
+                        slug: $("#new-category-url-input").val(),
+                        description: $("#new-category-description-input").val()
+                    };
                     request = $.apptools.api.category.put(categoryDict);
-                request.fulfill({
-                    success: function(obj, objType, rawResponse) {
-                        document.location.reload();
-                    },
-                    error: function(err) {
-                        alert("There was an error when you tried to delete that category.");
-                    }
-                });
+                    break;
+
+                case "save-new-proposal-btn":
+                    // TODO: Need to make the creator and category keys work correctly.
+                    var proposalDict = {
+                        name: $("#new-proposal-name-input").val(),
+                        slug: $("#new-proposal-url-input").val(),
+                        summary: $("#new-proposal-summary-input").val(),
+                        category: $("#new-proposal-category-input").val(),
+                        status: $("#new-proposal-status-input").val(),
+                        pitch: $("#new-proposal-pitch-input").val(),
+                        tech: $("#new-proposal-tech-input").val(),
+                        keywords: $("#new-proposal-keywords-input").val(),
+                        creator: $("#new-proposal-creator-input").val(),
+                    };
+                    request = $.apptools.api.proposal.put(proposalDict);
+                    break;
+
+                default:
+                    alert("What button did you just click? (it was " + this.id + ")");
+                    break;
+                }
+                if (request) {
+                    fulfillBbqRequest(request, "Failed to something.");
+                }
             });
 
+            $(".delete-object").click(function() {
+                var toDelete = this.id.match(/delete-(\w+)-(\w+)/),
+                    request = null;
+                switch (toDelete[1]) {
+                case "category":
+                    request = $.apptools.api.category.delete({slug: toDelete[2]});
+                    break;
+
+                case "proposal":
+                    request = $.apptools.api.proposal.delete({slug: toDelete[2]});
+                    break;
+
+                default:
+                    alert("That failed: (" + toDelete + ")");
+                    break;
+                }
+
+                if (request) {
+                    fulfillBbqRequest(request, "Failed to delete category");
+                }
+            });
+
+            /*
+             * Edit objects.
+             */
+
+            $(".start-edit-inline").click(function() {
+                var toEdit = this.id.match(/start-edit-(\w+)-(\w+)/),
+                    editType = toEdit[1],
+                    slug = toEdit[2];
+                $("#start-edit-" + editType + "-" + slug).hide();
+                $("#save-edit-" + editType + "-" + slug).show();
+                $("#cancel-edit-" + editType + "-" + slug).show();
+                $("#" + editType + "-display-" + slug).hide();
+                $("#" + editType + "-inputs-" + slug).show();
+            });
+
+            $(".cancel-edit-inline").click(function() {
+                var toEdit = this.id.match(/cancel-edit-(\w+)-(\w+)/),
+                    editType = toEdit[1],
+                    slug = toEdit[2];
+                $("#start-edit-" + editType + "-" + slug).show();
+                $("#save-edit-" + editType + "-" + slug).hide();
+                $("#cancel-edit-" + editType + "-" + slug).hide();
+                $("#" + editType + "-display-" + slug).show();
+                $("#" + editType + "-inputs-" + slug).hide();
+            });
+
+            $(".save-edit-inline").click(function() {
+                var toSave = this.id.match(/save-edit-(\w+)-(\w+)/);
+                switch (toSave[1]) {
+                case "category":
+                    var categoryDict = {
+                            key: $("#category-inputs-" + toSave[2] + " .slug-input").val(),
+                            slug: $("#category-inputs-" + toSave[2] + " .slug-input").val(),
+                            name: $("#category-inputs-" + toSave[2] + " .name-input").val(),
+                            description: $("#category-inputs-" + toSave[2] + " .description-input").val()
+                        },
+                        request = $.apptools.api.category.put(categoryDict);
+                    break;
+
+                case "proposal":
+                    break;
+
+                default:
+                    alert("What button did you just click? (it was " + this.id + ")");
+                    break;
+                }
+
+                fulfillBbqRequest(request, "Failed to edit something.");
+            });
         }
 
         lightGrill();

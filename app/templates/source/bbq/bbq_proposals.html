@@ -1,8 +1,76 @@
-<h2>Proposals!</h2>
+<h2>Proposals (...does not work yet)!</h2>
 <ul>
     {% for proposal in proposals %}
-    <li>{{ proposal.name }}</li>
+    <li id="proposal-{{ proposal.slug }}">
+        <p id="proposal-display-{{ proposal.slug }}">
+            <span>{{ proposal.name }}</span>
+            <span>{{ proposal.slug }}</span>
+            <span>{{ proposal.summary }}</span>
+        </p>
+        <p id="proposal-inputs-{{ proposal.slug }}" style="display: none;">
+            <span><input class="name-input" value="{{ proposal.name }}"></span>
+            <span><input class="slug-input" value="{{ proposal.slug }}" disabled="disabled"></span>
+            <span><input class="summary-input" value="{{ proposal.summary }}"></span>
+        </p>
+        <span>
+            <button id="delete-proposal-{{ proposal.slug }}" class="delete-object" type="button">delete</button>
+            <button id="start-edit-proposal-{{ proposal.slug }}" class="start-edit-inline" type="button">edit</button>
+            <button id="cancel-edit-proposal-{{ proposal.slug }}" class="cancel-edit-inline" type="button" style="display: none;">cancel</button>
+            <button id="save-edit-proposal-{{ proposal.slug }}" class="save-edit-inline" type="button" style="display: none;">save</button>
+        </span>
+    </li>
     {% else %}
     <li>No proposals yet!</li>
     {% endfor %}
 </ul>
+<button id="show-new-proposal-btn" class="show-new-inline">+ Add New Proposal (does not work yet)</button>
+<div id="new-proposal-inline" class="inline-form" style="display: none;">
+    <form id="new-proposal-frm">
+        <p>
+            <label for="new-proposal-name-input">Name:</label>
+            <input type="text" id="new-proposal-name-input" name="name">
+        </p>
+        <p>
+            <label for="new-proposal-url-input">URL Slug:</label>
+            <input type="text" id="new-proposal-url-input" name="url">
+        </p>
+        <p>
+            <label for="new-proposal-summary-input">Summary:</label>
+            <input type="text" id="new-proposal-summary-input" name="summary">
+        </p>
+        <p>
+            <label for="new-proposal-category-input">category:</label>
+            <select id="new-proposal-category-input" name="category">
+                {% for category in categories %}
+                <option value="{{ category.key }}">{{ category.name }}</option>
+                {% else %}
+                <option value="">Add a category first...</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <label for="new-proposal-status-input">status:</label>
+            <input type="text" id="new-proposal-status-input" name="status">
+        </p>
+        <p>
+            <label for="new-proposal-pitch-input">pitch:</label>
+            <input type="text" id="new-proposal-pitch-input" name="pitch">
+        </p>
+        <p>
+            <label for="new-proposal-tech-input">tech:</label>
+            <input type="text" id="new-proposal-tech-input" name="tech">
+        </p>
+        <p>
+            <label for="new-proposal-keywords-input">keywords:</label>
+            <input type="text" id="new-proposal-keywords-input" name="keywords">
+        </p>
+        <p>
+            <label for="new-proposal-creator-input">creator:</label>
+            <input type="text" id="new-proposal-creator-input" name="creator">
+        </p>
+        <p>
+            <button id="save-new-proposal-btn" class="save-new-inline" type="button">Yeah, add that!</button>
+            <button id="cancel-new-proposal-btn" class="cancel-new-inline" type="button">Never mind.</button>
+        </p>
+    </form>
+</div>

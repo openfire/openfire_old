@@ -13,18 +13,18 @@
             <span><input class="description-input" value="{{ category.description }}"></span>
         </p>
         <span>
-            <button id="delete-category-{{ category.slug }}" class="delete-category-btn" type="button">delete</button>
-            <button id="start-edit-category-{{ category.slug }}" class="start-edit-category-btn" type="button">edit</button>
-            <button id="cancel-edit-category-{{ category.slug }}" class="cancel-edit-category-btn" type="button" style="display: none;">cancel</button>
-            <button id="save-edit-category-{{ category.slug }}" class="save-edit-category-btn" type="button" style="display: none;">save</button>
+            <button id="delete-category-{{ category.slug }}" class="delete-object" type="button">delete</button>
+            <button id="start-edit-category-{{ category.slug }}" class="start-edit-inline" type="button">edit</button>
+            <button id="cancel-edit-category-{{ category.slug }}" class="cancel-edit-inline" type="button" style="display: none;">cancel</button>
+            <button id="save-edit-category-{{ category.slug }}" class="save-edit-inline" type="button" style="display: none;">save</button>
         </span>
     </li>
     {% else %}
     <li>No categories yet!</li>
     {% endfor %}
 </ul>
-<button id="show-new-category-btn">+ Add New Category</button>
-<div id="new-category-inline" style="display: none;">
+<button id="show-new-category-btn" class="show-new-inline">+ Add New Category</button>
+<div id="new-category-inline" class="inline-form" style="display: none;">
     <form id="new-category-frm">
         <p>
             <label for="new-category-name-input">Name:</label>
@@ -39,8 +39,8 @@
             <input type="text" id="new-category-description-input" name="description">
         </p>
         <p>
-            <button id="save-new-category-btn" type="button">Yeah, add that!</button>
-            <button id="cancel-new-category-btn" type="button">Never mind.</button>
+            <button id="save-new-category-btn" class="save-new-inline" type="button">Yeah, add that!</button>
+            <button id="cancel-new-category-btn" class="cancel-new-inline" type="button">Never mind.</button>
         </p>
     </form>
 </div>
