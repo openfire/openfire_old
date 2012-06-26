@@ -34,96 +34,100 @@ from openfire.core.sessions import SessionsMixin
 
 class WebHandler(BaseHandler, SessionsMixin):
 
-	''' Handler for desktop web requests. '''
+    ''' Handler for desktop web requests. '''
 
-	## ++ Internal Shortcuts ++ ##
-	@webapp2.cached_property
-	def logging(self):
+    ## ++ Init ++ ##
+    def __init__(self, **kwargs):
+        self.session = None
 
-		''' Cached access to this handler's logging pipe '''
+    ## ++ Internal Shortcuts ++ ##
+    @webapp2.cached_property
+    def logging(self):
 
-		return super(WebHandler, self).logging.extend('WebHandler', self.__class__.__name__)._setcondition(self.config.get('logging', False))
+        ''' Cached access to this handler's logging pipe '''
 
-
-	## ++ Internal Methods ++ ##
-	def dispatch(self):
-
-		''' Retrieve session + dispatch '''
-
-		# Construct session store
-		self.session = self.get_session()
-
-		try:
-			response = super(WebHandler, self).dispatch()
-
-		finally:
-			self.save_session()
-
-		return response
-
-	def build_session(self):
-
-		''' Build an initial session object and create an SID '''
-
-		self.logging.info('Building session...')
-
-		session_id = int(round(random.random() * 1000000000, 0))
-		sid_struct = (self.request.environ.get('REMOTE_ADDR'), self.request.headers.get('User-Agent', ''), session_id)
-
-		session_string = '::'.join([unicode(i) for i in sid_struct])
-
-		self.logging.info('Session string: "%s"' % session_string)
-		sid = hashlib.sha256(session_string).hexdigest()
-
-		self.logging.info('Session ID: "%s"' % session_id)		
-		self.logging.info('Encoded SID: "%s"' % sid)
-
-		self.session['sid'] = sid
-		self.session['id'] = session_id
-		return
-
-	def handle_exception2(self, exception, debug):
-
-		''' Handle an unhandled exception '''
-
-		self.logging.critical('Unhandled exception encountered.')
-		self.logging.critical(str(exception))
-
-		if not config.debug:
-			self.response.write('Woops! Error.<br />')
-		else:
-			self.response.write('<b>Unhandled exception encountered:</b><br />')
-			self.response.write(str(exception))
-			raise exception
-
-		return self.error(500)
-
-	def _bindRuntimeTemplateContext(self, context):
-
-		''' Bind in the session '''
-
-		if 'user' not in context:
-			context['user'] = {}
-		context['user']['session'] = self.session
-		return super(WebHandler, self)._bindRuntimeTemplateContext(context)
+        return super(WebHandler, self).logging.extend('WebHandler', self.__class__.__name__)._setcondition(self.config.get('logging', False))
 
 
-	## ++ HTTP Methods ++ ##
-	def head(self):
+    ## ++ Internal Methods ++ ##
+    def dispatch(self):
 
-		''' Run GET, if defined, and return the headers only. '''
+        ''' Retrieve session + dispatch '''
 
-		if hasattr(self, 'get'):
-			self.get()
-		return
+        # Construct session store
+        self.session = self.get_session()
 
-	def options(self):
+        try:
+            response = super(WebHandler, self).dispatch()
 
-		''' Return available methods '''
+        finally:
+            self.save_session()
 
-		return
+        return response
+
+    def build_session(self):
+
+        ''' Build an initial session object and create an SID '''
+
+        self.logging.info('Building session...')
+
+        session_id = int(round(random.random() * 1000000000, 0))
+        sid_struct = (self.request.environ.get('REMOTE_ADDR'), self.request.headers.get('User-Agent', ''), session_id)
+
+        session_string = '::'.join([unicode(i) for i in sid_struct])
+
+        self.logging.info('Session string: "%s"' % session_string)
+        sid = hashlib.sha256(session_string).hexdigest()
+
+        self.logging.info('Session ID: "%s"' % session_id)
+        self.logging.info('Encoded SID: "%s"' % sid)
+
+        self.session['sid'] = sid
+        self.session['id'] = session_id
+        return
+
+    def handle_exception2(self, exception, debug):
+
+        ''' Handle an unhandled exception '''
+
+        self.logging.critical('Unhandled exception encountered.')
+        self.logging.critical(str(exception))
+
+        if not config.debug:
+            self.response.write('Woops! Error.<br />')
+        else:
+            self.response.write('<b>Unhandled exception encountered:</b><br />')
+            self.response.write(str(exception))
+            raise exception
+
+        return self.error(500)
+
+    def _bindRuntimeTemplateContext(self, context):
+
+        ''' Bind in the session '''
+
+        if 'user' not in context:
+            context['user'] = {}
+        context['user']['session'] = self.session
+        return super(WebHandler, self)._bindRuntimeTemplateContext(context)
+
+
+    ## ++ HTTP Methods ++ ##
+    def head(self):
+
+        ''' Run GET, if defined, and return the headers only. '''
+
+        if hasattr(self, 'get'):
+            self.get()
+        return
+
+    def options(self):
+
+        ''' Return available methods '''
+
+        return
 
 
 class MobileHandler(BaseHandler):
 
-	''' Handler for mobile web requests. '''
+    ''' Handler for mobile web requests. '''
