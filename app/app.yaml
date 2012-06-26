@@ -1,10 +1,10 @@
-application: open-fire-staging
-version: develop
+application: open-fire
+version: 0.1-alpha
 runtime: python27
 api_version: 1
 threadsafe: yes
 
-default_expiration: "0m"
+default_expiration: "365d"
 
 
 #### ===== Files to Skip
@@ -117,13 +117,6 @@ handlers:
   script: lib.dist.apptrace.overview.main
   login: admin
   auth_fail_action: unauthorized
-
-# AppStats: RPC profiling
-#- url: /_ah/appstats.*
-#  script: google.appengine.ext.appstats.ui.app
-#  login: admin
-#  secure: always
-#  auth_fail_action: unauthorized
 
 # AppEngine Pipelines
 - url: /_ah/pipeline.*
