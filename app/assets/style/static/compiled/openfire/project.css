@@ -921,6 +921,9 @@ a.mod:active {
   background: linear-gradient(top center, #ffb246, #f57220);
   opacity: 0.75;
 }
+.project-card a {
+  text-decoration: none;
+}
 .project-card .project-icon::after {
   display: block;
   content: attr(data-name);
@@ -937,6 +940,7 @@ a.mod:active {
   font-style: italic;
   text-transform: uppercase;
   overflow: hidden;
+  text-decoration: none;
 }
 .project-card .project-icon:hover {
   cursor: pointer;
