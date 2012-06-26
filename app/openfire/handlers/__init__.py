@@ -36,9 +36,7 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
-    ## ++ Init ++ ##
-    def __init__(self, **kwargs):
-        self.session = None
+    session = None
 
     ## ++ Internal Shortcuts ++ ##
     @webapp2.cached_property
