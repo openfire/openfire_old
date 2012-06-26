@@ -5,7 +5,6 @@ from openfire.messages import user, common
 
 
 ## User service api.
-#
 class UserService(RemoteService):
 
     @remote.method(user.ProfileRequest, user.Profile)

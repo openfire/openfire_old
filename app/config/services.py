@@ -58,18 +58,30 @@ config['apptools.project.services'] = {
             }
         },
 
-        ## BBQ API - admin stuff (shhh!)
-        'bbq': {
+        ## Activity API - general and personal site activity.
+        'activity': {
+            'enabled': True,
+            'service': 'openfire.services.activity.ActivityService',
+            'methods': ['site_metrics', 'known_backers', 'known_followers'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
+        ## Alerts API - used for managing subscriptions on site items
+        'alerts': {
 			'enabled': False,
-			'service': 'openfire.services.bbq.BBQService',
-			'methods': ['grant', 'revoke', 'flush_cache', 'create_user'],
+			'service': 'openfire.services.alerts.AlertsService',
+			'methods': ['subscribe', 'unsubscribe', 'edit', 'subscriptions', 'pending', 'all'],
 
 			'config': {
 				'caching': 'none',
-				'security': 'private',
+				'security': 'none',
 				'recording': 'none'
 			}
-
         },
 
         ## Auth API - allows async login/logout, session management, and related stuff
@@ -85,30 +97,18 @@ config['apptools.project.services'] = {
 			}
         },
 
-        ## Content API - allows saving/retrieving of small content snippets
-        'content': {
+        ## BBQ API - admin stuff (shhh!)
+        'bbq': {
 			'enabled': False,
-			'service': 'openfire.services.content.ContentService',
-			'methods': ['get', 'put', 'sync'],
+			'service': 'openfire.services.bbq.BBQService',
+			'methods': ['grant', 'revoke', 'flush_cache', 'create_user'],
 
 			'config': {
 				'caching': 'none',
-				'security': 'none',
+				'security': 'private',
 				'recording': 'none'
 			}
-        },
 
-        ## User API - allows user profiles/data and facepiles to be retrieved
-        'user': {
-            'enabled': True,
-            'service': 'openfire.services.user.UserService',
-            'methods': ['profile', 'account', 'follow', 'followers'],
-
-            'config': {
-                'caching': 'none',
-                'security': 'none',
-                'recording': 'none'
-            }
         },
 
         ## Category API - provides structured information about openfire categories
@@ -122,6 +122,32 @@ config['apptools.project.services'] = {
                 'security': 'none',
                 'recording': 'none'
             }
+        },
+
+        ## Content API - allows saving/retrieving of small content snippets
+        'content': {
+			'enabled': False,
+			'service': 'openfire.services.content.ContentService',
+			'methods': ['get', 'put', 'sync'],
+
+			'config': {
+				'caching': 'none',
+				'security': 'none',
+				'recording': 'none'
+			}
+        },
+
+        ## Indexer API - allows programmatic control of openfire's content indexer
+        'indexer': {
+			'enabled': False,
+			'service': 'openfire.services.indexer.IndexerService',
+			'methods': ['index', 'queued', 'purge', 'rebuild'],
+
+			'config': {
+				'caching': 'none',
+				'security': 'private',
+				'recording': 'none'
+			}
         },
 
         ## Project API - provides structured information about openfire projects
@@ -150,19 +176,6 @@ config['apptools.project.services'] = {
             }
         },
 
-        ## Activity API - general and personal site activity.
-        'activity': {
-            'enabled': True,
-            'service': 'openfire.services.activity.ActivityService',
-            'methods': ['site_metrics', 'known_backers', 'known_followers'],
-
-            'config': {
-                'caching': 'none',
-                'security': 'none',
-                'recording': 'none'
-            }
-        },
-
         ## Realtime API - used for establishing/managing a realtime/push session
         'realtime': {
 			'enabled': False,
@@ -174,6 +187,32 @@ config['apptools.project.services'] = {
 				'security': 'none',
 				'recording': 'none'
 			}
+        },
+
+        ## Search API - provides methods to retrieve/traverse quick/autocomplete/fulltext search results
+        'search': {
+			'enabled': False,
+			'service': 'openfire.services.search.SearchService',
+			'methods': ['quick', 'advanced', 'autocomplete'],
+
+			'config': {
+				'caching': 'none',
+				'security': 'private',
+				'recording': 'none'
+			}
+        },
+
+        ## User API - allows user profiles/data and facepiles to be retrieved
+        'user': {
+            'enabled': False,
+            'service': 'openfire.services.user.UserService',
+            'methods': ['profile', 'account', 'follow', 'followers'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
         }
 
     }  # End services
