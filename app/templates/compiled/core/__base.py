@@ -1,7 +1,7 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\core\\__base.html'
+    name = '/source/core/__base.html'
 
     def root(context, environment=environment):
         if 0: yield None
@@ -37,7 +37,7 @@ def run(environment):
 
     def block_north(context, environment=environment):
         if 0: yield None
-        template = environment.get_template('core/__north.html', '/source\\core\\__base.html')
+        template = environment.get_template('core/__north.html', '/source/core/__base.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
 
@@ -120,7 +120,7 @@ def run(environment):
         for event in context.blocks['presouth'][0](context):
             yield event
         yield u'\n'
-        template = environment.get_template('core/__south.html', '/source\\core\\__base.html')
+        template = environment.get_template('core/__south.html', '/source/core/__base.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
         yield u'\n'

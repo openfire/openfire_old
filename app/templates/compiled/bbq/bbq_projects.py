@@ -1,12 +1,12 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\bbq\\bbq_projects.html'
+    name = '/source/bbq/bbq_projects.html'
 
     def root(context, environment=environment):
         l_projects = context.resolve('projects')
         if 0: yield None
-        yield u'<h2>Projects!</h2>\n<ul>\n    '
+        yield u'<h2>Projects (...are coming soon)!</h2>\n<ul>\n    '
         l_project = missing
         t_1 = 1
         for l_project in l_projects:

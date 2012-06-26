@@ -1,12 +1,12 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\layout\\landing.html'
+    name = '/source/layout/landing.html'
 
     def root(context, environment=environment):
         parent_template = None
         if 0: yield None
-        parent_template = environment.get_template('layout/layout_base.html', '/source\\layout\\landing.html')
+        parent_template = environment.get_template('layout/layout_base.html', '/source/layout/landing.html')
         for name, parent_block in parent_template.blocks.iteritems():
             context.blocks.setdefault(name, []).append(parent_block)
         for event in parent_template.root_render_func(context):
@@ -58,7 +58,7 @@ def run(environment):
         else:
             if 0: yield None
             yield u"\n                <div class='ohnoes'>\n                    Oh noez, no projects!\n                </div>\n            "
-        yield u'\n            </div>\n\n        </section><!-- #projects -->\n\n        <section id=\'activity\' class=\'newsfeed\' role=\'region\'>\n\n            <h2>Activity</h2>\n            <div class="section-wrap">\n                <ul class=\'feed\'>\n                    <li class=\'feed-item\'>\n                        <span class="datetime">\n                            &nbsp;\n                        </span>\n                    </li>\n                </ul>\n            </div>\n\n        </section><!-- #activity -->\n\n     </div><!-- #content -->\n\n<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options=\'{"ratio":{"x":0.7,"y":0.7}}\'>\n    <h1>How it works!</h1>\n    <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>\n</div>\n'
+        yield u'\n            </div>\n\n        </section><!-- #projects -->\n\n        <section id=\'activity\' class=\'newsfeed\' role=\'region\'>\n\n            <h2>Activity</h2>\n            <div class="section-wrap">\n                <!--<ul class=\'feed\'>\n                    <li class=\'feed-item\'>\n                        <span class="datetime">\n                            &nbsp;\n                        </span>\n                    </li>\n                </ul>-->\n\n                <div id=\'pre-scroller\' class="scroller-frame">\n                    <div class="scroller-pane" id="pane1">\n                        <p>\n                            test pane 1\n                        </p>\n                    </div>\n                    <div class="scroller-pane" id="pane2">\n                        <p>\n                            test pane 2\n                        </p>\n                    </div>\n                </div>\n                <div>\n                    <a id="a-pane1">pane 1</a>\n                    <a id="a-pane2">pane 2</a>\n                </div>\n            </div>\n\n        </section><!-- #activity -->\n\n     </div><!-- #content -->\n\n<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options=\'{"ratio":{"x":0.7,"y":0.7}}\'>\n    <h1>How it works!</h1>\n    <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>\n</div>\n'
 
     def block_tinylogo(context, environment=environment):
         if 0: yield None
