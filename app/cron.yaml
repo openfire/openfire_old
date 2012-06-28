@@ -4,26 +4,22 @@ cron:
 - description: Instance Warmup
   url: /_ah/warmup
   schedule: every 12 hours synchronized
-  timezone: America/Los_Angeles
   target: command
 
 # garbage collection
 - description: Garbage Collector
   url: /_internal/tick/garbage
-  schedule: every 14 days
-  timezone: America/Los_Angeles
+  schedule: every 48 hours
   target: command
 
 # cache warmup
 - description: Cache Warmup
-  url: /_internal/tick/cache/warmup
+  url: /_internal/tick/cache?warmup
   schedule: every 12 hours synchronized
-  timezone: America/Los_Angeles
   target: data
 
 # periodic cache reset
 - description: Cache Reset
-  url: /_internal/tick/cache/clear
-  schedule: every 7 days
-  timezone: America/Los_Angeles
+  url: /_internal/tick/cache?clear
+  schedule: every 48 hours
   target: command
