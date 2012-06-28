@@ -1,8 +1,9 @@
+from openfire.models import AppModel
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 
 
-class Asset(ndb.Model):
+class Asset(AppModel):
 
     ''' Describes a stored asset, like CSS or JS or an image. '''
 
@@ -39,7 +40,7 @@ class Video(Media):
     provider = ndb.StringProperty('p', indexed=True, choices=['youtube', 'vimeo'])
 
 
-class CustomURL(ndb.Model):
+class CustomURL(AppModel):
 
     ''' Describes a custom URL mapping. '''
 

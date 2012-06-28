@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import config
+
+from openfire.models import AppModel
 from google.appengine.ext import ndb
 
 

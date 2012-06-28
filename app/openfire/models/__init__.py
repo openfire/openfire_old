@@ -3,10 +3,21 @@
 
 from google.appengine.ext import ndb
 
+
 class ModelMixin(object):
 
     def kind(self):
+
+        ''' Return a dummy kind name, because we're a mixin. '''
+
         return '__mixin__'
+
+
+class PipelineTriggerMixin(ModelMixin):
+
+	''' Mixin class that provides pipeline-based model triggers. '''
+
+	pass
 
 
 class MessageConverterMixin(ModelMixin):
@@ -14,6 +25,9 @@ class MessageConverterMixin(ModelMixin):
     ''' Mixin class for automagically generating a ProtoRPC Message class from a model. '''
 
     def to_message(self, include=None, exclude=None):
+
+		''' Convert an entity instance into a message instance. '''
+
         response = self._message_class()
 
         if self.key is not None:
@@ -32,6 +46,8 @@ class MessageConverterMixin(ModelMixin):
 
     @classmethod
     def from_message(cls, message, key=None, **kwargs):
+
+		''' Convert a message instance to an entity instance. '''
 
         if (hasattr(message, 'key') and message.key) and key is None:
             obj = cls(key=ndb.key.Key(urlsafe=message.key), **kwargs)
@@ -63,7 +79,6 @@ class MessageConverterMixin(ModelMixin):
 
         return obj
 
-
     def mutate_from_message(self, message):
 
         ''' Copy all the attributes except the key from message to this object. '''
@@ -91,3 +106,10 @@ class MessageConverterMixin(ModelMixin):
                 else:
                     continue
         return self
+
+
+class AppModel(ndb.Model, MessageConverterMixin, PipelineTriggerMixin):
+
+	''' Abstract, top-level model for all openfire models. '''
+
+	pass
