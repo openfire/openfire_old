@@ -13,3 +13,4 @@ app/.sass-cache
 tools/*
 var/*
 node_modules/*
+.installed.cfg
