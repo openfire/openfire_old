@@ -27,6 +27,14 @@ Use this classes to test functionality depending on webapp framework.
 import StringIO
 import urlparse
 
+
+class MockHeaders(dict):
+  """Mocks out headers in webapp.Request and webapp.Response."""
+
+  def add_header(self, key, value):
+    self[key] = value
+
+
 class MockRequest(object):
   """Mocks out webapp.Request.
 
@@ -47,10 +55,11 @@ class MockRequest(object):
     self._path = '/start'
     self.params = {}
     self.params_list = []
-    self.headers = {}
+    self.headers = MockHeaders()
     self.body = ''
     self.url = ''
     self.path_qs = ''
+    self.query_string = ''
     self.update_properties()
     self.environ = {}
 
@@ -69,9 +78,10 @@ class MockRequest(object):
     Parses the URL and sets path, scheme, host and parameters correctly.
     """
     o = urlparse.urlparse(url)
-    self.path = o.path
     self.scheme = o.scheme or self.scheme
     self.host = o.netloc or self.host
+    self.path = o.path
+    self.update_properties()
 
     for (name, value) in urlparse.parse_qs(o.query).items():
       assert len(value) == 1
@@ -177,14 +187,14 @@ class MockRequest(object):
     """Update url, path_qs property to be in sync with path and params."""
     self.path_qs = self._path
 
-    params_qs = ''
+    self.query_string = ''
     for param_value_pair in self.params_list:
-      if params_qs:
-        params_qs += '&'
-      params_qs += param_value_pair[0] + "=" + param_value_pair[1]
+      if self.query_string:
+        self.query_string += '&'
+      self.query_string += param_value_pair[0] + "=" + param_value_pair[1]
 
-    if params_qs:
-      self.path_qs += '?' + params_qs
+    if self.query_string:
+      self.path_qs += '?' + self.query_string
     self.url = self.scheme + '://' + self.host + self.path_qs
 
   def arguments(self):
@@ -204,7 +214,7 @@ class MockResponse(object):
 
   def __init__(self):
     self.out = StringIO.StringIO()
-    self.headers = {}
+    self.headers = MockHeaders()
     self.status = 200
     self.status_message = 'OK'
 

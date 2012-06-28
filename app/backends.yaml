@@ -1,0 +1,21 @@
+backends:
+- name: api
+  class: B1
+  instances: 10
+  options: dynamic, public
+- name: data
+  class: B2
+  instances: 4
+  options: dynamic, failfast
+- name: analzyer
+  class: B4
+  instances: 2
+  options: failfast, dynamic
+- name: command
+  class: B8
+  instances: 1
+  options: dynamic, public
+- name: transport
+  class: B2
+  instances: 4
+  options: dynamic, failfast

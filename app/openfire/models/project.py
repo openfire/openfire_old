@@ -20,6 +20,7 @@ from openfire.messages.common import Category as CategoryMessage
 class Category(AppModel):
 
     ''' A category for projects and proposals to exist in. '''
+
     _message_class = CategoryMessage
 
     # Naming/Ancestry
@@ -35,19 +36,15 @@ class Category(AppModel):
     project_count = ndb.IntegerProperty('pc', indexed=True, default=1)
     backer_count = ndb.IntegerProperty('bc', indexed=True, default=1)
 
-    # Timestamps
-    modified = ndb.DateTimeProperty('m', auto_now=True, indexed=True)
-    created = ndb.DateTimeProperty('c', auto_now_add=True, indexed=True)
-
 
 ## Project Proposals
 class Proposal(AppModel):
 
     ''' A proposal for a project on openfire. '''
+
     _message_class = ProposalMessage
 
     # Naming/Status
-    slug = ndb.StringProperty('s', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=True, required=True)
     status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a'])  # draft, submitted, review, denied, accepted
     category = ndb.KeyProperty('ct', indexed=True, required=True)
@@ -75,7 +72,6 @@ class Project(AppModel):
     _message_class = ProjectMessage
 
     # Naming/Status/Ancestry
-    slug = ndb.StringProperty('s', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=True, required=True)
     status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c'])  # private, featured, open, closed
     proposal = ndb.KeyProperty('pr', indexed=True, required=True)

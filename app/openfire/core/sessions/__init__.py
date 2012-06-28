@@ -88,7 +88,12 @@ class CoreSessionAPI(CoreAPI):
                 cookie = self.serializer.deserialize(name, cookie, max_age=int(ttl))
 
                 self.logging.info('SecureCookie decoded: "%s".' % cookie)
-                return cookie.get('sid', None)
+
+                if cookie is None:
+                    self.logging.info('EWW! Stale cookie. New session needed.')
+                    return None
+                else:
+                    return cookie.get('sid', None)
 
             self.logging.info('Cookie result: "%s".' % cookie)
             if cookie is not None and 'sid' in cookie:

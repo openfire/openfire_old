@@ -34,6 +34,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db
 from mapreduce import base_handler
 from mapreduce import context
+from mapreduce import errors
 from mapreduce import input_readers
 from mapreduce import model
 from mapreduce import operation
@@ -50,6 +51,9 @@ _SLICE_DURATION_SEC = 15
 
 # Delay between consecutive controller callback invocations.
 _CONTROLLER_PERIOD_SEC = 2
+
+# Set of strings of various test-injected faults.
+_TEST_INJECTED_FAULTS = set()
 
 
 class Error(Exception):
@@ -120,6 +124,10 @@ class MapperWorkerCallbackHandler(util.HugeTaskHandler):
                     shard_id)
       return
 
+    if not shard_state.active:
+      logging.error("Shard is not active. Looks like spurious task execution.")
+      return
+
     ctx = context.Context(spec, shard_state,
                           task_retry_count=self.task_retry_count())
 
@@ -128,6 +136,8 @@ class MapperWorkerCallbackHandler(util.HugeTaskHandler):
                    shard_state.shard_number, shard_state.mapreduce_id)
       if tstate.output_writer:
         tstate.output_writer.finalize(ctx, shard_state.shard_number)
+      # We recieved a command to abort. We don't care if we override
+      # some data.
       shard_state.active = False
       shard_state.result_status = model.ShardState.RESULT_ABORTED
       shard_state.put(config=util.create_datastore_write_config(spec))
@@ -185,7 +195,7 @@ class MapperWorkerCallbackHandler(util.HugeTaskHandler):
           shard_state.result_status = model.ShardState.RESULT_SUCCESS
 
       operation.counters.Increment(
-          "mapper-walltime-msec",
+          context.COUNTER_MAPPER_WALLTIME_MS,
           int((time.time() - self._start_time)*1000))(ctx)
 
       # TODO(user): Mike said we don't want this happen in case of
@@ -196,7 +206,27 @@ class MapperWorkerCallbackHandler(util.HugeTaskHandler):
         # shard is going to stop. Finalize output writer if any.
         if tstate.output_writer:
           tstate.output_writer.finalize(ctx, shard_state.shard_number)
-      shard_state.put(config=util.create_datastore_write_config(spec))
+
+      config = util.create_datastore_write_config(spec)
+      # We don't want shard state to override active state, since that
+      # may stuck job execution (see issue 116). Do a transactional
+      # verification for status.
+      # TODO(user): this might still result in some data inconsistency
+      # which can be avoided. It doesn't seem to be worth it now, because
+      # various crashes might result in all sort of data consistencies
+      # anyway.
+      @db.transactional(retries=5)
+      def tx():
+        fresh_shard_state = db.get(
+            model.ShardState.get_key_by_shard_id(shard_id))
+        if (not fresh_shard_state.active or
+            "worker_active_state_collision" in _TEST_INJECTED_FAULTS):
+          shard_state.active = False
+          logging.error("Spurious task execution. Aborting the shard.")
+          return
+        fresh_shard_state.copy_from(shard_state)
+        fresh_shard_state.put(config=config)
+      tx()
     finally:
       context.Context._set(None)
       if quota_consumer:
@@ -230,7 +260,7 @@ class MapperWorkerCallbackHandler(util.HugeTaskHandler):
       else:
         result = handler(data)
 
-      if util.is_generator_function(handler):
+      if util.is_generator(handler):
         for output in result:
           if isinstance(output, operation.Operation):
             output(ctx)
@@ -402,36 +432,12 @@ class ControllerCallbackHandler(util.HugeTaskHandler):
     poll_time = state.last_poll_time
     state.last_poll_time = datetime.datetime.utcfromtimestamp(self._time())
 
-    config = util.create_datastore_write_config(spec)
-
     if not state.active:
-      # This is the last execution.
-      # Enqueue done_callback if needed.
-      if spec.mapper.output_writer_class():
-        spec.mapper.output_writer_class().finalize_job(state)
-      def put_state(state):
-        state.put(config=config)
-        done_callback = spec.params.get(
-            model.MapreduceSpec.PARAM_DONE_CALLBACK)
-        if done_callback:
-          done_task = taskqueue.Task(
-              url=done_callback,
-              headers={"Mapreduce-Id": spec.mapreduce_id},
-              method=spec.params.get("done_callback_method", "POST"))
-          queue_name = spec.params.get(
-              model.MapreduceSpec.PARAM_DONE_CALLBACK_QUEUE,
-              "default")
-
-          if not _run_task_hook(spec.get_hooks(),
-                                "enqueue_done_task",
-                                done_task,
-                                queue_name):
-            done_task.add(queue_name, transactional=True)
-        FinalizeJobHandler.schedule(self.base_path(), spec)
-
-      db.run_in_transaction(put_state, state)
+      ControllerCallbackHandler._finalize_job(
+          spec, state, self.base_path())
       return
     else:
+      config = util.create_datastore_write_config(spec)
       state.put(config=config)
 
     processing_rate = int(spec.mapper.params.get(
@@ -492,6 +498,44 @@ class ControllerCallbackHandler(util.HugeTaskHandler):
       serial identifier as int.
     """
     return int(self.request.get("serial_id"))
+
+  @staticmethod
+  def _finalize_job(mapreduce_spec, mapreduce_state, base_path):
+    """Finalize job execution.
+
+    Finalizes output writer, invokes done callback an schedules
+    finalize job execution.
+
+    Args:
+      mapreduce_spec: an instance of MapreduceSpec
+      mapreduce_state: an instance of MapreduceState
+      base_path: handler base path.
+    """
+    config = util.create_datastore_write_config(mapreduce_spec)
+    # Enqueue done_callback if needed.
+    if mapreduce_spec.mapper.output_writer_class():
+      mapreduce_spec.mapper.output_writer_class().finalize_job(mapreduce_state)
+    def put_state(state):
+      state.put(config=config)
+      done_callback = mapreduce_spec.params.get(
+          model.MapreduceSpec.PARAM_DONE_CALLBACK)
+      if done_callback:
+        done_task = taskqueue.Task(
+            url=done_callback,
+            headers={"Mapreduce-Id": mapreduce_spec.mapreduce_id},
+            method=mapreduce_spec.params.get("done_callback_method", "POST"))
+        queue_name = mapreduce_spec.params.get(
+            model.MapreduceSpec.PARAM_DONE_CALLBACK_QUEUE,
+            "default")
+
+        if not _run_task_hook(mapreduce_spec.get_hooks(),
+                              "enqueue_done_task",
+                              done_task,
+                              queue_name):
+          done_task.add(queue_name, transactional=True)
+      FinalizeJobHandler.schedule(base_path, mapreduce_spec)
+
+    db.run_in_transaction(put_state, mapreduce_state)
 
   @staticmethod
   def get_task_name(mapreduce_spec, serial_id):
@@ -588,9 +632,6 @@ class KickOffJobHandler(util.HugeTaskHandler):
     state = model.MapreduceState.create_new(spec.mapreduce_id)
     state.mapreduce_spec = spec
     state.active = True
-    # TODO(user): Initialize UI fields correctly.
-    state.char_url = ""
-    state.sparkline_url = ""
     if app_id:
       state.app_id = app_id
 
@@ -600,7 +641,7 @@ class KickOffJobHandler(util.HugeTaskHandler):
       logging.warning("Found no mapper input data to process.")
       state.active = False
       state.active_shards = 0
-      state.put(config=util.create_datastore_write_config(spec))
+      ControllerCallbackHandler._finalize_job(spec, state, self.base_path())
       return
 
     # Update state and spec with actual shard count.
@@ -788,7 +829,9 @@ class StartJobHandler(base_handler.PostJsonHandler):
     return value
 
   @classmethod
-  def _start_map(cls, name, mapper_spec,
+  def _start_map(cls,
+                 name,
+                 mapper_spec,
                  mapreduce_params,
                  base_path=None,
                  queue_name=None,
@@ -796,15 +839,17 @@ class StartJobHandler(base_handler.PostJsonHandler):
                  countdown=None,
                  hooks_class_name=None,
                  _app=None,
-                 transactional=False):
+                 transactional=False,
+                 parent_entity=None):
     queue_name = queue_name or os.environ.get("HTTP_X_APPENGINE_QUEUENAME",
                                               "default")
     if queue_name[0] == "_":
       # We are currently in some special queue. E.g. __cron.
       queue_name = "default"
 
-    # Check that handler can be instantiated.
-    mapper_spec.get_handler()
+    if not transactional and parent_entity:
+      raise Exception("Parent shouldn't be specfied "
+                      "for non-transactional starts.")
 
     # Check that reader can be instantiated and is configured correctly
     mapper_input_reader_class = mapper_spec.input_reader_class()
@@ -822,6 +867,14 @@ class StartJobHandler(base_handler.PostJsonHandler):
         mapreduce_params,
         hooks_class_name)
 
+    # Check that handler can be instantiated.
+    ctx = context.Context(mapreduce_spec, None)
+    context.Context._set(ctx)
+    try:
+      mapper_spec.get_handler()
+    finally:
+      context.Context._set(None)
+
     kickoff_params = {"mapreduce_spec": mapreduce_spec.to_json_str()}
     if _app:
       kickoff_params["app"] = _app
@@ -835,7 +888,7 @@ class StartJobHandler(base_handler.PostJsonHandler):
     config = util.create_datastore_write_config(mapreduce_spec)
 
     def start_mapreduce():
-      parent = None
+      parent = parent_entity
       if not transactional:
         # Save state in datastore so that UI can see it.
         # We can't save state in foreign transaction, but conventional UI
@@ -873,15 +926,17 @@ class FinalizeJobHandler(base_handler.TaskQueueHandler):
   def handle(self):
     mapreduce_id = self.request.get("mapreduce_id")
     mapreduce_state = model.MapreduceState.get_by_job_id(mapreduce_id)
-
-    db.delete(model.MapreduceControl.get_key_by_job_id(mapreduce_id))
-
     if mapreduce_state:
+      config=util.create_datastore_write_config(mapreduce_state.mapreduce_spec)
+      db.delete(model.MapreduceControl.get_key_by_job_id(mapreduce_id),
+              config=config)
       shard_states = model.ShardState.find_by_mapreduce_state(mapreduce_state)
       for shard_state in shard_states:
-        db.delete(util._HugeTaskPayload.all().ancestor(shard_state))
-      db.delete(shard_states)
-      db.delete(util._HugeTaskPayload.all().ancestor(mapreduce_state))
+        db.delete(util._HugeTaskPayload.all().ancestor(shard_state),
+                  config=config)
+      db.delete(shard_states, config=config)
+      db.delete(util._HugeTaskPayload.all().ancestor(mapreduce_state),
+                config=config)
 
   @classmethod
   def schedule(cls, base_path, mapreduce_spec):

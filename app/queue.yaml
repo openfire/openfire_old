@@ -1,0 +1,113 @@
+total_storage_limit: 120M
+
+queue:
+
+# default catchall queue
+- name: default
+  rate: 1/s
+  mode: push
+  bucket_size: 20
+  target: command
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# deferred queue, for general one-off tasks
+- name: deferred
+  rate: 1/s
+  mode: push
+  bucket_size: 5
+  target: command
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# high-thoroughput data queue, for non-transactional data transforms
+- name: data
+  rate: 1/s
+  mode: push
+  bucket_size: 5
+  target: data
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# high-thoroughput pipeline trigger queue
+- name: trigger
+  rate: 1/s
+  mode: push
+  bucket_size: 5
+  target: data
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# high-thoroughput notification middleware queue
+- name: notify
+  rate: 1/s
+  mode: push
+  bucket_size: 5
+  target: data
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# mail delivery
+- name: mail
+  rate: 2000/d
+  mode: push
+  bucket_size: 5
+  target: transport
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 1d
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# XMPP/jabber delivery
+- name: xmpp
+  rate: 5/s
+  mode: push
+  bucket_size: 10
+  target: transport
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# push channel delivery
+- name: channel
+  rate: 5/s
+  mode: push
+  bucket_size: 10
+  target: transport
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 15m
+    min_backoff_seconds: 5
+    max_backoff_seconds: 120
+    max_doublings: 3
+
+# eventlog pull queue
+- name: eventlog
+  mode: pull
+  acl:
+  - user_email: codebot@openfi.re

@@ -1,9 +1,21 @@
 # -*- coding: utf-8 -*-
 ## openfire models init.
 
+# Base Imports
+import config
+import webapp2
+
+# AppTools Imports
+from apptools.util import debug
+
+# External Imports
 from google.appengine.ext import ndb
 
+# Openfire Imports
+from openfire.pipelines.model import ModelPipeline
 
+
+## ModelMixin - abstract parent object for model mixin classes
 class ModelMixin(object):
 
     def kind(self):
@@ -13,16 +25,94 @@ class ModelMixin(object):
         return '__mixin__'
 
 
+## PipelineTriggerMixin - allows bound pipelines to be constructed and started automatically when NDB hooks fire on models
 class PipelineTriggerMixin(ModelMixin):
 
     ''' Mixin class that provides pipeline-based model triggers. '''
 
-    pass
+    _pipeline_class = None
+
+    ### === Internal Properties === ###
+    @webapp2.cached_property
+    def __config(self):
+
+        ''' Private cached shortcut to config. '''
+
+        return config.config.get('openfire.datamodel.integration.pipelines', {})
+
+    @webapp2.cached_property
+    def __logging(self):
+
+        ''' Private cached shortcut to logging pipe. '''
+
+        return debug.AppToolsLogger('openfire.datamodel.mixins', 'PipelineTriggerMixin')._setcondition(self.__config.get('logging', False))
+
+    ### === Internal Methods === ###
+    def _construct_hook_pipeline(self, action):
+
+        ''' Conditionally trigger a hooked model-driven pipeline. '''
+
+        if hasattr(self, '_pipeline_class'):
+            if self._pipeline_class is not None:
+                if isinstance(self.__pipeline_class, ModelPipeline):
+                    if hasattr(self._pipeline_class, action):
+                        self.__logging.info('Pipeline has hook for action `%s`.' % action)
+                        return self._pipeline_class(**{
+                            'key': self.key.urlsafe(),
+                            'action': action
+                        })
+                    else:
+                        self.__logging.error('Model-attached pipeline (on model "%s") is not an instance of ModelPipeline (of type "%s").' % (self, self.__pipeline_class))
+                        return
+        else:
+            self.__logging.info('No hooked pipeline detected for model "%s" on action "%s".' % (self, action))
+        return
+
+    def _trigger_hook_pipeline(self, action, start=False):
+
+        ''' Try to construct a pipeline for a given trigger hook, and optionally start it. '''
+
+        if action not in frozenset(['put', 'delete']):
+            self.__logging.warning('Triggered NDB hook action is not `put` or `delete`. Ignoring.')
+            return
+        else:
+            self.__logging.info('Valid hook action for potential pipeline hook. Trying to construct/resolve.')
+            p = self._construct_hook_pipeline(action)
+            if p is not None:
+                if start:
+                    self.__logging.info('Starting hooked pipeline...')
+                    pipeline = p.start(self.__config.get('trigger_queue', 'default'))
+                    self.__logging.info('Hooked pipeline away: "%s"' % pipeline)
+                    return pipeline
+                return p
+        return
+
+    ### === Hook Methods === ###
+    def _post_put_hook(self):
+
+        ''' This hook is run after an AppModel is put using NDB. '''
+
+        if self.__config.get('enable', False):
+            self.__logging.info('Pipelines-NDB integration hooks enabled.')
+            self._trigger_hook_pipeline('put', self.__config.get('autostart', False))
+        return
+
+    def _post_delete_hook(self):
+
+        ''' This hook is run after an AppModel is deleted using NDB. '''
+
+        if self.__config.get('enable', False):
+            self.__logging.info('Pipelines-NDB integration hooks enabled.')
+            self._trigger_hook_pipeline('delete', self.__config.get('autostart', False))
+        return
 
 
+## MessageConverterMixin - allows us to automatically convert an NDB model to or from a bound ProtoRPC message class
 class MessageConverterMixin(ModelMixin):
 
     ''' Mixin class for automagically generating a ProtoRPC Message class from a model. '''
+
+    _message_class = None
 
     def to_message(self, include=None, exclude=None):
 
@@ -106,8 +196,16 @@ class MessageConverterMixin(ModelMixin):
         return self
 
 
+## AppModel - abstract parent class to all openfire app models, brings together mixins, default functions and default properties
 class AppModel(ndb.Model, MessageConverterMixin, PipelineTriggerMixin):
 
     ''' Abstract, top-level model for all openfire models. '''
 
-    pass
+    # NDB Cache Policy
+    _use_cache = True
+    _use_memcache = True
+    _use_datastore = True
+
+    # Timestamps
+    modified = ndb.DateTimeProperty('_tm', auto_now=True, indexed=True)
+    created = ndb.DateTimeProperty('_tc', auto_now_add=True, indexed=True)

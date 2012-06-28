@@ -7,6 +7,8 @@
 """
 
 from webapp2 import Route
+
+from webapp2_extras.routes import PathPrefixRoute
 from webapp2_extras.routes import HandlerPrefixRoute
 
 rules = [
@@ -58,7 +60,14 @@ rules = [
             Route('/login', name='auth/login', handler='Login'),
             Route('/logout', name='auth/logout', handler='Logout'),
             Route('/register', name='auth/register', handler='Register'),
-        ])
+        ]),
 
+        ## === Internal URLs === ##
+        HandlerPrefixRoute('internal.', [
+            PathPrefixRoute('/_internal', [
+                Route('/tick/cache', name='internal/cache-flush', handler='NoOp'),
+                Route('/tick/garbage', name='internal/garbage-collector', handler='NoOp')
+            ])
+        ])
     ])
 ]

@@ -27,13 +27,14 @@ __all__ = ['create', 'get_blob_key', 'get_file_name']
 
 import urllib
 
-from mapreduce.lib.files import file as files
 from google.appengine.api import datastore
+from google.appengine.api import namespace_manager
+from mapreduce.lib.files import file as files
 from google.appengine.ext import blobstore
 
 
 
-_BLOBSTORE_FILESYSTEM = 'blobstore'
+_BLOBSTORE_FILESYSTEM = files.BLOBSTORE_FILESYSTEM
 _BLOBSTORE_DIRECTORY = '/' + _BLOBSTORE_FILESYSTEM + '/'
 _BLOBSTORE_NEW_FILE_NAME = 'new'
 _CREATION_HANDLE_PREFIX = 'writable:'
@@ -106,9 +107,9 @@ def get_blob_key(create_file_name):
     return blobstore.BlobKey(ticket)
 
 
+
   blob_file_index = datastore.Get([datastore.Key.from_path(
-      _BLOB_FILE_INDEX_KIND,
-      ticket)])[0]
+      _BLOB_FILE_INDEX_KIND, ticket, namespace='')])[0]
   if blob_file_index:
     blob_key_str = blob_file_index[_BLOB_KEY_PROPERTY_NAME]
 
@@ -119,7 +120,7 @@ def get_blob_key(create_file_name):
 
 
     results = datastore.Get([datastore.Key.from_path(
-        blobstore.BLOB_INFO_KIND, blob_key_str)])
+        blobstore.BLOB_INFO_KIND, blob_key_str, namespace='')])
     if results[0] is None:
       return None
   else:

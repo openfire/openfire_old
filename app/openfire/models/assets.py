@@ -15,7 +15,7 @@ class Asset(AppModel):
     cdn = ndb.StringProperty('c', indexed=True, default=None)
     kind = ndb.StringProperty('t', indexed=True, choices=['i', 's', 't', 'v'], default='i')  # image, style, script, video
     blob = ndb.BlobKeyProperty('b', indexed=True)
-    versions = ndb.KeyProperty('v', indexed=True)
+    versions = ndb.KeyProperty('v', indexed=True, repeated=True)
 
 
 ## Media - links another object to a static asset, either via an Asset reference or a URL
