@@ -6,8 +6,9 @@ queue:
 - name: default
   rate: 1/s
   mode: push
-  bucket_size: 20
   target: command
+  bucket_size: 20
+  max_concurrent_requests: 5
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -19,8 +20,9 @@ queue:
 - name: deferred
   rate: 1/s
   mode: push
-  bucket_size: 5
   target: command
+  bucket_size: 5
+  max_concurrent_requests: 10
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -32,8 +34,9 @@ queue:
 - name: data
   rate: 1/s
   mode: push
-  bucket_size: 5
   target: data
+  bucket_size: 5
+  max_concurrent_requests: 15
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -45,8 +48,9 @@ queue:
 - name: trigger
   rate: 1/s
   mode: push
-  bucket_size: 5
   target: data
+  bucket_size: 5
+  max_concurrent_requests: 15
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -60,6 +64,7 @@ queue:
   mode: push
   bucket_size: 5
   target: data
+  max_concurrent_requests: 10
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -73,6 +78,7 @@ queue:
   mode: push
   bucket_size: 5
   target: transport
+  max_concurrent_requests: 5
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 1d
@@ -86,6 +92,7 @@ queue:
   mode: push
   bucket_size: 10
   target: transport
+  max_concurrent_requests: 5
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -99,6 +106,7 @@ queue:
   mode: push
   bucket_size: 10
   target: transport
+  max_concurrent_requests: 5
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 15m
@@ -111,3 +119,9 @@ queue:
   mode: pull
   acl:
   - user_email: codebot@openfi.re
+
+- name: analysis
+  mode: pull
+
+- name: command
+  mode: pull
