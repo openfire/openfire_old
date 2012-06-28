@@ -1,0 +1,1 @@
+from openfire.models import AppModel

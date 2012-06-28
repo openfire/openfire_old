@@ -1,35 +1,36 @@
+from openfire.models import AppModel
 from google.appengine.ext import ndb
 
 
-class Index(ndb.Model):
+class Index(AppModel):
 
 	''' A container for traversible index entries. '''
 
 	pass
 
 
-class IndexEntry(ndb.Model):
+class IndexEntry(AppModel):
 
 	''' A value entry in the index. '''
 
 	pass
 
 
-class IndexMapping(ndb.Model):
+class IndexMapping(AppModel):
 
 	''' A mapping: entry => key. '''
 
 	pass
 
 
-class IndexEvent(ndb.Model):
+class IndexEvent(AppModel):
 
 	''' An event performed by the indexer, like rebuilding/optimizing/creating indexes. '''
 
 	pass
 
 
-class IndexMutation(ndb.Model):
+class IndexMutation(AppModel):
 
 	''' A mutation event on the mapping/entry/index, built as part of an index event. '''
 

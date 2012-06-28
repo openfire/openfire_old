@@ -1,3 +1,4 @@
+from openfire.models import AppModel
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 

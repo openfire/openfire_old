@@ -1,14 +1,12 @@
+from openfire.models import AppModel
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 
-from openfire.models.assets import Avatar
-
-from openfire.models.role import RoleMapping
-
 from openfire.models.assets import Media
+from openfire.models.assets import Avatar
 from openfire.models.social import Follow
 from openfire.models.social import Comment
-from openfire.models import MessageConverterMixin
+from openfire.models.role import RoleMapping
 
 from openfire.messages.project import Project as ProjectMessage
 from openfire.messages.proposal import Proposal as ProposalMessage
@@ -18,7 +16,7 @@ from openfire.messages.common import Category as CategoryMessage
 ######## ======== Top-Level Project Models ======== ########
 
 ## Project Categories
-class Category(ndb.Model, MessageConverterMixin):
+class Category(AppModel):
 
     ''' A category for projects and proposals to exist in. '''
     _message_class = CategoryMessage
@@ -42,7 +40,7 @@ class Category(ndb.Model, MessageConverterMixin):
 
 
 ## Project Proposals
-class Proposal(ndb.Model, MessageConverterMixin):
+class Proposal(AppModel):
 
     ''' A proposal for a project on openfire. '''
     _message_class = ProposalMessage
@@ -69,7 +67,7 @@ class Proposal(ndb.Model, MessageConverterMixin):
 
 
 ## Projects
-class Project(ndb.Model, MessageConverterMixin):
+class Project(AppModel):
 
     ''' An openfire project, also known as a `spark` :) '''
 
@@ -174,7 +172,7 @@ class ProposalRoleMapping(RoleMapping):
 
 
 ######## ======== Project Submodels ======== ########
-class Backer(ndb.Model):
+class Backer(AppModel):
 
     ''' Describes a user who has backed a project. '''
 
@@ -184,7 +182,7 @@ class Backer(ndb.Model):
     anonymous = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
-class Update(ndb.Model):
+class Update(AppModel):
 
     ''' Describes an update posted by project admins. '''
 
