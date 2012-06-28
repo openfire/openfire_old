@@ -1,7 +1,6 @@
-from google.appengine.ext import ndb
-from openfire.models.sessions import UserSession
 
 
+## @TODO: NOT IN USE YET - ASYNC CONTAINER FOR SESSION DATA
 class SessionDataContainer(object):
 
     ''' Deferred sessiondata container. '''
@@ -61,7 +60,8 @@ class SessionDataContainer(object):
         if not name.startswith('_'):
             if self._init is False:  # first lazy-load access
                 if name in self._dirty:  # could it be in the mutation queue?
-                    future = self._resolve(False)  # trigger an async get
+                    #future = self._resolve(False)  # trigger an async get
+                    ## @TODO: FINISH THIS
                     return self._queue[self._dirty[name]]  # we got lucky
                 else:
                     return self._resolve(True).get(name)
@@ -74,31 +74,32 @@ class SessionDataContainer(object):
 
         if not name.startswith('_'):
             if self._init is False:  # first lazy-load access
-                future = self._resolve(False)  # trigger an async get
+                #future = self._resolve(False)  # trigger an async get
+                ## @TODO: FINISH THIS
+                pass
         else:
             return object.__setattr__(self, name, value)
 
-
     #### ++++ External Methods ++++ ####
     def __contains__(self, name):
-    
+
         ''' Returns True if the session contains the data point. '''
-    
+
         if self._future:
             return name in self._data
         else:
             return name in self._retrieve(True)
 
     def __getattr__(self, name):
-    
+
         ''' `value = session.key` syntax '''
-    
+
         return object.__getattribute__(self, '_get')(name)
 
     def __setattr__(self, name, value):
-    
+
         ''' `session.key = value` syntax '''
-    
+
         return object.__getattribute__(self, '_set')(name, value)
 
     def __getitem__(self, name):

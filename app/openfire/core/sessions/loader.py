@@ -56,7 +56,6 @@ class OpenfireSessionLoader(object):
 
         return hashlib.sha256(base64.b64encode(self._str(cltx))).hexdigest()
 
-
     #### ++++ External Methods ++++ ####
     def get_session(self, id):
 
@@ -100,7 +99,7 @@ class MemcacheSessionLoader(OpenfireSessionLoader):
         self.logging.info('Looking in memcache for encoded session ID: "%s"' % self._en(id))
 
         session = memcache.get(self._en(id))
-        
+
         self.logging.info('Memcache result: "%s"' % session)
 
         return session
@@ -119,8 +118,7 @@ class MemcacheSessionLoader(OpenfireSessionLoader):
         memcache.set(self._en(id), struct, int(timeout))
 
         self.logging.info('Struct saved TTL(%s): "%s"' % (timeout, struct))
-
-        return 
+        return
 
 
 class PersistentSessionLoader(OpenfireSessionLoader):
@@ -132,14 +130,14 @@ class PersistentSessionLoader(OpenfireSessionLoader):
         ''' Returns a session from the datastore, given a session ID. '''
 
         try:
-            session = ndb.Key(sessions.UserSession, self._en(id)).get()
+            session = ndb.Key(sessions.Session, self._en(id)).get()
             assert session != None
 
-        except AssertionError, a:
+        except AssertionError:
             self.logging.info('Session not found at encoded ID "%s".' % id)
             pass
 
-        except Exception, e:
+        except Exception:
             self.logging.error('Error encountered building datastore key for session at encoded ID "%s".' % id)
             if config.debug:
                 raise
@@ -154,8 +152,8 @@ class PersistentSessionLoader(OpenfireSessionLoader):
 
         self.logging.info('Saving session in datastore at ID: "%s"' % id)
 
-        skey = ndb.Key(sessions.UserSession, id)
-        session_o = sessions.UserSession(key=skey, sid=id, data=struct, user=None, addr=handler.request.environ.get('REMOTE_ADDR', '__NULL__'))
+        skey = ndb.Key(sessions.Session, id)
+        session_o = sessions.Session(key=skey, sid=id, data=struct, user=None, addr=handler.request.environ.get('REMOTE_ADDR', '__NULL__'))
         session_key = session_o.put(use_memcache=True, use_datastore=True)
 
         self.logging.info('Session stored at key: "%s"' % session_key.urlsafe())

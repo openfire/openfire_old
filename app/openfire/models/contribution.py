@@ -1,7 +1,9 @@
-from openfire.models import AppModel
+# -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
+from openfire.models import AppModel
 
 
+## ContributionType - a type of contribution that a user can make to a project
 class ContributionType(AppModel):
 
     ''' A type of contribution that a user can make to a project. '''
@@ -14,6 +16,7 @@ class ContributionType(AppModel):
     subunit_plural = ndb.StringProperty('sp', indexed=True, required=True)
 
 
+## Contribution - something given to a project from a user
 class Contribution(AppModel):
 
     ''' Represents a contribution made by a user to a project, making them a `Backer`. '''

@@ -1,9 +1,9 @@
-from openfire.models import AppModel
+# -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
-from google.appengine.ext.ndb import polymodel
+from openfire.models import AppModel
 
 
-class Role(ndb.Model):
+class Role(AppModel):
 
     ''' Represents a role that a user can play on a project. '''
 
@@ -12,7 +12,7 @@ class Role(ndb.Model):
     description = ndb.TextProperty('t', indexed=False, required=True)
 
 
-class RoleMapping(polymodel.PolyModel):
+class RoleMapping(AppModel):
 
     ''' Maps a user to a role and a project/proposal. '''
 

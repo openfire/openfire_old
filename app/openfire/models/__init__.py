@@ -15,9 +15,9 @@ class ModelMixin(object):
 
 class PipelineTriggerMixin(ModelMixin):
 
-	''' Mixin class that provides pipeline-based model triggers. '''
+    ''' Mixin class that provides pipeline-based model triggers. '''
 
-	pass
+    pass
 
 
 class MessageConverterMixin(ModelMixin):
@@ -26,7 +26,7 @@ class MessageConverterMixin(ModelMixin):
 
     def to_message(self, include=None, exclude=None):
 
-		''' Convert an entity instance into a message instance. '''
+        ''' Convert an entity instance into a message instance. '''
 
         response = self._message_class()
 
@@ -47,7 +47,7 @@ class MessageConverterMixin(ModelMixin):
     @classmethod
     def from_message(cls, message, key=None, **kwargs):
 
-		''' Convert a message instance to an entity instance. '''
+        ''' Convert a message instance to an entity instance. '''
 
         if (hasattr(message, 'key') and message.key) and key is None:
             obj = cls(key=ndb.key.Key(urlsafe=message.key), **kwargs)
@@ -75,8 +75,6 @@ class MessageConverterMixin(ModelMixin):
 
                 else:
                     continue
-
-
         return obj
 
     def mutate_from_message(self, message):
@@ -110,6 +108,6 @@ class MessageConverterMixin(ModelMixin):
 
 class AppModel(ndb.Model, MessageConverterMixin, PipelineTriggerMixin):
 
-	''' Abstract, top-level model for all openfire models. '''
+    ''' Abstract, top-level model for all openfire models. '''
 
-	pass
+    pass

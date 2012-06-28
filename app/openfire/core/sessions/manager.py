@@ -32,11 +32,10 @@ class OpenfireSessionManager(sessions.CustomBackendSessionFactory):
     sid = None
     _sid_re = re.compile(r'(.*)')
 
-
     #### ++++ Builtins ++++ ####
-    def __init__(self,use_threadcache=_sessions_config.get('backends', {}).get('threadcache', {}).get('enabled', False),
-                      use_memcache=_sessions_config.get('backends', {}).get('memcache', {}).get('enabled', False),
-                      use_datastore=_sessions_config.get('backends', {}).get('datastore', {}).get('enabled', False)):
+    def __init__(self, use_threadcache=_sessions_config.get('backends', {}).get('threadcache', {}).get('enabled', False),
+                       use_memcache=_sessions_config.get('backends', {}).get('memcache', {}).get('enabled', False),
+                       use_datastore=_sessions_config.get('backends', {}).get('datastore', {}).get('enabled', False)):
 
         ''' Prepare session loaders. '''
 
@@ -53,7 +52,6 @@ class OpenfireSessionManager(sessions.CustomBackendSessionFactory):
 
             self._prepare_loaders(reversed(installed_loaders))
 
-
     #### ++++ Shortcuts ++++ ####
     @webapp2.cached_property
     def config(self):
@@ -68,7 +66,6 @@ class OpenfireSessionManager(sessions.CustomBackendSessionFactory):
         ''' Cached shortcut to named logging pipe '''
 
         return debug.AppToolsLogger(path='openfire.core.sessions.manager', name='SessionManager')._setcondition(self.config.get('logging', False))
-
 
     #### ++++ Internal Methods ++++ ####
     def _is_valid_sid(self, sid):
@@ -117,7 +114,6 @@ class OpenfireSessionManager(sessions.CustomBackendSessionFactory):
             self.logging.info('Found valid session at SID "%s" using loader "%s".' % (sid, loader))
             self.logging.info('Session contents: "%s".' % s)
             valid_session = s
-
 
         return valid_session
 
@@ -210,12 +206,9 @@ class OpenfireSessionManager(sessions.CustomBackendSessionFactory):
             self.logging.error('Failed to import and construct any valid session loaders.')
             return
 
-
     #### ++++ External Methods ++++ ####
     def make_session(self):
 
         ''' Return a struct suitable for use as a session starting point '''
 
         return {'sid': self._get_new_sid(), 'timestamp': str(datetime.datetime.now())}
-
-

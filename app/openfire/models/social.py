@@ -1,9 +1,12 @@
-from openfire.models import AppModel
+# -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
-from google.appengine.ext.ndb import polymodel
+from openfire.models import AppModel
 
 
-class Comment(polymodel.PolyModel):
+######## ======== Abstract Social Models ======== ########
+
+## Comment - abstract model for a text-based comment left on a site datapoint by a user
+class Comment(AppModel):
 
     ''' Represents a comment made by a user on some site object. '''
 
@@ -12,7 +15,8 @@ class Comment(polymodel.PolyModel):
     reply_to = ndb.KeyProperty('r', indexed=True, default=None)
 
 
-class Follow(polymodel.PolyModel):
+## Follow - abstract model for a request to subscribe to a site datapoint, added by a user
+class Follow(AppModel):
 
     ''' Describes a user's desire to follow some site object. '''
 

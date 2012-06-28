@@ -1,5 +1,6 @@
-from openfire.models import AppModel
+# -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
+from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
 
 from openfire.models.assets import Avatar
@@ -7,8 +8,8 @@ from openfire.models.assets import Avatar
 
 ######## ======== Top-Level User Models ======== ########
 
-## User Account
-class User(ndb.Model):
+## User - top-level entity for user accounts
+class User(AppModel):
 
     ''' An openfire user. '''
 
@@ -18,7 +19,7 @@ class User(ndb.Model):
     bio = ndb.TextProperty('b', indexed=False)
 
 
-## User Avatar
+## UserAvatar - links an avatar resource to a user profile
 class UserAvatar(Avatar):
 
     ''' Maps an avatar to a user. '''
@@ -26,30 +27,21 @@ class UserAvatar(Avatar):
     user = ndb.KeyProperty('u', indexed=True, required=True)
 
 
-## User Email
-class EmailAddress(ndb.Model):
+## EmailAddress - links an email address to a user, for the purpose of signin/notifications/contact
+class EmailAddress(AppModel):
 
     ''' An openfire user's email address. '''
 
     user = ndb.KeyProperty('u', indexed=True)
     address = ndb.StringProperty('e', indexed=True)
     label = ndb.StringProperty('l', indexed=False, choices=['w', 'p', 'o'], default='p')  # work, personal & other
-    notify = ndb.BooleanProperty('n', indexed=True, default=False)
-    jabber = ndb.BooleanProperty('j', indexed=True, default=False)
+    notify = ndb.BooleanProperty('n', indexed=True, default=False)  # use this email to notify?
+    jabber = ndb.BooleanProperty('j', indexed=True, default=False)  # use this email for jabber?
+    gravatar = ndb.BooleanProperty('g', indexed=True, default=False)  # use this email for gravatar?
 
 
-## User Profile Content
-class ProfileContent(ndb.Model):
-
-    ''' Content from the profile of an openfire user. '''
-
-    user = ndb.KeyProperty('u', indexed=True)
-    snippet_id = ndb.StringProperty('s', indexed=True)
-    content = ndb.TextProperty('c', indexed=False)
-
-
-## User Permissions
-class Permissions(ndb.Model):
+## Permissions - a set of binary permissions that can be bestowed/revoked on a user
+class Permissions(AppModel):
 
     ''' Describes permissions bestowed on an openfire user. '''
 
@@ -61,7 +53,7 @@ class Permissions(ndb.Model):
 
 ######## ======== 3rd Party Account Models ======== ########
 
-## External Acocunt
+## SocialAccount - a linked 3rd party account on an external platform
 class SocialAccount(polymodel.PolyModel):
 
     ''' Describes an account from a 3rd party platform that an openfire user has attached. '''
@@ -74,7 +66,7 @@ class SocialAccount(polymodel.PolyModel):
     link = ndb.StringProperty('l', indexed=False)
 
 
-## Google via OAuth/OpenID
+## GoogleAccount - account federation from Google via OAuth/OpenID
 class GoogleAccount(SocialAccount):
 
     ''' Describes a Google account that is attached to an openfire user. '''
@@ -82,7 +74,7 @@ class GoogleAccount(SocialAccount):
     pass
 
 
-## Facebook via OAuth
+## FacebookAccount - account federation from Facebook via OAuth
 class FacebookAccount(SocialAccount):
 
     ''' Describes a Facebook account that is attached to an openfire user. '''
@@ -90,7 +82,7 @@ class FacebookAccount(SocialAccount):
     pass
 
 
-## Twitter via OAuth
+## TwitterAccount - account federation from Twitter via OAuth
 class TwitterAccount(SocialAccount):
 
     ''' Describes a Twitter account that is attached to an openfire user. '''
@@ -98,7 +90,7 @@ class TwitterAccount(SocialAccount):
     pass
 
 
-## Anyone via OpenID
+## OpenIDAccount - account federation from anyone via OpenID
 class OpenIDAccount(SocialAccount):
 
     ''' Describes an OpenID account that is attached to an openfire user. '''

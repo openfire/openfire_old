@@ -1,5 +1,6 @@
-from openfire.models import AppModel
+# -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
+from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
 
 from openfire.models.assets import Media
@@ -105,11 +106,12 @@ class Project(AppModel):
 
 
 ## Contribution Goals
-class Goal(polymodel.PolyModel):
+class Goal(AppModel):
 
     ''' Represents a contribution goal for an openfire project. '''
 
-    contribution_type = ndb.KeyProperty('t', indexed=True, required=True)
+    target = ndb.KeyProperty('t', indexed=True, required=True)
+    contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
     amount = ndb.IntegerProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('d', indexed=False)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
@@ -118,60 +120,20 @@ class Goal(polymodel.PolyModel):
 
 
 ## Contribution Tiers
-class Tier(polymodel.PolyModel):
+class Tier(AppModel):
 
     ''' Represents a contribution tier for an openfire project. '''
 
-    contribution_type = ndb.KeyProperty('t', indexed=True, required=True)
+    target = ndb.KeyProperty('t', indexed=True, required=True)
+    contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
     amount = ndb.IntegerProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('d', indexed=False)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
 
 
-######## ======== Proposal Submodels ======== ########
-class ProposalGoal(Goal):
-
-    ''' Goal attached to a proposal. '''
-
-    proposal = ndb.KeyProperty('pr', indexed=True, required=True)
-
-
-class ProposalTier(Tier):
-
-    ''' Tier attached to a proposal. '''
-
-    proposal = ndb.KeyProperty('pr', indexed=True, required=True)
-
-
-class ProposalAvatar(Avatar):
-
-    ''' Maps an avatar to a proposal. '''
-
-    proposal = ndb.KeyProperty('pr', indexed=True, required=True)
-
-
-class ProposalMedia(Media):
-
-    ''' Describes a piece of media attached to a proposal. '''
-
-    proposal = ndb.KeyProperty('pr', indexed=True, required=True)
-
-
-class ProposalComment(Comment):
-
-    ''' Describes a comment posted to a proposal. '''
-
-    proposal = ndb.KeyProperty('pr', indexed=True, required=True)
-
-
-class ProposalRoleMapping(RoleMapping):
-
-    ''' Maps a project to a user and a role. '''
-
-    proposal = ndb.KeyProperty('pr', indexed=True, required=True)
-
-
 ######## ======== Project Submodels ======== ########
+
+## Backer - when a user contributes to a project, they have "backed" it
 class Backer(AppModel):
 
     ''' Describes a user who has backed a project. '''
@@ -182,6 +144,7 @@ class Backer(AppModel):
     anonymous = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
+## Update - a status/media/engagement update posted on a project by project creators
 class Update(AppModel):
 
     ''' Describes an update posted by project admins. '''
@@ -189,55 +152,3 @@ class Update(AppModel):
     project = ndb.KeyProperty('p', indexed=True, required=True)
     author = ndb.KeyProperty('u', indexed=True, required=True)
     content = ndb.StringProperty('c', indexed=True, required=True)
-
-
-class ProjectTier(Tier):
-
-    ''' Tier attached to a project. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
-
-
-class ProjectGoal(Goal):
-
-    ''' Goal attached to a project. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
-
-
-class ProjectMedia(Media):
-
-    ''' Describes a piece of media attached to a project. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
-
-
-class ProjectAvatar(Avatar):
-
-    ''' Maps an avatar to a proposal. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
-
-
-class ProjectFollow(Follow):
-
-    ''' Describes a user's intent to follow a project. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
-    trigger_email = ndb.BooleanProperty('e', indexed=True, default=False)
-    trigger_sms = ndb.BooleanProperty('s', indexed=True, default=False)
-    trigger_xmpp = ndb.BooleanProperty('x', indexed=True, default=False)
-
-
-class ProjectComment(Comment):
-
-    ''' Describes a comment posted to a project. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
-
-
-class ProjectRoleMapping(RoleMapping):
-
-    ''' Maps a project to a user and a role. '''
-
-    project = ndb.KeyProperty('p', indexed=True, required=True)
