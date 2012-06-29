@@ -95,6 +95,9 @@
 			{% include "core/__north.html" %}
 		{%- endblock -%}
 		{% block stylesheets %}{% endblock %}
+		{% if util.api.users.is_current_user_admin() %}
+			<link rel="stylesheet" href="{{ asset.style('admin', 'compiled') }}" />
+		{% endif %}
 		{% block postnorth %}{% endblock %}
 
 		<title>{% block title %}openfire!{% endblock title %}</title>

@@ -414,51 +414,6 @@ p {
   left: 13%;
   font: 32pt "Satisfy", cursive;
 }
-#main #masthead #how-it-works-button {
-  height: 120px;
-  width: 300px;
-  position: absolute;
-  right: 5%;
-  top: 75px;
-  border-radius: 12px;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220));
-  background: -webkit-linear-gradient(top center, #f79331, #f57220);
-  background: -moz-linear-gradient(top center, #f79331, #f57220);
-  background: -o-linear-gradient(top center, #f79331, #f57220);
-  background: -ms-linear-gradient(top center, #f79331, #f57220);
-  background: linear-gradient(top center, #f79331, #f57220);
-  text-align: right;
-}
-#main #masthead #how-it-works-button:hover {
-  cursor: pointer;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffd468), color-stop(100%, #ffb246));
-  background: -webkit-linear-gradient(top center, #ffd468, #ffb246);
-  background: -moz-linear-gradient(top center, #ffd468, #ffb246);
-  background: -o-linear-gradient(top center, #ffd468, #ffb246);
-  background: -ms-linear-gradient(top center, #ffd468, #ffb246);
-  background: linear-gradient(top center, #ffd468, #ffb246);
-}
-#main #masthead #how-it-works-button:active {
-  margin-top: 2px;
-  margin-right: 2px;
-}
-#main #masthead #how-it-works-button a, #main #masthead #how-it-works-button a:link, #main #masthead #how-it-works-button a:visited, #main #masthead #how-it-works-button a:active {
-  cursor: pointer;
-  display: block;
-  line-height: 120px;
-  vertical-align: middle;
-  margin-right: 20px;
-  width: 280px;
-  font-family: "Karla", sans-serif;
-  font-size: 25px;
-  font-weight: 700;
-  color: #eeeeee;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-#main #masthead #how-it-works-button a:hover, #main #masthead #how-it-works-button a:link:hover, #main #masthead #how-it-works-button a:visited:hover, #main #masthead #how-it-works-button a:active:hover {
-  color: white;
-}
 
 #footer-container {
   position: fixed;
