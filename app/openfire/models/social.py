@@ -2,6 +2,9 @@
 from google.appengine.ext import ndb
 from openfire.models import AppModel
 
+from openfire.messages import common as messages
+from openfire.pipelines.model import social as pipelines
+
 
 ######## ======== Abstract Social Models ======== ########
 
@@ -9,6 +12,9 @@ from openfire.models import AppModel
 class Comment(AppModel):
 
     ''' Represents a comment made by a user on some site object. '''
+
+    _message_class = messages.Comment
+    _pipeline_class = pipelines.CommentPipeline
 
     user = ndb.KeyProperty('u', indexed=True, required=True)
     content = ndb.StringProperty('c', indexed=True, required=True)
@@ -19,5 +25,8 @@ class Comment(AppModel):
 class Follow(AppModel):
 
     ''' Describes a user's desire to follow some site object. '''
+
+    _message_class = messages.Follow
+    _pipeline_class = pipelines.FollowPipeline
 
     user = ndb.KeyProperty('u', indexed=True, required=True)

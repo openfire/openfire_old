@@ -59,7 +59,7 @@ class Comments(messages.Message):
 
     ''' A list of comments. '''
 
-    comments= messages.MessageField(Comment, 1, repeated=True)
+    comments = messages.MessageField(Comment, 1, repeated=True)
 
 
 class Post(messages.Message):
@@ -75,6 +75,13 @@ class Posts(messages.Message):
     ''' A list of posts. '''
 
     posts = messages.MessageField(Post, 1, repeated=True)
+
+
+class Follow(messages.Message):
+
+    ''' Represents a user Follow. @TODO: Fill this out. '''
+
+    pass
 
 
 class FollowRequest(messages.Message):

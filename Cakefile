@@ -599,12 +599,13 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 		out.whisper data
 
 	out.shout 'coffee', 'Compiling CoffeeScript...', true
-	out.say 'coffee', 'Compiling AppTools base...'
 
 	total_ops = total_ops + 1
 	node_bin = 'node'
 	js_prefix = fixpath(__dirname, 'app', 'assets', 'js')
 	coffee_bin = fixpath(__dirname, 'node_modules', 'coffee-script', 'bin', 'coffee')
+
+	out.shout 'coffee', 'Compiling AppTools JS...'
 	out.spawn 'coffee', node_bin, [ coffee_bin,
 									'--join', fixpath(js_prefix, 'static', 'apptools', 'base.js'),
 									'--compile', fixpath(js_prefix, 'source', 'apptools', '_milk.coffee'),
@@ -615,7 +616,11 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'events.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'agent.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'dispatch.coffee'),
-									fixpath(js_prefix, 'source', 'apptools', 'storage.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', '_core.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', 'dom.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', 'indexed.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', 'sql.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', '_init.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'rpc.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'user.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'push.coffee'),
@@ -625,6 +630,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'scroller.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
+	out.shout 'coffee', 'Compiling AppTools JS for admins...'
 	out.spawn 'coffee', node_bin, [ coffee_bin,
 									'--join', fixpath(js_prefix, 'static', 'apptools', 'base.admin.js'),
 									'--compile', fixpath(js_prefix, 'source', 'apptools', '_milk.coffee'),
@@ -635,7 +641,11 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'events.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'agent.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'dispatch.coffee'),
-									fixpath(js_prefix, 'source', 'apptools', 'storage.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', '_core.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', 'dom.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', 'indexed.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', 'sql.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'storage', '_init.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'rpc.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'user.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'push.coffee'),
@@ -648,12 +658,30 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'admin', 'page.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'admin', 'site.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'admin', 'content.coffee'),
-									fixpath(js_prefix, 'source', 'apptools', '_init.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
+
+	out.shout 'coffee', 'Compiling openfire JS...'
+	out.spawn 'coffee', node_bin, [ coffee_bin,
+									'--join', fixpath(js_prefix, 'static', 'openfire', 'app.js'),
+									'--compile', fixpath(js_prefix, 'source', 'openfire', '_util.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_core.coffee'),
-									fixpath(js_prefix, 'source', 'openfire', 'bbq.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'model.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'auth.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'user.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
-
+	out.shout 'coffee', 'Compiling openfire JS for admins...'
+	out.spawn 'coffee', node_bin, [ coffee_bin,
+									'--join', fixpath(js_prefix, 'static', 'openfire', 'app.admin.js'),
+									'--compile', fixpath(js_prefix, 'source', 'openfire', '_util.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', '_core.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'model.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'auth.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'user.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'bbq.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
 	out.say 'coffee', 'Done :)'
 

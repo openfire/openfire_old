@@ -17,12 +17,11 @@ class ProjectService(RemoteService):
 
         ''' Returns a list of projects. '''
 
-        projects = Project.query(Project.status!='p').fetch()
+        projects = Project.query(Project.status != 'p').fetch()
         messages = []
         for project in projects:
             messages.append(project.to_message())
         return project_messages.Projects(projects=messages)
-
 
     @remote.method(project_messages.ProjectRequest, project_messages.Project)
     def get(self, request):
@@ -46,7 +45,6 @@ class ProjectService(RemoteService):
 
         return project.to_message()
 
-
     @remote.method(project_messages.Project, project_messages.Project)
     def put(self, request):
 
@@ -66,14 +64,12 @@ class ProjectService(RemoteService):
 
         return project.to_message()
 
-
     @remote.method(common_messages.Comment, Echo)
     def comment(self, request):
 
         ''' Comment on a project. '''
 
         return Echo('')
-
 
     @remote.method(common_messages.Comments, Echo)
     def comments(self, request):
@@ -82,14 +78,12 @@ class ProjectService(RemoteService):
 
         return common_messages.Comments()
 
-
     @remote.method(common_messages.Post, message_types.VoidMessage)
     def post(self, request):
 
         ''' Post and update to a project. '''
 
         return None
-
 
     @remote.method(message_types.VoidMessage, common_messages.Posts)
     def posts(self, request):
@@ -98,14 +92,12 @@ class ProjectService(RemoteService):
 
         return common_messages.posts()
 
-
     @remote.method(media_messages.AddMedia, media_messages.Media)
     def add_media(self, request):
 
         ''' Add media to a project. '''
 
         return media_messages.Media()
-
 
     @remote.method(message_types.VoidMessage, media_messages.Media)
     def media(self, request):
@@ -114,14 +106,12 @@ class ProjectService(RemoteService):
 
         return common_messages.Media()
 
-
     @remote.method(common_messages.FollowRequest, Echo)
     def follow(self, request):
 
         ''' Follow a project and return the new follow count. '''
 
-        return Echo('')
-
+        return Echo(message='cool')
 
     @remote.method(common_messages.FollowersRequest, common_messages.FollowersResponse)
     def followers(self, request):
@@ -130,14 +120,12 @@ class ProjectService(RemoteService):
 
         return common_messages.FollowersResponse()
 
-
     @remote.method(message_types.VoidMessage, project_messages.Backers)
     def backers(self, request):
 
         ''' Return backers of a project. '''
 
         return project_messages.Backers()
-
 
     @remote.method(project_messages.BackProject, Echo)
     def back(self, request):
@@ -146,14 +134,12 @@ class ProjectService(RemoteService):
 
         return Echo('')
 
-
     @remote.method(project_messages.SuspendProject, Echo)
     def suspend(self, request):
 
         ''' Suspend a project. '''
 
         return Echo('')
-
 
     @remote.method(project_messages.ShutdownProject, Echo)
     def shutdown(self, request):

@@ -114,4 +114,5 @@ class BBQController
             error: (err) ->
                 alert 'There was an error: ' + errMsg
 
-@__openfire_preinit.abstract_base_controllers.push(BBQController)
+if @__openfire_preinit?
+    @__openfire_preinit.abstract_base_controllers.push(BBQController)

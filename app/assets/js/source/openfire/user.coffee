@@ -4,9 +4,11 @@ class UserController extends OpenfireController
     @events = []
 
     constructor: (openfire, window) ->
-        return
 
-    @_init = () =>
-        return
+	    @_init = () =>
+	        return
 
-@__openfire_preinit.abstract_base_controllers.push(UserController)
+	    return
+
+if @__openfire_preinit?
+	@__openfire_preinit.abstract_base_controllers.push(UserController)

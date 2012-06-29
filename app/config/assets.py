@@ -83,7 +83,22 @@ config['apptools.project.assets'] = {
 
             'assets': {
                 'base': {'min': True, 'version': 1.0},  # RPC, events, dev, storage, user, etc (see $.apptools)
-                'admin': {'min': True, 'version': 1.0}  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'admin': {'name': 'base.admin', 'min': True, 'version': 1.0}  # RPC, events, dev, storage, user, etc (see $.apptools)
+            }
+
+        },
+
+        ### Openfire ###
+        ('openfire', 'openfire'): {
+
+            'config': {
+                'version_mode': 'getvar',
+                'bundle': 'openfire.bundle.min.js'
+            },
+
+            'assets': {
+                'app': {'min': True, 'version': 1.0},  # openfire app base
+                'admin': {'name': 'app.admin', 'min': True, 'version': 1.0}  # openfire app base for admins
             }
 
         },
