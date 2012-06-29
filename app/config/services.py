@@ -126,15 +126,15 @@ config['apptools.project.services'] = {
 
         ## Content API - allows saving/retrieving of small content snippets
         'content': {
-            'enabled': False,
-            'service': 'openfire.services.content.ContentService',
-            'methods': ['get', 'put', 'sync'],
+			'enabled': True,
+			'service': 'openfire.services.content.ContentService',
+			'methods': ['save_snippet', 'get_snippet'],
 
-            'config': {
-                'caching': 'none',
-                'security': 'none',
-                'recording': 'none'
-            }
+			'config': {
+				'caching': 'none',
+				'security': 'none',
+				'recording': 'none'
+			}
         },
 
         ## Indexer API - allows programmatic control of openfire's content indexer
