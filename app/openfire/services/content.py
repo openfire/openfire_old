@@ -27,7 +27,7 @@ class ContentService(RemoteService):
         if request.snippet_key is not None:
             self.api.memcache.delete('Snippet//' + hashlib.sha256(request.snippet_key).hexdigest())
 
-        snippet = ContentSnippet(key=self.ext.ndb.Key('ContentSnippet', request.snippet_keyname),
+        snippet = ContentSnippet(key=self.api.ndb.Key('ContentSnippet', request.snippet_keyname),
                     content=request.inner_html)
         snippet.put()
 

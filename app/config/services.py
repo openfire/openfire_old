@@ -126,9 +126,9 @@ config['apptools.project.services'] = {
 
         ## Content API - allows saving/retrieving of small content snippets
         'content': {
-			'enabled': False,
+			'enabled': True,
 			'service': 'openfire.services.content.ContentService',
-			'methods': ['get', 'put', 'sync'],
+			'methods': ['save_snippet', 'get_snippet'],
 
 			'config': {
 				'caching': 'none',
