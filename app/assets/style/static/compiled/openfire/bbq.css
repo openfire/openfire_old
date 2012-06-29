@@ -1,0 +1,35 @@
+#category-container .category {
+  display: inline-block;
+  border: 2px solid black;
+}
+#category-container .category .category-info span, #category-container .category .category-info textarea {
+  display: inline;
+}
+#category-container .category .category-info label {
+  display: block;
+  text-decoration: underline;
+}
+
+#proposal-container .proposal {
+  display: inline-block;
+  border: 2px solid black;
+}
+#proposal-container .proposal .proposal-info span, #proposal-container .proposal .proposal-info textarea {
+  display: inline;
+}
+#proposal-container .proposal .proposal-info label {
+  display: block;
+  text-decoration: underline;
+}
+
+#project-container .project {
+  display: inline-block;
+  border: 2px solid black;
+}
+#project-container .project .project-info span, #project-container .project .project-info textarea {
+  display: inline;
+}
+#project-container .project .project-info label {
+  display: block;
+  text-decoration: underline;
+}

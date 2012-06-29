@@ -1,28 +1,25 @@
 <h2>Categories!</h2>
-<ul>
+<div id="category-container">
     {% for category in categories %}
-    <li id="category-{{ category.slug }}">
-        <p id="category-display-{{ category.slug }}">
-            <span>{{ category.name }}</span>
-            <span>{{ category.slug }}</span>
-            <span>{{ category.description }}</span>
-        </p>
-        <p id="category-inputs-{{ category.slug }}" style="display: none;">
-            <span><input class="name-input" value="{{ category.name }}"></span>
-            <span><input class="slug-input" value="{{ category.slug }}" disabled="disabled"></span>
-            <span><input class="description-input" value="{{ category.description }}"></span>
-        </p>
-        <span>
-            <button id="delete-category-{{ category.slug }}" class="delete-object" type="button">delete</button>
-            <button id="start-edit-category-{{ category.slug }}" class="start-edit-inline" type="button">edit</button>
-            <button id="cancel-edit-category-{{ category.slug }}" class="cancel-edit-inline" type="button" style="display: none;">cancel</button>
-            <button id="save-edit-category-{{ category.slug }}" class="save-edit-inline" type="button" style="display: none;">save</button>
-        </span>
-    </li>
-    {% else %}
-    <li>No categories yet!</li>
+    <div class="category">
+        <div class="category-info">
+            <span class="category-key" style="display: none;">{{ category.key.urlsafe() }}</span>
+            <label>Name: </label>
+            <span class="category-name editable">{{ category.name }}</span>
+            <label>Slug: </label>
+            <span class="category-slug editable">{{ category.slug }}</span>
+            <label>Description: </label>
+            <span class="category-description editable">{{ category.description }}</span>
+        </div>
+        <div class="category-actions">
+            <button class="delete" type="button">delete</button>
+            <button class="start-edit" type="button">edit</button>
+            <button class="cancel-edit" type="button" style="display: none;">cancel</button>
+            <button class="save-edit" type="button" style="display: none;">save</button>
+        </div>
+    </div>
     {% endfor %}
-</ul>
+</div>
 <button id="show-new-category-btn" class="show-new-inline">+ Add New Category</button>
 <div id="new-category-inline" class="inline-form" style="display: none;">
     <form id="new-category-frm">

@@ -92,8 +92,8 @@ class ProjectServiceTestCase(unittest.TestCase):
 
     def test_project_list_method(self):
         ''' Add one private and one public project to the database then query. '''
-        db_loader.create_project(slug='test-1')
-        db_loader.create_project(slug='test-2', status='p')
+        db_loader.create_project()
+        db_loader.create_project(status='p')
         response = generic_service_method_success_test(self, 'project', 'list')
         self.assertEqual(response['response']['type'], 'Projects',
             'System project list service method failed.')
@@ -102,33 +102,31 @@ class ProjectServiceTestCase(unittest.TestCase):
 
     def test_project_get_method(self):
         ''' Add one private and one public project to the database then query. '''
-        slug = 'test-1'
-        db_loader.create_project(slug=slug)
-        response = generic_service_method_success_test(self, 'project', 'get', params={'slug':slug})
+        project_key = db_loader.create_project()
+        key = project_key.urlsafe()
+        response = generic_service_method_success_test(self, 'project', 'get', params={'key':key})
         self.assertEqual(response['response']['type'], 'Project',
             'Project get service method failed.')
-        self.assertEqual(response['response']['content']['slug'], slug,
+        self.assertEqual(response['response']['content']['key'], key,
             'Project get method returned the wrong project.')
 
     def test_project_put_method(self):
 
         ''' Add a project (not through api) and then update it. '''
 
-        slug = 'savetheeverything'
-        proposalKey = ndb.Key('Proposal', 'fake')
-        categoryKey = ndb.Key('Category', slug)
-        creatorKey = ndb.Key('User', 'fakie')
+        proposal_key = ndb.Key('Proposal', 'fake')
+        category_key = ndb.Key('Category', 'everything')
+        creator_key = ndb.Key('User', 'fakie')
         name_1 = 'Save the Everything!'
         pitch_1 = 'Save all the animals!'
         name_2 = 'Save everything!!'
         pitch_2 = 'Yeah, save all those things.'
 
-        db_loader.create_project(slug=slug, name=name_1, pitch=pitch_1,
-                    proposal=proposalKey, category=categoryKey, creator=creatorKey)
+        project_key = db_loader.create_project(name=name_1, pitch=pitch_1,
+                    proposal=proposal_key, category=category_key, creator=creator_key)
 
         params = {
-            'key': slug,
-            'slug': slug,
+            'key': project_key.urlsafe(),
             'name': name_2,
             'pitch': pitch_2,
         }
@@ -236,7 +234,7 @@ class ProposalServiceTestCase(unittest.TestCase):
 
     def test_proposal_list_method(self):
         ''' Add a proposal to the database then query. '''
-        db_loader.create_proposal(slug='test-1')
+        db_loader.create_proposal()
         response = generic_service_method_success_test(self, 'proposal', 'list')
         self.assertEqual(response['response']['type'], 'Proposals',
             'System proposal list service method failed.')
@@ -245,12 +243,12 @@ class ProposalServiceTestCase(unittest.TestCase):
 
     def test_proposal_get_method(self):
         ''' Add one private and one public proposal to the database then query. '''
-        slug = 'test-1'
-        db_loader.create_proposal(slug=slug)
-        response = generic_service_method_success_test(self, 'proposal', 'get', params={'slug':slug})
+        proposal_key = db_loader.create_proposal()
+        key = proposal_key.urlsafe()
+        response = generic_service_method_success_test(self, 'proposal', 'get', params={'key':key})
         self.assertEqual(response['response']['type'], 'Proposal',
             'Proposal get service method failed.')
-        self.assertEqual(response['response']['content']['slug'], slug,
+        self.assertEqual(response['response']['content']['key'], key,
             'Proposal get method returned the wrong proposal.')
 
 
@@ -258,17 +256,15 @@ class ProposalServiceTestCase(unittest.TestCase):
 
         ''' Add a proposal through the api and then update it. '''
 
-        slug = 'savetheeverything'
         name_1 = 'Save the Everything!'
         pitch_1 = 'Save all the animals!'
         name_2 = 'Save everything!!'
         pitch_2 = 'Yeah, save all those things.'
 
         params = {
-            'slug': slug,
             'name': name_1,
             'pitch': pitch_1,
-            'category': ndb.Key('Category', slug).urlsafe(),
+            'category': ndb.Key('Category', 'everything').urlsafe(),
             'creator': ndb.Key('User', 'fakie').urlsafe(),
         }
 
@@ -282,7 +278,7 @@ class ProposalServiceTestCase(unittest.TestCase):
 
         params['name'] = name_2
         params['pitch'] = pitch_2
-        params['key'] = slug
+        params['key'] = response['response']['content']['key']
 
         response = generic_service_method_success_test(self, 'proposal', 'put', params=params)
         self.assertEqual(response['response']['type'], 'Proposal',
@@ -356,7 +352,7 @@ class CategoryServiceTestCase(unittest.TestCase):
 
         params['name'] = name_2
         params['description'] = description_2
-        params['key'] = slug
+        params['key'] = response['response']['content']['key']
 
         response = generic_service_method_success_test(self, 'category', 'put', params=params)
         self.assertEqual(response['response']['type'], 'Category',
@@ -371,9 +367,9 @@ class CategoryServiceTestCase(unittest.TestCase):
         ''' Add a category and then delete it through the api. '''
 
         slug = 'test-slug'
-        db_loader.create_category(slug=slug)
+        category_key = db_loader.create_category(slug=slug)
         params = {
-            'slug': slug,
+            'key': category_key.urlsafe(),
         }
         response = generic_service_method_success_test(self, 'category', 'delete', params=params)
         self.assertEqual(response['response']['type'], 'Echo',

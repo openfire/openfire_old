@@ -32,7 +32,7 @@ class ProjectService(RemoteService):
         is_owner = False
         is_admin = True
 
-        project_key = ndb.Key('Project', request.slug)
+        project_key = ndb.Key(urlsafe=request.key)
         project = project_key.get()
 
         if not project:
@@ -55,21 +55,57 @@ class ProjectService(RemoteService):
             # TODO: How to return error?
             return project_messages.Project()
 
-        project_key = ndb.Key('Project', request.key)
+        project_key = ndb.Key(urlsafe=request.key)
         project = project_key.get()
 
         # Update the project.
         project.mutate_from_message(request)
+        project.slug = "TODO: Remove me! (OF-64)"
         project.put()
 
         return project.to_message()
+
+
+    @remote.method(project_messages.ProjectRequest, Echo)
+    def go_live(self, request):
+
+        ''' Enable a project to be shown to the general public. '''
+
+        if not request.key:
+            # Cannot create a project through this service.
+            # TODO: How to return error?
+            return project_messages.Project()
+
+        project_key = ndb.Key(urlsafe=request.key)
+        project = project_key.get()
+
+        if not project:
+            # Project not found.
+            raise remote.ApplicationError('Project not found')
+
+        # Update the project to open.
+        project.status = 'o'
+        project.put()
+
+        return Echo(message='Opened project')
+
+
+    @remote.method(project_messages.ProjectRequest, Echo)
+    def delete(self, request):
+
+        ''' Remove a category. '''
+
+        project_key = ndb.Key(urlsafe=request.key)
+        project_key.delete()
+        return Echo(message='Project removed')
+
 
     @remote.method(common_messages.Comment, Echo)
     def comment(self, request):
 
         ''' Comment on a project. '''
 
-        return Echo('')
+        return Echo(message='')
 
     @remote.method(common_messages.Comments, Echo)
     def comments(self, request):
@@ -132,18 +168,38 @@ class ProjectService(RemoteService):
 
         ''' Become a backer of a project. '''
 
-        return Echo('')
+        return Echo(message='')
 
     @remote.method(project_messages.SuspendProject, Echo)
     def suspend(self, request):
 
         ''' Suspend a project. '''
 
-        return Echo('')
+        project_key = ndb.Key(urlsafe=request.key)
+        project = project_key.get()
+
+        if not project:
+            # Project not found.
+            raise remote.ApplicationError('Project not found')
+
+        project.status = 'p'
+        project.put()
+
+        return Echo(message='Project suspended')
 
     @remote.method(project_messages.ShutdownProject, Echo)
     def shutdown(self, request):
 
         ''' Shut down a project. '''
 
-        return Echo('')
+        project_key = ndb.Key(urlsafe=request.key)
+        project = project_key.get()
+
+        if not project:
+            # Project not found.
+            raise remote.ApplicationError('Project not found')
+
+        project.status = 'c'
+        project.put()
+
+        return Echo(message='Project shut down')

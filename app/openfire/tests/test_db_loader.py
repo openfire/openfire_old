@@ -10,24 +10,24 @@ def create_category(slug='test', name='Test Category', description='some txt'):
         ).put()
 
 
-def create_proposal(slug='test', name='Test Proposal', status='s', public=True,
+def create_proposal(name='Test Proposal', status='s', public=True,
                     summary="SUMMARY", pitch="PITCH", tech="TECH", keywords=["KEYWORDS"],
                     category=ndb.Key('Category', 'test_category_key'),
                     creator=ndb.Key('User', 'test_user_key'),
                     ):
-    return Proposal(key=ndb.Key('Proposal', slug), slug=slug, name=name, status=status, public=public,
+    return Proposal(name=name, status=status, public=public,
                     summary=summary, pitch=pitch, tech=tech, keywords=keywords,
                     category=category, creator=creator
                     ).put()
 
 
-def create_project(slug='test', name='Test Project', status='o', public=True,
+def create_project(name='Test Project', status='o', public=True,
                     summary="SUMMARY", pitch="PITCH", tech="TECH", keywords=["KEYWORDS"],
                     proposal=ndb.Key('Proposal', 'test_proposal_key'),
                     category=ndb.Key('Category', 'test_category_key'),
                     creator=ndb.Key('User', 'test_user_key'),
                     ):
-    return Project(key=ndb.Key('Project', slug), slug=slug, name=name, status=status, public=public,
-                    summary=summary, pitch=pitch, tech=tech, keywords=keywords, proposal=proposal,
+    return Project(name=name, status=status, public=public, summary=summary,
+                    pitch=pitch, tech=tech, keywords=keywords, proposal=proposal,
                     category=category, creator=creator
                     ).put()
