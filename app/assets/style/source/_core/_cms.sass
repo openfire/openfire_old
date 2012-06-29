@@ -1,0 +1,577 @@
+.text-left
+  text-align: left
+
+.text-right
+  text-align: right
+
+.text-center
+  text-align: center
+
+.small
+  font-size: 0.9em
+
+.smaller
+  font-size: 0.8em
+
+.smallest
+  font-size: 0.7em
+
+.big
+  font-size: 1.2em
+
+.bigger
+  font-size: 1.3em
+
+.biggest
+  font-size: 1.4em
+
+.silent
+  display: none
+
+.quiet
+  color: #999
+  font-style: italic
+  a
+    color: #999
+    font-style: italic
+
+.loud
+  color: #000
+  a
+    color: #000
+
+.highlight
+  background: #ff0
+  a
+    background: #ff0
+
+input
+  font-family: Georgia, serif
+  &.text, &.button
+    font-family: Georgia, serif
+
+textarea, select
+  font-family: Georgia, serif
+
+.form-error
+  border-color: #f00
+
+.center, .aligncenter
+  display: block
+  margin-left: auto
+  margin-right: auto
+
+.hidden
+  display: hidden
+
+.invisible
+  opacity: 0
+
+.block
+  display: block
+
+.inline
+  display: inline
+
+.in-block
+  display: inline-block
+
+.in-table
+  display: inline-table
+
+.table
+  display: table
+
+.none
+  display: none
+
+.nowrap
+  white-space: nowrap
+
+.bigger
+  font-size: 1.2em
+
+.left, .floatleft
+  float: left
+
+.right, .floatright
+  float: right
+
+.clear, .clearer
+  clear: both
+
+.noclear
+  clear: none
+
+.clearer
+  display: block
+  font-size: 0
+  line-height: 0
+  height: 0
+
+.fixed
+  position: fixed
+
+.centered
+  margin: 0px auto
+
+#upload_wrap
+  width: 209px
+  background-color: #f4f4f4
+  border: 1px solid #d4d4d4
+  padding: 0px
+  border-bottom-left-radius: 7px
+  border-bottom-right-radius: 7px
+  padding: 7px
+
+#upload-files-pane,
+#acco-page-manager-pane
+  width: 215px
+  padding: 4px
+  text-align: left
+  margin: 0px
+  min-height: 50px
+  background-color: #f4f4f4
+  border: 1px solid #d4d4d4
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+
+#upload-files-list
+  list-style-type: none
+  margin: 0 !important
+  padding: 0 !important
+
+  li
+    list-style-type: none
+    max-height: 50px
+
+    .upload-preview-landing
+      height: 50px
+      width: 50px
+      padding: 0
+      background-color: rgba(255,255,255,0.25)
+      display: inline-block
+      vertical-align: middle
+      text-align: middle
+
+      img
+        margin: 0
+        vertical-align: middle
+        text-align: middle
+        max-height: 50px
+        max-width: 50px
+
+    .upload-progress
+      display: inline-block
+      height: 6px
+      background-color: rgba(100,100,100,0.5)
+      background-image: url(data:image/gif;base64,R0lGODlhEAAQAIABAPv8/f///yH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8xMi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNS4xIFdpbmRvd3MiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NkE3RUU0Qzk4Mjc0MTFFMTk2NzhDODRCNkQ4MUU0QjgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NkE3RUU0Q0E4Mjc0MTFFMTk2NzhDODRCNkQ4MUU0QjgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2QTdFRTRDNzgyNzQxMUUxOTY3OEM4NEI2RDgxRTRCOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo2QTdFRTRDODgyNzQxMUUxOTY3OEM4NEI2RDgxRTRCOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgH//v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAACH5BAkKAAEALAAAAAAQABAAAAImDB6ZB2romHtTxnaxgpsvb3XaM5JZBXqmiJZq+LWofLL156a5VgAAIfkECQoAAQAsAAAAABAAEAAAAiaEg2iQyr1aOJAm697FseqJgV+3jSEpSiionl9atS+60q45c3dTAAAh+QQJCgABACwAAAAAEAAQAAACJgSCaJdh7V6TaUFbqdI4s/2BkxaFnThe5MqqYTm+5wl7bnzbeFMAACH5BAkKAAEALAAAAAAQABAAAAIkRH6gmMbqEHyLxjCt3u3i2jGfB4aUmElkOXLmC6cxK8vt6WIFACH5BAkKAAEALAAAAAAQABAAAAIkjA15qJewwluTNgZtxrFy3W2fI0oXE5aeqZ4rC8bj/NZtm4YFACH5BAkKAAEALAAAAAAQABAAAAImjAN5lrC9kDrwTXaxo1luHlWg9WFhJ3pnmapc6WorOVv1+J63VgAAIfkECQoAAQAsAAAAABAAEAAAAiWMgaYIGuxeWpM2G6Grh8vsheLVkeU2oqZkatgLd+CaovMds0EBACH5BAUKAAEALAAAAAAQABAAAAIlTICmCHrpWISLGvvadJljOWnXZ4GV2IXqOqJp5ZGxS9JlzbZGAQA7)
+      background-size: 16px 16px
+      border-radius: 4px
+      border: 1px solid rgba(100,100,100,0.25)
+
+    .upload-done
+      display: inline-block
+      height: 6px
+      background-image: url(data:image/gif;base64,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)
+      background-size: 16px 16px
+      border-radius: 4px
+      border: 1px solid transparent
+
+    .upload-percentage
+      font-size: 11px
+      color: black
+      margin-right: 2px
+      margin-left: 2px
+
+.dragdrop
+  background-color: #e7e7e7
+  width: auto
+  border: 2px solid transparent
+  border-radius: 5px
+  min-height: 100px
+  padding: 0px
+  width: 205px
+  text-align: center
+  font-size: 50px
+  line-height: 100px
+  vertical-align: middle
+  color: #d4d4d4
+  font-family: Arial, sans-serif
+  &:hover
+    background-color: #f4f4f4
+    border: 2px dashed #cdcdcd
+    color: #cdcdcd
+
+.hover
+  background-color: #f4f4f4
+  border: 2px dashed #cdcdcd
+  color: #cdcdcd
+
+.accordion
+  .acco
+    display: block
+    height: 17px
+    font:
+      family: 'Open Sans'
+      size: 15px
+      weight: 700
+    line-height: 17px
+    text-transform: uppercase
+    color: #5f5f5f
+    width: 100%
+    border: none
+    outline: 0
+    background-color: transparent
+
+    &:hover
+      background-color: rgba(126,126,126,0.5)
+      color: #383838
+
+    &:active
+      background-color: rgba(188,188,188, 0.75)
+      color: white
+
+  .current-fold
+    background-color: rgba(188,188,188, 1)
+    color: white
+
+  .acco-btf
+    position: relative
+    background-color: rgba(188,188,188, 0.75)
+
+    a
+      color: #535353
+      margin-left: 5px
+
+      &:hover
+        text-decoration: underline
+
+img
+  &.bordered, &.alignleft, &.alignright, &.aligncenter
+    padding: 3px
+  &.alignleft, &.left
+    margin: 0 1.5em 1em 0
+    vertical-align: middle
+  &.alignright, &.right
+    margin: 0 0 1em 1.5em
+  &.preview
+    max-width: 150px
+
+.panel, .cms_pane, .cms_subpane, .sys_message, .cms_message, .cms_subpane p, .cms_sp
+  font-family: "Open Sans", sans-serif !important
+
+.cms_nav
+  font-family: "Open Sans", sans-serif !important
+  a
+    font-family: "Open Sans", sans-serif !important
+
+.CMS_panel_footer.scr
+  font-family: "Open Sans", sans-serif !important
+
+.h1, .h2, .h3
+  font-family: 'Open Sans', sans-serif
+  margin-top: 0
+  margin-bottom: 5px
+  margin-right: 4px
+  text-decoration: none
+
+a
+  &.h1, &.h2, &.h3
+    font-family: 'Open Sans', sans-serif
+    margin-top: 0
+    margin-bottom: 5px
+    margin-right: 4px
+    text-decoration: none
+
+.h1
+  font-size: 1.4em !important
+  font-weight: 700 !important
+  color: black
+  border: none !important
+
+a.h1
+  font-size: 1.4em !important
+  font-weight: 700 !important
+  color: black
+  border: none !important
+  &:hover, &:visited
+    font-size: 1.4em !important
+    font-weight: 700 !important
+    color: black
+    border: none !important
+
+.h2
+  font-size: 1.2em !important
+  font-weight: 400 !important
+  color: black
+  border: none !important
+
+a.h2
+  font-size: 1.2em !important
+  font-weight: 400 !important
+  color: black
+  border: none !important
+  &:hover, &:visited
+    font-size: 1.2em !important
+    font-weight: 400 !important
+    color: black
+    border: none !important
+
+.h3
+  font-style: italic
+  font-weight: 400
+  color: #333
+  border: none !important
+
+a.h3
+  font-style: italic
+  font-weight: 400
+  color: #333
+  border: none !important
+  &:hover, &:visited
+    font-style: italic
+    font-weight: 400
+    color: #333
+    border: none !important
+
+.loader
+  background-image: url(data:image/gif;base64,R0lGODlhEAAQAPQAAPfuZc3BEPXsYtXKIuLXO83BEdLHHPDmV+jeR9DEFt/VNt3SMfHoW+XbQu3jUdjNJ9rPLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFUCAgjmRpnqUwFGwhKoRgqq2YFMaRGjWA8AbZiIBbjQQ8AmmFUJEQhQGJhaKOrCksgEla+KIkYvC6SJKQOISoNSYdeIk1ayA8ExTyeR3F749CACH5BAAKAAEALAAAAAAQABAAAAVoICCKR9KMaCoaxeCoqEAkRX3AwMHWxQIIjJSAZWgUEgzBwCBAEQpMwIDwY1FHgwJCtOW2UDWYIDyqNVVkUbYr6CK+o2eUMKgWrqKhj0FrEM8jQQALPFA3MAc8CQSAMA5ZBjgqDQmHIyEAIfkEAAoAAgAsAAAAABAAEAAABWAgII4j85Ao2hRIKgrEUBQJLaSHMe8zgQo6Q8sxS7RIhILhBkgumCTZsXkACBC+0cwF2GoLLoFXREDcDlkAojBICRaFLDCOQtQKjmsQSubtDFU/NXcDBHwkaw1cKQ8MiyEAIfkEAAoAAwAsAAAAABAAEAAABVIgII5kaZ6AIJQCMRTFQKiDQx4GrBfGa4uCnAEhQuRgPwCBtwK+kCNFgjh6QlFYgGO7baJ2CxIioSDpwqNggWCGDVVGphly3BkOpXDrKfNm/4AhACH5BAAKAAQALAAAAAAQABAAAAVgICCOZGmeqEAMRTEQwskYbV0Yx7kYSIzQhtgoBxCKBDQCIOcoLBimRiFhSABYU5gIgW01pLUBYkRItAYAqrlhYiwKjiWAcDMWY8QjsCf4DewiBzQ2N1AmKlgvgCiMjSQhACH5BAAKAAUALAAAAAAQABAAAAVfICCOZGmeqEgUxUAIpkA0AMKyxkEiSZEIsJqhYAg+boUFSTAkiBiNHks3sg1ILAfBiS10gyqCg0UaFBCkwy3RYKiIYMAC+RAxiQgYsJdAjw5DN2gILzEEZgVcKYuMJiEAOwAAAAAAAAAAAA==)
+  background-color: transparent
+  background-repeat: no-repeat
+  z-index: 995
+  background-position: 20px 50%
+  height: 16px
+  margin-right: 8px
+
+.editable
+  border: none
+
+.drag
+  cursor: move
+
+  &:active
+    cursor: move
+
+#m-overlay
+  width: 100%
+  height: 100%
+  bottom: 0
+  left: 0
+  right: 0
+  background-color: #fff
+  z-index: 900
+
+#CMS_panel
+  z-index: 990
+  width: 225px
+  height: 505px
+
+.sys_message, .cms_message
+  border-radius: 5px
+  padding: 5px
+  position: fixed
+  top: 10px
+  border: 1px dotted
+  text-align: center
+  cursor: pointer
+  font-weight: bold
+
+.sys_message
+  left: 10px
+  width: 150px
+  z-index: 999
+
+.cms_message
+  right: 10px
+  width: 200px
+  z-index: 998
+  &:hover
+    border: 1px solid
+  &:active
+    margin-top: 1px
+    margin-right: 1px
+
+.yay
+  background-color: #99E368
+  border-color: #68A83D
+  color: #68A83D
+
+.warn
+  background-color: #F7EE65
+  border-color: #F5BE18
+  color: #e4ad07
+
+.error
+  background-color: #FF9E9E
+  border-color: #B31717
+  color: #B31717
+
+.notify
+  background-color: #8FBDF2
+  border-color: #256BBA
+  color: #256BBA
+
+.panel
+  width: 225px
+  background-color: white
+  border: 1px solid #dfdfdf
+  border-radius: 7px
+  padding: 9px
+  font-size: 11
+
+.cms_pane hr
+  width: 210px
+  color: #dfdfdf
+  background-color: #dfdfdf
+  height: 1px
+  margin: 10px auto
+  border: none
+
+.cms_subpane
+  white-space: normal
+  text-align: center
+
+.cms_sp
+
+  width: 225px
+  color: #808080
+  text-transform: uppercase
+  font-size: 13px
+  font-weight: 700
+  line-height: 18px
+  text-align: center
+  letter-spacing: 3px
+  margin: 0
+  padding: 0
+  background: -webkit-gradient(linear, left top, left bottom, from(#d4d4d4), to(#b4b4b4))
+
+.cms_subpane
+  cursor: default
+
+  p
+    width: 215px
+    padding: 4px
+    text-align: center
+    margin: 0px
+    min-height: 40px
+    color: #808080
+    background-color: #f4f4f4
+    border: 1px solid #d4d4d4
+    border-bottom-right-radius: 5px
+    border-bottom-left-radius: 5px
+
+  button
+    font-family: 'Open Sans', sans-serif
+    text-transform: uppercase
+    font-size: 11px
+    font-weight: 700
+    border: 1px solid #808080
+    background-color: transparent
+    color: #808080
+    border-radius: 4px
+    cursor: pointer
+
+    &:hover
+      border-color: #5a5a5a
+      color: #5a5a5a
+    &:active
+      border-color: #333
+      color: #333
+      background-color: #fff
+
+    &.cms_disabled
+      border: 1px solid #bbb
+      color: #bbb
+      border-radius: 4px
+      font-weight: 400
+      font-style: italic
+
+      &:active,
+      &:hover
+        background-color: transparent
+        cursor: default
+
+
+
+#CMS_frame
+  overflow: hidden
+  width: 225px
+  height: 475px
+
+.cms_pane
+  position: relative
+  white-space: normal
+  width: 225px
+  height: 475px
+
+#CMS_nav
+  a
+    float: left
+    width: 33%
+    text-align: center
+    text-decoration: none
+    text-transform: uppercase
+    font-weight: 700
+    cursor: pointer
+    &:link, &:visited, &:active, &.curr:hover
+      color: #f4f4f4
+      background: #808080
+      background: -webkit-gradient(linear, left top, left bottom, from(#949494), to(gray))
+  .curr
+    &:link, &:visited
+      color: #808080
+      background: #f4f4f4
+  a
+    &.curr:active, &:hover
+      color: #808080
+      background: #f4f4f4
+
+#CMS_panel_footer
+  margin-top: 20px
+  text-align: center
+  font-size: 10px
+  color: black
+
+.entry-title
+  display: none !important
+
+.new-items p
+  margin: 0 0 15px 0
+  font-size: 13px
+
+#wrapper
+  /* inlined
+  padding-bottom: 15px
+  margin-bottom: 0px
+
+#masthead, #branding
+  border: 0
+
+#support_work_top_mow
+  padding: 0
+  margin: 13px 20px 0 0
+
+#footer
+  /* inlined
+  border: 0
+  margin-top: 0
+
+#colophon
+  /* inlined
+  border: 0
+  margin-top: 0
+  padding: 10px
+
+#contact_table
+  width: 220px
+  border: 0
+  border-spacing: 0
+  border-collapse: 0
+  font: normal 11px Arial
+
+#content_table
+  width: 690px
+  border: 0
+  border-spacing: 0
+  border-collapse: 0
