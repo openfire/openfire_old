@@ -48,7 +48,7 @@ class Proposal(ndb.Model, MessageConverterMixin):
     _message_class = ProposalMessage
 
     # Naming/Status
-    slug = ndb.StringProperty('s', indexed=True, required=True)
+    #TODO (see OF-64) slug = ndb.StringProperty('s', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=True, required=True)
     status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a'])  # draft, submitted, review, denied, accepted
     category = ndb.KeyProperty('ct', indexed=True, required=True)
@@ -76,7 +76,7 @@ class Project(ndb.Model, MessageConverterMixin):
     _message_class = ProjectMessage
 
     # Naming/Status/Ancestry
-    slug = ndb.StringProperty('s', indexed=True, required=True)
+    #TODO (see OF-64) slug = ndb.StringProperty('s', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=True, required=True)
     status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c'])  # private, featured, open, closed
     proposal = ndb.KeyProperty('pr', indexed=True, required=True)

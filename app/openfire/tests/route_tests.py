@@ -17,13 +17,13 @@ import webapp2
 import test_db_loader as db_loader
 
 
-def generic_view_success_test(test_case, url):
+def generic_view_success_test(test_case, url, error="generic view error"):
     """ A generic success test for a given url.
     """
     request = webapp2.Request.blank(url)
     response = request.get_response(dispatch.gateway)
-    test_case.assertEqual(response.status_int, 200)
-    test_case.assertTrue(len(response.body))
+    test_case.assertEqual(response.status_int, 200, error)
+    test_case.assertTrue(len(response.body), error)
 
 
 class HomepageTestCase(unittest.TestCase):
@@ -103,7 +103,7 @@ class ProposalPageTestCase(unittest.TestCase):
         self.testbed.init_memcache_stub()
 
         # Create a proposal with token 'proposaltoken'.
-        db_loader.create_proposal(slug='proposaltoken')
+        db_loader.create_proposal()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -129,7 +129,7 @@ class ProjectPageTestCase(unittest.TestCase):
         self.testbed.init_memcache_stub()
 
         # Create a project called 'fakeproject'.
-        db_loader.create_project(slug='fakeproject')
+        db_loader.create_project()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -138,7 +138,8 @@ class ProjectPageTestCase(unittest.TestCase):
         generic_view_success_test(self, '/projects')
 
     def test_project_page(self):
-        generic_view_success_test(self, '/project/fakeproject')
+        # TODO Set up a custom URL here or on the project somehow
+        generic_view_success_test(self, '/fakeproject', 'EXPECTED FAILURE: SEE OF-64')
 
 
 class BBQPageTestCase(unittest.TestCase):

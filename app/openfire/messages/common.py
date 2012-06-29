@@ -6,6 +6,7 @@ class CategoryRequest(messages.Message):
     ''' A request for a category by slug. '''
 
     slug = messages.StringField(1)
+    key = messages.StringField(2)
 
 
 class Category(messages.Message):

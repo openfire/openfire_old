@@ -1,28 +1,40 @@
-<h2>Proposals (...does not work yet)!</h2>
-<ul>
+<h2>Proposals!</h2>
+<div id="proposal-container">
     {% for proposal in proposals %}
-    <li id="proposal-{{ proposal.slug }}">
-        <p id="proposal-display-{{ proposal.slug }}">
-            <span>{{ proposal.name }}</span>
-            <span>{{ proposal.slug }}</span>
-            <span>{{ proposal.summary }}</span>
-        </p>
-        <p id="proposal-inputs-{{ proposal.slug }}" style="display: none;">
-            <span><input class="name-input" value="{{ proposal.name }}"></span>
-            <span><input class="slug-input" value="{{ proposal.slug }}" disabled="disabled"></span>
-            <span><input class="summary-input" value="{{ proposal.summary }}"></span>
-        </p>
-        <span>
-            <button id="delete-proposal-{{ proposal.slug }}" class="delete-object" type="button">delete</button>
-            <button id="start-edit-proposal-{{ proposal.slug }}" class="start-edit-inline" type="button">edit</button>
-            <button id="cancel-edit-proposal-{{ proposal.slug }}" class="cancel-edit-inline" type="button" style="display: none;">cancel</button>
-            <button id="save-edit-proposal-{{ proposal.slug }}" class="save-edit-inline" type="button" style="display: none;">save</button>
-        </span>
-    </li>
+    <div class="proposal">
+        <div class="proposal-info">
+            <span class="proposal-key" style="display: none;">{{ proposal.key.urlsafe() }}</span>
+            <label>Name: </label>
+            <span class="proposal-name editable">{{ proposal.name }}</span>
+            <label>Summary: </label>
+            <span class="proposal-summary editable">{{ proposal.summary }}</span>
+            <label>Category: </label>
+            <span class="proposal-category editable">{{ proposal.category }}</span>
+            <label>Status: </label>
+            <span class="proposal-status editable">{{ proposal.status }}</span>
+            <label>Pitch: </label>
+            <span class="proposal-pitch editable">{{ proposal.pitch }}</span>
+            <label>Tech: </label>
+            <span class="proposal-tech editable">{{ proposal.tech }}</span>
+            <label>Keywords: </label>
+            <span class="proposal-keywords editable">{{ proposal.keywords }}</span>
+            <label>Creator: </label>
+            <span class="proposal-creator editable">{{ proposal.creator }}</span>
+        </div>
+        <div>
+            <button class="delete" type="button">delete</button>
+            <button class="start-edit" type="button">edit</button>
+            <button class="cancel-edit" type="button" style="display: none;">cancel</button>
+            <button class="save-edit" type="button" style="display: none;">save</button>
+            <button class="promote-to-project" type="button">Promote to a project</button>
+            <button class="suspend" type="button">Suspend</button>
+            <button class="reject" type="button">Reject</button>
+        </div>
+    </div>
     {% else %}
-    <li>No proposals yet!</li>
+    <div>No proposals yet!</div>
     {% endfor %}
-</ul>
+</div>
 <button id="show-new-proposal-btn" class="show-new-inline">+ Add New Proposal (does not work yet)</button>
 <div id="new-proposal-inline" class="inline-form" style="display: none;">
     <form id="new-proposal-frm">

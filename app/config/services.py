@@ -154,7 +154,7 @@ config['apptools.project.services'] = {
         'project': {
             'enabled': True,
             'service': 'openfire.services.project.ProjectService',
-            'methods': ['get', 'list', 'put', 'comment', 'comments', 'post', 'posts', 'add_media', 'media', 'follow', 'followers', 'backers', 'back', 'suspend', 'shutdown'],
+            'methods': ['get', 'list', 'put', 'go_live', 'delete', 'comment', 'comments', 'post', 'posts', 'media', 'follow', 'followers', 'backers', 'back', 'suspend', 'shutdown'],
 
             'config': {
                 'caching': 'none',
@@ -167,7 +167,7 @@ config['apptools.project.services'] = {
         'proposal': {
             'enabled': True,
             'service': 'openfire.services.proposal.ProposalService',
-            'methods': ['get', 'list', 'put', 'comment', 'comments', 'promote', 'suspend', 'reject'],
+            'methods': ['get', 'list', 'put', 'delete', 'comment', 'comments', 'promote', 'suspend', 'reject'],
 
             'config': {
                 'caching': 'none',
