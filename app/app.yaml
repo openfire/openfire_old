@@ -1,10 +1,10 @@
 application: open-fire-staging
-version: develop
+version: optimized
 runtime: python27
 api_version: 1
 threadsafe: yes
 
-default_expiration: "365d"
+default_expiration: "1m"
 
 
 #### ===== Files to Skip
@@ -36,17 +36,15 @@ libraries:
 #### ===== Builtin SDK Includes
 builtins:
 - appstats: on
-#- deferred: on
-#- mapreduce: on
-#- remote_api: on
-#- admin_redirect: on
-#- datastore_admin: on
+- deferred: on
+- remote_api: on
+- admin_redirect: on
 
 
 #### ===== Incoming Services
-#inbound_services:
+inbound_services:
+- warmup
 #- mail
-#- warmup
 #- xmpp_message
 #- xmpp_presence
 #- xmpp_subscribe
@@ -56,6 +54,45 @@ builtins:
 #### ===== Force precompilation
 derived_file_type:
 - python_precompiled
+
+
+#### ===== PageSpeed Config
+pagespeed:
+  domains_to_rewrite:
+  - open-fire-staging.appspot.com
+  - staging.openfi.re
+  - www-beta.openfi.re
+  enabled_rewriters:
+  - ProxyCss
+  - ProxyImages
+  - ProxyJs
+  - ConvertMetaTags
+  - InlineCss
+  - InlineJs
+  - InlineImages
+  - InlinePreviewImages
+  - CollapseWhitespace
+  - CombineHeads
+  - ElideAttributes
+  - RemoveComments
+  - MinifyCss
+  - CombineCss
+  - MoveCssToHead
+  - WebpOptimization
+  - ImageConvertToJpeg
+  - ImageRecompressJpeg
+  - ImageProgressiveJpeg
+  - ImageRecompressPng
+  - ImageStripMetadata
+  - ImageStripColorProfile
+  - ImageResize
+  - LazyloadImages
+  - ImageAddDimensions
+  - CombineJs
+  - JsOptimize
+  disabled_rewriters:
+  - LeftTrimUrls
+  - DeferJs
 
 
 #### ===== Custom Admin Pages

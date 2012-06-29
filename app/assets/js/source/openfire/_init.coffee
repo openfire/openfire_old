@@ -44,7 +44,7 @@ class Openfire
                         window.apptools?.events?.register(event) for event in obj.events
 
                     # instantiate and bind to window, if obj isn't private
-                    if obj.export? isnt 'private' then window[o] = obj = new obj(@) else obj = new obj()
+                    if obj.export? isnt 'private' then (obj = new obj(@)) and window[o] = obj else obj = new obj()
 
                     # lastly init, if it needs it
                     obj._init?()
@@ -56,7 +56,7 @@ class Openfire
                     @sys.state.classes[(cl=cls.constructor.name)] = cls
                     if cls.events?
                         window.apptools?.events?.register(event) for event in cls.events
-                    if cls.export? isnt 'private' then window[cl] = cls = new cls(@) else cls = new cls()
+                    if cls.export? isnt 'private' then (cls = new cls(@)) and window[cl] = cls else cls = new cls()
                     cls._init?()
 
                     return cls
@@ -66,7 +66,7 @@ class Openfire
                     @sys.state.controllers[(c=ctrlr.constructor.name)] = ctrlr
                     if ctrlr.events?
                         window.apptools?.events?.register(event) for event in ctrlr.events
-                    if ctrlr.export? isnt 'private' then window[c] = ctrlr = new ctrlr(@, window) else ctrlr = new ctrlr(@, window)
+                    if ctrlr.export? isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[c] = ctrlr else ctrlr = new ctrlr(window)
                     ctrlr._init?()
 
                     return ctrlr
@@ -90,7 +90,7 @@ class Openfire
 
 # bind openfire to window
 window.Openfire = Openfire
-window.openfire = new Openfire()
+window.openfire = new Openfire(window)
 
 # if jQuery's around, extend it with openfire
 if $?
