@@ -23,12 +23,12 @@ defaults =
 out =
 
 	flags:
-		header: '\033[95m'
-		blue: '\033[94m'
-		green: '\033[92m'
-		yellow: '\033[93m'
-		red: '\033[91m'
-		end: '\033[0m'
+		header: ''
+		blue: ''
+		green: ''
+		yellow: ''
+		red: ''
+		end: ''
 
 		wrap: (message, flag) ->
 			if defaults.colorize
@@ -307,7 +307,7 @@ task 'scaffold', 'download a skeleton from git and install it', (options) =>
 	out.say 'skeleton', 'Target directory: "'+skeleton_dir+'".'
 
 	gitfinish = () =>
-		wrench.chmodSyncRecursive(skeleton_dir, 0755);
+		wrench.chmodSyncRecursive(skeleton_dir, '0755')
 		out.say 'install', 'Installation complete at: app/'
 		out.shout 'skeleton', 'Finished skeleton installation.'
 
@@ -331,7 +331,7 @@ task 'scaffold', 'download a skeleton from git and install it', (options) =>
 task 'project:bootstrap', 'generate a buildout executable', (options) =>
 
 	#f = fs.openSync(fixpath(__dirname, '.installed.cfg'), 'a+')
-	#fs.chmodSync(fixpath(__dirname, '.installed.cfg'), 0777)
+	#fs.chmodSync(fixpath(__dirname, '.installed.cfg'), '0777')
 
 	bootstrap_done = () =>
 		out.say 'bootstrap', out.flags.wrap('Bootstrap complete.', out.flags.green)+' From now on, you can use `'+out.flags.wrap('cake make', out.flags.green)+'` to update dependencies.'
@@ -422,7 +422,7 @@ task 'update:apptools', 'download and install apptools library', (options) ->
 	out.say 'apptools', 'Target directory: "'+apptools_dir+'".'
 
 	gitfinish = () =>
-		wrench.chmodSyncRecursive(apptools_dir, 0755);
+		wrench.chmodSyncRecursive(apptools_dir, '0755');
 		out.say 'apptools', 'Apptools installation complete at: app/lib/apptools'
 		out.shout 'apptools', 'Finished skeleton installation.'
 
@@ -495,7 +495,7 @@ task 'clean:gaelibs', 'clean GAE libraries (ndb, pipelines, mapreduce & protorpc
 							throw error
 
 		catch error
-			wrench.mkdirSyncRecursive lib_dir, 0777
+			wrench.mkdirSyncRecursive lib_dir, '0777'
 			out.say 'clean', 'Library "'+libs[lib]+'" not found. Creating empty lib directory.'
 			continue
 
