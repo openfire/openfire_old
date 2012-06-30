@@ -128,13 +128,6 @@ class ProjectService(RemoteService):
 
         return common_messages.posts()
 
-    @remote.method(media_messages.AddMedia, media_messages.Media)
-    def add_media(self, request):
-
-        ''' Add media to a project. '''
-
-        return media_messages.Media()
-
     @remote.method(message_types.VoidMessage, media_messages.Media)
     def media(self, request):
 
@@ -147,7 +140,12 @@ class ProjectService(RemoteService):
 
         ''' Follow a project and return the new follow count. '''
 
+<<<<<<< HEAD
         return Echo(message='cool')
+=======
+        return Echo(message='')
+
+>>>>>>> 33f69f093df6ddd0fc5711db2f7b5deeb135d7e8
 
     @remote.method(common_messages.FollowersRequest, common_messages.FollowersResponse)
     def followers(self, request):
@@ -169,6 +167,10 @@ class ProjectService(RemoteService):
         ''' Become a backer of a project. '''
 
         return Echo(message='')
+<<<<<<< HEAD
+=======
+
+>>>>>>> 33f69f093df6ddd0fc5711db2f7b5deeb135d7e8
 
     @remote.method(project_messages.SuspendProject, Echo)
     def suspend(self, request):
@@ -184,6 +186,11 @@ class ProjectService(RemoteService):
 
         project.status = 'p'
         project.put()
+<<<<<<< HEAD
+=======
+
+        return Echo(message='Project suspended')
+>>>>>>> 33f69f093df6ddd0fc5711db2f7b5deeb135d7e8
 
         return Echo(message='Project suspended')
 
