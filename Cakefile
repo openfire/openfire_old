@@ -1,3 +1,5 @@
+## == OPENFIRE CAKEFILE v 1.0 == ##
+
 fs = require 'fs'
 path = require 'path'
 util = require 'util'
