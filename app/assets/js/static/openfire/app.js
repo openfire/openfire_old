@@ -557,28 +557,28 @@
               }
             }
             return preinit;
-          },
-          sniff_headers: function(document) {
-            var cookie, i, session, _ref;
-            session = null;
-            _ref = document.cookies.split(";");
-            for (i in _ref) {
-              cookie = _ref[i];
-              cookie = cookie.split("=");
-              if (cookie[0] === _this.sys.config.session.cookie) {
-                session = cookie[1].split("|");
-                if (session.length > 2) {
-                  if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
-                    session = cookie[2];
-                  }
+          }
+        },
+        sniff_headers: function(document) {
+          var cookie, i, session, _ref;
+          session = null;
+          _ref = document.cookie.split(";");
+          for (i in _ref) {
+            cookie = _ref[i];
+            cookie = cookie.split("=");
+            if (cookie[0] === _this.sys.config.session.cookie) {
+              session = cookie[1].split("|");
+              if (session.length > 2) {
+                if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
+                  session = cookie[2];
                 }
-                break;
               }
-              continue;
+              break;
             }
-            if (session !== null && session !== false) {
-              return _this.sys.state.session.established = true;
-            }
+            continue;
+          }
+          if (session !== null && session !== false) {
+            return _this.sys.state.session.established = true;
           }
         },
         install: {

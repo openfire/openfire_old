@@ -46,22 +46,22 @@ class Openfire
 
                     return preinit  # preinit HANDLED.
 
-                sniff_headers: (document) =>
+            sniff_headers: (document) =>
 
-                    # only lookin' for cookies right now
-                    session = null
-                    for i, cookie of document.cookies.split(";")
-                        cookie = cookie.split("=");
-                        if cookie[0] == @sys.config.session.cookie
-                            session = cookie[1].split("|")
-                            if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
-                                if (@sys.config.session.timeout * 1000) > +new Date()  # check expiration
-                                    session = cookie[2]
-                            break
-                        continue
+                # only lookin' for cookies right now
+                session = null
+                for i, cookie of document.cookie.split(";")
+                    cookie = cookie.split("=");
+                    if cookie[0] == @sys.config.session.cookie
+                        session = cookie[1].split("|")
+                        if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
+                            if (@sys.config.session.timeout * 1000) > +new Date()  # check expiration
+                                session = cookie[2]
+                        break
+                    continue
 
-                    if session isnt null and session isnt false
-                        @sys.state.session.established = true
+                if session isnt null and session isnt false
+                    @sys.state.session.established = true
 
 
             install:
