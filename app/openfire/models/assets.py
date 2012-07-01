@@ -4,6 +4,7 @@
 from google.appengine.ext import ndb
 from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
+from openfire.messages.common import CustomUrl as CustomUrlMessage
 
 # Model Attachments
 from openfire.messages import assets as messages
@@ -74,7 +75,7 @@ class CustomURL(AppModel):
 
     ''' Describes a custom URL mapping. '''
 
-    _message_class = messages.CustomURL
+    _message_class = CustomUrlMessage
     _pipeline_class = pipelines.CustomURLPipeline
 
     slug = ndb.StringProperty('s', indexed=True, required=True)

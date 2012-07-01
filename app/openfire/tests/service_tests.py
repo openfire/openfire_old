@@ -16,6 +16,7 @@ import copy
 
 import test_db_loader as db_loader
 from openfire.models.project import Category
+from openfire.models.assets import CustomURL
 
 
 API_DICT = {
@@ -30,7 +31,7 @@ API_DICT = {
 }
 
 
-def generic_service_method_success_test(test_case, service_name, service_method, params={}):
+def generic_service_method_success_test(test_case, service_name, service_method, params={}, should_fail=False):
     ''' A generic success test for a given service url.
     Returns a response dict loaded from the response body with json.
     '''
@@ -44,8 +45,9 @@ def generic_service_method_success_test(test_case, service_name, service_method,
     request.method = 'POST'
     request.body = json.dumps(requestDict)
     response = request.get_response(dispatch.gateway)
-    test_case.assertEqual(response.status_int, 200)
-    test_case.assertTrue(len(response.body))
+    if not should_fail:
+        test_case.assertEqual(response.status_int, 200)
+        test_case.assertTrue(len(response.body))
     responseDict = json.loads(response.body)
     test_case.assertTrue(responseDict)
     return responseDict
@@ -373,3 +375,87 @@ class CategoryServiceTestCase(unittest.TestCase):
         self.assertEqual(response['response']['type'], 'Echo',
             'Category put service method failed.')
         self.assertEqual(len(Category.query().fetch(1)), 0, 'Failed to delete category.')
+
+
+class CustomUrlServiceTestCase(unittest.TestCase):
+    ''' Test cases for the custom_url service.
+    '''
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def test_custom_url_list_method(self):
+
+        ''' Add a custom_url to the database then query. '''
+
+        slug = 'test-slug'
+        db_loader.create_custom_url(slug=slug)
+        response = generic_service_method_success_test(self, 'url', 'list')
+        self.assertEqual(response['response']['type'], 'CustomUrls',
+            'System custom_url list service method failed.')
+        self.assertEqual(len(response['response']['content']['urls']), 1,
+            'Failed to return the correct number of urls.')
+
+    def test_custom_url_get_method(self):
+
+        ''' Add a custom_url to the database then query. '''
+
+        custom_url_slug = 'test-slug'
+        db_loader.create_custom_url(slug=custom_url_slug)
+        response = generic_service_method_success_test(self, 'url', 'get', params={'slug':custom_url_slug})
+        self.assertEqual(response['response']['type'], 'CustomUrl',
+            'CustomUrl get service method failed.')
+        self.assertEqual(response['response']['content']['slug'], custom_url_slug,
+            'CustomUrl get method returned the wrong custom url.')
+
+    def test_custom_url_put_method(self):
+
+        ''' Add a custom url through the api and then try again to get an error. '''
+
+        target = db_loader.create_project()
+        params = {
+            'slug': 'test',
+            'target': target.urlsafe(),
+        }
+
+        response = generic_service_method_success_test(self, 'url', 'put', params=params)
+        self.assertEqual(response['response']['type'], 'CustomUrl',
+            'CustomUrl put service method failed to create a new custom_url.')
+
+        response = generic_service_method_success_test(self, 'url', 'put', params=params, should_fail=True)
+        self.assertEqual(response['response']['content']['state'], 'APPLICATION_ERROR', 'Allowed overwriting of a custom url.')
+
+    def test_custom_url_delete_method(self):
+
+        ''' Add a custom_url and then delete it through the api. '''
+
+        slug = 'test-slug'
+        custom_url_key = db_loader.create_custom_url(slug=slug)
+        params = {
+            'key': custom_url_key.urlsafe(),
+        }
+        response = generic_service_method_success_test(self, 'url', 'delete', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'CustomUrl delete service method failed.')
+        self.assertEqual(len(CustomURL.query().fetch(1)), 0, 'Failed to delete custom url.')
+
+    def test_custom_url_check_method(self):
+
+        ''' Add a custom_url and then delete it through the api. '''
+
+        slug = 'test-slug'
+        params = {'slug': slug}
+        response = generic_service_method_success_test(self, 'url', 'check', params=params)
+        self.assertEqual(response['response']['type'], 'CustomUrlCheck',
+            'CustomUrl check service method failed.')
+        self.assertEqual(response['response']['content']['taken'], False, 'Custom url is taken that was never assigned.')
+
+        db_loader.create_custom_url(slug=slug)
+        response = generic_service_method_success_test(self, 'url', 'check', params=params)
+        self.assertEqual(response['response']['content']['taken'], True, 'Custom url is not taken that was assigned.')

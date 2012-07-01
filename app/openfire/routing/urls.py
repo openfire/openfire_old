@@ -41,13 +41,13 @@ rules = [
         HandlerPrefixRoute('propose.', [
             Route('/propose', name='propose/landing', handler='ProposeLanding'),
             Route('/apply', name='apply', handler='Apply'),
-            Route('/proposal/<token>', name='proposal/home', handler='ProposalHome'),
+            Route('/proposal/<key>', name='proposal/home', handler='ProposalHome'),
         ]),
 
         ## === Project URLs === ##
         HandlerPrefixRoute('project.', [
             Route('/projects', name='project/landing', handler='ProjectLanding'),
-            Route('/project/<customurl>', name='project/home', handler='ProjectHome'),
+            Route('/project/<key>', name='project/home', handler='ProjectHome'),
         ]),
 
         ## === BBQ URLs === ##
@@ -68,6 +68,8 @@ rules = [
                 Route('/tick/cache', name='internal/cache-flush', handler='NoOp'),
                 Route('/tick/garbage', name='internal/garbage-collector', handler='NoOp')
             ])
-        ])
+        ]),
+
+        Route('/<customurl>', name='custom_url', handler='main.CustomUrlHandler'),
     ])
 ]

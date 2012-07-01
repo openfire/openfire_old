@@ -108,7 +108,6 @@ config['apptools.project.services'] = {
                 'security': 'private',
                 'recording': 'none'
             }
-
         },
 
         ## Category API - provides structured information about openfire categories
@@ -135,6 +134,19 @@ config['apptools.project.services'] = {
 				'security': 'none',
 				'recording': 'none'
 			}
+        },
+
+        ## URL API - Add, delete, and update custom urls.
+        'url': {
+            'enabled': True,
+            'service': 'openfire.services.url.CustomUrlService',
+            'methods': ['get', 'list', 'put', 'delete', 'check'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'private',
+                'recording': 'none'
+            }
         },
 
         ## Indexer API - allows programmatic control of openfire's content indexer
