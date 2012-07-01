@@ -490,7 +490,7 @@
     Util.events = [];
 
     Util.prototype.is = function(thing) {
-      return Util.in_array(thing, [false, null, NaN, void 0, 0, {}, [], '', 'false', 'False', 'null', 'NaN', 'undefined', '0', 'none', 'None']);
+      return !this.in_array(thing, [false, null, NaN, void 0, 0, {}, [], '', 'false', 'False', 'null', 'NaN', 'undefined', '0', 'none', 'None']);
     };
 
     Util.prototype.is_function = function(object) {
@@ -505,7 +505,7 @@
       if (!object || typeof object !== 'object' || object.nodeType || (typeof object === 'object' && __indexOf.call(object, 'setInterval') >= 0)) {
         return false;
       }
-      if (object.constructor && !object.hasOwnProperty('constructor') && !object.constructor.prototype.hasOwnProperty('isPrototypeOf')) {
+      if ((object.constructor != null) && !object.hasOwnProperty('constructor') && !object.constructor.prototype.hasOwnProperty('isPrototypeOf')) {
         return false;
       }
       return true;
@@ -547,7 +547,10 @@
       if (node == null) {
         node = document;
       }
-      return document.getElementById(query) || node.getElementsByClassName(query) || node.getElementsByTagName(query) || null;
+      if (query.nodeType) {
+        return query;
+      }
+      return document.getElementById(query) || node.getElementsByClassName(query) || node.getElementsByTagName(query) || false;
     };
 
     Util.prototype.get_offset = function(elem) {
@@ -567,15 +570,11 @@
     };
 
     Util.prototype.has_class = function(element, cls) {
-      if (element.classList != null) {
-        return element.classList.contains(cls);
-      } else {
-        return element.className && new RegExp('\\s*' + cls + '\\s*').test(element.className);
-      }
+      return element.classList.contains(cls) || (element.className && new RegExp('\\s*' + cls + '\\s*').test(element.className));
     };
 
     Util.prototype.is_id = function(str) {
-      if (str.charAt(0) === '#' || document.getElementById(str !== null)) {
+      if (str.charAt(0) === '#' || document.getElementById(str) !== null) {
         return true;
       } else {
         return false;
@@ -583,33 +582,88 @@
     };
 
     Util.prototype.bind = function(element, event, fn, prop) {
+      var el, ev, func, _i, _len, _results, _results1,
+        _this = this;
       if (prop == null) {
         prop = false;
       }
-      return element.addEventListener(event, fn, prop);
+      if (this.is_array(element)) {
+        _results = [];
+        for (_i = 0, _len = element.length; _i < _len; _i++) {
+          el = element[_i];
+          _results.push((function(el) {
+            return _this.bind(el, event, fn, prop);
+          })(el));
+        }
+        return _results;
+      } else if (this.is_raw_object(event)) {
+        _results1 = [];
+        for (ev in event) {
+          func = event[ev];
+          _results1.push((function(ev, func) {
+            return _this.bind(element, ev, func, prop);
+          })(ev, func));
+        }
+        return _results1;
+      } else {
+        return element.addEventListener(event, fn, prop);
+      }
     };
 
     Util.prototype.unbind = function(element, event) {
-      return element.removeEventListener(event);
+      var el, els, ev, item, _i, _j, _k, _len, _len1, _len2, _results, _results1, _results2,
+        _this = this;
+      if (this.is_array(element)) {
+        _results = [];
+        for (_i = 0, _len = element.length; _i < _len; _i++) {
+          el = element[_i];
+          _results.push((function(el) {
+            return _this.unbind(el, event);
+          })(el));
+        }
+        return _results;
+      } else if (this.is_array(event)) {
+        _results1 = [];
+        for (_j = 0, _len1 = event.length; _j < _len1; _j++) {
+          ev = event[_j];
+          _results1.push((function(ev) {
+            return _this.unbind(element, ev);
+          })(ev));
+        }
+        return _results1;
+      } else if (this.is_raw_object(element)) {
+        _results2 = [];
+        for (el in element) {
+          ev = element[el];
+          _results2.push((function(el, ev) {
+            return _this.unbind(el, ev);
+          })(el, ev));
+        }
+        return _results2;
+      } else if (element.constructor.name === 'NodeList') {
+        els = [];
+        for (_k = 0, _len2 = element.length; _k < _len2; _k++) {
+          item = element[_k];
+          els.push(item);
+        }
+        return this.unbind(els, event);
+      } else {
+        return element.removeEventListener(event);
+      }
     };
 
-    Util.prototype.block = function(method, object) {
-      var result, _done,
-        _this = this;
+    Util.prototype.block = function(async_method, object) {
+      var result, _done;
+      if (object == null) {
+        object = {};
+      }
+      console.log('[Util] Enforcing blocking at user request... :(');
       _done = false;
       result = null;
-      if (object != null) {
-        method(object, function(x) {
-          result = x;
-          return _done = true;
-        });
-      } else {
-        method(function(x) {
-          result = x;
-          return _done = true;
-        });
-      }
-      console.log('[Util]: Enforcing blocking at user request... :(');
+      async_method(object, function(x) {
+        result = x;
+        return _done = true;
+      });
       while (true) {
         if (_done !== false) {
           break;
@@ -631,10 +685,10 @@
 
     Util.prototype.prep_animation = function(t, e, c) {
       var options;
-      options = t && is_object(t) ? Util.extend({}, t) : {
+      options = (t != null) && this.is_object(t) ? this.extend({}, t) : {
         complete: c || (!c && e) || (is_function(t && t)),
         duration: t,
-        easing: c && e || (e && !is_function(e && e))
+        easing: (c && e) || (e && !is_function(e))
       };
       return options;
     };
@@ -694,11 +748,7 @@
         target = arguments[1] || {};
         i++;
       }
-      if (len === i) {
-        target = this;
-        i--;
-      }
-      if (!is_object(target) && !is_function(target)) {
+      if (!this.is_object(target) && !this.is_function(target)) {
         target = {};
       }
       args = Array.prototype.slice.call(arguments, i);
@@ -714,14 +764,14 @@
           o = String(option);
           clone = value;
           src = target[option];
-          if (deep && (clone != null) && (is_raw_object(clone) || (a = is_array(clone)))) {
+          if (deep && (clone != null) && (_this.is_raw_object(clone) || (a = _this.is_array(clone)))) {
             if (a != null) {
               a = false;
-              copied_src = src && (is_array(src) ? src : []);
+              copied_src = src && (_this.is_array(src) ? src : []);
             } else {
-              copied_src = src && (is_raw_object(src) ? src : {});
+              copied_src = src && (_this.is_raw_object(src) ? src : {});
             }
-            _results.push(target[option] = extend(deep, copied_src, clone));
+            _results.push(target[option] = _this.extend(deep, copied_src, clone));
           } else if (clone != null) {
             _results.push(target[option] = clone);
           } else {
@@ -2951,155 +3001,6 @@
     module: CoreWidgetAPI
   });
 
-  Modal = (function(_super) {
-
-    __extends(Modal, _super);
-
-    function Modal(target, trigger, options) {
-      var _this = this;
-      this.state = {
-        el: target,
-        trigger: trigger,
-        dialog: null,
-        overlay: null,
-        active: false,
-        init: false
-      };
-      this.defaults = {
-        start: {
-          width: '0px',
-          height: '0px',
-          top: window.innerHeight / 2 + 'px',
-          left: window.innerHeight / 2 + 'px'
-        },
-        ratio: {
-          x: 0.4,
-          y: 0.4
-        },
-        html: ['<div id="modal-dialog" style="opacity: 0;" class="fixed dropshadow dialog">', '<div id="modal-fade" style="opacity: 0">', '<div id="modal-content">&nbsp;</div>', '<span class="modal-ui" class="absolute">', '<span id="modal-title" class="absolute"></span>', '<span id="modal-close" class="absolute">X</span>', '</span>', '</div>', '</div>'].join('\n'),
-        rounded: true
-      };
-      this.config = $.extend(true, this.defaults, options);
-      this.calc = function() {
-        var css, dH, dW, r, wH, wW;
-        css = {};
-        r = _this.config.ratio;
-        wW = window.innerWidth;
-        wH = window.innerHeight;
-        dW = Math.floor(r.x * wW);
-        dH = Math.floor(r.y * wH);
-        css.width = dW + 'px';
-        css.height = dH + 'px';
-        css.left = Math.floor((wW - dW) / 2);
-        css.top = Math.floor((wH - dH) / 2);
-        return css;
-      };
-      this.make = function() {
-        var close_x, content, d, dialog, fade, id, prop, range, title, val, _ref;
-        range = document.createRange();
-        range.selectNode(_this.util.get('div').item(0));
-        d = range.createContextualFragment(_this.config.html);
-        document.body.appendChild(d);
-        dialog = _this.util.get('modal-dialog');
-        title = _this.util.get('modal-title');
-        content = _this.util.get('modal-content');
-        close_x = _this.util.get('modal-close');
-        fade = _this.util.get('modal-fade');
-        id = target.getAttribute('id');
-        dialog.setAttribute('id', 'modal-dialog-' + id);
-        if (_this.config.rounded) {
-          dialog.classList.add('rounded');
-        }
-        _ref = _this.config.start;
-        for (prop in _ref) {
-          val = _ref[prop];
-          dialog.style[prop] = val;
-        }
-        content.setAttribute('id', 'modal-content-' + id);
-        content.style.height = _this.calc().height;
-        content.innerHTML = target.innerHTML;
-        title.setAttribute('id', 'modal-title-' + id);
-        title.innerHTML = target.getAttribute('data-title');
-        close_x.setAttribute('id', 'modal-close-' + id);
-        fade.setAttribute('id', 'modal-fade' + id);
-        _this.state.dialog = dialog.getAttribute('id');
-        return dialog;
-      };
-      this.open = function(dialog) {
-        var dialogAnimation, final, o, overlayAnimation;
-        _this.state.active = true;
-        o = _this.overlay('modal');
-        _this.state.overlay = o.getAttribute('id');
-        document.body.appendChild(o);
-        dialogAnimation = overlayAnimation = _this.animation;
-        dialogAnimation.complete = function() {
-          return _this.util.bind(_this.util.get('modal-close-' + target.getAttribute('id')), 'mousedown', _this.close(dialog));
-        };
-        overlayAnimation.complete = function() {
-          return _this.util.bind(o, 'mousedown', _this.close(dialog));
-        };
-        final = _this.calc();
-        final.opacity = 1;
-        $(o).animate({
-          opacity: 0.5
-        }, overlayAnimation);
-        $(dialog).animate(final, dialogAnimation);
-        return dialog;
-      };
-      this.close = function(dialog) {
-        var fadeAnim, finalAnim, midpoint, midpointAnim, overlay, overlayAnim;
-        _this.state.active = false;
-        overlay = _this.util.get(_this.state.overlay);
-        midpoint = {
-          width: window.innerWidth,
-          height: '0px',
-          left: '0px',
-          right: '0px',
-          opacity: 0.5
-        };
-        fadeAnim = midpointAnim = finalAnim = overlayAnim = _this.animation;
-        overlayAnim.duration = fadeAnim.duration = midpointAnim.duration = 300;
-        finalAnim.duration = 250;
-        overlayAnim.complete = function() {
-          document.removeChild(overlay);
-          return document.removeChild(modal);
-        };
-        midpointAnim.complete = function() {
-          $(dialog).animate({
-            opacity: 0
-          }, finalAnim);
-          return $(overlay).animate({
-            opacity: 0
-          }, overlayAnim);
-        };
-        fadeAnim.complete = function() {
-          setTimeout(function() {
-            m.classList.remove('dropshadow');
-            m.classList.remove('rounded');
-            return m.style.padding = '0px';
-          }, 150);
-          return $(dialog).animate(midpoint, midpointAnim);
-        };
-        _this.util.get('modal-content-' + target.getAttribute('id')).style.overflow = 'hidden';
-        _this.util.get('modal-fade-' + target.getAttribute('id')).animate({
-          opacity: 0
-        }, fadeAnim);
-        return dialog;
-      };
-    }
-
-    Modal.prototype._init = function() {
-      var dialog;
-      dialog = this.make();
-      document.body.appendChild(dialog);
-      this.state.init = true;
-      return $.apptools.events.trigger('MODAL_READY', this);
-    };
-
-    return Modal;
-
-  })(CoreWidget);
-
   ModalAPI = (function(_super) {
 
     __extends(ModalAPI, _super);
@@ -3110,62 +3011,255 @@
 
     function ModalAPI(apptools, widget, window) {
       var _this = this;
-      this.state = {
+      this._state = {
         modals: [],
         modals_by_id: {},
-        next: modals.length
+        init: false
       };
-      this.create = function(target, trigger, options) {
-        var modal;
-        if (options == null) {
-          options = {};
-        }
+      this.create = function(target, trigger) {
+        var id, modal, options;
+        options = target.hasAttribute('data-options') ? JSON.parse(target.getAttribute('data-options')) : {};
         modal = new Modal(target, trigger, options);
-        _this.state.modals.push(modal);
-        _this.state.modals_by_id[modal.state.el.getAttribute('id')] = _this.state.next;
-        return modal;
+        id = modal._state.element_id;
+        _this._state.modals_by_id[id] = _this._state.modals.push(modal) - 1;
+        return modal._init();
       };
       this.destroy = function(modal) {
-        var dialog, id;
-        id = modal.state.el.getAttribute('id');
-        dialog = document.getElementById(modal.state.dialog);
-        _this.state.modals.splice(_this.state.modals_by_id[id], 1);
-        delete _this.state.modals_by_id[id];
-        document.removeChild(dialogue);
+        var id;
+        id = modal._state.element_id;
+        _this._state.modals.splice(_this._state.modals_by_id[id], 1);
+        delete _this._state.modals_by_id[id];
+        document.body.removeChild(Util.get(id));
         return modal;
       };
       this.enable = function(modal) {
         var trigger;
-        trigger = modal.state.trigger;
-        _this.prime({
-          trigger: _this.util.get(modal.state.dialog)
-        }, modal.open);
+        trigger = Util.get(modal._state.trigger_id);
+        Util.bind(trigger, 'mousedown', modal.open, false);
         return modal;
       };
       this.disable = function(modal) {
-        _this.unprime([modal.state.trigger]);
+        Util.unbind(Util.get(modal._state.trigger_id));
         return modal;
       };
-    }
-
-    ModalAPI.prototype._init = function(apptools) {
-      var modal, modals, _fn, _i, _len,
-        _this = this;
-      modals = this.util.get('modal');
-      _fn = function(modal) {
-        modal = _this.create(modal, _this.util.get('a-' + modal.getAttribute('id')));
-        return modal = _this.enable(modal);
+      this._init = function() {
+        var modal, modals, _i, _len;
+        modals = Util.get('pre-modal');
+        for (_i = 0, _len = modals.length; _i < _len; _i++) {
+          modal = modals[_i];
+          _this.enable(_this.create(modal, Util.get('a-' + modal.getAttribute('id'))));
+        }
+        return _this._state.init = true;
       };
-      for (_i = 0, _len = modals.length; _i < _len; _i++) {
-        modal = modals[_i];
-        _fn(modal);
-      }
-      return apptools.events.trigger('MODAL_API_READY', this);
-    };
+    }
 
     return ModalAPI;
 
   })(CoreWidgetAPI);
+
+  Modal = (function(_super) {
+
+    __extends(Modal, _super);
+
+    function Modal(target, trigger, options) {
+      var _this = this;
+      this._state = {
+        cached_id: target.getAttribute('id'),
+        trigger_id: trigger.getAttribute('id'),
+        element_id: null,
+        overlay: null,
+        active: false,
+        init: false,
+        config: {
+          initial: {
+            width: '0px',
+            height: '0px',
+            top: window.innerHeight / 2 + 'px',
+            left: window.innerHeight / 2 + 'px'
+          },
+          ratio: {
+            x: 0.4,
+            y: 0.4
+          },
+          template: ['<div id="modal-dialog" style="opacity: 0;" class="fixed dropshadow">', '<div id="modal-fade" style="opacity: 0">', '<div id="modal-content">&nbsp;</div>', '<div id="modal-ui" class="absolute">', '<div id="modal-title" class="absolute"></div>', '<div id="modal-close" class="absolute">X</div>', '</div>', '</div>', '</div>'].join('\n'),
+          rounded: true,
+          padding: null
+        }
+      };
+      this._state.config = Util.extend(true, this._state.config, JSON.parse(target.getAttribute('data-options')));
+      this.internal = {
+        calc: function() {
+          var css, dH, dW, r, wH, wW;
+          css = {};
+          r = _this._state.config.ratio;
+          wW = window.innerWidth;
+          wH = window.innerHeight;
+          dW = Math.floor(r.x * wW);
+          dH = Math.floor(r.y * wH);
+          css.width = dW + 'px';
+          css.height = dH + 'px';
+          css.left = Math.floor((wW - dW) / 2);
+          css.top = Math.floor((wH - dH) / 2);
+          return css;
+        },
+        classify: function(element, method) {
+          var ecl;
+          if (method === 'close' || !(method != null)) {
+            if (Util.in_array('dropshadow', (ecl = element.classList))) {
+              ecl.remove('dropshadow');
+            }
+            if (Util.in_array('rounded', ecl)) {
+              ecl.remove('rounded');
+            }
+            element.style.padding = '0px';
+            return element;
+          } else if (method === 'open') {
+            if (!Util.in_array('dropshadow', (ecl = element.classList))) {
+              ecl.add('dropshadow');
+            }
+            if (!Util.in_array('rounded', ecl) && _this._state.config.rounded) {
+              ecl.add('rounded');
+            }
+            element.style.padding = '10px';
+            return element;
+          } else if (!(element != null)) {
+            return false;
+          }
+        }
+      };
+      this.make = function() {
+        var close_x, content, d, dialog, doc, fade, id, prop, range, t, template, title, ui, val, _ref;
+        template = _this._state.config.template;
+        range = document.createRange();
+        range.selectNode(doc = document.getElementsByTagName('div').item(0));
+        d = range.createContextualFragment(template);
+        document.body.appendChild(d);
+        dialog = Util.get('modal-dialog');
+        title = Util.get('modal-title');
+        content = Util.get('modal-content');
+        ui = Util.get('modal-ui');
+        close_x = Util.get('modal-close');
+        fade = Util.get('modal-fade');
+        id = _this._state.cached_id;
+        dialog.classList.add(dialog.getAttribute('id'));
+        dialog.setAttribute('id', id + '-modal-dialog');
+        if (_this._state.config.rounded) {
+          dialog.classList.add('rounded');
+        }
+        _ref = _this._state.config.initial;
+        for (prop in _ref) {
+          val = _ref[prop];
+          dialog.style[prop] = val;
+        }
+        content.classList.add(content.getAttribute('id'));
+        content.setAttribute('id', id + '-modal-content');
+        content.style.height = _this.internal.calc().height;
+        content.innerHTML = (t = Util.get(id)).innerHTML;
+        title.classList.add(title.getAttribute('id'));
+        title.setAttribute('id', id + '-modal-title');
+        title.innerHTML = t.getAttribute('data-title');
+        ui.classList.add(ui.getAttribute('id'));
+        ui.setAttribute('id', id + '-modal-ui');
+        close_x.classList.add(close_x.getAttribute('id'));
+        close_x.setAttribute('id', id + '-modal-close');
+        fade.classList.add(fade.getAttribute('id'));
+        fade.setAttribute('id', id + '-modal-fade');
+        _this._state.element_id = dialog.getAttribute('id');
+        return dialog;
+      };
+      this.open = function() {
+        var close_x, dialog, dialog_animation, fade_animation, final, id, overlay, overlay_animation;
+        id = _this._state.cached_id;
+        dialog = Util.get(_this._state.element_id);
+        close_x = Util.get(id + '-modal-close');
+        _this._state.active = true;
+        overlay = _this._state.overlay || _this.prepare_overlay('modal');
+        _this._state.overlay = overlay;
+        if (!(overlay.parentNode != null)) {
+          document.body.appendChild(overlay);
+        }
+        fade_animation = _this.animation;
+        dialog_animation = _this.animation;
+        overlay_animation = _this.animation;
+        dialog_animation.complete = function() {
+          _this.internal.classify(dialog, 'open');
+          return $('#' + id + '-modal-fade').animate({
+            opacity: 1
+          }, fade_animation);
+        };
+        final = _this.internal.calc();
+        final.opacity = 1;
+        dialog.style.display = 'block';
+        overlay.style.display = 'block';
+        $(overlay).animate({
+          opacity: 0.5
+        }, overlay_animation);
+        $(dialog).animate(final, dialog_animation);
+        Util.bind([close_x, overlay], 'mousedown', _this.close);
+        return dialog;
+      };
+      this.close = function() {
+        var d_id, dialog, id, midpoint, overlay;
+        id = _this._state.cached_id;
+        overlay = _this._state.overlay;
+        d_id = '#' + _this._state.element_id;
+        dialog = Util.get(_this._state.element_id);
+        Util.unbind([Util.get(id + '-modal-close'), overlay], 'mousedown');
+        midpoint = Util.extend({}, _this._state.config.initial, {
+          opacity: 0.5
+        });
+        Util.get(id + '-modal-content').style.overflow = 'hidden';
+        $('#' + id + '-modal-fade').animate({
+          opacity: 0
+        }, {
+          duration: 300,
+          complete: function() {
+            _this.internal.classify(dialog, 'close');
+            return $(d_id).animate(midpoint, {
+              duration: 200,
+              complete: function() {
+                return $(d_id).animate({
+                  opacity: 0
+                }, {
+                  duration: 250,
+                  complete: function() {
+                    var prop, val, _ref;
+                    dialog.style.display = 'none';
+                    _ref = _this._state.config.initial;
+                    for (prop in _ref) {
+                      val = _ref[prop];
+                      dialog.style[prop] = val;
+                    }
+                    return $(_this._state.overlay).animate({
+                      opacity: 0
+                    }, {
+                      duration: 300,
+                      complete: function() {
+                        _this._state.overlay.style.display = 'none';
+                        return _this._state.active = false;
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+        return dialog;
+      };
+      this._init = function() {
+        var dialog;
+        dialog = _this.make();
+        trigger.removeAttribute('href');
+        _this._state.init = true;
+        $.apptools.events.trigger('MODAL_READY', _this);
+        return _this;
+      };
+    }
+
+    return Modal;
+
+  })(CoreWidget);
 
   this.__apptools_preinit.abstract_base_classes.push(Modal);
 

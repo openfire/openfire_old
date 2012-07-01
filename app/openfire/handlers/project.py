@@ -23,11 +23,11 @@ class ProjectHome(WebHandler):
 
     ''' openfire page. '''
 
-    def get(self, customurl):
+    def get(self, key):
 
         ''' Render project_home.html. '''
 
-        p = ndb.Key(project.Project, customurl)
+        p = ndb.Key(urlsafe=key)
         a = ndb.Key(assets.Avatar, 'current', parent=p)
         v = ndb.Key(assets.Video, 'mainvideo', parent=p)
 
@@ -36,5 +36,5 @@ class ProjectHome(WebHandler):
         if models[0] is None:
             return self.error(404)
         else:
-            self.render('projects/project_home.html', project_slug=customurl, project=models[0], video=models[2], avatar=models[1])
+            self.render('projects/project_home.html', project=models[0], video=models[2], avatar=models[1])
             return

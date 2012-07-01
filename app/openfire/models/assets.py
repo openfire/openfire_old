@@ -2,6 +2,7 @@
 from google.appengine.ext import ndb
 from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
+from openfire.messages.common import CustomUrl as CustomUrlMessage
 
 
 ######## ======== Assets + Media Top-Level Models ======== ########
@@ -55,6 +56,8 @@ class Video(Media):
 class CustomURL(AppModel):
 
     ''' Describes a custom URL mapping. '''
+
+    _message_class = CustomUrlMessage
 
     slug = ndb.StringProperty('s', indexed=True, required=True)
     target = ndb.KeyProperty('t', indexed=True, required=True)
