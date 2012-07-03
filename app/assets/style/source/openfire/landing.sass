@@ -1,14 +1,55 @@
 @import "../main"
 
 .ohnoes
-	width: 200px
-	height: 50px
-	text-align: center
-	background: #E07979
-	border: 2px solid #DB4B4B
-	border-radius: 5px
-	position: relative
-	margin: 50px
-	margin-left: auto
-	margin-right: auto
-	line-height: 50px
+    width: 200px
+    height: 50px
+    text-align: center
+    background: #E07979
+    border: 2px solid #DB4B4B
+    border-radius: 5px
+    position: relative
+    margin: 50px
+    margin-left: auto
+    margin-right: auto
+    line-height: 50px
+
+#main
+    #masthead
+        #how-it-works-button
+            height: 120px
+            width: 300px
+            position: absolute
+            right: 5%
+            top: 75px
+            border-radius: 12px
+            +background(linear-gradient(top center, #f79331, #f57220))
+            text-align: right
+
+            &:hover
+                cursor: pointer
+                +background(linear-gradient(top center, #ffd468, #ffb246))
+
+            &:active
+                margin-top: 2px
+                margin-right: 2px
+
+            a,
+            a:link,
+            a:visited,
+            a:active
+                cursor: pointer
+                display: block
+                line-height: 120px
+                vertical-align: middle
+                margin-right: 20px
+                width: 280px
+                font:
+                    family: 'Karla', sans-serif
+                    size: 25px
+                    weight: 700
+                color: #eee
+                text-decoration: none
+                text-transform: uppercase
+
+                &:hover
+                    color: white

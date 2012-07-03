@@ -15,16 +15,10 @@ logic / request handling stuff across your entire app, by putting it here.
 ## General Imports
 import random
 import config
-import logging
 import hashlib
 
 ## Webapp2 Imports
 import webapp2
-
-from webapp2_extras import sessions
-
-from webapp2_extras.appengine import sessions_ndb
-from webapp2_extras.appengine import sessions_memcache
 
 ## AppTools Imports
 from apptools.core import BaseHandler
@@ -47,7 +41,6 @@ class WebHandler(BaseHandler, SessionsMixin):
         ''' Cached access to this handler's logging pipe '''
 
         return super(WebHandler, self).logging.extend('WebHandler', self.__class__.__name__)._setcondition(self.config.get('logging', False))
-
 
     ## ++ Internal Methods ++ ##
     def dispatch(self):

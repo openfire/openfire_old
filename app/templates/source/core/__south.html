@@ -15,8 +15,12 @@
 <script src="{{ asset.script('base', 'apptools') }}"></script>
 {%- endif -%}
 
-{# <!-- Project Scripts --> #}
-
+<!-- Project Scripts -->
+{%- if util.api.users.is_current_user_admin() -%}
+<script src="{{ asset.script('app', 'openfire') }}"></script>
+{%- else -%}
+<script src="{{ asset.script('admin', 'openfire') }}"></script>
+{%- endif -%}
 
 {# <!-- Services Manifest --> #}
 {%- if page.services or page.analytics -%}

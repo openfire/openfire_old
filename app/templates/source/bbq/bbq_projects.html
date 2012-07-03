@@ -1,8 +1,44 @@
-<h2>Projects (...are coming soon)!</h2>
-<ul>
+<h2>Projects!</h2>
+<div id="project-container">
     {% for project in projects %}
-    <li>{{ project.name }}</li>
+    <div class="project">
+        <div class="project-info">
+            <span class="project-key" style="display: none;">{{ project.key.urlsafe() }}</span>
+            <label>Name: </label>
+            <span class="project-name editable">{{ project.name }}</span>
+            <label>Summary: </label>
+            <span class="project-summary editable">{{ project.summary }}</span>
+            <label>Category: </label>
+            <span class="project-category editable">{{ project.category }}</span>
+            <label>Status: </label>
+            <span class="project-status editable">{{ project.status }}</span>
+            <label>Pitch: </label>
+            <span class="project-pitch editable">{{ project.pitch }}</span>
+            <label>Tech: </label>
+            <span class="project-tech editable">{{ project.tech }}</span>
+            <label>Keywords: </label>
+            <span class="project-keywords editable">{{ project.keywords }}</span>
+            <label>Creator: </label>
+            <span class="project-creator editable">{{ project.creator }}</span>
+            <label>Owners: </label>
+            <span class="project-owners editable">{{ project.owners }}</span>
+            <label>Goals: </label>
+            <span class="project-goals editable">{{ project.goals }}</span>
+            <label>Tiers: </label>
+            <span class="project-tiers editable">{{ project.tiers }}</span>
+        </div>
+        <div>
+            <button class="delete" type="button">delete</button>
+            <button class="start-edit" type="button">edit</button>
+            <button class="cancel-edit" type="button" style="display: none;">cancel</button>
+            <button class="save-edit" type="button" style="display: none;">save</button>
+            <button class="go-live" type="button">Go-Live!</button>
+            <button class="suspend" type="button">Suspend</button>
+            <button class="shutdown" type="button">Shut Down</button>
+        </div>
+    </div>
     {% else %}
-    <li>No projects yet!</li>
+    <div>No projects yet!</div>
     {% endfor %}
-</ul>
+</div>
+

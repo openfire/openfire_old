@@ -7,6 +7,13 @@ class Openfire
 
             core_events: ['OPENFIRE_READY']
 
+            # internal config
+            config:
+                session:
+                    cookie: "ofsession"
+                    header: "X-AppFactory-Session"
+                    timeout: 86400  # one day, for now
+
             # internal state
             state:
 
@@ -16,6 +23,12 @@ class Openfire
                 controllers: {}     # Installed system controllers
                 classes: {}         # Installed openfire-related classes
                 objects: {}         # Installed openfire-related objects
+                session:            # Runtime session info
+                    established: false
+                    authenticated: false
+                    csrf:
+                        next: null
+                        history: []
 
                 consider_preinit: (preinit) =>
 
@@ -32,6 +45,24 @@ class Openfire
                         @sys.install.controller(ctrlr) for ctrlr in preinit.abstract_base_controllers
 
                     return preinit  # preinit HANDLED.
+
+            sniff_headers: (document) =>
+
+                # only lookin' for cookies right now
+                session = null
+                for i, cookie of document.cookie.split(";")
+                    cookie = cookie.split("=");
+                    if cookie[0] == @sys.config.session.cookie
+                        session = cookie[1].split("|")
+                        if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
+                            if (@sys.config.session.timeout * 1000) > +new Date()  # check expiration
+                                session = cookie[2]
+                        break
+                    continue
+
+                if session isnt null and session isnt false
+                    @sys.state.session.established = true
+
 
             install:
                 # installs an openfire base object
@@ -83,7 +114,8 @@ class Openfire
             @sys.state.preinit = window.__openfire_preinit
             @sys.state.consider_preinit(window.__openfire_preinit)
 
-        ### Init code will go here, if we actually need any more. ###
+        # sniff headers/session
+        session = @sys.sniff_headers(document)
 
         # trigger system ready
         return @sys.go()

@@ -72,11 +72,11 @@ class AuthController extends OpenfireController
         @create_user = () =>
             return
 
-    @_init = () =>
-        return
+        @_init = () =>
+            return
 
 
-
-@__openfire_preinit.abstract_base_objects.push(Session)
-@__openfire_preinit.abstract_base_classes.push(User)
-@__openfire_preinit.abstract_base_controllers.push(AuthController)
+if @__openfire_preinit?
+    @__openfire_preinit.abstract_base_objects.push(Session)
+    @__openfire_preinit.abstract_base_classes.push(User)
+    @__openfire_preinit.abstract_base_controllers.push(AuthController)
