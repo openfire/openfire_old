@@ -4,64 +4,71 @@ from protorpc import messages
 #### ++++ Object Messages ++++ ####
 class Keyword(messages.Message):
 
-	''' A keyword in a search query. '''
+    ''' A keyword in a search query. '''
 
-	pass
+    pass
 
 
 class Filter(messages.Message):
 
-	''' A filter directive in a search query. '''
+    ''' A filter directive in a search query. '''
 
-	pass
+    pass
 
 
 class Sort(messages.Message):
 
-	''' A sort directive in a search query. '''
+    ''' A sort directive in a search query. '''
 
-	pass
+    pass
+
+
+class Search(messages.Message):
+
+    ''' Represents a user search. '''
+
+    pass
 
 
 class SearchResult(messages.Message):
 
-	''' A single search result. '''
+    ''' A single search result. '''
 
-	pass
+    pass
 
 
 class SearchResults(messages.Message):
 
-	''' A set of search results. '''
+    ''' A set of search results. '''
 
-	pass
+    pass
 
 
 #### ++++ Request Messages ++++ ####
 class QuickSearchRequest(messages.Message):
 
-	''' A request for simple, fuzzy, keyword-based quicksearch. '''
+    ''' A request for simple, fuzzy, keyword-based quicksearch. '''
 
-	pass
+    pass
 
 
 class AdvancedSearchRequest(messages.Message):
 
-	''' A request for advanced, filter/sort-based fulltext search. '''
+    ''' A request for advanced, filter/sort-based fulltext search. '''
 
-	pass
+    pass
 
 
 class AutocompleteRequest(messages.Message):
 
-	''' A request for autocomplete. '''
+    ''' A request for autocomplete. '''
 
-	pass
+    pass
 
 
 #### ++++ Response Messages ++++ ####
 class SearchResponse(messages.Message):
 
-	''' Response to a search query. '''
+    ''' Response to a search query. '''
 
-	pass
+    pass

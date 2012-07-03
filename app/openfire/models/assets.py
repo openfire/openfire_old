@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
+
+# Datastore Imports
 from google.appengine.ext import ndb
 from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
+
+# Model Attachments
+from openfire.messages import assets as messages
+from openfire.pipelines.model import assets as pipelines
 
 
 ######## ======== Assets + Media Top-Level Models ======== ########
@@ -10,6 +16,9 @@ from google.appengine.ext.ndb import polymodel
 class Asset(AppModel):
 
     ''' Describes a stored asset, like CSS or JS or an image. '''
+
+    _message_class = messages.Asset
+    _pipeline_class = pipelines.AssetPipeline
 
     url = ndb.StringProperty('u', indexed=True, default=None)
     cdn = ndb.StringProperty('c', indexed=True, default=None)
@@ -22,6 +31,9 @@ class Asset(AppModel):
 class Media(polymodel.PolyModel):
 
     ''' Describes an attachment between a Asset and a site object. '''
+
+    _message_class = messages.Media
+    _pipeline_class = pipelines.MediaPipeline
 
     url = ndb.StringProperty('r', indexed=False, required=False)
     asset = ndb.KeyProperty('a', indexed=True, required=True)
@@ -36,6 +48,9 @@ class Avatar(Media):
 
     ''' Describes a user avatar. '''
 
+    _message_class = messages.Avatar
+    _pipeline_class = pipelines.AvatarPipeline
+
     version = ndb.IntegerProperty('v', indexed=True, default=1)
     active = ndb.BooleanProperty('e', indexed=True, default=False)
     content = ndb.BlobProperty('bc', indexed=False)
@@ -46,6 +61,9 @@ class Video(Media):
 
     ''' Describes a web video. '''
 
+    _message_class = messages.Video
+    _pipeline_class = pipelines.VideoPipeline
+
     provider = ndb.StringProperty('p', indexed=True, choices=['youtube', 'vimeo'])
 
 
@@ -55,6 +73,9 @@ class Video(Media):
 class CustomURL(AppModel):
 
     ''' Describes a custom URL mapping. '''
+
+    _message_class = messages.CustomURL
+    _pipeline_class = pipelines.CustomURLPipeline
 
     slug = ndb.StringProperty('s', indexed=True, required=True)
     target = ndb.KeyProperty('t', indexed=True, required=True)

@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
+
+# Datastore Imports
 from google.appengine.ext import ndb
 from openfire.models import AppModel
-from google.appengine.ext.ndb import polymodel
 
-from openfire.models.assets import Media
-from openfire.models.assets import Avatar
-from openfire.models.social import Follow
-from openfire.models.social import Comment
-from openfire.models.role import RoleMapping
+# Message Classes
+from openfire.messages import common
+from openfire.messages import project
+from openfire.messages import proposal
 
-from openfire.messages.project import Project as ProjectMessage
-from openfire.messages.proposal import Proposal as ProposalMessage
-from openfire.messages.common import Category as CategoryMessage
+# Pipeline Classes
+from openfire.pipelines.model import project as pipelines
 
 
 ######## ======== Top-Level Project Models ======== ########
@@ -21,7 +20,8 @@ class Category(AppModel):
 
     ''' A category for projects and proposals to exist in. '''
 
-    _message_class = CategoryMessage
+    _message_class = common.CategoryMessage
+    _pipeline_class = pipelines.CategoryPipeline
 
     # Naming/Ancestry
     slug = ndb.StringProperty('s', indexed=True, required=True)
@@ -42,7 +42,8 @@ class Proposal(AppModel):
 
     ''' A proposal for a project on openfire. '''
 
-    _message_class = ProposalMessage
+    _message_class = proposal.ProposalMessage
+    _pipeline_class = pipelines.ProposalPipeline
 
     # Naming/Status
     name = ndb.StringProperty('n', indexed=True, required=True)
@@ -69,7 +70,8 @@ class Project(AppModel):
 
     ''' An openfire project, also known as a `spark` :) '''
 
-    _message_class = ProjectMessage
+    _message_class = project.ProjectMessage
+    _pipeline_class = pipelines.ProjectPipeline
 
     # Naming/Status/Ancestry
     name = ndb.StringProperty('n', indexed=True, required=True)
@@ -106,6 +108,9 @@ class Goal(AppModel):
 
     ''' Represents a contribution goal for an openfire project. '''
 
+    _message_class = common.Goal
+    _pipeline_class = pipelines.GoalPipeline
+
     target = ndb.KeyProperty('t', indexed=True, required=True)
     contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
     amount = ndb.IntegerProperty('a', indexed=True, required=True)
@@ -119,6 +124,9 @@ class Goal(AppModel):
 class Tier(AppModel):
 
     ''' Represents a contribution tier for an openfire project. '''
+
+    _message_class = common.Tier
+    _pipeline_class = pipelines.TierPipeline
 
     target = ndb.KeyProperty('t', indexed=True, required=True)
     contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
@@ -134,6 +142,9 @@ class Backer(AppModel):
 
     ''' Describes a user who has backed a project. '''
 
+    _message_class = project.Backer
+    _pipeline_class = pipelines.BackerPipeline
+
     user = ndb.KeyProperty('u', indexed=True, required=True)
     project = ndb.KeyProperty('p', indexed=True, required=True)
     contributions = ndb.KeyProperty('c', indexed=True, repeated=True)
@@ -144,6 +155,9 @@ class Backer(AppModel):
 class Update(AppModel):
 
     ''' Describes an update posted by project admins. '''
+
+    _message_class = common.Post
+    _pipeline_class = pipelines.UpdatePipeline
 
     project = ndb.KeyProperty('p', indexed=True, required=True)
     author = ndb.KeyProperty('u', indexed=True, required=True)

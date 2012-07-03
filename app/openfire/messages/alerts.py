@@ -23,7 +23,7 @@ class Subscription(messages.Message):
 	pass
 
 
-class Notification(messages.Message):
+class Alert(messages.Message):
 
 	''' A notification of a match on a prospective query that is part of a subscription to a system object. '''
 
@@ -38,7 +38,7 @@ class Subscriptions(messages.Message):
 	pass
 
 
-class Notifications(messages.Message):
+class Alerts(messages.Message):
 
 	''' A list of notifications. '''
 
@@ -53,7 +53,7 @@ class SubscriptionRequest(messages.Message):
 	pass
 
 
-class NotificationsRequest(messages.Message):
+class AlertsRequest(messages.Message):
 
 	''' A response with containing a list of notifications. '''
 

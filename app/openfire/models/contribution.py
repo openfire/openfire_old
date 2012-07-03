@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
+
+# Datastore Imports
 from google.appengine.ext import ndb
 from openfire.models import AppModel
+
+# Model Attachments
+from openfire.messages import contribution as messages
+from openfire.pipelines.model import contribution as pipelines
 
 
 ## ContributionType - a type of contribution that a user can make to a project
 class ContributionType(AppModel):
 
     ''' A type of contribution that a user can make to a project. '''
+
+    _message_class = messages.ContributionType
+    _pipeline_class = messages.ContributionTypePipeline
 
     slug = ndb.StringProperty('s', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=True, required=True)
@@ -20,6 +29,9 @@ class ContributionType(AppModel):
 class Contribution(AppModel):
 
     ''' Represents a contribution made by a user to a project, making them a `Backer`. '''
+
+    _message_class = messages.Contribution
+    _pipeline_class = pipelines.ContributionPipeline
 
     type = ndb.KeyProperty('t', indexed=True, required=True)
     project = ndb.KeyProperty('p', indexed=True, required=True)

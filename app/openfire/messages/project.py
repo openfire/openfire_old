@@ -1,6 +1,14 @@
 from protorpc import messages
 from openfire.messages.common import Goal, Tier
 
+
+class Backer(messages.Message):
+
+    ''' Represents a single backer. '''
+
+    pass
+
+
 class Project(messages.Message):
 
     ''' Contains all project fields for users. Can be request or response. '''
