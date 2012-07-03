@@ -144,7 +144,7 @@ config['apptools.project.services'] = {
 
             'config': {
                 'caching': 'none',
-                'security': 'private',
+                'security': 'none',
                 'recording': 'none'
             }
         },
