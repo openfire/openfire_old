@@ -543,22 +543,39 @@
       return matches.length > 0;
     };
 
-    Util.prototype.to_array = function(nodelist) {
+    Util.prototype.to_array = function(node_or_token_list) {
       var array;
       array = [];
-      for (i = nodelist.length; i--; array.unshift(nodelist[i]));
+      for (i = node_or_token_list.length; i--; array.unshift(node_or_token_list[i]));
 
-      return array;
+      if (array !== []) {
+        return array;
+      } else {
+        return null;
+      }
     };
 
     Util.prototype.get = function(query, node) {
+      var cls, id, tg;
       if (node == null) {
         node = document;
       }
       if (query.nodeType) {
         return query;
       }
-      return document.getElementById(query) || this.to_array(node.getElementsByClassName(query)) || this.to_array(node.getElementsByTagName(query)) || null;
+      if ((id = document.getElementById(query)) != null) {
+        return id;
+      } else {
+        if ((cls = node.getElementsByClassName(query)).length > 0) {
+          return this.to_array(cls);
+        } else {
+          if ((tg = node.getElementsByTagName(query)).length > 0) {
+            return this.to_array(tg);
+          } else {
+            return null;
+          }
+        }
+      }
     };
 
     Util.prototype.get_offset = function(elem) {
@@ -3057,7 +3074,7 @@
         return modal;
       };
       this.get = function(element_id) {
-        return _this._state.modals_by_id(element_id) || false;
+        return _this._state.modals_by_id[element_id] || false;
       };
       this._init = function() {
         var modal, modals, _i, _len;
@@ -3083,6 +3100,7 @@
       var _this = this;
       this._state = {
         cached_id: target.getAttribute('id'),
+        cached_html: null,
         trigger_id: trigger.getAttribute('id'),
         element_id: null,
         overlay: null,
@@ -3102,10 +3120,9 @@
           template: ['<div id="modal-dialog" style="opacity: 0;" class="fixed dropshadow">', '<div id="modal-fade" style="opacity: 0">', '<div id="modal-content">&nbsp;</div>', '<div id="modal-ui" class="absolute">', '<div id="modal-title" class="absolute"></div>', '<div id="modal-close" class="absolute">X</div>', '</div>', '</div>', '</div>'].join('\n'),
           rounded: true,
           padding: null
-        },
-        hook: null
+        }
       };
-      this._state.config = Util.extend(true, this._state.config, JSON.parse(target.getAttribute('data-options')));
+      this._state.config = Util.extend(true, this._state.config, options);
       this.internal = {
         calc: function() {
           var css, dH, dW, r, wH, wW;
@@ -3184,6 +3201,8 @@
         fade.classList.add(fade.getAttribute('id'));
         fade.setAttribute('id', id + '-modal-fade');
         _this._state.element_id = dialog.getAttribute('id');
+        _this._state.cached_html = t.innerHTML;
+        t.innerHTML = '';
         return dialog;
       };
       this.open = function() {
@@ -3423,7 +3442,6 @@
       };
       this.jump = function(pane) {
         var animation, diff, frameO, paneO;
-        console.log('PANE TOLERANCE: ', pane);
         _this._state.active = true;
         animation = _this.animation;
         animation.complete = function() {
@@ -3470,7 +3488,7 @@
 
     TabsAPI.mount = 'tabs';
 
-    TabsAPI.events = ['tabs_READY', 'tabs_API_READY'];
+    TabsAPI.events = ['TABS_READY', 'TABS_API_READY'];
 
     function TabsAPI(apptools, widget, window) {
       var _this = this;
@@ -3496,9 +3514,17 @@
         return tabs;
       };
       this.enable = function(tabs) {
+        var trigger;
+        for (trigger in tabs._state.tabs) {
+          Util.bind(Util.get(trigger), 'click', tabs["switch"], false);
+        }
         return tabs;
       };
       this.disable = function(tabs) {
+        var trigger;
+        for (trigger in tabs._state.tabs) {
+          Util.unbind(Util.get(trigger), 'click');
+        }
         return tabs;
       };
       this._init = function() {
@@ -3535,33 +3561,119 @@
           width: '500px'
         }
       };
-      this._state.config = Util.extend(true, this._state.config, JSON.parse(target.getAttribute('data-options')));
+      this._state.config = Util.extend(true, this._state.config, options);
       this.internal = {
         classify: function() {
-          var tabs, tabset, triggers;
-          tabset = Util.get(_this._state.element_id);
-          triggers = Util.get('tab-trigger', tabset);
-          tabs = Util.get('tab', tabset);
-          if (!Util.has_class(tabset, 'relative')) {
-            tabset.classList.add('relative');
+          var cls, tab, tabs, trigger, triggers, _cls, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
+          target = Util.get(_this._state.element_id);
+          triggers = Util.get('a', target);
+          tabs = Util.get('div', target);
+          target.style.width = _this._state.config.width;
+          _ref = ['relative', 'tabset'];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            cls = _ref[_i];
+            target.classList.add(cls);
           }
-          return trigger.classList.add('');
+          for (_j = 0, _len1 = triggers.length; _j < _len1; _j++) {
+            trigger = triggers[_j];
+            if (_this._state.config.rounded) {
+              trigger.classList.add('tab-rounded');
+            } else {
+              trigger.classList.add('tab-link');
+            }
+          }
+          for (_k = 0, _len2 = tabs.length; _k < _len2; _k++) {
+            tab = tabs[_k];
+            _ref1 = ['absolute', 'tab'];
+            for (_l = 0, _len3 = _ref1.length; _l < _len3; _l++) {
+              _cls = _ref1[_l];
+              tab.classList.add(_cls);
+            }
+          }
+          return _this;
         }
       };
+      this.make = function() {
+        var trigger, triggers, _fn, _i, _len;
+        target = Util.get(_this._state.element_id);
+        triggers = Util.get('a', target);
+        _fn = function(trigger) {
+          var content_div, content_id, trigger_id;
+          content_div = Util.get(content_id = trigger.getAttribute('href').slice(1));
+          trigger.setAttribute('id', (trigger_id = 'a-' + content_id));
+          if (!(content_div != null)) {
+            return false;
+          } else {
+            content_div.style.opacity = 0;
+            content_div.classList.remove('pre-tabs');
+            trigger.removeAttribute('href');
+            _this._state.tabs[trigger_id] = content_id;
+            return _this._state.tab_count++;
+          }
+        };
+        for (_i = 0, _len = triggers.length; _i < _len; _i++) {
+          trigger = triggers[_i];
+          _fn(trigger);
+        }
+        return _this.internal.classify();
+      };
       this["switch"] = function(e) {
-        var a_t, current, tabset, trigger;
+        var current, currents, tabset, target_id, trigger, _at;
+        console.log('event target: ' + e.target);
         _this._state.active = true;
         tabset = Util.get(_this._state.element_id);
-        current = (a_t = _this._state.active_tab) != null ? Util.get(a_t) : Util.get('current-tab', tabset)[0];
-        target = Util.get((trigger = e.target).getAttribute('id').split('-').splice(1));
-        current.style.opacity = 0;
-        return target.style.opacity = 1;
+        currents = Util.get('tab-current', tabset);
+        current = currents != null ? Util.get('tab-current', tabset)[0] : ((_at = _this._state.active_tab) != null ? Util.get(_at) : false);
+        target = Util.get(target_id = (trigger = e.target).getAttribute('id').split('-').splice(1).join('-'));
+        console.log('TARGET_ID: ' + target_id + ' AND TARGET: ' + target);
+        if (current === target) {
+          return _this;
+        }
+        if (current === false) {
+          current = Util.get('div', tabset)[0];
+          current.classList.add('tab-current');
+        }
+        return $(current).animate({
+          opacity: 0
+        }, {
+          duration: 200,
+          complete: function() {
+            current.classList.remove('tab-current');
+            target.classList.add('tab-current');
+            _this._state.active_tab = target_id;
+            return $(target).animate({
+              opacity: 1
+            }, {
+              duration: 300,
+              complete: function() {
+                return _this._state.active = false;
+              }
+            });
+          }
+        });
+      };
+      this._init = function() {
+        var tabs;
+        tabs = _this.make();
+        Util.get('a', Util.get(_this._state.element_id))[0].click();
+        _this._state.init = true;
+        apptools.events.trigger('TABS_READY', _this);
+        return _this;
       };
     }
 
     return Tabs;
 
   })(CoreWidget);
+
+  this.__apptools_preinit.abstract_base_classes.push(Tabs);
+
+  this.__apptools_preinit.abstract_base_classes.push(TabsAPI);
+
+  this.__apptools_preinit.deferred_core_modules.push({
+    module: TabsAPI,
+    "package": 'widgets'
+  });
 
   CoreAdminAPI = (function(_super) {
 

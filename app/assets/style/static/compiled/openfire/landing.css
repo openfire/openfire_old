@@ -635,6 +635,10 @@ p {
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
 .dropshadow {
   box-shadow: 2px 2px 3px #333333;
 }
@@ -787,6 +791,41 @@ a.mod:active {
 }
 .scroller-pane p {
   padding: 0px 7px;
+}
+
+.tabset {
+  text-align: center;
+}
+.tabset .tab-rounded {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.tabset .tab-link, .tabset .tab-rounded {
+  margin: 0 3px;
+  padding: 15px 10px;
+  border: 1px solid #6f6f66;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #dfdfdd), color-stop(100%, #eeeeee));
+  background: -webkit-linear-gradient(top, #dfdfdd, #eeeeee);
+  background: -moz-linear-gradient(top, #dfdfdd, #eeeeee);
+  background: -o-linear-gradient(top, #dfdfdd, #eeeeee);
+  background: -ms-linear-gradient(top, #dfdfdd, #eeeeee);
+  background: linear-gradient(top, #dfdfdd, #eeeeee);
+  font-size: 11px;
+  line-height: 11px;
+}
+.tabset .tab-link.tab-current, .tabset .tab-rounded.tab-current {
+  border-bottom: none !important;
+}
+.tabset .tab-link {
+  display: inline-block;
+}
+.tabset .tab {
+  top: 52px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  text-align: left;
+  background-color: #eeeeee;
 }
 
 #superbar {
