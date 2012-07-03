@@ -42,7 +42,7 @@ class EmailAddress(AppModel):
 
     ''' An openfire user's email address. '''
 
-    _message_class = messages.EmailMessage
+    _message_class = messages.EmailAddress
     _pipeline_class = pipelines.EmailAddressPipeline
 
     user = ndb.KeyProperty('u', indexed=True)

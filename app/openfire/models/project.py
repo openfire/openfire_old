@@ -20,7 +20,7 @@ class Category(AppModel):
 
     ''' A category for projects and proposals to exist in. '''
 
-    _message_class = common.CategoryMessage
+    _message_class = common.Category
     _pipeline_class = pipelines.CategoryPipeline
 
     # Naming/Ancestry
@@ -33,8 +33,8 @@ class Category(AppModel):
     keywords = ndb.StringProperty('k', indexed=True, repeated=True)
 
     # Counts
-    project_count = ndb.IntegerProperty('pc', indexed=True, default=1)
-    backer_count = ndb.IntegerProperty('bc', indexed=True, default=1)
+    project_count = ndb.IntegerProperty('pc', indexed=True, default=0)
+    backer_count = ndb.IntegerProperty('bc', indexed=True, default=0)
 
 
 ## Project Proposals
@@ -42,7 +42,7 @@ class Proposal(AppModel):
 
     ''' A proposal for a project on openfire. '''
 
-    _message_class = proposal.ProposalMessage
+    _message_class = proposal.Proposal
     _pipeline_class = pipelines.ProposalPipeline
 
     # Naming/Status
@@ -70,7 +70,7 @@ class Project(AppModel):
 
     ''' An openfire project, also known as a `spark` :) '''
 
-    _message_class = project.ProjectMessage
+    _message_class = project.Project
     _pipeline_class = pipelines.ProjectPipeline
 
     # Naming/Status/Ancestry

@@ -15,11 +15,40 @@ class CategoryPipeline(ModelPipeline):
         ''' Fired when a category is put. '''
 
         logging.info('=== FIRED ON PUT ===')
+        logging.info('--CategoryPipeline test was hit on method `put`')
+        logging.info('--Was passed this key: "%s".' % key)
+        logging.info('--Was passed this category: "%s".' % category)
+        logging.info('=== FIRED ON PUT ===')
         return
 
     def delete(self, key):
 
         ''' Fired when a category is deleted. '''
+
+        logging.info('=== FIRED ON DELETE ===')
+        logging.info('--CategoryPipeline test was hit on method `delete`')
+        logging.info('--Was passed this key: "%s".' % key)
+        logging.info('=== FIRED ON DELETE ===')
+        return
+
+
+## ProposalPipeline - fired when a Proposal entity is put/deleted
+class ProposalPipeline(ModelPipeline):
+
+    ''' Processes proposal puts/deletes. '''
+
+    _model_binding = 'openfire.models.project.Proposal'
+
+    def put(self, key, proposal):
+
+        ''' Fired when a proposal is put. '''
+
+        logging.info('=== FIRED ON PUT ===')
+        return
+
+    def delete(self, key):
+
+        ''' Fired when a proposal is deleted. '''
 
         logging.info('=== FIRED ON DELETE ===')
         return

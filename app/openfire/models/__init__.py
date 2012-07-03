@@ -10,6 +10,7 @@ from apptools.util import debug
 
 # External Imports
 from google.appengine.ext import ndb
+from google.appengine.ext.ndb import eventloop
 
 # Openfire Imports
 from openfire.pipelines.model import ModelPipeline
@@ -18,11 +19,7 @@ from openfire.pipelines.model import ModelPipeline
 ## ModelMixin - abstract parent object for model mixin classes
 class ModelMixin(object):
 
-    def kind(self):
-
-        ''' Return a dummy kind name, because we're a mixin. '''
-
-        return '__mixin__'
+    pass
 
 
 ## PipelineTriggerMixin - allows bound pipelines to be constructed and started automatically when NDB hooks fire on models
@@ -33,77 +30,87 @@ class PipelineTriggerMixin(ModelMixin):
     _pipeline_class = None
 
     ### === Internal Properties === ###
-    @webapp2.cached_property
-    def __config(self):
-
-        ''' Private cached shortcut to config. '''
-
-        return config.config.get('openfire.datamodel.integration.pipelines', {})
-
-    @webapp2.cached_property
-    def __logging(self):
-
-        ''' Private cached shortcut to logging pipe. '''
-
-        return debug.AppToolsLogger('openfire.datamodel.mixins', 'PipelineTriggerMixin')._setcondition(self.__config.get('logging', False))
+    __config = config.config.get('openfire.datamodel.integration.pipelines', {})
+    __logging = debug.AppToolsLogger('openfire.datamodel.mixins', 'PipelineTriggerMixin')._setcondition(__config.get('logging', False))
 
     ### === Internal Methods === ###
-    def _construct_hook_pipeline(self, action):
+    @classmethod
+    def _construct_hook_pipeline(cls, action, **kwargs):
 
         ''' Conditionally trigger a hooked model-driven pipeline. '''
 
-        if hasattr(self, '_pipeline_class'):
-            if self._pipeline_class is not None:
-                if isinstance(self.__pipeline_class, ModelPipeline):
-                    if hasattr(self._pipeline_class, action):
-                        self.__logging.info('Pipeline has hook for action `%s`.' % action)
-                        return self._pipeline_class(**{
-                            'key': self.key.urlsafe(),
-                            'action': action
-                        })
+        if hasattr(cls, '_pipeline_class'):
+            if cls._pipeline_class is not None:
+                if issubclass(cls._pipeline_class, ModelPipeline):
+                    cls.__logging.info('Valid pipeline found for model `%s`.' % cls)
+                    if hasattr(cls._pipeline_class, action):
+                        cls.__logging.info('Pipeline has hook for action `%s`.' % action)
+
+                        ## build pipeline params
+                        kwargs['action'] = action
+
+                        ## build pipeline
+                        return cls._pipeline_class(**kwargs)
+
                     else:
-                        self.__logging.error('Model-attached pipeline (on model "%s") is not an instance of ModelPipeline (of type "%s").' % (self, self.__pipeline_class))
+                        cls.__logging.info('Pipeline does not have a hook defined for action `%s`.' % action)
                         return
+
+                else:
+                    cls.__logging.error('Model-attached pipeline (on model "%s") is not an instance of ModelPipeline (of type "%s").' % (cls, cls._pipeline_class))
+                    return
         else:
-            self.__logging.info('No hooked pipeline detected for model "%s" on action "%s".' % (self, action))
+            cls.__logging.info('No hooked pipeline detected for model "%s" on action "%s".' % (cls, action))
         return
 
-    def _trigger_hook_pipeline(self, action, start=False):
+    @classmethod
+    def _trigger_hook_pipeline(cls, action, start=False, **kwargs):
 
         ''' Try to construct a pipeline for a given trigger hook, and optionally start it. '''
 
         if action not in frozenset(['put', 'delete']):
-            self.__logging.warning('Triggered NDB hook action is not `put` or `delete`. Ignoring.')
+            cls.__logging.warning('Triggered NDB hook action is not `put` or `delete`. Ignoring.')
             return
         else:
-            self.__logging.info('Valid hook action for potential pipeline hook. Trying to construct/resolve.')
-            p = self._construct_hook_pipeline(action)
-            if p is not None:
+            cls.__logging.info('Valid hook action for potential pipeline hook. Trying to construct/resolve.')
+            p = cls._construct_hook_pipeline(action, **kwargs)
+            cls.__logging.info('Got back pipeline: `%s`.' % p)
+            if p:
                 if start:
-                    self.__logging.info('Starting hooked pipeline...')
-                    pipeline = p.start(self.__config.get('trigger_queue', 'default'))
-                    self.__logging.info('Hooked pipeline away: "%s"' % pipeline)
+                    cls.__logging.info('Starting hooked pipeline...')
+                    pipeline = p.start(queue_name=cls.__config.get('trigger_queue', 'default'))
+                    cls.__logging.info('Hooked pipeline away: "%s"' % pipeline)
                     return pipeline
+                cls.__logging.info('Autostart is off. NOT starting constructed pipeline.')
                 return p
+            else:
+                cls.__logging.error('Could not construct pipeline! :(')
+                return
         return
 
     ### === Hook Methods === ###
-    def _post_put_hook(self):
+    def _pipelines_post_put_hook(self, future):
 
         ''' This hook is run after an AppModel is put using NDB. '''
 
-        if self.__config.get('enable', False):
-            self.__logging.info('Pipelines-NDB integration hooks enabled.')
-            self._trigger_hook_pipeline('put', self.__config.get('autostart', False))
+        cls = self.__class__
+        if cls.__config.get('enable', False):
+            cls.__logging.info('Pipelines-NDB integration hooks enabled.')
+            cls._trigger_hook_pipeline('put', cls.__config.get('autostart', False), key=self.key.urlsafe())
+        else:
+            cls.__logging.info('Pipelines-NDB integration hooks disabled.')
         return
 
-    def _post_delete_hook(self):
+    @classmethod
+    def _pipelines_post_delete_hook(cls, key, future):
 
         ''' This hook is run after an AppModel is deleted using NDB. '''
 
-        if self.__config.get('enable', False):
-            self.__logging.info('Pipelines-NDB integration hooks enabled.')
-            self._trigger_hook_pipeline('delete', self.__config.get('autostart', False))
+        if cls.__config.get('enable', False):
+            cls.__logging.info('Pipelines-NDB integration hooks enabled.')
+            cls._trigger_hook_pipeline('delete', cls.__config.get('autostart', False), key=key.urlsafe())
+        else:
+            cls.__logging.info('Pipelines-NDB integration hooks disabled.')
         return
 
 
@@ -209,3 +216,16 @@ class AppModel(ndb.Model, MessageConverterMixin, PipelineTriggerMixin):
     # Timestamps
     modified = ndb.DateTimeProperty('_tm', auto_now=True, indexed=True)
     created = ndb.DateTimeProperty('_tc', auto_now_add=True, indexed=True)
+
+    def _post_put_hook(self, future):
+
+        ''' Post-put hook. '''
+
+        self._pipelines_post_put_hook(future)
+
+    @classmethod
+    def _post_delete_hook(cls, key, future):
+
+        ''' Post-delete hook. '''
+
+        cls._pipelines_post_delete_hook(key, future)
