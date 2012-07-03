@@ -507,8 +507,7 @@
   Openfire = (function() {
 
     function Openfire(window) {
-      var session,
-        _this = this;
+      var _this = this;
       this.sys = {
         core_events: ['OPENFIRE_READY'],
         config: {
@@ -670,7 +669,6 @@
         this.sys.state.preinit = window.__openfire_preinit;
         this.sys.state.consider_preinit(window.__openfire_preinit);
       }
-      session = this.sys.sniff_headers(document);
       return this.sys.go();
     }
 

@@ -61,6 +61,16 @@ class BBQCategory extends BBQBaseObject
         request = $.apptools.api.category.delete(key: @getAttr 'category', 'key')
         fulfillRequest(request)
 
+    '''
+    COMING SOON: DIALOGS!
+    startEdit: () ->
+        for modal in $.apptools.widgets.modal._state.modals
+            if modal._state.cached_id == 'new-category'
+                modal.open()
+                this._element.find('button.save-edit').click () ->
+                    _this.put()
+    '''
+
 
 class BBQProposal extends BBQBaseObject
 
@@ -133,6 +143,21 @@ class BBQProject extends BBQBaseObject
         fulfillRequest(request, "Failed to shut down a project")
 
 
+class BBQCustomUrl extends BBQBaseObject
+
+    constructor: (el) ->
+        @dataList = ['key', 'slug', 'target']
+        super el
+
+    put: () ->
+        request = $.apptools.api.url.delete(key: @getAttr 'custom-url', 'key')
+        fulfillRequest(request)
+
+    delete: () ->
+        request = $.apptools.api.url.delete(key: @getAttr 'custom-url', 'key')
+        fulfillRequest(request)
+
+
 class BBQController
 
     @export = 'private'
@@ -147,10 +172,10 @@ class BBQController
 
         @_init = () =>
             @initBbqNewInlines()
-            @initBbqCategories()
+            @initBbqObjects()
 
 
-    initBbqCategories: () ->
+    initBbqObjects: () ->
         _this = this
         $('.category').each () ->
             newCategory = new BBQCategory($(this))
@@ -163,6 +188,10 @@ class BBQController
         $('.project').each () ->
             newProject = new BBQProject($(this))
             _this.projects.push newProject
+
+        $('.custom-url').each () ->
+            newCustomUrl = new BBQCustomUrl($(this))
+            _this.customUrls.push newCustomUrl
 
 
     initBbqNewInlines: () ->
@@ -199,6 +228,12 @@ class BBQController
                         keywords: $('#new-proposal-keywords-input').val()
                         creator: $('#new-proposal-creator-input').val()
                     request = $.apptools.api.proposal.put(proposalDict)
+
+                when 'save-new-custom-url-btn'
+                    customUrlDict =
+                        slug: $('#new-custom-url-slug-input').val()
+                        target: $('#new-custom-url-target-input').val()
+                    request = $.apptools.api.url.put(customUrlDict)
 
                 else
                     alert 'What button did you just click? (it was ' + @id + ')'

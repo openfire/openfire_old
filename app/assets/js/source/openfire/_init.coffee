@@ -115,7 +115,8 @@ class Openfire
             @sys.state.consider_preinit(window.__openfire_preinit)
 
         # sniff headers/session
-        session = @sys.sniff_headers(document)
+        # TODO: This is commented out until apptoolsjs is updated.
+        #session = @sys.sniff_headers(document)
 
         # trigger system ready
         return @sys.go()
