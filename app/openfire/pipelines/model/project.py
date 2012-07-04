@@ -10,20 +10,6 @@ class CategoryPipeline(ModelPipeline):
 
     _model_binding = 'openfire.models.project.Category'
 
-    def put(self, key, category):
-
-        ''' Fired when a category is put. '''
-
-        logging.info('=== FIRED ON PUT ===')
-        return
-
-    def delete(self, key):
-
-        ''' Fired when a category is deleted. '''
-
-        logging.info('=== FIRED ON DELETE ===')
-        return
-
 
 ## ProjectPipeline - fired when a Project entity is put/deleted
 class ProjectPipeline(ModelPipeline):
@@ -31,20 +17,6 @@ class ProjectPipeline(ModelPipeline):
     ''' Processes project puts/deletes. '''
 
     _model_binding = 'openfire.models.project.Project'
-
-    def put(self, key, project):
-
-        ''' Fired when a project is put. '''
-
-        logging.info('=== FIRED ON PUT ===')
-        return
-
-    def delete(self, key):
-
-        ''' Fired when a project is deleted. '''
-
-        logging.info('=== FIRED ON DELETE ===')
-        return
 
 
 ## GoalPipeline - fired when a Goal entity is put/deleted
