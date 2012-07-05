@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
-from openfire.models import user, project, assets, system, contribution
+from openfire.models import user, project, assets, system, contribution, indexer
 
 
 class DevModels(WebHandler):
@@ -18,13 +18,52 @@ class DevModels(WebHandler):
 
         if run:
 
-			## contribution types
-			money = contribution.ContributionType(slug='money', name='Money', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
-			time = contribution.ContributionType(slug='time', name='Time', unit='hour', plural='hours', subunit='minute', subunit_plural='minutes')
-			code = contribution.ContributionType(slug='code', name='Code', unit='line', plural='lines')
-			advocacy = contribution.ContributionType(slug='advocacy', name='Advocacy', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+            ## indexer models
+            if hasattr(indexer.Index, 'new'):
 
-			contribution_types = ndb.put_multi([money, time, code, advocacy])
+                indexer.IndexEvent(id='_init_').put()
+
+                ## indexes
+                meta_i = indexer.Index.new('_meta_')
+                user_i = indexer.Index.new('user')
+                update_i = indexer.Index.new('update')
+                project_i = indexer.Index.new('project')
+                category_i = indexer.Index.new('category')
+                activity_i = indexer.Index.new('activity')
+
+                indexes = ndb.put_multi([meta_i, user_i, update_i, project_i, category_i, activity_i])
+
+                indexer.IndexEvent(id='_indexes_init_').put()
+
+                ## entries
+                user_i_entry = indexer.IndexEntry(id='user', parent=meta_i)
+                update_i_entry = indexer.IndexEntry(id='update', parent=meta_i)
+                project_i_entry = indexer.IndexEntry(id='project', parent=meta_i)
+                category_i_entry = indexer.IndexEntry(id='category', parent=meta_i)
+                activity_i_entry = indexer.IndexEntry(id='activity', parent=meta_i)
+
+                index_entries = ndb.put_multi([user_i_entry, update_i_entry, project_i_entry, category_i_entry, activity_i_entry])
+
+                indexer.IndexEvent(id='_entries_init_').put()
+
+                ## mappings
+                user_i_mapping = indexer.IndexMapping(id=user_i.key.urlsafe(), parent=user_i_entry)
+                update_i_mapping = indexer.IndexMapping(id=update_i.key.urlsafe(), parent=update_i_entry)
+                project_i_mapping = indexer.IndexMapping(id=project_i.key.urlsafe(), parent=project_i_entry)
+                category_i_mapping = indexer.IndexMapping(id=category_i.key.urlsafe(), parent=category_i_entry)
+                activity_i_mapping = indexer.IndexMapping(id=activity_i.key.urlsafe(), parent=activity_i_entry)
+
+                index_mappings = ndb.put_multi([user_i_mapping, update_i_mapping, project_i_mapping, category_i_mapping, activity_i_mapping])
+
+                indexer.IndexEvent(id='_mappings_init_').put()
+
+            ## contribution types
+            money = contribution.ContributionType(slug='money', name='Money', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+            time = contribution.ContributionType(slug='time', name='Time', unit='hour', plural='hours', subunit='minute', subunit_plural='minutes')
+            code = contribution.ContributionType(slug='code', name='Code', unit='line', plural='lines')
+            advocacy = contribution.ContributionType(slug='advocacy', name='Advocacy', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+
+            contribution_types = ndb.put_multi([money, time, code, advocacy])
 
             ## users first
             pug = user.User(key=ndb.Key(user.User, 'pug'), username='pug', firstname='David', lastname='Anderson', bio='hola yo soy pug').put()
@@ -57,15 +96,15 @@ class DevModels(WebHandler):
                     public=True,
                     viewers=[pug, ethan],
                     goals=[
-						project.Goal(),
-						project.Goal(),
-						project.Goal()
-					],
-					tiers=[
-						project.Tier(),
-						project.Tier(),
-						project.Tier()
-					]
+                        project.Goal(),
+                        project.Goal(),
+                        project.Goal()
+                    ],
+                    tiers=[
+                        project.Tier(),
+                        project.Tier(),
+                        project.Tier()
+                    ]
             ).put()
 
             seasteading = project.Proposal(
@@ -81,15 +120,15 @@ class DevModels(WebHandler):
                     public=True,
                     viewers=[pug, sam],
                     goals=[
-						project.Goal(),
-						project.Goal(),
-						project.Goal()
-					],
-					tiers=[
-						project.Tier(),
-						project.Tier(),
-						project.Tier()
-					]
+                        project.Goal(),
+                        project.Goal(),
+                        project.Goal()
+                    ],
+                    tiers=[
+                        project.Tier(),
+                        project.Tier(),
+                        project.Tier()
+                    ]
             ).put()
 
             urbsly = project.Proposal(
@@ -105,15 +144,15 @@ class DevModels(WebHandler):
                     public=True,
                     viewers=[pug, david],
                     goals=[
-						project.Goal(),
-						project.Goal(),
-						project.Goal()
-					],
-					tiers=[
-						project.Tier(),
-						project.Tier(),
-						project.Tier()
-					]
+                        project.Goal(),
+                        project.Goal(),
+                        project.Goal()
+                    ],
+                    tiers=[
+                        project.Tier(),
+                        project.Tier(),
+                        project.Tier()
+                    ]
             ).put()
 
             proposals = [fatcatmap, seasteading, urbsly]
