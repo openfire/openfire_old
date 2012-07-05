@@ -507,7 +507,8 @@
   Openfire = (function() {
 
     function Openfire(window) {
-      var _this = this;
+      var session,
+        _this = this;
       this.sys = {
         core_events: ['OPENFIRE_READY'],
         config: {
@@ -559,16 +560,20 @@
           },
           sniff_headers: function(document) {
             var cookie, i, session, _ref;
+            $.apptools.dev.verbose('openfire', 'Sniffing response cookies.');
             session = null;
             _ref = document.cookies.split(";");
             for (i in _ref) {
               cookie = _ref[i];
+              $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.split("="));
               cookie = cookie.split("=");
               if (cookie[0] === _this.sys.config.session.cookie) {
                 session = cookie[1].split("|");
+                $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', _this.sys.config.session.cookie, session);
                 if (session.length > 2) {
                   if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
                     session = cookie[2];
+                    $.apptools.dev.log('openfire:sessions', 'Valid session found and loaded.', session);
                   }
                 }
                 break;
@@ -669,6 +674,7 @@
         this.sys.state.preinit = window.__openfire_preinit;
         this.sys.state.consider_preinit(window.__openfire_preinit);
       }
+      session = this.sys.state.sniff_headers(document);
       return this.sys.go();
     }
 

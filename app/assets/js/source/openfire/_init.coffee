@@ -48,15 +48,20 @@ class Openfire
 
                 sniff_headers: (document) =>
 
+                    $.apptools.dev.verbose('openfire', 'Sniffing response cookies.')
+
                     # only lookin' for cookies right now
                     session = null
                     for i, cookie of document.cookies.split(";")
+                        $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.split("="))
                         cookie = cookie.split("=");
                         if cookie[0] == @sys.config.session.cookie
                             session = cookie[1].split("|")
+                            $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', @sys.config.session.cookie, session)                            
                             if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
                                 if (@sys.config.session.timeout * 1000) > +new Date()  # check expiration
                                     session = cookie[2]
+                                    $.apptools.dev.log('openfire:sessions', 'Valid session found and loaded.', session)
                             break
                         continue
 
@@ -116,7 +121,7 @@ class Openfire
 
         # sniff headers/session
         # TODO: This is commented out until apptoolsjs is updated.
-        #session = @sys.sniff_headers(document)
+        session = @sys.state.sniff_headers(document)
 
         # trigger system ready
         return @sys.go()

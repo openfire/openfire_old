@@ -12,8 +12,8 @@ class ContributionType(AppModel):
     name = ndb.StringProperty('n', indexed=True, required=True)
     unit = ndb.StringProperty('u', indexed=True, required=True)
     plural = ndb.StringProperty('p', indexed=True, required=True)
-    subunit = ndb.StringProperty('su', indexed=True, required=True)
-    subunit_plural = ndb.StringProperty('sp', indexed=True, required=True)
+    subunit = ndb.StringProperty('su', indexed=True, default=None)
+    subunit_plural = ndb.StringProperty('sp', indexed=True, default=None)
 
 
 ## Contribution - something given to a project from a user
