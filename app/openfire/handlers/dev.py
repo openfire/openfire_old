@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
-from openfire.models import user, project, assets, system
+from openfire.models import user, project, assets, system, contribution
 
 
 class DevModels(WebHandler):
@@ -17,6 +17,15 @@ class DevModels(WebHandler):
             run = (not flag.has_run)
 
         if run:
+
+			## contribution types
+			money = contribution.ContributionType(slug='money', name='Money', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+			time = contribution.ContributionType(slug='time', name='Time', unit='hour', plural='hours', subunit='minute', subunit_plural='minutes')
+			code = contribution.ContributionType(slug='code', name='Code', unit='line', plural='lines')
+			advocacy = contribution.ContributionType(slug='advocacy', name='Advocacy', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+
+			contribution_types = ndb.put_multi([money, time, code, advocacy])
+
             ## users first
             pug = user.User(key=ndb.Key(user.User, 'pug'), username='pug', firstname='David', lastname='Anderson', bio='hola yo soy pug').put()
             sam = user.User(key=ndb.Key(user.User, 'sam'), username='sam', firstname='Sam', lastname='Gammon', bio='fiesta ayayayay').put()
@@ -46,7 +55,17 @@ class DevModels(WebHandler):
                     creator=sam,
                     owners=[sam, david],
                     public=True,
-                    viewers=[pug, ethan]
+                    viewers=[pug, ethan],
+                    goals=[
+						project.Goal(),
+						project.Goal(),
+						project.Goal()
+					],
+					tiers=[
+						project.Tier(),
+						project.Tier(),
+						project.Tier()
+					]
             ).put()
 
             seasteading = project.Proposal(
@@ -60,7 +79,17 @@ class DevModels(WebHandler):
                     creator=david,
                     owners=[david, ethan],
                     public=True,
-                    viewers=[pug, sam]
+                    viewers=[pug, sam],
+                    goals=[
+						project.Goal(),
+						project.Goal(),
+						project.Goal()
+					],
+					tiers=[
+						project.Tier(),
+						project.Tier(),
+						project.Tier()
+					]
             ).put()
 
             urbsly = project.Proposal(
@@ -74,10 +103,22 @@ class DevModels(WebHandler):
                     creator=ethan,
                     owners=[ethan, sam],
                     public=True,
-                    viewers=[pug, david]
+                    viewers=[pug, david],
+                    goals=[
+						project.Goal(),
+						project.Goal(),
+						project.Goal()
+					],
+					tiers=[
+						project.Tier(),
+						project.Tier(),
+						project.Tier()
+					]
             ).put()
 
             proposals = [fatcatmap, seasteading, urbsly]
+
+            # then goals + tiers (project sub-artifacts)
 
             # fourth, projects
             fatcatmap = project.Project(

@@ -64,6 +64,10 @@ class Proposal(AppModel):
     public = ndb.BooleanProperty('pp', indexed=True, default=False)
     viewers = ndb.KeyProperty('pv', indexed=True, repeated=True)
 
+    # Tiers + Goals
+    tiers = ndb.LocalStructuredProperty('tr', repeated=True, compressed=True)
+    goals = ndb.LocalStructuredProperty('gl', repeated=True, compressed=True)
+
 
 ## Projects
 class Project(AppModel):
@@ -99,6 +103,10 @@ class Project(AppModel):
     money = ndb.IntegerProperty('mn', default=0)
     progress = ndb.IntegerProperty('pr', default=0, choices=set(range(0, 100)))
 
+    # Tiers + Goals
+    tiers = ndb.KeyProperty('tr', repeated=True)
+    goals = ndb.KeyProperty('gl', repeated=True)
+
     def is_private(self):
         return self.status == 'p'
 
@@ -111,7 +119,7 @@ class Goal(AppModel):
     _message_class = common.Goal
     _pipeline_class = pipelines.GoalPipeline
 
-    target = ndb.KeyProperty('t', indexed=True, required=True)
+    target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
     amount = ndb.IntegerProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('d', indexed=False)

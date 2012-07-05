@@ -41,6 +41,29 @@
                             {% endfor %}
                         </ul>
                         <br />
+                        
+                        <b>project tiers:</b>
+						{% if project.tiers %}
+						<ul>
+							{% for tier in project.tiers %}
+								<li>Tier</li>
+						    {% endfor %}
+						 </ul>
+						{% else %}
+							<br /><b>no project tiers yet! :(</b><br />
+						{% endif %}
+						<br />
+
+						<b>project goals:</b>
+						{% if project.goals %}
+							{% for goal in project.goals %}
+								<li>Goal</li>
+							{% endfor %}
+						{% else %}
+							<br /><b>no project goals yet! :(</b><br />
+						{% endif %}
+						<br />
+
                         <b>technology:</b>
                         <p>{{ project.tech }}
                     {% endblock %}
@@ -65,12 +88,3 @@
     </div>
 
 {% endblock %}
-
-{% block postsouth %}
-<script type='text/javascript'>
-
-$(document).ready(function () {
-});
-
-</script>
-{% endblock postsouth %}

@@ -862,7 +862,8 @@
   Openfire = (function() {
 
     function Openfire(window) {
-      var _this = this;
+      var session, _base,
+        _this = this;
       this.sys = {
         core_events: ['OPENFIRE_READY'],
         config: {
@@ -911,28 +912,32 @@
               }
             }
             return preinit;
-          }
-        },
-        sniff_headers: function(document) {
-          var cookie, i, session, _ref;
-          session = null;
-          _ref = document.cookie.split(";");
-          for (i in _ref) {
-            cookie = _ref[i];
-            cookie = cookie.split("=");
-            if (cookie[0] === _this.sys.config.session.cookie) {
-              session = cookie[1].split("|");
-              if (session.length > 2) {
-                if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
-                  session = cookie[2];
+          },
+          sniff_headers: function(document) {
+            var cookie, i, session, _ref;
+            $.apptools.dev.verbose('openfire', 'Sniffing response cookies.');
+            session = null;
+            _ref = document.cookies.split(";");
+            for (i in _ref) {
+              cookie = _ref[i];
+              $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.split("="));
+              cookie = cookie.split("=");
+              if (cookie[0] === _this.sys.config.session.cookie) {
+                session = cookie[1].split("|");
+                $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', _this.sys.config.session.cookie, session);
+                if (session.length > 2) {
+                  if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
+                    session = cookie[2];
+                    $.apptools.dev.log('openfire:sessions', 'Valid session found and loaded.', session);
+                  }
                 }
+                break;
               }
-              break;
+              continue;
             }
-            continue;
-          }
-          if (session !== null && session !== false) {
-            return _this.sys.state.session.established = true;
+            if (session !== null && session !== false) {
+              return _this.sys.state.session.established = true;
+            }
           }
         },
         install: {
@@ -1024,6 +1029,7 @@
         this.sys.state.preinit = window.__openfire_preinit;
         this.sys.state.consider_preinit(window.__openfire_preinit);
       }
+      session = typeof (_base = this.sys.state).sniff_headers === "function" ? _base.sniff_headers(document) : void 0;
       return this.sys.go();
     }
 
