@@ -27,6 +27,12 @@ class User(AppModel):
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
     bio = ndb.TextProperty('b', indexed=False)
+    customurl = ndb.KeyProperty('url', indexed=True, default=None)
+
+    def get_custom_url(self):
+        if self.customurl:
+            return self.customurl.id()
+        return None
 
 
 ## UserAvatar - links an avatar resource to a user profile

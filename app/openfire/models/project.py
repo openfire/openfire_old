@@ -87,7 +87,6 @@ class Proposal(AppModel):
     name = ndb.StringProperty('n', indexed=True, required=True)
     status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a'])  # draft, submitted, review, denied, accepted
     category = ndb.KeyProperty('ct', indexed=True, required=True)
-    customurl = ndb.KeyProperty('url', indexed=True, default=None)
 
     # Content
     summary = ndb.StringProperty('m', indexed=True)
@@ -121,6 +120,7 @@ class Project(AppModel):
     status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c'])  # private, featured, open, closed
     proposal = ndb.KeyProperty('pr', indexed=True, required=True)
     category = ndb.KeyProperty('ct', indexed=True, required=True)
+    customurl = ndb.KeyProperty('url', indexed=True, default=None)
 
     # Content
     summary = ndb.StringProperty('m', indexed=True)
@@ -148,6 +148,11 @@ class Project(AppModel):
 
     def is_private(self):
         return self.status == 'p'
+
+    def get_custom_url(self):
+        if self.customurl:
+            return self.customurl.id()
+        return None
 
 
 ######## ======== Project Submodels ======== ########

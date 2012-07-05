@@ -341,6 +341,22 @@ class DevModels(WebHandler):
 
             ndb.put_multi(custom_urls)
 
+            fatcatmap.customurl = fcm_url.key
+            seasteading.customurl = ssd_url.key
+            urbsly.customurl = urb_url.key
+
+            sam_obj = sam.get()
+            david_obj = david.get()
+            ethan_obj = ethan.get()
+            pug_obj = pug.get()
+
+            sam_obj.customurl = sam_url.key
+            david_obj.customurl = david_url.key
+            ethan_obj.customurl = ethan_url.key
+            pug_obj.customurl = pug_url.key
+
+            ndb.put_multi([fatcatmap, seasteading, urbsly, sam_obj, david_obj, ethan_obj, pug_obj])
+
             system.SystemProperty.set('fixture', 'openfire.dev.BaseDataFixture', has_run=True)
 
         return self.redirect_to('landing')
