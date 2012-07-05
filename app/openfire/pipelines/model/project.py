@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import logging
 from openfire.pipelines.model import ModelPipeline
 
 
@@ -9,6 +8,14 @@ class CategoryPipeline(ModelPipeline):
     ''' Processes category puts/deletes. '''
 
     _model_binding = 'openfire.models.project.Category'
+
+
+## ProposalPipeline - fired when a Proposal entity is put/deleted
+class ProposalPipeline(ModelPipeline):
+
+    ''' Processes project puts/deletes. '''
+
+    _model_binding = 'openfire.models.project.Proposal'
 
 
 ## ProjectPipeline - fired when a Project entity is put/deleted

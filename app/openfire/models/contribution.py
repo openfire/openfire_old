@@ -15,7 +15,7 @@ class ContributionType(AppModel):
     ''' A type of contribution that a user can make to a project. '''
 
     _message_class = messages.ContributionType
-    _pipeline_class = messages.ContributionTypePipeline
+    _pipeline_class = pipelines.ContributionTypePipeline
 
     slug = ndb.StringProperty('s', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=True, required=True)
@@ -37,3 +37,4 @@ class Contribution(AppModel):
     project = ndb.KeyProperty('p', indexed=True, required=True)
     user = ndb.KeyProperty('u', indexed=True, required=True)
     amount = ndb.IntegerProperty('a', indexed=True, required=True)
+    tier = ndb.KeyProperty('tr', indexed=True, required=True)

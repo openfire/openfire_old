@@ -1,3 +1,4 @@
+import datetime
 from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.models import user, project, assets, system, contribution, indexer
@@ -31,47 +32,45 @@ class DevModels(WebHandler):
                 category_i = indexer.Index.new('category')
                 activity_i = indexer.Index.new('activity')
 
-                indexes = ndb.put_multi([meta_i, user_i, update_i, project_i, category_i, activity_i])
+                ndb.put_multi([meta_i, user_i, update_i, project_i, category_i, activity_i])
 
                 indexer.IndexEvent(id='_indexes_init_').put()
 
                 ## entries
-                user_i_entry = indexer.IndexEntry(id='user', parent=meta_i)
-                update_i_entry = indexer.IndexEntry(id='update', parent=meta_i)
-                project_i_entry = indexer.IndexEntry(id='project', parent=meta_i)
-                category_i_entry = indexer.IndexEntry(id='category', parent=meta_i)
-                activity_i_entry = indexer.IndexEntry(id='activity', parent=meta_i)
+                user_i_entry = meta_i.add('user')
+                update_i_entry = meta_i.add('update')
+                project_i_entry = meta_i.add('project')
+                category_i_entry = meta_i.add('category')
+                activity_i_entry = meta_i.add('activity')
 
-                index_entries = ndb.put_multi([user_i_entry, update_i_entry, project_i_entry, category_i_entry, activity_i_entry])
+                ndb.put_multi([user_i_entry, update_i_entry, project_i_entry, category_i_entry, activity_i_entry])
 
                 indexer.IndexEvent(id='_entries_init_').put()
 
                 ## mappings
-                user_i_mapping = indexer.IndexMapping(id=user_i.key.urlsafe(), parent=user_i_entry)
-                update_i_mapping = indexer.IndexMapping(id=update_i.key.urlsafe(), parent=update_i_entry)
-                project_i_mapping = indexer.IndexMapping(id=project_i.key.urlsafe(), parent=project_i_entry)
-                category_i_mapping = indexer.IndexMapping(id=category_i.key.urlsafe(), parent=category_i_entry)
-                activity_i_mapping = indexer.IndexMapping(id=activity_i.key.urlsafe(), parent=activity_i_entry)
+                user_i_mapping = user_i_entry.map(user_i.key)
+                update_i_mapping = update_i_entry.map(update_i.key)
+                project_i_mapping = project_i_entry.map(project_i.key)
+                category_i_mapping = category_i_entry.map(category_i.key)
+                activity_i_mapping = activity_i_entry.map(activity_i.key)
 
-                index_mappings = ndb.put_multi([user_i_mapping, update_i_mapping, project_i_mapping, category_i_mapping, activity_i_mapping])
+                ndb.put_multi([user_i_mapping, update_i_mapping, project_i_mapping, category_i_mapping, activity_i_mapping])
 
                 indexer.IndexEvent(id='_mappings_init_').put()
 
             ## contribution types
-            money = contribution.ContributionType(slug='money', name='Money', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
-            time = contribution.ContributionType(slug='time', name='Time', unit='hour', plural='hours', subunit='minute', subunit_plural='minutes')
-            code = contribution.ContributionType(slug='code', name='Code', unit='line', plural='lines')
-            advocacy = contribution.ContributionType(slug='advocacy', name='Advocacy', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+            money = contribution.ContributionType(id='money', slug='money', name='Money', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
+            time = contribution.ContributionType(id='time', slug='time', name='Time', unit='hour', plural='hours', subunit='minute', subunit_plural='minutes')
+            code = contribution.ContributionType(id='code', slug='code', name='Code', unit='line', plural='lines')
+            advocacy = contribution.ContributionType(id='advocacy', slug='advocacy', name='Advocacy', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
 
-            contribution_types = ndb.put_multi([money, time, code, advocacy])
+            ndb.put_multi([money, time, code, advocacy])
 
             ## users first
             pug = user.User(key=ndb.Key(user.User, 'pug'), username='pug', firstname='David', lastname='Anderson', bio='hola yo soy pug').put()
             sam = user.User(key=ndb.Key(user.User, 'sam'), username='sam', firstname='Sam', lastname='Gammon', bio='fiesta ayayayay').put()
             david = user.User(key=ndb.Key(user.User, 'david'), username='david', firstname='David', lastname='Rekow', bio='hi i is david').put()
             ethan = user.User(key=ndb.Key(user.User, 'ethan'), username='ethan', firstname='Ethan', lastname='Leland', bio='i am mister ethan').put()
-
-            users = [pug, sam, david, ethan]
 
             ## categories next
             politics = project.Category(key=ndb.Key(project.Category, 'politics'), slug='politics', name='Politics', description='Having to do with politics.', keywords=['policy', 'government']).put()
@@ -80,14 +79,12 @@ class DevModels(WebHandler):
             law = project.Category(key=ndb.Key(project.Category, 'law'), slug='law', name='Law', description='Having to do with law or policy.', keywords=['policy', 'law', 'government']).put()
             business = project.Category(key=ndb.Key(project.Category, 'business'), slug='business', name='Business', description='Having to do with commercial enterprise.', keywords=['corporations', 'startups']).put()
 
-            categories = [politics, transparency, money, law, business]
-
             ## proposals third
             fatcatmap = project.Proposal(
                     name='fat cat map',
                     status='a',
                     category=transparency,
-                    summary='ever wonder who your local congressman gets his money?',
+                    summary='ever wonder where your local congressman gets his money?',
                     pitch='cool fat pitch herr',
                     tech='Google App Engine, Amazon AWS, Layer9, AppTools',
                     keywords=['transparency', 'politics', 'opendata', 'visualization'],
@@ -96,14 +93,61 @@ class DevModels(WebHandler):
                     public=True,
                     viewers=[pug, ethan],
                     goals=[
-                        project.Goal(),
-                        project.Goal(),
-                        project.Goal()
+                        project.Goal(amount=1000),
+                        project.Goal(amount=10000),
+                        project.Goal(amount=100000),
+                        project.Goal(amount=500000),
+                        project.Goal(amount=1000000)
                     ],
                     tiers=[
-                        project.Tier(),
-                        project.Tier(),
-                        project.Tier()
+                        project.Tier(
+                            name='Friend',
+                            amount=10,
+                            description="We'll give you an invite to the private beta!",
+                            delivery=datetime.date(year=2012, month=9, day=1)
+                        ),
+                        project.Tier(
+                            name='Supporter',
+                            amount=35,
+                            description="Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
+                            delivery=datetime.date(year=2012, month=9, day=1)
+                        ),
+                        project.Tier(
+                            name='Backer',
+                            amount=50,
+                            description="Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
+                            delivery=datetime.date(year=2012, month=9, day=1)
+                        ),
+                        project.Tier(
+                            name='Sponsor',
+                            amount=100,
+                            description="Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
+                            delivery=datetime.date(year=2012, month=8, day=1)
+                        ),
+                        project.Tier(
+                            name='Investor',
+                            amount=300,
+                            description="Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
+                            delivery=datetime.date(year=2012, month=8, day=1)
+                        ),
+                        project.Tier(
+                            name='Inner Circle',
+                            amount=500,
+                            description="Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
+                            delivery=datetime.date(year=2012, month=8, day=1)
+                        ),
+                        project.Tier(
+                            name='Transparency Warrior',
+                            amount=1000,
+                            description="As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
+                            delivery=datetime.date(year=2012, month=7, day=15)
+                        ),
+                        project.Tier(
+                            name='Fat Cat',
+                            amount=10000,
+                            description="Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
+                            delivery=datetime.date(year=2012, month=7, day=10)
+                        )
                     ]
             ).put()
 
@@ -118,17 +162,7 @@ class DevModels(WebHandler):
                     creator=david,
                     owners=[david, ethan],
                     public=True,
-                    viewers=[pug, sam],
-                    goals=[
-                        project.Goal(),
-                        project.Goal(),
-                        project.Goal()
-                    ],
-                    tiers=[
-                        project.Tier(),
-                        project.Tier(),
-                        project.Tier()
-                    ]
+                    viewers=[pug, sam]
             ).put()
 
             urbsly = project.Proposal(
@@ -142,20 +176,8 @@ class DevModels(WebHandler):
                     creator=ethan,
                     owners=[ethan, sam],
                     public=True,
-                    viewers=[pug, david],
-                    goals=[
-                        project.Goal(),
-                        project.Goal(),
-                        project.Goal()
-                    ],
-                    tiers=[
-                        project.Tier(),
-                        project.Tier(),
-                        project.Tier()
-                    ]
+                    viewers=[pug, david]
             ).put()
-
-            proposals = [fatcatmap, seasteading, urbsly]
 
             # then goals + tiers (project sub-artifacts)
 
@@ -165,7 +187,7 @@ class DevModels(WebHandler):
                     status='o',
                     category=transparency,
                     proposal=fatcatmap,
-                    summary='ever wonder who your local congressman gets his money?',
+                    summary='ever wonder where your local congressman gets his money?',
                     pitch='cool fat pitch herr',
                     tech='Google App Engine, Amazon AWS, Layer9, AppTools',
                     keywords=['transparency', 'politics', 'opendata', 'visualization'],
@@ -173,7 +195,8 @@ class DevModels(WebHandler):
                     owners=[sam, david],
                     public=True,
                     viewers=[pug, ethan]
-            ).put()
+            )
+            fatcatmap.put()
 
             seasteading = project.Project(
                     name='SeaSteading',
@@ -188,7 +211,8 @@ class DevModels(WebHandler):
                     owners=[david, ethan],
                     public=True,
                     viewers=[pug, sam]
-            ).put()
+            )
+            seasteading.put()
 
             urbsly = project.Project(
                     name='urbsly',
@@ -203,9 +227,83 @@ class DevModels(WebHandler):
                     owners=[ethan, sam],
                     public=True,
                     viewers=[pug, david]
-            ).put()
+            )
+            urbsly.put()
 
-            projects = [fatcatmap, seasteading, urbsly]
+            # project tiers + goals: FATCATMAP
+            fatcatmap_goals = [
+                project.Goal(parent=fatcatmap.key, amount=1000),
+                project.Goal(parent=fatcatmap.key, amount=10000),
+                project.Goal(parent=fatcatmap.key, amount=100000),
+                project.Goal(parent=fatcatmap.key, amount=500000),
+                project.Goal(parent=fatcatmap.key, amount=1000000)
+            ]
+
+            fatcatmap_tiers = [
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Friend',
+                    amount=10,
+                    description="We'll give you an invite to the private beta!",
+                    delivery=datetime.date(year=2012, month=9, day=1)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Supporter',
+                    amount=35,
+                    description="Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
+                    delivery=datetime.date(year=2012, month=9, day=1)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Backer',
+                    amount=50,
+                    description="Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
+                    delivery=datetime.date(year=2012, month=9, day=1)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Sponsor',
+                    amount=100,
+                    description="Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
+                    delivery=datetime.date(year=2012, month=8, day=1)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Investor',
+                    amount=300,
+                    description="Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
+                    delivery=datetime.date(year=2012, month=8, day=1)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Inner Circle',
+                    amount=500,
+                    description="Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
+                    delivery=datetime.date(year=2012, month=8, day=1)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Transparency Warrior',
+                    amount=1000,
+                    description="As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
+                    delivery=datetime.date(year=2012, month=7, day=15)
+                ),
+                project.Tier(
+                    parent=fatcatmap.key,
+                    name='Fat Cat',
+                    amount=10000,
+                    description="Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
+                    delivery=datetime.date(year=2012, month=7, day=10)
+                )
+            ]
+
+            ndb.put_multi(fatcatmap_goals)
+            ndb.put_multi(fatcatmap_tiers)
+
+            fatcatmap.goals = [g.key for g in fatcatmap_goals]
+            fatcatmap.tiers = [t.key for t in fatcatmap_tiers]
+            fatcatmap.put()
 
             # fif, assets, avatars + videos
             fcm_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'fatcatmap.png'), url='fatcatmap.png', kind='i').put()
@@ -216,11 +314,11 @@ class DevModels(WebHandler):
 
             avatars = [
 
-                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=fatcatmap), version=1, active=True, url='fatcatmap.png', asset=fcm_avatar),
-                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=fatcatmap), url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube'),
-                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=seasteading), version=1, active=True, url='seasteading.png', asset=ssd_avatar),
-                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=urbsly), version=1, active=True, url='urbsly.png', asset=urb_avatar),
-                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=urbsly), url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube')
+                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=fatcatmap.key), version=1, active=True, url='fatcatmap.png', asset=fcm_avatar),
+                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=fatcatmap.key), url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube'),
+                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=seasteading.key), version=1, active=True, url='seasteading.png', asset=ssd_avatar),
+                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=urbsly.key), version=1, active=True, url='urbsly.png', asset=urb_avatar),
+                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=urbsly.key), url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube')
 
             ]
 
@@ -229,9 +327,9 @@ class DevModels(WebHandler):
             # finally, custom URLS
 
             ## projects first
-            fcm_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'fatcatmap'), slug='fatcatmap', target=fatcatmap)
-            ssd_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'seasteading'), slug='seasteading', target=seasteading)
-            urb_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'urbsly'), slug='urbsly', target=urbsly)
+            fcm_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'fatcatmap'), slug='fatcatmap', target=fatcatmap.key)
+            ssd_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'seasteading'), slug='seasteading', target=seasteading.key)
+            urb_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'urbsly'), slug='urbsly', target=urbsly.key)
 
             ## then users
             sam_url = assets.CustomURL(key=ndb.Key(assets.CustomURL, 'sam'), slug='sam', target=sam)
@@ -243,6 +341,6 @@ class DevModels(WebHandler):
 
             ndb.put_multi(custom_urls)
 
-            s = system.SystemProperty.set('fixture', 'openfire.dev.BaseDataFixture', has_run=True)
+            system.SystemProperty.set('fixture', 'openfire.dev.BaseDataFixture', has_run=True)
 
         return self.redirect_to('landing')
