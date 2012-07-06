@@ -881,6 +881,10 @@
           classes: {},
           objects: {},
           session: {
+            data: null,
+            verified: false,
+            timestamp: null,
+            signature: null,
             established: false,
             authenticated: false,
             csrf: {
@@ -914,20 +918,26 @@
             return preinit;
           },
           sniff_headers: function(document) {
-            var cookie, i, session, _ref;
+            var cookie, data, i, key, session, signature, timestamp, _ref, _ref1, _ref2, _ref3;
             $.apptools.dev.verbose('openfire', 'Sniffing response cookies.');
             session = null;
-            _ref = document.cookies.split(";");
+            _ref = document.cookie.split(";");
             for (i in _ref) {
               cookie = _ref[i];
-              $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.split("="));
-              cookie = cookie.split("=");
-              if (cookie[0] === _this.sys.config.session.cookie) {
-                session = cookie[1].split("|");
-                $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', _this.sys.config.session.cookie, session);
+              $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.replace('"', '').split("="));
+              _ref1 = cookie.split("="), key = _ref1[0], cookie = _ref1[1];
+              if (key === _this.sys.config.session.cookie) {
+                _ref2 = session = cookie.replace('"', '').split("|"), data = _ref2[0], timestamp = _ref2[1], signature = _ref2[2];
+                _ref3 = [data.replace('"', ''), Number(timestamp), signature.replace('"', '')], data = _ref3[0], timestamp = _ref3[1], signature = _ref3[2];
+                $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', _this.sys.config.session.cookie, data, timestamp, signature);
                 if (session.length > 2) {
-                  if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
-                    session = cookie[2];
+                  $.apptools.dev.verbose('openfire:sessions', 'Checking session timeout with TTL of ', _this.sys.config.session.timeout, 'and session creation time of', session[1]);
+                  if (((+new Date(timestamp * 1000)) + (_this.sys.config.session.timeout * 1000)) > +new Date()) {
+                    session = {
+                      data: data,
+                      timestamp: timestamp,
+                      signature: signature
+                    };
                     $.apptools.dev.log('openfire:sessions', 'Valid session found and loaded.', session);
                   }
                 }
@@ -936,6 +946,9 @@
               continue;
             }
             if (session !== null && session !== false) {
+              _this.sys.state.session.data = session.data;
+              _this.sys.state.session.timestamp = session.timestamp;
+              _this.sys.state.session.signature = signature;
               return _this.sys.state.session.established = true;
             }
           }
