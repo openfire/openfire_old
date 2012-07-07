@@ -5,9 +5,6 @@ from google.appengine.ext import ndb
 from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
 
-# Model Imports
-from openfire.models.assets import Avatar
-
 # Model Attachments
 from openfire.messages import user as messages
 from openfire.pipelines.model import user as pipelines
@@ -28,19 +25,12 @@ class User(AppModel):
     lastname = ndb.StringProperty('l', indexed=True)
     bio = ndb.TextProperty('b', indexed=False)
     customurl = ndb.KeyProperty('url', indexed=True, default=None)
+    avatar = ndb.KeyProperty('av', repeated=True)
 
     def get_custom_url(self):
         if self.customurl:
             return self.customurl.id()
         return None
-
-
-## UserAvatar - links an avatar resource to a user profile
-class UserAvatar(Avatar):
-
-    ''' Maps an avatar to a user. '''
-
-    user = ndb.KeyProperty('u', indexed=True, required=True)
 
 
 ## EmailAddress - links an email address to a user, for the purpose of signin/notifications/contact

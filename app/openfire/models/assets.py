@@ -26,6 +26,7 @@ class Asset(AppModel):
     kind = ndb.StringProperty('t', indexed=True, choices=['i', 's', 't', 'v'], default='i')  # image, style, script, video
     blob = ndb.BlobKeyProperty('b', indexed=True)
     versions = ndb.KeyProperty('v', indexed=True, repeated=True)
+    pending = ndb.BooleanProperty('p', indexed=True, default=True)
 
 
 ## Media - links another object to a static asset, either via an Asset reference or a URL
@@ -55,6 +56,19 @@ class Avatar(Media):
     version = ndb.IntegerProperty('v', indexed=True, default=1)
     active = ndb.BooleanProperty('e', indexed=True, default=False)
     content = ndb.BlobProperty('bc', indexed=False)
+    approved = ndb.BooleanProperty('a', indexed=True, default=False)
+
+
+## Image - a piece of content that is a video or movie (always external, never has an Asset attachment)
+class Image(Media):
+
+    ''' Describes an image. '''
+
+    _message_class = messages.Image
+    _pipeline_class = pipelines.ImagePipeline
+
+    content = ndb.BlobProperty('bc', indexed=False)
+    approved = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
 ## Video - a piece of content that is a video or movie (always external, never has an Asset attachment)
@@ -66,6 +80,7 @@ class Video(Media):
     _pipeline_class = pipelines.VideoPipeline
 
     provider = ndb.StringProperty('p', indexed=True, choices=['youtube', 'vimeo'])
+    approved = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
 ######## ======== Custom URLs ======== ########

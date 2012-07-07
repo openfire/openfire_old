@@ -58,12 +58,11 @@ class Openfire
                     # only lookin' for cookies right now
                     session = null
                     for i, cookie of document.cookie.split(";")
-                        $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.replace('"', '').split("="))
-                        [key, cookie] = cookie.split("=");
-                        if key == @sys.config.session.cookie
-                            [data, timestamp, signature] = session = cookie.replace('"', '').split("|")
-                            [data, timestamp, signature] = [data.replace('"', ''), Number(timestamp), signature.replace('"', '')]
-                            $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', @sys.config.session.cookie, data, timestamp, signature)
+                        $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.split("="))
+                        cookie = cookie.split("=")
+                        if cookie[0] == @sys.config.session.cookie
+                            session = cookie[1].split("|")
+                            $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', @sys.config.session.cookie, session)
                             if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
                                 ## @TODO: verify session signature
                                 $.apptools.dev.verbose('openfire:sessions', 'Checking session timeout with TTL of ', @sys.config.session.timeout, 'and session creation time of', session[1])

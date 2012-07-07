@@ -14,7 +14,7 @@ class RemoteService(BaseService, SessionsMixin):
 
         ''' Initialize hook. '''
 
-        logging.critical('!!!!!!!!!!  ====  INITIALIZE HOOK RAN  ====  !!!!!!!!!!')
-        logging.critical('SELF: %s' % self)
-        logging.critical('SELF DIR: %s' % dir(self))
+        #logging.critical('!!!!!!!!!!  ====  INITIALIZE HOOK RAN  ====  !!!!!!!!!!')
+        #logging.critical('SELF: %s' % self)
+        #logging.critical('SELF DIR: %s' % dir(self))
         return
