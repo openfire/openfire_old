@@ -121,6 +121,13 @@ class BBQProject extends BBQBaseObject
         el.find('button.shutdown').click ->
             _this.shutdown()
 
+        """
+        WORK IN PROGRESS. -Ethan
+        $.apptools.widgets.uploader._init()
+        uploader = $.apptools.widgets.uploader.get('drop-image-here')
+        el.find('.drop-image-here').bind 'drop', uploader.upload
+        """
+
     put: () ->
         @loadData()
         request = $.apptools.api.project.put(@_dataDict)

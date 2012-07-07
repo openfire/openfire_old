@@ -146,6 +146,10 @@ class Project(AppModel):
     tiers = ndb.KeyProperty('tr', repeated=True)
     goals = ndb.KeyProperty('gl', repeated=True)
 
+    # Avatar + Media
+    avatar = ndb.KeyProperty('av', repeated=True)
+    video = ndb.KeyProperty('vi', repeated=True)
+
     def is_private(self):
         return (self.status not in ['p', 'c']) or self.public
 

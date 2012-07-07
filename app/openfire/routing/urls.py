@@ -70,6 +70,15 @@ rules = [
             ])
         ]),
 
+        ## === Media and Asset URLs === ##
+        HandlerPrefixRoute('media.', [
+            PathPrefixRoute('/_assets', [
+                Route('/blob_uploaded/<asset_key>', name='blob-uploaded', handler='BlobstoreUploaded'),
+                Route('/blob_uploaded/<asset_key>/<target_key>', name='blob-uploaded', handler='BlobstoreUploaded'),
+                Route('/get/<asset_key>', name='get-asset', handler='MediaStorage'),
+            ])
+        ]),
+
         Route('/<customurl>', name='custom_url', handler='main.CustomUrlHandler'),
     ])
 ]

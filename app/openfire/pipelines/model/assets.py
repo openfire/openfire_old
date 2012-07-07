@@ -26,6 +26,14 @@ class AvatarPipeline(ModelPipeline):
     _model_binding = 'openfire.models.assets.Avatar'
 
 
+## ImagePipeline - fired when a Image entity is put/deleted
+class ImagePipeline(ModelPipeline):
+
+    ''' Processes video puts/deletes. '''
+
+    _model_binding = 'openfire.models.assets.Image'
+
+
 ## VideoPipeline - fired when a Video entity is put/deleted
 class VideoPipeline(ModelPipeline):
 
