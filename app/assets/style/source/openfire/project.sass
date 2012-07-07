@@ -17,7 +17,7 @@
 	position: absolute
 	background: #CCC
 	width: 300px
-	height: 600px
+	height: 650px
 	right: 5%
 	top: -125px
 
@@ -41,11 +41,33 @@
 			width: 90px
 			text-align: center
 
+	section
+		min-height: 50px
+
 	#quickinfo
-		background: transparent !important
-		width: 90% !important
+		position: relative
 		padding: 0 20px
 		margin: 0 !important
+
+	#backers
+		position: relative
+		width: 100%
+		margin-top: 15px
+		height: 130px
+		text-align: center
+
+		#backproject
+			height: 50px
+
+			#back
+				line-height: 40px
+				margin: 10px
+				width: 280px
+
+		#backer_summary
+			margin-top: 15px
+			height: 40px
+			text-align: center
 
 
 .contentwrap
@@ -69,13 +91,47 @@
 	#deets
 		width: 640px
 		left: 5%
-		top: 300px
+		top: 275px
 		position: relative
 
-		h1
-			font-size: 32pt
+		.prsection
+			min-height: 85px
+			padding: 10px
+
+		#projecttitle
+			height: 75px
 			margin-top: 15px
 			margin-bottom: 10px
+			display: block
+
+			h1
+				font-size: 32pt !important
+				color: black !important
+				margin: 0 !important
+				float: left
+				clear: left
+
+			#deetactions
+				float: left
+				clear: right
+				width: 60%
+				height: 50px
+				line-height: 30px
+				padding: 0 15px 0 15px
+				margin-left: 10px
+
+				.buttongroup
+					float: left
+					margin-right: 20px
+					h6
+						margin: 0
+						-webkit-margin-before: 0
+						-webkit-margin-after: 0
+						display: block
+						height: 16px
+						line-height: 20px
+						border-bottom: 1px solid #222
+						max-width: 150px
 
 		#intro
 			background: transparent !important

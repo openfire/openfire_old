@@ -364,28 +364,6 @@ p {
   right: 0;
   z-index: 500;
 }
-#main #content section {
-  width: 45%;
-  margin: 0px 2.5% 300px;
-  background: #eeeeee;
-  min-height: 800px;
-  min-width: 100px;
-  float: left;
-}
-#main #content section h2 {
-  font-family: "Karla", sans-serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: #bbbbbb;
-  background-color: white;
-  text-transform: uppercase;
-  line-height: 50px;
-  vertical-align: middle;
-  height: 50px;
-  width: 100%;
-  margin: 0;
-  padding: 10px 0;
-}
 #main #content::before {
   display: block;
   content: "";
@@ -1002,6 +980,27 @@ section.newsfeed ul.feed li.feed-item .datetime {
   line-height: 50px;
 }
 
+#main #content section {
+  margin: 0px 2.5% 300px;
+  width: 45%;
+  background: #eeeeee;
+  min-width: 100px;
+  float: left;
+}
+#main #content section h2 {
+  font-family: "Karla", sans-serif;
+  font-size: 44px;
+  font-weight: 700;
+  color: #bbbbbb;
+  background-color: white;
+  text-transform: uppercase;
+  line-height: 50px;
+  vertical-align: middle;
+  height: 50px;
+  width: 100%;
+  margin: 0;
+  padding: 10px 0;
+}
 #main #masthead #how-it-works-button {
   height: 120px;
   width: 300px;

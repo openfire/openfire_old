@@ -17,20 +17,67 @@ class ProjectController extends OpenfireController
     constructor: (openfire, window) ->
 
         @_init = () =>
+
+            $('#back').click(@action.back)
+            $('#follow').click(@action.follow)
+            $('.sharebutton').click(@action.share)
+
             return
 
-    follow: () ->
+        @action =
+            follow: (event) =>
 
-        ## follow a project
-        $.apptools.api.project.follow().fulfill({
+                event.preventDefault()
+                event.stopPropagation()
 
-            success: () =>
-                alert 'Success.'
+                $.apptools.dev.verbose('project:action', 'User requested to FOLLOW this project.', event)
 
-            failure: () =>
-                alert 'Failure.'
+                ## follow a project
+                $.apptools.api.project.follow().fulfill({
 
-        })
+                    success: () =>
+                        alert 'Success.'
+
+                    failure: () =>
+                        alert 'Failure.'
+
+                })
+
+            share: (event) =>
+
+                event.preventDefault()
+                event.stopPropagation()
+
+                $.apptools.dev.verbose('project:action', 'User requested to SHARE this project.', event)
+
+                ## share a project
+                $.apptools.api.project.share().fulfill({
+
+                    success: () =>
+                        alert 'Success.'
+
+                    failure: () =>
+                        alert 'Failure.'
+
+                })
+
+            back: (event) =>
+
+                event.preventDefault()
+                event.stopPropagation()
+
+                $.apptools.dev.verbose('project:action', 'User requested to BACK this project.', event)
+
+                ## back a project
+                $.apptools.api.project.back().fulfill({
+
+                    success: () =>
+                        alert 'Success.'
+
+                    failure: () =>
+                        alert 'Failure.'
+
+                })
 
 
 # proposal controller

@@ -2332,15 +2332,6 @@
           }
         }
       };
-      if (apptools.sys.libraries.resolve('jQuery') !== false) {
-        $.ajaxSetup({
-          global: true,
-          xhr: function() {
-            return _this.internals.transports.xhr.factory();
-          },
-          headers: this.internals.config.headers
-        });
-      }
       this.rpc = {
         lastRequest: null,
         lastFailure: null,
@@ -2427,6 +2418,18 @@
             transport = 'xhr';
           }
           apptools.dev.verbose('RPC', 'Fulfill', config, request, callbacks);
+          if (apptools.sys.libraries.resolve('jQuery') !== false) {
+            $.ajaxSetup({
+              type: 'POST',
+              accepts: 'application/json',
+              contentType: 'application/json',
+              global: true,
+              xhr: function() {
+                return _this.internals.transports.xhr.factory();
+              },
+              headers: _this.internals.config.headers
+            });
+          }
           _this.rpc.lastRequest = request;
           _this.rpc.history[request.envelope.id] = {
             request: request,

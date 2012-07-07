@@ -1,12 +1,14 @@
 import datetime
 from google.appengine.ext import ndb
-from openfire.handlers import WebHandler
+from apptools import BaseHandler
 from openfire.models import user, project, assets, system, contribution, indexer
 
 
-class DevModels(WebHandler):
+class DevModels(BaseHandler):
 
     ''' Quickly insert some dev models for testing. This is NOT meant to be a full, permanent fixture. '''
+
+    force_load_session = False
 
     def get(self):
 

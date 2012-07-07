@@ -364,28 +364,6 @@ p {
   right: 0;
   z-index: 500;
 }
-#main #content section {
-  width: 45%;
-  margin: 0px 2.5% 300px;
-  background: #eeeeee;
-  min-height: 800px;
-  min-width: 100px;
-  float: left;
-}
-#main #content section h2 {
-  font-family: "Karla", sans-serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: #bbbbbb;
-  background-color: white;
-  text-transform: uppercase;
-  line-height: 50px;
-  vertical-align: middle;
-  height: 50px;
-  width: 100%;
-  margin: 0;
-  padding: 10px 0;
-}
 #main #content::before {
   display: block;
   content: "";
@@ -800,7 +778,8 @@ a.mod:active {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
-.tabset .tab-link, .tabset .tab-rounded {
+.tabset .tab-link,
+.tabset .tab-rounded {
   margin: 0 5px;
   padding: 20px;
   border: 1px solid #6f6f66;
@@ -1005,7 +984,7 @@ section.newsfeed ul.feed li.feed-item .datetime {
   position: absolute;
   background: #cccccc;
   width: 300px;
-  height: 600px;
+  height: 650px;
   right: 5%;
   top: -125px;
 }
@@ -1026,11 +1005,33 @@ section.newsfeed ul.feed li.feed-item .datetime {
   width: 90px;
   text-align: center;
 }
+#sidebar section {
+  min-height: 50px;
+}
 #sidebar #quickinfo {
-  background: transparent !important;
-  width: 90% !important;
+  position: relative;
   padding: 0 20px;
   margin: 0 !important;
+}
+#sidebar #backers {
+  position: relative;
+  width: 100%;
+  margin-top: 15px;
+  height: 130px;
+  text-align: center;
+}
+#sidebar #backers #backproject {
+  height: 50px;
+}
+#sidebar #backers #backproject #back {
+  line-height: 40px;
+  margin: 10px;
+  width: 280px;
+}
+#sidebar #backers #backer_summary {
+  margin-top: 15px;
+  height: 40px;
+  text-align: center;
 }
 
 .contentwrap {
@@ -1053,13 +1054,48 @@ section.newsfeed ul.feed li.feed-item .datetime {
 #project #deets {
   width: 640px;
   left: 5%;
-  top: 300px;
+  top: 275px;
   position: relative;
 }
-#project #deets h1 {
-  font-size: 32pt;
+#project #deets .prsection {
+  min-height: 85px;
+  padding: 10px;
+}
+#project #deets #projecttitle {
+  height: 75px;
   margin-top: 15px;
   margin-bottom: 10px;
+  display: block;
+}
+#project #deets #projecttitle h1 {
+  font-size: 32pt !important;
+  color: black !important;
+  margin: 0 !important;
+  float: left;
+  clear: left;
+}
+#project #deets #projecttitle #deetactions {
+  float: left;
+  clear: right;
+  width: 60%;
+  height: 50px;
+  line-height: 30px;
+  padding: 0 15px 0 15px;
+  margin-left: 10px;
+}
+#project #deets #projecttitle #deetactions .buttongroup {
+  float: left;
+  margin-right: 20px;
+}
+#project #deets #projecttitle #deetactions .buttongroup h6 {
+  margin: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  display: block;
+  height: 16px;
+  line-height: 20px;
+  border-bottom: 1px solid #222222;
+  max-width: 150px;
 }
 #project #deets #intro {
   background: transparent !important;
