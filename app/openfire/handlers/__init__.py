@@ -87,13 +87,16 @@ class WebHandler(BaseHandler, SessionsMixin):
                     self.session['uid'] = u.email()
 
                 ## try to load the user's session, since they are logged in
-                u = user.User.get_by_id(self.session['uid'])
+                """
+                from openfire.models import user as user_models
+                u = user_models.User.get_by_id(self.session['uid'])
                 if u is None:
                     self.session['redirect'] = self.url_for('auth/register')
                     self.session['returnto'] = self.request.url
                     self.session['register'] = True
                 else:
                     self.session['ukey'] = u.key.urlsafe()
+                """
         return self.session
 
     def handle_exception2(self, exception, debug):

@@ -306,19 +306,37 @@ class DevModels(WebHandler):
             fatcatmap.put()
 
             # fif, assets, avatars + videos
-            fcm_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'fatcatmap.png'), url='fatcatmap.png', kind='i').put()
-            fcm_video = assets.Asset(key=ndb.Key(assets.Asset, 'bnyiMnG62OI'), url='http://www.youtube.com/watch?v=bnyiMnG62OI', kind='v').put()
-            ssd_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'seasteading.png'), url='seasteading.png', kind='i').put()
-            urb_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'urbsly.png'), url='urbsly.png', kind='i').put()
-            urb_video = assets.Asset(key=ndb.Key(assets.Asset, 'rQkTI7XXYvw'), url='http://www.youtube.com/watch?v=bnyiMnG62OI', kind='v').put()
+            fcm_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'fatcatmap.png'),
+                    url='fatcatmap.png', kind='i', pending=False).put()
+
+            fcm_video = assets.Asset(key=ndb.Key(assets.Asset, 'bnyiMnG62OI'),
+                    url='http://www.youtube.com/watch?v=bnyiMnG62OI', kind='v', pending=False).put()
+
+            ssd_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'seasteading.png'),
+                    url='seasteading.png', kind='i', pending=False).put()
+
+            urb_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'urbsly.png'),
+                    url='urbsly.png', kind='i', pending=False).put()
+
+            urb_video = assets.Asset(key=ndb.Key(assets.Asset, 'rQkTI7XXYvw'),
+                    url='http://www.youtube.com/watch?v=bnyiMnG62OI', kind='v', pending=False).put()
 
             avatars = [
 
-                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=fatcatmap.key), version=1, active=True, url='fatcatmap.png', asset=fcm_avatar),
-                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=fatcatmap.key), url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube'),
-                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=seasteading.key), version=1, active=True, url='seasteading.png', asset=ssd_avatar),
-                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=urbsly.key), version=1, active=True, url='urbsly.png', asset=urb_avatar),
-                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=urbsly.key), url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube')
+                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=fatcatmap.key),
+                            version=1, active=True, url='fatcatmap.png', asset=fcm_avatar, approved=True),
+
+                    assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=fatcatmap.key),
+                            url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube', approved=True),
+
+                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=seasteading.key),
+                            version=1, active=True, url='seasteading.png', asset=ssd_avatar, approved=True),
+
+                    assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=urbsly.key),
+                            version=1, active=True, url='urbsly.png', asset=urb_avatar, approved=True),
+
+                    assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=urbsly.key),
+                            url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube', approved=True)
 
             ]
 
