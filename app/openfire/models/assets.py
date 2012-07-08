@@ -65,6 +65,7 @@ class Video(Media):
     _message_class = messages.Video
     _pipeline_class = pipelines.VideoPipeline
 
+    ext_id = ndb.StringProperty('pid', indexed=True)
     provider = ndb.StringProperty('p', indexed=True, choices=['youtube', 'vimeo'])
 
 

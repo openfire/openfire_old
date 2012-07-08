@@ -32,6 +32,7 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
+    user = None
     session = None
 
     ## ++ Internal Shortcuts ++ ##
@@ -93,7 +94,10 @@ class WebHandler(BaseHandler, SessionsMixin):
                     self.session['returnto'] = self.request.url
                     self.session['register'] = True
                 else:
+                    self.user = u
                     self.session['ukey'] = u.key.urlsafe()
+                    self.session['email'] = u.email()
+                    self.session['nickname'] = u.nickname()
         return self.session
 
     def handle_exception2(self, exception, debug):
@@ -119,6 +123,15 @@ class WebHandler(BaseHandler, SessionsMixin):
         if 'user' not in context:
             context['user'] = {}
         context['user']['session'] = self.session
+
+        # install encryption shim
+        context['encrypt'] = lambda x: x
+        context['decrypt'] = lambda x: x
+
+        context['security'] = {
+            'current_user': self.user
+        }
+
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)
 
 

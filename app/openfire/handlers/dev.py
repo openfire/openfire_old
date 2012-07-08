@@ -74,6 +74,25 @@ class DevModels(BaseHandler):
             david = user.User(key=ndb.Key(user.User, 'david'), username='david', firstname='David', lastname='Rekow', bio='hi i is david').put()
             ethan = user.User(key=ndb.Key(user.User, 'ethan'), username='ethan', firstname='Ethan', lastname='Leland', bio='i am mister ethan').put()
 
+            ## user emails
+            user_emails = [
+                user.EmailAddress(id='david@openfi.re', parent=pug, user=pug, address='david@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
+                user.EmailAddress(id='sam@openfi.re', parent=sam, user=sam, address='sam@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
+                user.EmailAddress(id='davidr@openfi.re', parent=david, user=david, address='davidr@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
+                user.EmailAddress(id='ethan@openfi.re', parent=ethan, user=ethan, address='ethan@openfi.re', label='d', notify=True, jabber=True, gravatar=True)
+            ]
+            ndb.put_multi(user_emails)
+
+            # user permissions
+            user_perms = [
+                user.Permissions(id='global', parent=pug, user=pug, moderator=True, admin=True, developer=True),
+                user.Permissions(id='global', parent=sam, user=sam, moderator=True, admin=True, developer=True),
+                user.Permissions(id='global', parent=david, user=david, moderator=True, admin=True, developer=True),
+                user.Permissions(id='global', parent=ethan, user=ethan, moderator=True, admin=True, developer=True)
+            ]
+            ndb.put_multi(user_perms)
+
+
             ## categories next
             politics = project.Category(key=ndb.Key(project.Category, 'politics'), slug='politics', name='Politics', description='Having to do with politics.', keywords=['policy', 'government']).put()
             transparency = project.Category(key=ndb.Key(project.Category, 'transparency', parent=politics), slug='transparency', name='Transparency', description='Having to do with open information.', keywords=['politics', 'policy', 'opennes', 'freedom'], parent=politics).put()
@@ -312,15 +331,15 @@ class DevModels(BaseHandler):
             fcm_video = assets.Asset(key=ndb.Key(assets.Asset, 'bnyiMnG62OI'), url='http://www.youtube.com/watch?v=bnyiMnG62OI', kind='v').put()
             ssd_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'seasteading.png'), url='seasteading.png', kind='i').put()
             urb_avatar = assets.Asset(key=ndb.Key(assets.Asset, 'urbsly.png'), url='urbsly.png', kind='i').put()
-            urb_video = assets.Asset(key=ndb.Key(assets.Asset, 'rQkTI7XXYvw'), url='http://www.youtube.com/watch?v=bnyiMnG62OI', kind='v').put()
+            urb_video = assets.Asset(key=ndb.Key(assets.Asset, 'rQkTI7XXYvw'), url='http://www.youtube.com/watch?v=rQkTI7XXYvw', kind='v').put()
 
             avatars = [
 
                     assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=fatcatmap.key), version=1, active=True, url='fatcatmap.png', asset=fcm_avatar),
-                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=fatcatmap.key), url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube'),
+                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=fatcatmap.key), url='https://www.youtube.com/embed/bnyiMnG62OI', ext_id='bnyiMnG62OI', asset=fcm_video, provider='youtube'),
                     assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=seasteading.key), version=1, active=True, url='seasteading.png', asset=ssd_avatar),
                     assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=urbsly.key), version=1, active=True, url='urbsly.png', asset=urb_avatar),
-                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=urbsly.key), url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube')
+                    assets.Video(key=ndb.Key(assets.Avatar, 'mainvideo', parent=urbsly.key), url='https://www.youtube.com/embed/rQkTI7XXYvw', ext_id='rQkTI7XXYvw', asset=urb_video, provider='youtube')
 
             ]
 

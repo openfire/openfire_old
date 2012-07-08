@@ -125,15 +125,15 @@ config['apptools.project.services'] = {
 
         ## Content API - allows saving/retrieving of small content snippets
         'content': {
-			'enabled': True,
-			'service': 'openfire.services.content.ContentService',
-			'methods': ['save_snippet', 'get_snippet'],
+            'enabled': True,
+            'service': 'openfire.services.content.ContentService',
+            'methods': ['save_snippet', 'get_snippet'],
 
-			'config': {
-				'caching': 'none',
-				'security': 'none',
-				'recording': 'none'
-			}
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
         },
 
         ## URL API - Add, delete, and update custom urls.

@@ -11,12 +11,27 @@
     </div><!-- #masthead -->
 
     <div id='content'>
+        <div id="fb-root"></div>
         <div id='project'>
 
             <div id='welcomebox'>
+                <div id='promote'>
+                </div>
                 {% block media %}
                     {% if video %}
-                        <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                        {% if video.provider == 'vimeo' %}
+                            {% if video.ext_id %}
+                                <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% else %}
+                                <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% endif %}
+                        {% else %}
+                            {% if video.provider == 'youtube' %}
+                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                            {% else %}
+                                <img src="http://placehold.it/640x360/222222&text=video" />
+                            {% endif %}
+                        {% endif %}
                     {% else %}
                         <img src="http://placehold.it/640x360/222222&text=video" />
                     {% endif %}
@@ -114,4 +129,39 @@
         </div><!-- end #content -->
     </div>
 
+{% endblock %}
+
+{% block presouth %}
+<script>
+
+  // openfire project init
+  window._cp = {
+    ke: '{{ encrypt(project.key.urlsafe()) }}', // encrypted key
+    {%- if util.config.debug -%}
+    kd: '{{ project.key.urlsafe() }}', // unencrypted key
+    {%- endif -%}
+    i: project.key.id(), // key id
+    {%- if project.current_user_following -%}
+    f: true, // following?
+    {%- else -%}
+    f: false, // following?
+    {%- endif -%}
+    {%- if project.current_user_backed -%}
+    b: true, // backed?
+    {%- else -%}
+    b: false, // backed?
+    {%- endif -%}
+    {%- if security.current_user.key in project.owners -%}
+    o: true, // owner privs
+    {%- else -%}
+    o: false, // owner privs
+    {%- endif -%}
+    {%- if security.current_user.key in project.viewers -%}
+    v: true // viewer privs
+    {%- else -%}
+    v: false // viewer privs
+    {%- endif -%}
+  };
+
+</script>
 {% endblock %}

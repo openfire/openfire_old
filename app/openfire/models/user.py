@@ -23,6 +23,7 @@ class User(AppModel):
     _message_class = messages.User
     _pipeline_class = pipelines.UserPipeline
 
+    user = ndb.UserProperty('usr', indexed=True)
     username = ndb.StringProperty('u', indexed=True)
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
@@ -53,7 +54,7 @@ class EmailAddress(AppModel):
 
     user = ndb.KeyProperty('u', indexed=True)
     address = ndb.StringProperty('e', indexed=True)
-    label = ndb.StringProperty('l', indexed=False, choices=['w', 'p', 'o'], default='p')  # work, personal & other
+    label = ndb.StringProperty('l', indexed=False, choices=['d', 'w', 'p', 'o'], default='p')  # work, personal & other
     notify = ndb.BooleanProperty('n', indexed=True, default=False)  # use this email to notify?
     jabber = ndb.BooleanProperty('j', indexed=True, default=False)  # use this email for jabber?
     gravatar = ndb.BooleanProperty('g', indexed=True, default=False)  # use this email for gravatar?
