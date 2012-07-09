@@ -54,7 +54,7 @@
 						<ul class='naked'>
 							{% for tier in tiers %}
 								<li>
-									<b>{{ tier.name }}</b>
+									<b>{{ tier.name }} - {{ currency(tier.amount) }}</b>
 								</li>
 						    {% endfor %}
 						 </ul>
@@ -68,7 +68,7 @@
 						{% if project.goals %}
                         <ul class='naked'>
 							{% for goal in goals %}
-								<li><b>{{ goal.amount }}</b></li>
+								<li><b>{{ currency(goal.amount) }}</b></li>
 							{% endfor %}
                         </ul>
 						{% else %}
@@ -89,7 +89,20 @@
 		            <b>project owners:</b>
 		            <ul class='naked'>
 		                {% for owner in owners %}
-		                    <li><img src="{{ gravatarify(owner.key.id(), 'jpg', '24') }}" width='24' height='24' alt='{{ owner.key.id() }}' />{%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>{%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>{%- endif -%}</li>
+		                    <li>
+								<div class='ownercard'>
+									<img src="{{ gravatarify(owner.key.id(), 'jpg', '32') }}" width='32' height='32' alt='{{ owner.key.id() }}' />
+
+									<div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
+										{%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+										{%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+										{%- endif -%}
+										{%- if owner.location -%}
+											<span class='location byline'>{{ owner.location }}</span>
+										{%- endif -%}
+									</div>
+								</div>
+							</li>
 		                {% endfor %}
 		            </ul>
 		        </div> <!-- end #owners -->

@@ -17,6 +17,8 @@ def run(environment):
         yield u'\n'
 
     def block_head(context, environment=environment):
+        l_util = context.resolve('util')
+        l_asset = context.resolve('asset')
         if 0: yield None
         yield u'\n\t\t'
         for event in context.blocks['meta'][0](context):
@@ -27,6 +29,12 @@ def run(environment):
             yield event
         for event in context.blocks['stylesheets'][0](context):
             yield event
+        yield u'\n\t\t'
+        if context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'api'), 'users'), 'is_current_user_admin')):
+            if 0: yield None
+            yield u'\n\t\t\t<link rel="stylesheet" href="%s" />\n\t\t' % (
+                context.call(environment.getattr(l_asset, 'style'), 'admin', 'compiled'), 
+            )
         yield u'\n\t\t'
         for event in context.blocks['postnorth'][0](context):
             yield event
@@ -132,5 +140,5 @@ def run(environment):
         if 0: yield None
 
     blocks = {'prenorth': block_prenorth, 'body': block_body, 'head': block_head, 'north': block_north, 'title': block_title, 'mobile': block_mobile, 'presouth': block_presouth, 'postsouth': block_postsouth, 'opengraph': block_opengraph, 'stylesheets': block_stylesheets, 'meta': block_meta, '_tpl_root': block__tpl_root, 'postnorth': block_postnorth}
-    debug_info = '2=9&93=12&110=15&20=19&21=22&93=24&94=26&97=28&98=31&100=34&94=38&95=40&100=44&72=48&73=53&80=56&81=57&82=58&83=59&113=62&115=65&46=68&52=72&97=75&21=78&29=83&30=86&46=89&72=91&88=94&2=97&3=100&11=106&12=107&13=108&14=109&15=110&16=111&20=114&110=117&113=120&114=123&115=127&98=131'
+    debug_info = '2=9&93=12&113=15&20=19&21=24&93=26&94=28&97=30&98=33&99=36&101=39&103=42&94=46&95=48&103=52&72=56&73=61&80=64&81=65&82=66&83=67&116=70&118=73&46=76&52=80&97=83&21=86&29=91&30=94&46=97&72=99&88=102&2=105&3=108&11=114&12=115&13=116&14=117&15=118&16=119&20=122&113=125&116=128&117=131&118=135&101=139'
     return locals()

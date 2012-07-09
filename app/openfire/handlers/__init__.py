@@ -13,6 +13,7 @@ logic / request handling stuff across your entire app, by putting it here.
 '''
 
 ## General Imports
+import babel
 import random
 import config
 import base64
@@ -74,6 +75,31 @@ class WebHandler(BaseHandler, SessionsMixin):
             self.save_session()
 
         return response
+
+    def _format_as_currency(self, number, isPercent):
+        #trunkates the 'number' variable to the 100's place
+        base = int(number)
+        remain = number - base
+        decStep = remain*100
+        decimal = int(decStep)
+        decimal = float(decimal)
+        decimal = decimal/100
+        money = base + decimal
+        money = str(money)
+        #conditional that adds an additonal '0' to the number if the decimal
+        # only goes to  the 10's place
+        zeroChk = remain *10
+        if zeroChk == int(zeroChk):
+            money = money + "0"
+        #conditional that will put in a dollar sign '$' if requested by making
+        # isPercent equal to zero, and insert a '%' if isPercent equals 1
+        if isPercent == 0:
+            #money = str(money)
+            money = "$" + money
+        elif isPercent == 1:
+            #money = str(money)
+            money = money + "%"
+        return money
 
     def build_session(self):
 
@@ -148,6 +174,8 @@ class WebHandler(BaseHandler, SessionsMixin):
         # install encryption shim
         context['encrypt'] = lambda x: self.encrypt(x)
         context['decrypt'] = lambda x: self.decrypt(x)
+        context['currency'] = lambda x: self._format_as_currency(x, False)
+        context['percentage'] = lambda x: self._format_as_currency(x, True)
 
         context['gravatarify'] = lambda x, y, z: ''.join(['http://www.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
 

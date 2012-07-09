@@ -23,6 +23,10 @@ def run(environment):
         if 0: yield None
         yield u'\n        MODERATION\n    '
 
-    blocks = {'main': block_main, 'moderate': block_moderate}
-    debug_info = '1=9&3=15&5=18'
+    def block_postnorth(context, environment=environment):
+        if 0: yield None
+        yield u'\n    <link rel="stylesheet" href="/assets/style/static/compiled/openfire/bbq.css">\n'
+
+    blocks = {'main': block_main, 'moderate': block_moderate, 'postnorth': block_postnorth}
+    debug_info = '1=9&7=15&9=18&3=26'
     return locals()

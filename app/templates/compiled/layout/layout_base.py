@@ -13,20 +13,20 @@ def run(environment):
             yield event
 
     def block_rightnav(context, environment=environment):
-        l_util = context.resolve('util')
+        l_gravatarify = context.resolve('gravatarify')
         l_api = context.resolve('api')
         l_link = context.resolve('link')
         if 0: yield None
         yield u"\n\t<ul class='right'>\n\n\t\t"
         if context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')) != None:
             if 0: yield None
-            yield u'  \n\t\t\t<li class=\'profiletab\'>\n\t\t\t\t<a href="/me" title=\'Profile\'>%s</a>\n\t\t\t\t<img src="http://www.gravatar.com/avatar/%s.jpg?s=32&d=http://placehold.it/32/ffffff.png" />\n\t\t\t</li>\n\t\t' % (
+            yield u'  \n\t\t\t<li class=\'profiletab\'>\n\t\t\t\t<a href="/me" title=\'Profile\'>%s</a>\n\t\t\t\t<img src="%s" width=\'32\' height=\'32\' alt=\'you!\' />\n\t\t\t</li>\n\t\t' % (
                 context.call(environment.getattr(context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')), 'nickname')), 
-                context.call(environment.getattr(context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'converters'), 'hashlib'), 'md5'), context.call(environment.getattr(context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')), 'email'))), 'hexdigest')), 
+                context.call(l_gravatarify, context.call(environment.getattr(context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')), 'email')), 'jpg', '32'), 
             )
         else:
             if 0: yield None
-            yield u'\n\t\t\t<li><a href="%s" title="Sign Up">Sign Up</a></li>\n\t\t\t<li><a href="%s" title="Log In">Log In</a></li>\n\t\t' % (
+            yield u'\n\t\t\t<li><a id=\'signup_trigger\' href="%s" title="Sign Up">Sign Up</a></li>\n\t\t\t<li><a id=\'login_trigger\' href="%s" title="Log In">Log In</a></li>\n\t\t' % (
                 context.call(l_link, 'auth/logout'), 
                 context.call(l_link, 'auth/login'), 
             )

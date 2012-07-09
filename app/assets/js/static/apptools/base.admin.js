@@ -2231,7 +2231,7 @@
         agent: {}
       };
       this.ajax = {
-        accepts: 'application/json',
+        accept: 'application/json',
         async: true,
         cache: true,
         global: true,
@@ -2444,15 +2444,6 @@
           }
         }
       };
-      if (apptools.sys.libraries.resolve('jQuery') !== false) {
-        $.ajaxSetup({
-          global: true,
-          xhr: function() {
-            return _this.internals.transports.xhr.factory();
-          },
-          headers: this.internals.config.headers
-        });
-      }
       this.rpc = {
         lastRequest: null,
         lastFailure: null,
@@ -2539,6 +2530,18 @@
             transport = 'xhr';
           }
           apptools.dev.verbose('RPC', 'Fulfill', config, request, callbacks);
+          if (apptools.sys.libraries.resolve('jQuery') !== false) {
+            $.ajaxSetup({
+              type: 'POST',
+              accepts: 'application/json',
+              contentType: 'application/json',
+              global: true,
+              xhr: function() {
+                return _this.internals.transports.xhr.factory();
+              },
+              headers: _this.internals.config.headers
+            });
+          }
           _this.rpc.lastRequest = request;
           _this.rpc.history[request.envelope.id] = {
             request: request,
@@ -3413,7 +3416,8 @@
         scroller = new Scroller(target, options);
         id = scroller._state.element_id;
         _this._state.scrollers_by_id[id] = _this._state.scrollers.push(scroller) - 1;
-        return scroller._init();
+        scroller._init();
+        return scroller;
       };
       this.destroy = function(scroller) {
         var id;
@@ -3448,10 +3452,14 @@
       };
       this._init = function() {
         var scroller, scrollers, _i, _len;
-        scrollers = Util.get('pre-scroller') || [];
-        for (_i = 0, _len = scrollers.length; _i < _len; _i++) {
-          scroller = scrollers[_i];
-          _this.create(_this.enable(scroller));
+        scrollers = Util.get('pre-scroller');
+        if (!Util.is_array(scrollers)) {
+          _this.internal.make(scrollers);
+        } else {
+          for (_i = 0, _len = scrollers.length; _i < _len; _i++) {
+            scroller = scrollers[_i];
+            _this.internal.make(scroller);
+          }
         }
         $.apptools.events.trigger('SCROLLER_API_READY', _this);
         _this._state.init = true;
@@ -4028,18 +4036,11 @@
         uploaders_by_id: {},
         init: false
       };
-      this.create = function(options) {
-        var id, uploader;
-        if (options == null) {
-          options = {};
-        }
-        uploader = new Uploader(options);
-        if (options.id != null) {
-          id = options.id;
-        } else {
-          uploader._state.boundary.match(/^-+(\w+)-+$/);
-          id = RegExp.$1;
-        }
+      this.create = function(target) {
+        var id, options, uploader;
+        options = target.hasAttribute('data-options') ? JSON.parse(target.getAttribute('data-options')) : {};
+        uploader = new Uploader(target, options);
+        id = uploader._state.element_id;
         _this._state.uploaders_by_id[id] = _this._state.uploaders.push(uploader) - 1;
         return uploader._init();
       };
@@ -4092,24 +4093,18 @@
 
     __extends(Uploader, _super);
 
-    function Uploader(options) {
+    function Uploader(target, options) {
       var _this = this;
       this._state = {
+        element_id: target.getAttribute('id'),
         boundary: null,
         active: false,
         init: false,
-        uploads: {
-          queued: 0,
-          finished: 0
-        },
-        session: null,
         config: {
           boundary_base: 'd4v1dR3K0W',
           banned_types: ['application/exe'],
           banned_extensions: ['.exe'],
-          max_cache: 15,
-          endpoints: [],
-          finish: null
+          max_cache: 15
         },
         cache: {
           uploads_by_type: {},
@@ -4130,12 +4125,8 @@
           }
           return true;
         },
-        finish: function(response) {
-          if (_this._state.config.finish != null) {
-            return _this._state.config.finish(response);
-          } else {
-            return response;
-          }
+        finish: this._state.config.finish || function(file, xhr) {
+          return true;
         },
         prep_body: function(file, data) {
           var body, boundary, crlf;
@@ -4182,13 +4173,14 @@
           return reader.readAsBinaryString(file);
         },
         ready: function(file, xhr) {
-          return xhr.onreadystatechange = function(e) {
+          return xhr.onreadystatechange = function() {
             if (xhr.readyState = 4) {
               if (xhr.status = 200) {
-                _this.internal.update_cache(file, xhr);
-                return _this.internal.finish(xhr.response);
+                return _this.internal.update_cache(file, xhr, function(f, x) {
+                  return _this.internal.finish(f, x);
+                });
               } else {
-                return 'XHR finished with status ' + xhr.status;
+                return false;
               }
             }
           };
@@ -4208,7 +4200,7 @@
             return false;
           }
         },
-        update_cache: function(file, xhr) {
+        update_cache: function(file, xhr, callback) {
           var l, mx, name, t, type, u;
           if ((t = _this._state.cache.uploads_by_type)[type = file.type] != null) {
             t[type]++;
@@ -4217,12 +4209,13 @@
           }
           (u = _this._state.cache.uploaded).push(name);
           if ((l = u.length) > (mx = _this._state.config.max_cache)) {
-            return u = u.splice(l - mx);
+            u = u.splice(l - mx);
           }
+          return callback != null ? callback.call(_this, file, xhr) : void 0;
         }
       };
       this.handle = function(e) {
-        var target;
+        console.log('EVENT OF TYPE ' + e.type + ' CAPTURED');
         if (e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
@@ -4238,50 +4231,34 @@
         }
       };
       this.upload = function(e) {
-        var files, process_upload;
+        var file, files, _i, _len, _results;
         if (e.preventDefault) {
+          e.preventDefault();
           e.stopPropagation();
-          files = e.dataTransfer.files;
-        } else if (Util.is_array(e)) {
-          files = e;
-        } else if (e.type) {
-          files = [e];
-        } else {
-          files = [];
         }
-        process_upload = function(f, url) {
-          _this._state.active = true;
-          return _this.internal.read(f, function(ev) {
-            var data, _f;
-            ev.preventDefault();
-            ev.stopPropagation();
-            _f = ev.target.file;
-            data = ev.target.result;
-            return _this.internal.send(_f, data, url);
-          });
-        };
-        $.apptools.api.media.generate_endpoint({
-          session_id: _this._state.session || null,
-          backend: 'blobstore',
-          file_count: files.length
-        }).fulfill({
-          success: function(response) {
-            var endpoints, file, i, _i, _len, _results;
-            endpoints = response.endpoints;
-            _results = [];
-            for (i = _i = 0, _len = files.length; _i < _len; i = ++_i) {
-              file = files[i];
-              _results.push(process_upload(file, endpoints[i]));
+        files = e.dataTransfer.files || [];
+        _results = [];
+        for (_i = 0, _len = files.length; _i < _len; _i++) {
+          file = files[_i];
+          _results.push($.apptools.api.assets.generate_upload_url().fulfill({
+            success: function(response) {
+              return _this.internal.read(file, function(e) {
+                var data, f;
+                e.preventDefault();
+                e.stopPropagation();
+                f = e.target.file;
+                data = e.target.result;
+                return _this.internal.send(f, data, response.url);
+              });
+            },
+            failure: function(error) {
+              return apptools.dev.error('UPLOADER', 'Upload failed with error: ' + error + ' :(');
             }
-            return _results;
-          },
-          failure: function(error) {
-            return alert('Uploader endpoint generation failed.');
-          }
-        });
-        return _this;
+          }));
+        }
+        return _results;
       };
-      this._init = function() {
+      this._init = function(apptools) {
         _this._state.boundary = _this.internal.provision_boundary();
         _this._state.init = true;
         apptools.events.trigger('UPLOADER_READY', _this);
@@ -5302,7 +5279,7 @@
           interfaces: {},
           integrations: [],
           add_flag: function(flagname) {
-            return _this.sys.state.flags.push(flagname);
+            return this.sys.flags.push(flagname);
           },
           consider_preinit: function(preinit) {
             var cls, lib, _i, _interface, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
@@ -5340,7 +5317,7 @@
         },
         modules: {
           install: function(module, mountpoint_or_callback, callback) {
-            var module_name, mountpoint, pass_parent, target_mod, _base;
+            var module_name, mountpoint, pass_parent, target_mod;
             if (mountpoint_or_callback == null) {
               mountpoint_or_callback = null;
             }
@@ -5375,23 +5352,21 @@
             }
             if (!(mountpoint[module_name] != null)) {
               if (pass_parent) {
-                target_mod = new module(_this, mountpoint, window);
-                mountpoint[module_name] = target_mod;
+                target_mod = mountpoint[module_name] = new module(_this, mountpoint, window);
                 _this.sys.state.modules[module_name] = {
                   module: target_mod,
                   classes: {}
                 };
               } else {
-                target_mod = new module(_this, window);
-                mountpoint[module_name] = target_mod;
+                target_mod = mountpoint[module_name] = new module(_this, window);
                 _this.sys.state.modules[module_name] = {
                   module: target_mod,
                   classes: {}
                 };
               }
             }
-            if (typeof (_base = mountpoint[module_name])._init === "function") {
-              _base._init(_this);
+            if (typeof module._init === "function") {
+              module._init(_this);
             }
             if ((_this.dev != null) && (_this.dev.verbose != null)) {
               _this.dev.verbose('ModuleLoader', 'Installed module:', target_mod, ' at mountpoint: ', mountpoint, ' under the name: ', module_name);
