@@ -17,6 +17,7 @@ class Video extends Asset
 # base project object
 class Project # extends Model
 
+    ###
     name: String()
     status: String()
     category: String()
@@ -28,6 +29,7 @@ class Project # extends Model
     owners: Array()
     goals: Array()
     tiers: Array()
+    ###
 
     @assets = []
     @assets_by_key = {}
@@ -70,7 +72,7 @@ class ProjectController extends OpenfireController
     @project = null
     @project_key = null
 
-    constructor: (openfire, window) ->
+    constructor: (openfire) ->
 
         @_state = Util.extend(true, {}, window._cp)
 
@@ -78,6 +80,14 @@ class ProjectController extends OpenfireController
         @project_key = @project.key.key
 
         @_init = () =>
+
+            document.getElementById('follow').addEventListener('click', @follow, false)
+            document.getElementById('share').addEventListener('click', @share, false)
+            document.getElementById('back').addEventListener('click', @back, false)
+
+            if @_state.o
+                document.body.addEventListener('drop', @add_media, false)
+
             return @get()
 
 
@@ -85,6 +95,16 @@ class ProjectController extends OpenfireController
 
         ## attach a media item to a project
         if @_state.o
+
+            if file_or_url.preventDefault
+                # it's an event, grab the files & try again
+                file_or_url.preventDefault()
+                file_or_url.stopPropagation()
+
+                e = file_or_url
+                files = e.dataTransfer.files
+
+                @add_media(fi, 'image') for fi in files if files?
 
             if file_or_url.type
                 # it's a file!
@@ -104,10 +124,9 @@ class ProjectController extends OpenfireController
 
                         success: (response) =>
 
-                            uploader = new Uploader
-
+                            uploader = $.apptools.widgets.uploader.create
                                 endpoints: [response.endpoint]
-                                session: $.openfire.sys.state.session.data or null
+                                session: $.openfire.sys.state.session.data or false
                                 finish: (response) =>
 
                                     @project.attach(new Image(response.media_key, response.serve_url))
@@ -251,6 +270,8 @@ class ProjectController extends OpenfireController
 
         ## share a project via social media
         # what do?
+
+        alert 'Testing social sharing!'
 
 
     update: () =>

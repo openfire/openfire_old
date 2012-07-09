@@ -42,7 +42,7 @@ class Openfire
 
                     # first consider base objects
                     if preinit.abstract_base_objects?
-                        @sys.install.object(obj) for obj in preinit.abstract_base_objects?
+                        @sys.install.object(obj) for obj in preinit.abstract_base_objects
 
                     # next classes
                     if preinit.abstract_base_classes?
@@ -122,10 +122,14 @@ class Openfire
 
                 # installs an openfire controller
                 controller: (ctrlr) =>
-                    @sys.state.controllers[(c=ctrlr.constructor.name)] = ctrlr
+                    @sys.state.controllers[ctrlr.mount] = ctrlr
                     if ctrlr.events?
                         window.apptools?.events?.register(event) for event in ctrlr.events
-                    if ctrlr.export? isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[c] = ctrlr else ctrlr = new ctrlr(window)
+                    if ctrlr.mount?
+                        mount_point = ctrlr.mount
+                    if ctrlr.export? isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[ctrlr.constructor.name] = ctrlr else ctrlr = new ctrlr(window)
+                    @[mount_point] = ctrlr
+
                     ctrlr._init?()
 
                     return ctrlr

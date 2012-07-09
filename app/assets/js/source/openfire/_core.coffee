@@ -31,7 +31,7 @@ class OpenfireException extends Error
 class MediaError extends OpenfireException
 class UserPermissionsError extends OpenfireException
 
-
+Util = new window.Util()
 
 @__openfire_preinit.abstract_base_objects.push OpenfireObject
 @__openfire_preinit.abstract_base_controllers.push OpenfireController
