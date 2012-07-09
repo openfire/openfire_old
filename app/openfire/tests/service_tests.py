@@ -427,6 +427,8 @@ class CustomUrlServiceTestCase(unittest.TestCase):
         response = generic_service_method_success_test(self, 'url', 'put', params=params)
         self.assertEqual(response['response']['type'], 'CustomUrl',
             'CustomUrl put service method failed to create a new custom_url.')
+        self.assertEqual(target.get().customurl.urlsafe(), response['response']['content']['key'],
+            'Failed to set custom url on target during put.')
 
         response = generic_service_method_success_test(self, 'url', 'put', params=params, should_fail=True)
         self.assertEqual(response['response']['content']['state'], 'APPLICATION_ERROR', 'Allowed overwriting of a custom url.')

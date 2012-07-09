@@ -1,20 +1,30 @@
 backends:
+
+## api backend - dedicated backend for serving JSONRPC servicelayer requests
 - name: api
   class: B1
   instances: 10
   options: dynamic, public
+
+## data backend - high-throgoughput compute pool for data mutations
 - name: data
   class: B2
   instances: 4
   options: dynamic, failfast
-- name: analzyer
+
+## analyzer backend - for computation of stats and analysis
+- name: analyzer
   class: B4
   instances: 2
   options: failfast, dynamic
+
+## command backend - for util/dev and command stuff
 - name: command
   class: B8
   instances: 1
   options: dynamic, public
+
+## transport backend - in charge of incoming/outgoing comms
 - name: transport
   class: B2
   instances: 4

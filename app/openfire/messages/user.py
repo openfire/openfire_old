@@ -1,6 +1,20 @@
 from protorpc import messages
 
 
+class User(messages.Message):
+
+    ''' Low-level representation of a user account. '''
+
+    pass
+
+
+class EmailAddress(messages.Message):
+
+    ''' Represents a user's email address. '''
+
+    pass
+
+
 class Profile(messages.Message):
 
     ''' Contains all profile fields for users. Can be request or response. '''
@@ -34,3 +48,17 @@ class AccountRequest(messages.Message):
 
     user = messages.StringField(1)
     account = messages.MessageField(Account, 2)
+
+
+class Permissions(messages.Message):
+
+    ''' Represents a set of permissions attached to a user. '''
+
+    pass
+
+
+class SocialAccount(messages.Message):
+
+    ''' Represents a social account attached to an openfire account. '''
+
+    pass

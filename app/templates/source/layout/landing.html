@@ -32,7 +32,7 @@
                 {% for project in projects %}
                     <!-- project card for {{ project.slug }} -->
                     <div class='project-card' data-project='{{ project.slug }}'>
-                        <a href="{{ link('project/home', customurl=project.key.id()) }}">
+                        <a href="{{ link('custom_url', customurl=project.slug) }}">
                             <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
                                 {% if project.avatar %}
                                     <img src="{{ asset.image('projects/cardstock', project.avatar) }}" title="{{ project.name }} - {{ project.summary }}" />

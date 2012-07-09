@@ -38,9 +38,10 @@ class Landing(WebHandler):
             data = ndb.get_multi(master_key_list, use_cache=True, use_memcache=True, use_datastore=True)
             for key, entity in zip(master_key_list, data):
                 if key.kind() == 'Project':
-                    projects[key.id()] = entity
+                    projects[key.id()] = entity.to_dict()
+                    projects[key.id()]['slug'] = entity.get_custom_url()
                 elif key.kind() == 'Media':
-                    projects[key.parent().id()].avatar = entity.url
+                    projects[key.parent().id()]['avatar'] = entity.url
 
             projects = [v for k, v in projects.items()]
 

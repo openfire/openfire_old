@@ -1,6 +1,29 @@
 from protorpc import messages
 
 
+#### ++++ Object Messages ++++ ####
+class ContentArea(messages.Message):
+
+    ''' Represents an editable, targeted, versioned area of content. '''
+
+    pass
+
+
+class ContentSnippet(messages.Message):
+
+    ''' Represents a blob of content data, that can be used as an Area or as a versioned content container under an Area. '''
+
+    pass
+
+
+class ContentSummary(messages.Message):
+
+    ''' Represents a shortened, plaintext summary of content in an HTML/versioned ContentSnippet. '''
+
+    pass
+
+
+#### ++++ Request/Response Messages ++++ ####
 class GetContentRequest(messages.Message):
 
     ''' Retrieve a content snippet. '''

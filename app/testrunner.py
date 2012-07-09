@@ -35,7 +35,10 @@ if __name__ == '__main__':
     if len(args) != 2:
         parser.print_help()
         APP_DIR = "./openfire/"
-        GAE_PATH = "/usr/local/google_appengine/"
+        if os.name == 'nt':
+            GAE_PATH = "../var/parts/google_appengine"
+        else:
+            GAE_PATH = "/usr/local/google_appengine/"
         print "GAE and APP paths not specified. Using default:"
         print "GAE_PATH: %s  APP_DIR: %s" % (GAE_PATH, APP_DIR)
     else:

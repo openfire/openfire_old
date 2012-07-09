@@ -23,6 +23,8 @@ import webapp2
 ## AppTools Imports
 from apptools.core import BaseHandler
 
+## Openfire Imports
+from openfire.models import user
 from openfire.core.sessions import SessionsMixin
 
 
@@ -30,6 +32,7 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
+    user = None
     session = None
 
     ## ++ Internal Shortcuts ++ ##
@@ -45,10 +48,18 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         ''' Retrieve session + dispatch '''
 
-        # Construct session store
-        self.session = self.get_session()
+        # Resolve user session
+        self.session = self.build_session()
 
         try:
+
+            # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
+            if self.session.get('redirect') is not None:
+                redirect_url = self.session.get('redirect')
+                del self.session['redirect']
+                return self.redirect(redirect_url)
+
+            # Dispatch method
             response = super(WebHandler, self).dispatch()
 
         finally:
@@ -60,22 +71,34 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         ''' Build an initial session object and create an SID '''
 
-        self.logging.info('Building session...')
+        ## build a session no matter what, yo
+        self.session = self.get_session()
 
-        session_id = int(round(random.random() * 1000000000, 0))
-        sid_struct = (self.request.environ.get('REMOTE_ADDR'), self.request.headers.get('User-Agent', ''), session_id)
+        if self.session.get('ukey', None) is None:
+            u = self.api.users.get_current_user()
+            if u is not None:
 
-        session_string = '::'.join([unicode(i) for i in sid_struct])
+                ## we have an authenticated user
+                self.session['authenticated'] = True
 
-        self.logging.info('Session string: "%s"' % session_string)
-        sid = hashlib.sha256(session_string).hexdigest()
+                ## sometimes this returns none (when federated identity auth is enabled), but then the email is a persistent token
+                if u.user_id() is not None:
+                    self.session['uid'] = u.user_id()
+                else:
+                    self.session['uid'] = u.email()
 
-        self.logging.info('Session ID: "%s"' % session_id)
-        self.logging.info('Encoded SID: "%s"' % sid)
-
-        self.session['sid'] = sid
-        self.session['id'] = session_id
-        return
+                ## try to load the user's session, since they are logged in
+                u = user.User.get_by_id(self.session['uid'])
+                if u is None:
+                    self.session['redirect'] = self.url_for('auth/register')
+                    self.session['returnto'] = self.request.url
+                    self.session['register'] = True
+                else:
+                    self.user = u
+                    self.session['ukey'] = u.key.urlsafe()
+                    self.session['email'] = u.email()
+                    self.session['nickname'] = u.nickname()
+        return self.session
 
     def handle_exception2(self, exception, debug):
 
@@ -100,6 +123,15 @@ class WebHandler(BaseHandler, SessionsMixin):
         if 'user' not in context:
             context['user'] = {}
         context['user']['session'] = self.session
+
+        # install encryption shim
+        context['encrypt'] = lambda x: x
+        context['decrypt'] = lambda x: x
+
+        context['security'] = {
+            'current_user': self.user
+        }
+
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)
 
 

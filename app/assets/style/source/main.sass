@@ -1,6 +1,7 @@
 @import "compass/utilities/sprites/sprite-img"
 @import "compass/css3/images"
 @import _core/config
+@import _core/fonts.sass
 @import _core/h5bp
 @import _core/initializr
 
@@ -36,29 +37,6 @@ p
     z-index: 500
 
     #content
-
-        section
-            width: 45%
-            margin: 0px 2.5% 300px
-            background: #eee
-            min-height: 800px
-            min-width: 100px
-            float: left
-
-            h2
-                font:
-                    family: 'Karla', sans-serif
-                    size: 44px
-                    weight: 700
-                color: #bbb
-                background-color: white
-                text-transform: uppercase
-                line-height: 50px
-                vertical-align: middle
-                height: 50px
-                width: 100%
-                margin: 0
-                padding: 10px 0
 
         &::before
             display: block
@@ -205,3 +183,4 @@ section.newsfeed
                 height: 50px
                 background-color: orange
 
+@import _partials/social.sass
