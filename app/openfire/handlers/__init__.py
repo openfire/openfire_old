@@ -68,8 +68,8 @@ class WebHandler(BaseHandler, SessionsMixin):
                 response = self.redirect(redirect_url)
 
             else:
-	            # Dispatch method
-	            response = super(WebHandler, self).dispatch()
+                # Dispatch method
+                response = super(WebHandler, self).dispatch()
 
         finally:
             self.save_session()
@@ -80,15 +80,15 @@ class WebHandler(BaseHandler, SessionsMixin):
         #trunkates the 'number' variable to the 100's place
         base = int(number)
         remain = number - base
-        decStep = remain*100
+        decStep = remain * 100
         decimal = int(decStep)
         decimal = float(decimal)
-        decimal = decimal/100
+        decimal = decimal / 100
         money = base + decimal
         money = str(money)
         #conditional that adds an additonal '0' to the number if the decimal
         # only goes to  the 10's place
-        zeroChk = remain *10
+        zeroChk = remain * 10
         if zeroChk == int(zeroChk):
             money = money + "0"
         #conditional that will put in a dollar sign '$' if requested by making
@@ -154,14 +154,14 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     def encrypt(self, subj):
 
-		''' Encrypt some string '''
+        ''' Encrypt some string '''
 
-		try:
-			from Crypto.Cipher import AES
-			e = AES.new('openfire_internal')
-			return 's:'+e.encrypt(subj)
-		except:
-			return 'b:'+base64.b64encode(subj)
+        try:
+            from Crypto.Cipher import AES
+            e = AES.new('openfire_internal')
+            return 's:' + e.encrypt(subj)
+        except:
+            return 'b:' + base64.b64encode(subj)
 
     def _bindRuntimeTemplateContext(self, context):
 
@@ -171,20 +171,29 @@ class WebHandler(BaseHandler, SessionsMixin):
             context['user'] = {}
         context['user']['session'] = self.session
 
+        # install meta config
+        context['_meta'] = config.config.get('openfire.meta')
+        context['_opengraph'] = context['_meta'].get('opengraph', {})
+        context['_location'] = context['_opengraph'].get('location', {})
+
         # install encryption shim
         context['encrypt'] = lambda x: self.encrypt(x)
         context['decrypt'] = lambda x: self.decrypt(x)
+
+        # install currency + percentage formatters
         context['currency'] = lambda x: self._format_as_currency(x, False)
         context['percentage'] = lambda x: self._format_as_currency(x, True)
 
+        # converts an email address into a gravatar img src url
         context['gravatarify'] = lambda x, y, z: ''.join(['http://www.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
 
+        # retrieves current user model + permissions
         context['security'] = {
+            'permissions': self.permissions,
             'current_user': self.user
         }
 
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)
-
 
     ## ++ HTTP Methods ++ ##
     def head(self):

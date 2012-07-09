@@ -4,7 +4,7 @@ Service tests.
 """
 
 import unittest
-from google.appengine.ext import testbed, ndb
+from google.appengine.ext import testbed, ndb, blobstore
 
 import bootstrap
 bootstrap.AppBootstrapper.prepareImports()
@@ -31,7 +31,7 @@ API_DICT = {
 }
 
 
-def generic_service_method_success_test(test_case, service_name, service_method, params={}, should_fail=False):
+def generic_service_method_success_test(test_case, service_name, service_method, params={}, request_method='POST', should_fail=False):
     ''' A generic success test for a given service url.
     Returns a response dict loaded from the response body with json.
     '''
@@ -42,7 +42,7 @@ def generic_service_method_success_test(test_case, service_name, service_method,
     requestDict['request']['params'] = params
     request = webapp2.Request.blank('/_api/rpc/%s.%s' % (service_name, service_method))
     request.headers['content-type'] = 'application/json'
-    request.method = 'POST'
+    request.method = request_method
     request.body = json.dumps(requestDict)
     response = request.get_response(dispatch.gateway)
     if not should_fail:
@@ -461,3 +461,36 @@ class CustomUrlServiceTestCase(unittest.TestCase):
         db_loader.create_custom_url(slug=slug)
         response = generic_service_method_success_test(self, 'url', 'check', params=params)
         self.assertEqual(response['response']['content']['taken'], True, 'Custom url is not taken that was assigned.')
+
+
+class MediaServiceTestCase(unittest.TestCase):
+    ''' Test cases for the media service.
+    '''
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+        self.testbed.init_blobstore_stub()
+        blobstub = self.testbed.get_stub(testbed.BLOBSTORE_SERVICE_NAME)
+        blobstub.CreateBlob('blob', 'blobdata')
+        self.blob_key = blobstore.BlobKey('blob')
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def test_media_generate_endpoint_method(self):
+
+        ''' Add a custom_url to the database then query. '''
+
+        response = generic_service_method_success_test(self, 'media', 'generate_endpoint')
+        self.assertEqual(response['response']['type'], 'Endpoint',
+            'Failed to return a endpoint message type.')
+
+        # Work in progress. -Ethan
+        #upload_url = response['response']['content']['endpoint'][0]
+        #upload_url = upload_url.replace('testbed.example.com:80', 'localhost:8080')
+        #upload_request = webapp2.Request.blank(upload_url)
+        #response = upload_request.get_response(dispatch.gateway)

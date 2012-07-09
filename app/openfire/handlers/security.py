@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import config as cfg
 from config import config
-from openfire.models import user
+from openfire.models import user as user_models
 from openfire.models import assets
 
 from apptools import BaseHandler
@@ -54,7 +54,7 @@ class Register(BaseHandler):
             return self.redirect_to('auth/login')
 
         # make sure user doesn't already exist
-        pu = user.User.get_by_id(u.email())
+        pu = user_models.User.get_by_id(u.email())
         if pu is None:
             if cfg.debug:
                 # only autoregister on the devserver
@@ -63,31 +63,30 @@ class Register(BaseHandler):
                 username, domain = tuple(u.email().split('@'))
 
                 # make user
-                user = user.User(id=u.email(), user=u, username=u.nickname(), firstname='John', lastname='Doe', bio='You are cool')
+                user = user_models.User(id=u.email(), user=u, username=u.nickname(), firstname='John', lastname='Doe', bio='You are cool')
                 ukey = user.put()
 
                 # make customurl
                 curl = assets.CustomURL(id=username, slug=username, target=ukey)
                 curl.put()
-                u.customurl = curl.key
+
+                user.customurl = curl.key
 
                 # make email
-                em = user.EmailAddress(id=u.email(), parent=ukey, user=ukey, address=u.email(), label='d', notify=True, jabber=True, gravatar=True)
+                em = user_models.EmailAddress(id=u.email(), parent=ukey, user=ukey, address=u.email(), label='d', notify=True, jabber=True, gravatar=True)
                 em.put()
-                u.email = [em.key]
+                user.email = [em.key]
 
                 # make permissions
-                pm = user.Permissions(id='global', parent=ukey, user=ukey, moderator=True, admin=True, developer=True)
+                pm = user_models.Permissions(id='global', parent=ukey, user=ukey, moderator=True, admin=True, developer=True)
                 pm.put()
-                u.permissions = [pm.key]
+                user.permissions = [pm.key]
 
-                u.put()
+                user.put()
 
                 self.response.write('<b>Done. Redirecting.</b>')
 
-                if 'redirect' in self.session:
-					self.session['redirect'] = False
-					self.session['returnto'] = '/'
+                # TODO: Redirect back to the url they came from, if provided.
 
                 return self.redirect_to('landing')
         else:

@@ -149,6 +149,19 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Media API - Add, delete, and update for images, videos, and scripts.
+        'media': {
+            'enabled': True,
+            'service': 'openfire.services.media.MediaService',
+            'methods': ['generate_endpoint', 'attach_image', 'attach_avatar', 'attach_video'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## Indexer API - allows programmatic control of openfire's content indexer
         'indexer': {
             'enabled': False,

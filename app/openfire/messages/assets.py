@@ -14,6 +14,10 @@ class Avatar(messages.Message):
     pass
 
 
+class Image(messages.Message):
+    pass
+
+
 class Video(messages.Message):
     pass
 
