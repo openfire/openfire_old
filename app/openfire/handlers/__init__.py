@@ -15,16 +15,21 @@ logic / request handling stuff across your entire app, by putting it here.
 ## General Imports
 import random
 import config
+import base64
 import hashlib
 
 ## Webapp2 Imports
 import webapp2
 
+## Google Imports
+from google.appengine.ext import ndb
+
 ## AppTools Imports
 from apptools.core import BaseHandler
 
 ## Openfire Imports
-from openfire.models import user
+from openfire.models.user import User
+from openfire.models.user import Permissions
 from openfire.core.sessions import SessionsMixin
 
 
@@ -32,8 +37,10 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
-    user = None
+    user = User
+    scope = None
     session = None
+    permissions = None
 
     ## ++ Internal Shortcuts ++ ##
     @webapp2.cached_property
@@ -57,10 +64,11 @@ class WebHandler(BaseHandler, SessionsMixin):
             if self.session.get('redirect') is not None:
                 redirect_url = self.session.get('redirect')
                 del self.session['redirect']
-                return self.redirect(redirect_url)
+                response = self.redirect(redirect_url)
 
-            # Dispatch method
-            response = super(WebHandler, self).dispatch()
+            else:
+	            # Dispatch method
+	            response = super(WebHandler, self).dispatch()
 
         finally:
             self.save_session()
@@ -82,22 +90,24 @@ class WebHandler(BaseHandler, SessionsMixin):
                 self.session['authenticated'] = True
 
                 ## sometimes this returns none (when federated identity auth is enabled), but then the email is a persistent token
-                if u.user_id() is not None:
-                    self.session['uid'] = u.user_id()
-                else:
-                    self.session['uid'] = u.email()
+                self.session['uid'] = u.email()
 
-                ## try to load the user's session, since they are logged in
-                u = user.User.get_by_id(self.session['uid'])
-                if u is None:
+                user, permissions = tuple(ndb.multi([ndb.Key(User, self.session['uid']), ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))]))
+                if user is None:
                     self.session['redirect'] = self.url_for('auth/register')
                     self.session['returnto'] = self.request.url
                     self.session['register'] = True
                 else:
-                    self.user = u
-                    self.session['ukey'] = u.key.urlsafe()
+                    self.user = user
+                    self.permissions = permissions
+                    self.session['ukey'] = user.key.urlsafe()
                     self.session['email'] = u.email()
                     self.session['nickname'] = u.nickname()
+                    if self.api.users.is_current_user_admin():
+                        self.session['root'] = True
+        else:
+            self.user = ndb.Key(urlsafe=self.session['ukey']).get()
+            self.permissions = ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))
         return self.session
 
     def handle_exception2(self, exception, debug):
@@ -116,6 +126,17 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         return self.error(500)
 
+    def encrypt(self, subj):
+
+		''' Encrypt some string '''
+
+		try:
+			from Crypto.Cipher import AES
+			e = AES.new('openfire_internal')
+			return 's:'+e.encrypt(subj)
+		except:
+			return 'b:'+base64.b64encode(subj)
+
     def _bindRuntimeTemplateContext(self, context):
 
         ''' Bind in the session '''
@@ -125,8 +146,10 @@ class WebHandler(BaseHandler, SessionsMixin):
         context['user']['session'] = self.session
 
         # install encryption shim
-        context['encrypt'] = lambda x: x
-        context['decrypt'] = lambda x: x
+        context['encrypt'] = lambda x: self.encrypt(x)
+        context['decrypt'] = lambda x: self.decrypt(x)
+
+        context['gravatarify'] = lambda x, y, z: ''.join(['http://www.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
 
         context['security'] = {
             'current_user': self.user

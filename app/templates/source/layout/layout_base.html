@@ -26,11 +26,11 @@
 		{% if api.users.get_current_user() != none %}  {# if the user is logged in... @TODO #}
 			<li class='profiletab'>
 				<a href="/me" title='Profile'>{{ api.users.get_current_user().nickname() }}</a>
-				<img src="http://www.gravatar.com/avatar/{{ util.converters.hashlib.md5(api.users.get_current_user().email()).hexdigest() }}.jpg?s=32&d=http://placehold.it/32/ffffff.png" />
+				<img src="{{ gravatarify(api.users.get_current_user().email(), 'jpg', '32') }}" width='32' height='32' alt='you!' />
 			</li>
 		{% else %}
-			<li><a href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>
-			<li><a href="{{ link('auth/login') }}" title="Log In">Log In</a></li>
+			<li><a id='signup_trigger' href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>
+			<li><a id='login_trigger' href="{{ link('auth/login') }}" title="Log In">Log In</a></li>
 		{% endif %}
 
 	</ul>

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @font-face {
   font-family: "Satisfy";
   font-style: normal;
@@ -40,6 +41,49 @@
   src: url("/assets/ext/static/fonts/zocial-regular-webfont.eot");
   src: url("/assets/ext/static/fonts/zocial-regular-webfont.eot?#iefix") format("embedded-opentype"), url("/assets/ext/static/fonts/zocial-regular-webfont.woff") format("woff"), url("/assets/ext/static/fonts/zocial-regular-webfont.ttf") format("truetype"), url("/assets/ext/static/fonts/zocial-regular-webfont.svg#ZocialRegular") format("svg");
   unicode-range: U+0 -U10FFFF;
+}
+
+@font-face {
+  font-family: "momentron";
+  src: url("/assets/ext/static/fonts/icons-momentum.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.momentron {
+  font-family: "momentron";
+  font-size: 20px;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+}
+
+.icon16 {
+  font-size: 16px !important;
+}
+
+.icon20 {
+  font-size: 20px !important;
+}
+
+.icon24 {
+  font-size: 24px !important;
+}
+
+.icon32 {
+  font-size: 32px !important;
+}
+
+.icon64 {
+  font-size: 64px !important;
+}
+
+.icon128 {
+  font-size: 128px !important;
+}
+
+.icon256 {
+  font-size: 256px !important;
 }
 
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
@@ -382,6 +426,13 @@ h1 {
 p {
   margin: 15px 0;
   padding: 5px 0;
+}
+
+.naked {
+  list-style: none;
+}
+.naked li {
+  list-style: none;
 }
 
 .lightorange {
@@ -822,8 +873,7 @@ a.mod:active {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
-.tabset .tab-link,
-.tabset .tab-rounded {
+.tabset .tab-link, .tabset .tab-rounded {
   margin: 0 5px;
   padding: 20px;
   border: 1px solid #6f6f66;
@@ -1496,7 +1546,6 @@ button:-moz-focus-inner {
   height: 25px;
   width: 300px;
   text-align: left;
-  background: blue;
 }
 
 #sidebar {
@@ -1526,9 +1575,20 @@ button:-moz-focus-inner {
   display: inline;
   position: absolute;
   right: 20px;
-  top: 30px;
-  width: 90px;
+  top: 25px;
+  width: 70px;
   text-align: center;
+}
+#sidebar header #sidebuttons button {
+  color: #222222;
+  padding: 0px;
+  margin-right: 3px;
+}
+#sidebar header #sidebuttons button:hover {
+  color: blue !important;
+}
+#sidebar header #sidebuttons button.following {
+  color: green !important;
 }
 #sidebar section {
   min-height: 50px;
@@ -1614,6 +1674,7 @@ button:-moz-focus-inner {
 }
 #project #deets #projecttitle #deetactions .buttongroup h6 {
   margin: 0;
+  margin-bottom: 5px !important;
   -webkit-margin-before: 0;
   -webkit-margin-after: 0;
   display: block;
@@ -1621,6 +1682,10 @@ button:-moz-focus-inner {
   line-height: 20px;
   border-bottom: 1px solid #222222;
   max-width: 150px;
+}
+#project #deets #projecttitle #deetactions .buttongroup button {
+  margin: 0;
+  padding: 0;
 }
 #project #deets #intro {
   background: transparent !important;

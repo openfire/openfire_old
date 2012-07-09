@@ -147,7 +147,7 @@ class Project(AppModel):
     goals = ndb.KeyProperty('gl', repeated=True)
 
     def is_private(self):
-        return self.status == 'p'
+        return self.status not in ['p', 'c']
 
     def get_custom_url(self):
         if self.customurl:

@@ -31,6 +31,8 @@ libraries:
   version: "latest"
 - name: setuptools
   version: "latest"
+- name: pycrypto
+  version: "latest"
 
 
 #### ===== Builtin SDK Includes
