@@ -49,31 +49,42 @@
                 <section id='quickinfo'>
                     {% block right %}
 
-                        <b>project tiers:</b>
-						{% if project.tiers %}
-						<ul class='naked'>
-							{% for tier in tiers %}
-								<li>
-									<b>{{ tier.name }} - {{ currency(tier.amount) }}</b>
-								</li>
-						    {% endfor %}
-						 </ul>
+						<div id='global_progress'>
+							<!-- project progress -->
+							<div id='progress' data-value="{{ project.progress }}" data-max="100">
+								<div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
+							</div>
+						</div><!-- end #global_progress -->
 
-						{% else %}
-							<br /><b>no project tiers yet! :(</b><br />
-						{% endif %}
-						<br />
+						<div id='project_goals'>
+							{% if project.goals %}
+	                        <ul class='naked'>
+								{% for goal in goals %}
+									<li>
+										<b>{{ currency(goal.amount) }}</b>
+									</li>
+								{% endfor %}
+	                        </ul>
+							{% else %}
+								<b>no project goals yet! :(</b>
+							{% endif %}
+						</div> <!-- end #project_goals -->
 
-						<b>project goals:</b>
-						{% if project.goals %}
-                        <ul class='naked'>
-							{% for goal in goals %}
-								<li><b>{{ currency(goal.amount) }}</b></li>
-							{% endfor %}
-                        </ul>
-						{% else %}
-							<br /><b>no project goals yet! :(</b><br />
-						{% endif %}
+						<div id='project_tiers'>
+							{% if project.tiers %}
+							<ul class='naked'>
+								{% for tier in tiers %}
+									<li>
+										<b>{{ tier.name }} - {{ currency(tier.amount) }}</b>
+									</li>
+							    {% endfor %}
+							 </ul>
+
+							{% else %}
+								<b>no project tiers yet! :(</b>
+							{% endif %}
+						</div>
+
                     {% endblock %}
                 </section> <!-- end #quickinfo -->
                 <section id='backers'>

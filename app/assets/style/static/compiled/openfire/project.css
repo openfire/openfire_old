@@ -430,6 +430,7 @@ p {
 
 .naked {
   list-style: none;
+  -webkit-padding-start: 0;
 }
 .naked li {
   list-style: none;
@@ -1533,6 +1534,13 @@ section.newsfeed ul.feed li.feed-item .datetime {
 button:-moz-focus-inner {
   border: 0;
   padding: 0;
+}
+
+#progress {
+  width: 320px;
+  position: relative;
+  left: -30px;
+  height: 30px;
 }
 
 #welcomebox {

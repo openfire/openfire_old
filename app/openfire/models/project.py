@@ -140,14 +140,14 @@ class Project(AppModel):
     backers = ndb.IntegerProperty('b', default=0)
     followers = ndb.IntegerProperty('f', default=0)
     money = ndb.IntegerProperty('mn', default=0)
-    progress = ndb.IntegerProperty('pr', default=0, choices=set(range(0, 100)))
+    progress = ndb.IntegerProperty('pro', default=0, choices=frozenset(range(0, 100)))
 
     # Tiers + Goals
     tiers = ndb.KeyProperty('tr', repeated=True)
     goals = ndb.KeyProperty('gl', repeated=True)
 
     def is_private(self):
-        return self.status not in ['p', 'c']
+        return (self.status not in ['p', 'c']) or self.public
 
     def get_custom_url(self):
         if self.customurl:

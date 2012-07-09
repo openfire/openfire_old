@@ -231,7 +231,9 @@ class DevModels(BaseHandler):
                     creator=sam,
                     owners=[sam, david],
                     public=True,
-                    viewers=[pug, ethan]
+                    viewers=[pug, ethan],
+                    progress=73,
+                    money=17261
             )
             fatcatmap.put()
 

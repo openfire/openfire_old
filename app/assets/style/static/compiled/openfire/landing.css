@@ -430,6 +430,7 @@ p {
 
 .naked {
   list-style: none;
+  -webkit-padding-start: 0;
 }
 .naked li {
   list-style: none;
