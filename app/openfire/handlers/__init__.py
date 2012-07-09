@@ -118,7 +118,7 @@ class WebHandler(BaseHandler, SessionsMixin):
                 ## sometimes this returns none (when federated identity auth is enabled), but then the email is a persistent token
                 self.session['uid'] = u.email()
 
-                user, permissions = tuple(ndb.multi([ndb.Key(User, self.session['uid']), ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))]))
+                user, permissions = tuple(ndb.get_multi([ndb.Key(User, self.session['uid']), ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))]))
                 if user is None:
                     self.session['redirect'] = self.url_for('auth/register')
                     self.session['returnto'] = self.request.url
