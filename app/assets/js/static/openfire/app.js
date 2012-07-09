@@ -463,20 +463,53 @@
 
     function ProjectController(openfire, window) {
       var _this = this;
-      this._init = function() {};
-    }
-
-    ProjectController.prototype.follow = function() {
-      var _this = this;
-      return $.apptools.api.project.follow().fulfill({
-        success: function() {
-          return alert('Success.');
+      this._init = function() {
+        $('#back').click(_this.action.back);
+        $('#follow').click(_this.action.follow);
+        $('.sharebutton').click(_this.action.share);
+      };
+      this.action = {
+        follow: function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          $.apptools.dev.verbose('project:action', 'User requested to FOLLOW this project.', event);
+          return $.apptools.api.project.follow().fulfill({
+            success: function() {
+              return alert('Success.');
+            },
+            failure: function() {
+              return alert('Failure.');
+            }
+          });
         },
-        failure: function() {
-          return alert('Failure.');
+        share: function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          $.apptools.dev.verbose('project:action', 'User requested to SHARE this project.', event);
+          return $.apptools.api.project.share().fulfill({
+            success: function() {
+              return alert('Success.');
+            },
+            failure: function() {
+              return alert('Failure.');
+            }
+          });
+        },
+        back: function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          $.apptools.dev.verbose('project:action', 'User requested to BACK this project.', event);
+          return $.apptools.api.project.back().fulfill({
+            success: function() {
+              return alert('Success.');
+            },
+            failure: function() {
+              return alert('Failure.');
+            }
+          });
         }
-      });
-    };
+      };
+    }
 
     return ProjectController;
 
@@ -507,7 +540,7 @@
   Openfire = (function() {
 
     function Openfire(window) {
-      var session,
+      var _base,
         _this = this;
       this.sys = {
         core_events: ['OPENFIRE_READY'],
@@ -515,7 +548,12 @@
           session: {
             cookie: "ofsession",
             header: "X-AppFactory-Session",
-            timeout: 86400
+            timeout: 86400,
+            cookieless: false
+          },
+          csrf: {
+            cookie: "ofcsrf",
+            header: "X-AppFactory-CSRF"
           }
         },
         state: {
@@ -526,6 +564,10 @@
           classes: {},
           objects: {},
           session: {
+            data: null,
+            verified: false,
+            timestamp: null,
+            signature: null,
             established: false,
             authenticated: false,
             csrf: {
@@ -559,26 +601,44 @@
             return preinit;
           },
           sniff_headers: function(document) {
-            var cookie, i, session, _ref;
-            session = null;
-            _ref = document.cookies.split(";");
-            for (i in _ref) {
-              cookie = _ref[i];
-              cookie = cookie.split("=");
-              if (cookie[0] === _this.sys.config.session.cookie) {
-                session = cookie[1].split("|");
-                if (session.length > 2) {
-                  if ((_this.sys.config.session.timeout * 1000) > +new Date()) {
-                    session = cookie[2];
+            var cookie, data, i, key, session, signature, timestamp, _ref, _ref1, _ref2;
+            $.apptools.dev.verbose('openfire', 'Sniffing response cookies.');
+            try {
+              session = null;
+              _ref = document.cookie.split(";");
+              for (i in _ref) {
+                cookie = _ref[i];
+                $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.replace('"', '').replace('"', '').split("="));
+                _ref1 = cookie.split("="), key = _ref1[0], cookie = _ref1[1];
+                if (key === _this.sys.config.session.cookie) {
+                  _ref2 = session = cookie.split("|"), data = _ref2[0], timestamp = _ref2[1], signature = _ref2[2];
+                  $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', _this.sys.config.session.cookie, data, timestamp, signature);
+                  if (session.length > 2) {
+                    $.apptools.dev.verbose('openfire:sessions', 'Checking session timeout with TTL of ', _this.sys.config.session.timeout, 'and session creation time of', session[1]);
+                    if (((+new Date(+timestamp * 1000)) + (_this.sys.config.session.timeout * 1000)) > +new Date()) {
+                      session = {
+                        data: data,
+                        timestamp: timestamp,
+                        signature: signature
+                      };
+                      $.apptools.dev.log('openfire:sessions', 'Valid session found and loaded.', session);
+                    }
                   }
+                  break;
                 }
-                break;
+                continue;
               }
-              continue;
+              if (session !== null && session !== false) {
+                _this.sys.state.session.data = session.data;
+                _this.sys.state.session.timestamp = session.timestamp;
+                _this.sys.state.session.signature = signature.replace('"', '');
+                _this.sys.state.session.established = true;
+              }
+            } catch (err) {
+              $.apptools.dev.error('openfire:sessions', 'An unknown exception was encountered when attempting to load the user\'s session.', err);
+              _this.sys.state.session.error = true;
             }
-            if (session !== null && session !== false) {
-              return _this.sys.state.session.established = true;
-            }
+            return _this.sys.state.session.established;
           }
         },
         install: {
@@ -670,7 +730,12 @@
         this.sys.state.preinit = window.__openfire_preinit;
         this.sys.state.consider_preinit(window.__openfire_preinit);
       }
-      session = this.sys.sniff_headers(document);
+      if (typeof (_base = this.sys.state).sniff_headers === "function" ? _base.sniff_headers(document) : void 0) {
+        if (this.sys.config.session.cookieless) {
+          $.apptools.api.internals.config.headers[this.sys.config.csrf.header] = this.sys.state.session.signature;
+          $.apptools.api.internals.config.headers[this.sys.config.session.header] = document.cookie;
+        }
+      }
       return this.sys.go();
     }
 

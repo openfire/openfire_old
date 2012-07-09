@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import logging
 from openfire.pipelines.model import ModelPipeline
 
 
@@ -8,19 +7,15 @@ class CategoryPipeline(ModelPipeline):
 
     ''' Processes category puts/deletes. '''
 
-    def put(self, key, category):
+    _model_binding = 'openfire.models.project.Category'
 
-        ''' Fired when a category is put. '''
 
-        logging.info('=== FIRED ON PUT ===')
-        return
+## ProposalPipeline - fired when a Proposal entity is put/deleted
+class ProposalPipeline(ModelPipeline):
 
-    def delete(self, key):
+    ''' Processes project puts/deletes. '''
 
-        ''' Fired when a category is deleted. '''
-
-        logging.info('=== FIRED ON DELETE ===')
-        return
+    _model_binding = 'openfire.models.project.Proposal'
 
 
 ## ProjectPipeline - fired when a Project entity is put/deleted
@@ -28,19 +23,7 @@ class ProjectPipeline(ModelPipeline):
 
     ''' Processes project puts/deletes. '''
 
-    def put(self, key, project):
-
-        ''' Fired when a project is put. '''
-
-        logging.info('=== FIRED ON PUT ===')
-        return
-
-    def delete(self, key):
-
-        ''' Fired when a project is deleted. '''
-
-        logging.info('=== FIRED ON DELETE ===')
-        return
+    _model_binding = 'openfire.models.project.Project'
 
 
 ## GoalPipeline - fired when a Goal entity is put/deleted
@@ -48,19 +31,7 @@ class GoalPipeline(ModelPipeline):
 
     ''' Processes goal puts/deletes. '''
 
-    def put(self, key, goal):
-
-        ''' Fired when a goal is put. '''
-
-        logging.info('=== FIRED ON PUT ===')
-        return
-
-    def delete(self, key):
-
-        ''' Fired when a goal is deleted. '''
-
-        logging.info('=== FIRED ON DELETE ===')
-        return
+    _model_binding = 'openfire.models.project.Goal'
 
 
 ## TierPipeline - fired when a Tier entity is put/deleted
@@ -68,16 +39,20 @@ class TierPipeline(ModelPipeline):
 
     ''' Processes tier puts/deletes. '''
 
-    def put(self, key, tier):
+    _model_binding = 'openfire.models.project.Tier'
 
-        ''' Fired when a tier is put. '''
 
-        logging.info('=== FIRED ON PUT ===')
-        return
+## BackerPipeline - fired when a Backer entity is put/deleted
+class BackerPipeline(ModelPipeline):
 
-    def delete(self, key):
+    ''' Processes backer puts/deletes. '''
 
-        ''' Fired when a tier is deleted. '''
+    _model_binding = 'openfire.models.project.Backer'
 
-        logging.info('=== FIRED ON DELETE ===')
-        return
+
+## UpdatePipeline - fired when a Update entity is put/deleted
+class UpdatePipeline(ModelPipeline):
+
+    ''' Processes update puts/deletes. '''
+
+    _model_binding = 'openfire.models.project.Update'

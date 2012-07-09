@@ -10,7 +10,18 @@ class Index(AppModel):
 
     ''' A container for traversible index entries. '''
 
-    pass
+    @classmethod
+    def new(cls, name, **kwargs):
+
+        ''' Factory method to create a new Index. '''
+
+        return cls(id=name, **kwargs)
+
+    def add(self, value, **kwargs):
+
+        ''' Shortcut factory method to add an IndexEntry to an index. '''
+
+        return IndexEntry.new(self, value, **kwargs)
 
 
 ## IndexEntry - hierarchical stop for *values* in the index
@@ -18,7 +29,22 @@ class IndexEntry(AppModel):
 
     ''' A value entry in the index. '''
 
-    pass
+    @classmethod
+    def new(cls, index, value, **kwargs):
+
+        ''' Factory method to create and attach a new IndexEntry. '''
+
+        if isinstance(index, ndb.Model):
+            index = index.key
+        elif isinstance(index, basestring):
+            index = ndb.Key(urlsafe=index)
+        return cls(id=value, parent=index, **kwargs)
+
+    def map(self, key, **kwargs):
+
+        ''' Shortcut factory method to add an IndexMapping to an IndexEntry. '''
+
+        return IndexMapping.new(self, key, **kwargs)
 
 
 ######## ======== Index Mutations ======== ########
@@ -28,7 +54,18 @@ class IndexMapping(AppModel):
 
     ''' A mapping: entry => key. '''
 
-    pass
+    @classmethod
+    def new(cls, entry, key, **kwargs):
+
+        ''' Factory method to create and attach a new IndexMapping. '''
+
+        if isinstance(entry, basestring):
+            entry = ndb.Key(urlsafe=key)
+        elif isinstance(entry, ndb.Model):
+            entry = entry.key
+        if isinstance(key, ndb.Key):
+            key = key.urlsafe()
+        return cls(id=key, parent=entry)
 
 
 ## IndexEvent - generated for our index audit log

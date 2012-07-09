@@ -67,19 +67,46 @@ class CoreSessionAPI(CoreAPI):
         self.logging.info('Loading session from SID "%s".' % sid)
         return self.manager._get_by_sid(sid)
 
-    def _sniff_session(self, request):
+    def _sniff_session(self, request, headers=True, cookies=True):
 
         ''' Try to detect an existing session. '''
 
-        if self.config.get('cookieless', False):
+        # resolve the session cookie TTL and name
+        ttl = self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)
+        name = self.config.get('frontends', {}).get('cookies', {}).get('name', 'ofsession')
+
+        # check headers first
+        if self.config.get('cookieless', False) and headers:
             self.logging.info('Sniffing session. Cookieless enabled.')
+
+            # check if our session header is there
             if self.header in request.headers:
-                return request.headers.get(self.header)
 
-        if self.config.get('frontends', {}).get('cookies').get('enabled', False):
+                self.logging.info('Found session header at configured key "%s".' % self.header)
 
-            ttl = self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)
-            name = self.config.get('frontends', {}).get('cookies', {}).get('name', 'ofsession')
+                # grab value and check for altcookie
+                val = request.headers.get(self.header)
+                if name in val:
+
+                    name, cookie = tuple(val.replace('"', '').split('='))
+                    self.logging.info('Session is an altcookie. Deserializing.')
+
+                    # found altcookie, deserialize
+                    altcookie = self.serializer.deserialize(name, cookie.replace('\\075', '='), max_age=int(ttl))
+                    if altcookie is None:  # stale cookie
+                        self.logging.warning('Altcookie is stale. Ignoring.')
+                        return
+                    else:
+                        # return SID
+                        return altcookie.get('sid', None)
+
+                else:
+                    self.logging.info('Session is a direct SID. Returning.')
+
+                    # assume it's an SID directly
+                    return request.headers.get(self.header)
+
+        if self.config.get('frontends', {}).get('cookies').get('enabled', False) and cookies:
 
             self.logging.info('Cookieless not found. Looking for securecookie at name "%s".' % name)
             cookie = request.cookies.get(name)
@@ -102,20 +129,23 @@ class CoreSessionAPI(CoreAPI):
         return None
 
     #### ++++ External Methods ++++ ####
-    def get_session(self, request, max_age=600):
+    def get_session(self, request, max_age=600, headers=True, cookies=True, create=True):
 
         ''' Create or load an existing user session. '''
 
         self.logging.info('Sniffing for existing session...')
-        self.sid = self._sniff_session(request)
+        self.sid = self._sniff_session(request, headers=headers, cookies=cookies)
         session = None
         if self.sid is not None:
             self.logging.info('Possibly valid session found at SID "%s".' % self.sid)
             session = self._load_session(self.sid)
         if session is None:
-            self.logging.info('Existing session not found or not valid. Starting a new one.')
-            session = self.manager.make_session()
-            self.sid = session.get('sid')
+            if create:
+                self.logging.info('Existing session not found or not valid. Starting a new one.')
+                session = self.manager.make_session()
+                self.sid = session.get('sid')
+            else:
+                self.logging.info('Existing session not found.')
 
         return session
 
@@ -145,7 +175,7 @@ class SessionsMixin(object):
 
     __sessions_bridge = None
 
-    def get_session(self, **kwargs):
+    def get_session(self, make=True, cookies=True, headers=True, **kwargs):
 
         ''' Proxy stuff to the Core Sessions API. '''
 
@@ -154,8 +184,9 @@ class SessionsMixin(object):
                 self.session_store = sessions.get_store(request=self.request)
             self.__sessions_bridge = CoreSessionAPI(self.session_store)
 
-        session = self.__sessions_bridge.get_session(self.request, **kwargs)
-        self.__session_id = session['sid']
+        session = self.__sessions_bridge.get_session(self.request, create=make, cookies=cookies, headers=headers, **kwargs)
+        if session is not None:
+            self.__session_id = session['sid']
 
         return session
 

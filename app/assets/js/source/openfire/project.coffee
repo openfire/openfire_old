@@ -268,7 +268,6 @@ class ProjectController extends OpenfireController
 
 
 
-
 # proposal controller
 class ProposalController extends OpenfireController
 

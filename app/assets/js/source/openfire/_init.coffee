@@ -13,6 +13,10 @@ class Openfire
                     cookie: "ofsession"
                     header: "X-AppFactory-Session"
                     timeout: 86400  # one day, for now
+                    cookieless: false
+                csrf:
+                    cookie: "ofcsrf"
+                    header: "X-AppFactory-CSRF"
 
             # internal state
             state:
@@ -24,6 +28,10 @@ class Openfire
                 classes: {}         # Installed openfire-related classes
                 objects: {}         # Installed openfire-related objects
                 session:            # Runtime session info
+                    data: null
+                    verified: false
+                    timestamp: null
+                    signature: null
                     established: false
                     authenticated: false
                     csrf:
@@ -46,23 +54,43 @@ class Openfire
 
                     return preinit  # preinit HANDLED.
 
+
                 sniff_headers: (document) =>
 
+                    $.apptools.dev.verbose('openfire', 'Sniffing response cookies.')
+
                     # only lookin' for cookies right now
-                    session = null
-                    for i, cookie of document.cookies.split(";")
-                        cookie = cookie.split("=");
-                        if cookie[0] == @sys.config.session.cookie
-                            session = cookie[1].split("|")
-                            if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
-                                if (@sys.config.session.timeout * 1000) > +new Date()  # check expiration
-                                    session = cookie[2]
-                            break
-                        continue
+                    try
+                        session = null
+                        for i, cookie of document.cookie.split(";")
+                            $.apptools.dev.verbose('openfire:sessions', 'Found a cookie.', i, cookie, cookie.replace('"', '').replace('"', '').split("="))
+                            [key, cookie] = cookie.split("=");
+                            if key == @sys.config.session.cookie
+                                [data, timestamp, signature] = session = cookie.split("|")
+                                $.apptools.dev.verbose('openfire:sessions', 'Possibly valid session cookie found!', @sys.config.session.cookie, data, timestamp, signature)
+                                if session.length > 2  # must be at least 3 (data|timestamp|hash), could sometimes come through as (data|timestamp|hash|csrf)
+                                    ## @TODO: verify session signature
+                                    $.apptools.dev.verbose('openfire:sessions', 'Checking session timeout with TTL of ', @sys.config.session.timeout, 'and session creation time of', session[1])
+                                    if ((+new Date(+timestamp * 1000)) + (_this.sys.config.session.timeout * 1000)) > +new Date()  # check expiration
+                                        session =
+                                            data: data
+                                            timestamp: timestamp
+                                            signature: signature
+                                        $.apptools.dev.log('openfire:sessions', 'Valid session found and loaded.', session)
+                                break
+                            continue
 
-                    if session isnt null and session isnt false
-                        @sys.state.session.established = true
+                        if session isnt null and session isnt false
+                            @sys.state.session.data = session.data
+                            @sys.state.session.timestamp = session.timestamp
+                            @sys.state.session.signature = signature.replace('"', '')
+                            @sys.state.session.established = true
 
+                    catch err
+                        $.apptools.dev.error('openfire:sessions', 'An unknown exception was encountered when attempting to load the user\'s session.', err)
+                        @sys.state.session.error = true
+
+                    return @sys.state.session.established
 
             install:
                 # installs an openfire base object
@@ -115,7 +143,14 @@ class Openfire
             @sys.state.consider_preinit(window.__openfire_preinit)
 
         # sniff headers/session
-        session = @sys.sniff_headers(document)
+        if @sys.state.sniff_headers?(document)
+
+            if @sys.config.session.cookieless
+                # append session header
+                $.apptools.api.internals.config.headers[@sys.config.csrf.header] = @sys.state.session.signature
+
+                # manually copy over cookie
+                $.apptools.api.internals.config.headers[@sys.config.session.header] = document.cookie
 
         # trigger system ready
         return @sys.go()

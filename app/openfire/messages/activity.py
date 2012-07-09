@@ -1,6 +1,22 @@
 from protorpc import messages
 
 
+#### ++++ Object Messages ++++ ####
+class Activity(messages.Message):
+
+    ''' A single activity object. '''
+
+    pass
+
+
+class ActivityStream(messages.Message):
+
+    ''' A set of activity objects for a given target and timeperiod. '''
+
+    pass
+
+
+#### ++++ Request/Response Messages ++++ ####
 class SiteMetricsRequest(messages.Message):
 
     ''' A request for any of the site metrics that we provide. '''

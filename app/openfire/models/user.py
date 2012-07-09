@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+
+# Datastore Imports
 from google.appengine.ext import ndb
 from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
 
+# Model Imports
 from openfire.models.assets import Avatar
+
+# Model Attachments
+from openfire.messages import user as messages
+from openfire.pipelines.model import user as pipelines
 
 
 ######## ======== Top-Level User Models ======== ########
@@ -13,10 +20,20 @@ class User(AppModel):
 
     ''' An openfire user. '''
 
+    _message_class = messages.User
+    _pipeline_class = pipelines.UserPipeline
+
+    user = ndb.UserProperty('usr', indexed=True)
     username = ndb.StringProperty('u', indexed=True)
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
     bio = ndb.TextProperty('b', indexed=False)
+    customurl = ndb.KeyProperty('url', indexed=True, default=None)
+
+    def get_custom_url(self):
+        if self.customurl:
+            return self.customurl.id()
+        return None
 
 
 ## UserAvatar - links an avatar resource to a user profile
@@ -32,9 +49,12 @@ class EmailAddress(AppModel):
 
     ''' An openfire user's email address. '''
 
+    _message_class = messages.EmailAddress
+    _pipeline_class = pipelines.EmailAddressPipeline
+
     user = ndb.KeyProperty('u', indexed=True)
     address = ndb.StringProperty('e', indexed=True)
-    label = ndb.StringProperty('l', indexed=False, choices=['w', 'p', 'o'], default='p')  # work, personal & other
+    label = ndb.StringProperty('l', indexed=False, choices=['d', 'w', 'p', 'o'], default='p')  # work, personal & other
     notify = ndb.BooleanProperty('n', indexed=True, default=False)  # use this email to notify?
     jabber = ndb.BooleanProperty('j', indexed=True, default=False)  # use this email for jabber?
     gravatar = ndb.BooleanProperty('g', indexed=True, default=False)  # use this email for gravatar?
@@ -44,6 +64,9 @@ class EmailAddress(AppModel):
 class Permissions(AppModel):
 
     ''' Describes permissions bestowed on an openfire user. '''
+
+    _message_class = messages.Permissions
+    _pipeline_class = pipelines.PermissionsPipeline
 
     user = ndb.KeyProperty('u', indexed=True)
     moderator = ndb.BooleanProperty('m', indexed=True, default=False)
@@ -57,6 +80,9 @@ class Permissions(AppModel):
 class SocialAccount(polymodel.PolyModel):
 
     ''' Describes an account from a 3rd party platform that an openfire user has attached. '''
+
+    _message_class = messages.SocialAccount
+    _pipeline_class = pipelines.SocialAccountPipeline
 
     user = ndb.KeyProperty('u', indexed=True)
     ext_id = ndb.StringProperty('e', indexed=True)
