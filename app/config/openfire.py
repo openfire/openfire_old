@@ -14,6 +14,74 @@ config['openfire'] = {
 
 }
 
+config['openfire.meta'] = {
+
+    'icon': '',
+    'logo': '',
+    'author': 'a collaboration between labor lapsus L3C + momentum labs',
+    'publisher': 'openfire now!',
+    'copyright': 'openfire, (c) 2012',
+    'robots': 'index,follow',
+    'revisit': '7 days',
+
+    'description': '',
+
+    'keywords': [
+        'positive disruption',
+        'innovation',
+        'technology',
+        'crowdfunding',
+        'entrepreneurship',
+        'social good',
+        'small business'
+    ],
+
+    'opengraph': {
+
+        'title': 'openfire: momentum for positive disruption!',
+        'type': 'website',
+        'determiner': 'a',
+        'locale': 'en_US',
+        'url': 'https://openfi.re',
+        'site_name': 'openfire',
+
+        'location': {
+            'latitude': '37.751185',
+            'longitude': '-122.442443',
+            'address': '531 Grand View Avenue',
+            'locality': 'San Francisco',
+            'region': 'California',
+            'zipcode': '94114',
+            'country': 'United States of America',
+            'email': 'disrupt@openfi.re',
+            'phone': '(866) 252-0640'
+        },
+
+        'facebook': {
+            'app_id': '468309289847671',
+            'admins': ['642005650']
+        }
+
+    },
+
+    'apple': {
+
+        'touch_icon': '',
+        'precomposed': '',
+        'startup_icon': '',
+        'status_bar_style': '',
+        'app_capable': ''
+
+    },
+
+    'google': {
+
+        'site_verification': ''
+
+    }
+
+}
+
 config['openfire.sessions'] = {
 
     'ttl': 86400,  # timeout in seconds for stale session records
