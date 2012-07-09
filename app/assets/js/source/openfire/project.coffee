@@ -266,6 +266,8 @@ class ProjectController extends OpenfireController
                 failure: (error) =>
                     alert 'update() failure'
 
+        else throw new UserPermissionsError(@constructor.name, 'Current user is not a project owner.')
+
 
 
 # proposal controller
