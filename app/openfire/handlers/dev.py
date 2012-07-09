@@ -69,10 +69,10 @@ class DevModels(BaseHandler):
             ndb.put_multi([money, time, code, advocacy])
 
             ## users first
-            pug = user.User(key=ndb.Key(user.User, 'pug'), username='pug', firstname='David', lastname='Anderson', bio='hola yo soy pug').put()
-            sam = user.User(key=ndb.Key(user.User, 'sam'), username='sam', firstname='Sam', lastname='Gammon', bio='fiesta ayayayay').put()
-            david = user.User(key=ndb.Key(user.User, 'david'), username='david', firstname='David', lastname='Rekow', bio='hi i is david').put()
-            ethan = user.User(key=ndb.Key(user.User, 'ethan'), username='ethan', firstname='Ethan', lastname='Leland', bio='i am mister ethan').put()
+            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', firstname='David', lastname='Anderson', bio='hola yo soy pug').put()
+            sam = user.User(key=ndb.Key(user.User, 'sam@openfi.re'), username='sam', firstname='Sam', lastname='Gammon', bio='fiesta ayayayay').put()
+            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', firstname='David', lastname='Rekow', bio='hi i is david').put()
+            ethan = user.User(key=ndb.Key(user.User, 'ethan@openfi.re'), username='ethan', firstname='Ethan', lastname='Leland', bio='i am mister ethan').put()
 
             ## user emails
             user_emails = [
@@ -81,7 +81,7 @@ class DevModels(BaseHandler):
                 user.EmailAddress(id='davidr@openfi.re', parent=david, user=david, address='davidr@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
                 user.EmailAddress(id='ethan@openfi.re', parent=ethan, user=ethan, address='ethan@openfi.re', label='d', notify=True, jabber=True, gravatar=True)
             ]
-            ndb.put_multi(user_emails)
+            user_emails = ndb.put_multi(user_emails)
 
             # user permissions
             user_perms = [
@@ -90,8 +90,24 @@ class DevModels(BaseHandler):
                 user.Permissions(id='global', parent=david, user=david, moderator=True, admin=True, developer=True),
                 user.Permissions(id='global', parent=ethan, user=ethan, moderator=True, admin=True, developer=True)
             ]
-            ndb.put_multi(user_perms)
+            user_perms = ndb.put_multi(user_perms)
 
+            pug = pug.get()
+            sam = sam.get()
+            david = david.get()
+            ethan = ethan.get()
+
+            pug.email = [user_emails[0]]
+            sam.email = [user_emails[1]]
+            david.email = [user_emails[2]]
+            ethan.email = [user_emails[3]]
+
+            pug.permissions = [user_perms[0]]
+            sam.permissions = [user_perms[1]]
+            david.permissions = [user_perms[2]]
+            ethan.permissions = [user_perms[3]]
+
+            pug, sam, david, ethan = tuple(ndb.put_multi([pug, sam, david, ethan]))
 
             ## categories next
             politics = project.Category(key=ndb.Key(project.Category, 'politics'), slug='politics', name='Politics', description='Having to do with politics.', keywords=['policy', 'government']).put()

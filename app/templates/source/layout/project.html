@@ -42,27 +42,23 @@
                 <header>
                     <div id='sidetitle' class='fancy title'><h1>{{ project.name }}</h1></div>
                     <div id='sidebuttons' class='buttons'>
-                        <button id='follow'>F</button>
-                        <button id='share'>S</button>
+                        <button id='follow' class='momentron{%- if project.current_user_following -%} following{%- endif -%}'>&#xf007f;</button>
+                        <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                 </header> <!-- end header -->
                 <section id='quickinfo'>
                     {% block right %}
-                        <b>project owners:</b>
-                        <ul>
-                            {% for owner in project.owners %}
-                                <li>{{ owner.id() }}</li>
-                            {% endfor %}
-                        </ul>
-                        <br />
 
                         <b>project tiers:</b>
 						{% if project.tiers %}
-						<ul>
-							{% for tier in project.tiers %}
-								<li>Tier</li>
+						<ul class='naked'>
+							{% for tier in tiers %}
+								<li>
+									<b>{{ tier.name }}</b>
+								</li>
 						    {% endfor %}
 						 </ul>
+
 						{% else %}
 							<br /><b>no project tiers yet! :(</b><br />
 						{% endif %}
@@ -70,9 +66,9 @@
 
 						<b>project goals:</b>
 						{% if project.goals %}
-                        <ul>
-							{% for goal in project.goals %}
-								<li>Goal</li>
+                        <ul class='naked'>
+							{% for goal in goals %}
+								<li><b>{{ goal.amount }}</b></li>
 							{% endfor %}
                         </ul>
 						{% else %}
@@ -88,6 +84,15 @@
                         backerz
                     </div> <!-- end #backer_summary -->
                 </section> <!-- end #backers -->
+
+                <div id='owners'>
+		            <b>project owners:</b>
+		            <ul class='naked'>
+		                {% for owner in owners %}
+		                    <li><img src="{{ gravatarify(owner.key.id(), 'jpg', '24') }}" width='24' height='24' alt='{{ owner.key.id() }}' />{%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>{%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>{%- endif -%}</li>
+		                {% endfor %}
+		            </ul>
+		        </div> <!-- end #owners -->
             </div> <!-- end #sidebar -->
 
             <article id='deets'>
@@ -98,9 +103,9 @@
                     <div id='deetactions'>
                         <div class='buttongroup'>
                             <h6>Share This</h6>
-                            <button id='fbshare' class='sharebutton'>Fb</button>
-                            <button id='twshare' class='sharebutton'>Tw</button>
-                            <button id='g+share' class='sharebutton'>G+</button>
+                            <button id='fbshare' class='zocial facebook sharebutton icon'></button>
+                            <button id='twshare' class='zocial twitter sharebutton icon'></button>
+                            <button id='g+share' class='zocial googleplus sharebutton icon'></button>
                         </div> <!-- end .buttongroup -->
                     </div> <!-- end #deetactions -->
                 </div> <!-- end #projecttitle -->
@@ -136,30 +141,30 @@
 
   // openfire project init
   window._cp = {
-    ke: '{{ encrypt(project.key.urlsafe()) }}', // encrypted key
+    ke: '{{ encrypt(project.key.urlsafe()) }}',
     {%- if util.config.debug -%}
-    kd: '{{ project.key.urlsafe() }}', // unencrypted key
+    kd: '{{ project.key.urlsafe() }}',
     {%- endif -%}
-    i: project.key.id(), // key id
+    i: {{ project.key.id() }},
     {%- if project.current_user_following -%}
-    f: true, // following?
+    f: true,
     {%- else -%}
-    f: false, // following?
+    f: false,
     {%- endif -%}
     {%- if project.current_user_backed -%}
-    b: true, // backed?
+    b: true,
     {%- else -%}
-    b: false, // backed?
+    b: false,
     {%- endif -%}
     {%- if security.current_user.key in project.owners -%}
-    o: true, // owner privs
+    o: true,
     {%- else -%}
-    o: false, // owner privs
+    o: false,
     {%- endif -%}
     {%- if security.current_user.key in project.viewers -%}
-    v: true // viewer privs
+    v: true
     {%- else -%}
-    v: false // viewer privs
+    v: false
     {%- endif -%}
   };
 

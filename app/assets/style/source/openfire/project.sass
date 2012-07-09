@@ -12,7 +12,6 @@
 	height: 25px
 	width: 300px
 	text-align: left
-	background: blue
 
 #sidebar
 
@@ -45,9 +44,20 @@
 			display: inline
 			position: absolute
 			right: 20px
-			top: 30px
-			width: 90px
+			top: 25px
+			width: 70px
 			text-align: center
+
+			button
+				color: #222
+				padding: 0px
+				margin-right: 3px
+
+				&:hover
+					color: blue !important
+
+				&.following
+					color: green !important
 
 	section
 		min-height: 50px
@@ -133,6 +143,7 @@
 					margin-right: 20px
 					h6
 						margin: 0
+						margin-bottom: 5px !important
 						-webkit-margin-before: 0
 						-webkit-margin-after: 0
 						display: block
@@ -140,6 +151,10 @@
 						line-height: 20px
 						border-bottom: 1px solid #222
 						max-width: 150px
+
+					button
+						margin: 0
+						padding: 0
 
 		#intro
 			background: transparent !important

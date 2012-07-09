@@ -28,7 +28,10 @@ class User(AppModel):
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
     bio = ndb.TextProperty('b', indexed=False)
+    location = ndb.StringProperty('loc', indexed=True)
     customurl = ndb.KeyProperty('url', indexed=True, default=None)
+    permissions = ndb.KeyProperty('prms', indexed=True, repeated=True)
+    email = ndb.KeyProperty('em', indexed=True, repeated=True)
 
     def get_custom_url(self):
         if self.customurl:
