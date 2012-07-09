@@ -157,13 +157,15 @@ a.mod
 
     .tab-link,
     .tab-rounded
-        margin: 0 5px
-        padding: 20px
+        margin: 0 3px
+        padding: 15px 10px
         border: 1px solid #6f6f66
-        border-bottom: none
         +background(linear-gradient(top, #dfdfdd, #eee))
         font-size: 11px
         line-height: 11px
+
+        &.tab-current
+            border-bottom: none !important
 
     .tab-link
         display: inline-block

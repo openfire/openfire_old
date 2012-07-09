@@ -875,10 +875,9 @@ a.mod:active {
 }
 .tabset .tab-link,
 .tabset .tab-rounded {
-  margin: 0 5px;
-  padding: 20px;
+  margin: 0 3px;
+  padding: 15px 10px;
   border: 1px solid #6f6f66;
-  border-bottom: none;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #dfdfdd), color-stop(100%, #eeeeee));
   background: -webkit-linear-gradient(top, #dfdfdd, #eeeeee);
   background: -moz-linear-gradient(top, #dfdfdd, #eeeeee);
@@ -887,6 +886,10 @@ a.mod:active {
   background: linear-gradient(top, #dfdfdd, #eeeeee);
   font-size: 11px;
   line-height: 11px;
+}
+.tabset .tab-link.tab-current,
+.tabset .tab-rounded.tab-current {
+  border-bottom: none !important;
 }
 .tabset .tab-link {
   display: inline-block;

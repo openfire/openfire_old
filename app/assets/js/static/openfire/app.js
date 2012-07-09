@@ -548,7 +548,8 @@
           session: {
             cookie: "ofsession",
             header: "X-AppFactory-Session",
-            timeout: 86400
+            timeout: 86400,
+            cookieless: false
           },
           csrf: {
             cookie: "ofcsrf",
@@ -730,8 +731,10 @@
         this.sys.state.consider_preinit(window.__openfire_preinit);
       }
       if (typeof (_base = this.sys.state).sniff_headers === "function" ? _base.sniff_headers(document) : void 0) {
-        $.apptools.api.internals.config.headers[this.sys.config.csrf.header] = this.sys.state.session.signature;
-        $.apptools.api.internals.config.headers[this.sys.config.session.header] = document.cookie;
+        if (this.sys.config.session.cookieless) {
+          $.apptools.api.internals.config.headers[this.sys.config.csrf.header] = this.sys.state.session.signature;
+          $.apptools.api.internals.config.headers[this.sys.config.session.header] = document.cookie;
+        }
       }
       return this.sys.go();
     }
