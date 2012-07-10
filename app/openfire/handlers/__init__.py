@@ -68,8 +68,11 @@ class WebHandler(BaseHandler, SessionsMixin):
                 response = self.redirect(redirect_url)
 
             else:
+                # Find super
+                _super = super(WebHandler, self)
+
                 # Dispatch method
-                response = super(WebHandler, self).dispatch()
+                response = _super.dispatch()
 
         finally:
             self.save_session()
@@ -132,8 +135,9 @@ class WebHandler(BaseHandler, SessionsMixin):
                     if self.api.users.is_current_user_admin():
                         self.session['root'] = True
         else:
-            self.user = ndb.Key(urlsafe=self.session['ukey']).get()
+            self.user = ndb.Key(urlsafe=self.session['ukey'])
             self.permissions = ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))
+            self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
     def handle_exception2(self, exception, debug):
@@ -162,6 +166,20 @@ class WebHandler(BaseHandler, SessionsMixin):
             return 's:' + e.encrypt(subj)
         except:
             return 'b:' + base64.b64encode(subj)
+
+    def decrypt(self, subj):
+
+        ''' Decrypt some string '''
+
+        try:
+            if 'e:' in subj:
+                from Crypto.Cipher import AES
+                e = AES.new('openfire_internal')
+                return e.decrypt(':'.split(subj)[1])
+        except:
+            pass
+        if 'b:' in subj:
+            return base64.b64decode(':'.split(subj)[1])
 
     def _bindRuntimeTemplateContext(self, context):
 

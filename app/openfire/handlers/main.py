@@ -91,4 +91,10 @@ class CustomUrlHandler(WebHandler):
 
         # Initialize the new handler with the current request and response.
         handler.initialize(self.request, self.response)
+
+        # Copy over session, user, permissions
+        handler.session = self.session
+        handler.user = self.user
+        handler.permissions = self.permissions
+
         return handler.get(**context)
