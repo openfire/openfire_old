@@ -10,7 +10,7 @@ class MailPipeline(TransportPipeline):
 
     ''' Abstract parent class for low-level mail pipelines. '''
 
-    pass
+    api = mail
 
 
 ## SendEmail - sends an email via the AppEngine Mail API
@@ -20,21 +20,21 @@ class SendEmail(MailPipeline):
 
     def run(self, sender, to, subject, body, **kwargs):
 
-		''' Pass through to mail.send_mail. '''
+        ''' Pass through to mail.send_mail. '''
 
-		return mail.send_mail(sender, to, subject, body, **kwargs)
+        return self.api.send_mail(sender, to, subject, body, **kwargs)
 
 
 ## SendAdminsEmail - sends an email to all openfire admins
 class SendAdminsEmail(MailPipeline):
 
-	''' Sends an email to an administrative address. '''
+    ''' Sends an email to an administrative address. '''
 
-	def run(self, sender, subject, body, **kwargs):
+    def run(self, sender, subject, body, **kwargs):
 
-		''' Pass through to mail.send_mail_to_admins. '''
+        ''' Pass through to mail.send_mail_to_admins. '''
 
-		return mail.send_mail_to_admins(sender, subject, body, **kwargs)
+        return self.api.send_mail_to_admins(sender, subject, body, **kwargs)
 
 
 ## IncomingEmail - fired when an email is received by openfire
@@ -44,6 +44,6 @@ class IncomingEmail(MailPipeline):
 
     def run(self, **kwargs):
 
-		''' Process email. '''
+        ''' Process email. '''
 
-		pass
+        pass
