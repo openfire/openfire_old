@@ -55,6 +55,15 @@ class Landing(WebHandler):
         return
 
 
+class VerifyURL(WebHandler):
+
+    ''' Test URL for blitz.io. '''
+
+    def get(self):
+        self.response.write('42')  # that's it folks
+        return
+
+
 class CustomUrlHandler(WebHandler):
 
     ''' openfire custom url handling. '''
@@ -91,4 +100,10 @@ class CustomUrlHandler(WebHandler):
 
         # Initialize the new handler with the current request and response.
         handler.initialize(self.request, self.response)
+
+        # Copy over session, user, permissions
+        handler.session = self.session
+        handler.user = self.user
+        handler.permissions = self.permissions
+
         return handler.get(**context)

@@ -26,12 +26,12 @@ def run(environment):
         if context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'api'), 'users'), 'is_current_user_admin')):
             if 0: yield None
             yield u'<script src="%s"></script>' % (
-                context.call(environment.getattr(l_asset, 'script'), 'app', 'openfire'), 
+                context.call(environment.getattr(l_asset, 'script'), 'admin', 'openfire'), 
             )
         else:
             if 0: yield None
             yield u'<script src="%s"></script>' % (
-                context.call(environment.getattr(l_asset, 'script'), 'admin', 'openfire'), 
+                context.call(environment.getattr(l_asset, 'script'), 'app', 'openfire'), 
             )
         yield u'\n<script id=\'google-jssdk\' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>\n<script id=\'facebook-jssdk\' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script>\n\n\n'
         if (environment.getattr(l_page, 'services') or environment.getattr(l_page, 'analytics')):
