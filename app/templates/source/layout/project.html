@@ -11,12 +11,27 @@
     </div><!-- #masthead -->
 
     <div id='content'>
+        <div id="fb-root"></div>
         <div id='project'>
 
             <div id='welcomebox'>
+                <div id='promote'>
+                </div>
                 {% block media %}
                     {% if video %}
-                        <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                        {% if video.provider == 'vimeo' %}
+                            {% if video.ext_id %}
+                                <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% else %}
+                                <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% endif %}
+                        {% else %}
+                            {% if video.provider == 'youtube' %}
+                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                            {% else %}
+                                <img src="http://placehold.it/640x360/222222&text=video" />
+                            {% endif %}
+                        {% endif %}
                     {% else %}
                         <img src="http://placehold.it/640x360/222222&text=video" />
                     {% endif %}
@@ -27,50 +42,155 @@
                 <header>
                     <div id='sidetitle' class='fancy title'><h1>{{ project.name }}</h1></div>
                     <div id='sidebuttons' class='buttons'>
-                        <form class='rpctrigger' action="#" method="POST">
-                            <button id='follow'>Follow</button>
-                        </form>
+                        <button id='follow' class='momentron{%- if project.current_user_following -%} following{%- endif -%}'>&#xf007f;</button>
+                        <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
-                </header>
+                </header> <!-- end header -->
                 <section id='quickinfo'>
                     {% block right %}
-                        <b>project owners:</b>
-                        <ul>
-                            {% for owner in project.owners %}
-                                <li>{{ owner.id() }}</li>
-                            {% endfor %}
-                        </ul>
-                        <br />
-                        <b>technology:</b>
-                        <p>{{ project.tech }}
+
+						<div id='global_progress'>
+							<!-- project progress -->
+							<div id='progress' data-value="{{ project.progress }}" data-max="100">
+								<div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
+							</div>
+						</div><!-- end #global_progress -->
+
+						<div id='project_goals'>
+							{% if project.goals %}
+	                        <ul class='naked'>
+								{% for goal in goals %}
+									<li>
+										<b>{{ currency(goal.amount) }}</b>
+									</li>
+								{% endfor %}
+	                        </ul>
+							{% else %}
+								<b>no project goals yet! :(</b>
+							{% endif %}
+						</div> <!-- end #project_goals -->
+
+						<div id='project_tiers'>
+							{% if project.tiers %}
+							<ul class='naked'>
+								{% for tier in tiers %}
+									<li>
+										<b>{{ tier.name }} - {{ currency(tier.amount) }}</b>
+									</li>
+							    {% endfor %}
+							 </ul>
+
+							{% else %}
+								<b>no project tiers yet! :(</b>
+							{% endif %}
+						</div>
+
                     {% endblock %}
-                </section>
-            </div>
+                </section> <!-- end #quickinfo -->
+                <section id='backers'>
+                    <div id='backproject'>
+                        <button id='back'>Back</button>
+                    </div> <!-- end #backproject -->
+                    <div id='backer_summary'>
+                        backerz
+                    </div> <!-- end #backer_summary -->
+                </section> <!-- end #backers -->
+
+                <div id='owners'>
+		            <b>project owners:</b>
+		            <ul class='naked'>
+		                {% for owner in owners %}
+		                    <li>
+								<div class='ownercard'>
+									<img src="{{ gravatarify(owner.key.id(), 'jpg', '32') }}" width='32' height='32' alt='{{ owner.key.id() }}' />
+
+									<div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
+										{%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+										{%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+										{%- endif -%}
+										{%- if owner.location -%}
+											<span class='location byline'>{{ owner.location }}</span>
+										{%- endif -%}
+									</div>
+								</div>
+							</li>
+		                {% endfor %}
+		            </ul>
+		        </div> <!-- end #owners -->
+            </div> <!-- end #sidebar -->
 
             <article id='deets'>
 
                 <!-- project title -->
-                <h1>{{ project.name }}</h1>
+                <div id='projecttitle'>
+                    <h1>{{ project.name }}</h1>
+                    <div id='deetactions'>
+                        <div class='buttongroup'>
+                            <h6>Share This</h6>
+                            <button id='fbshare' class='zocial facebook sharebutton icon'></button>
+                            <button id='twshare' class='zocial twitter sharebutton icon'></button>
+                            <button id='g+share' class='zocial googleplus sharebutton icon'></button>
+                        </div> <!-- end .buttongroup -->
+                    </div> <!-- end #deetactions -->
+                </div> <!-- end #projecttitle -->
 
                 <!-- intro/pitch -->
-                <section id='intro'>
+                <section id='intro' class='prsection'>
+                    <h2>Project Intro</h2>
                     {% block description %}
                       <p>{{ project.summary }}</p>
                     {% endblock %}
                 </section><!-- end #intro -->
 
-            </article><!-- end #project -->
+                <!-- technologies -->
+                <section id='technologies' class='prsection'>
+                    <h2>Technologies</h2>
+                    <p>{{ project.tech }}</p>
+                </section><!-- end #technologies -->
 
+                <!-- team -->
+                <section id='team' class='prsection'>
+                    <h2>Team</h2>
+                    <p>TEAM</p>
+                </section><!-- end #team -->
+
+            </article><!-- end #project -->
         </div><!-- end #content -->
     </div>
 
 {% endblock %}
 
-{% block postsouth %}
-<script type='text/javascript'>
+{% block presouth %}
+<script>
 
-$(document).ready(function () {
-});
+  // openfire project init
+  window._cp = {
+    ke: '{{ encrypt(project.key.urlsafe()) }}',
+    {%- if util.config.debug -%}
+    kd: '{{ project.key.urlsafe() }}',
+    {%- endif -%}
+    i: {{ project.key.id() }},
+    {%- if project.current_user_following -%}
+    f: true,
+    {%- else -%}
+    f: false,
+    {%- endif -%}
+    {%- if project.current_user_backed -%}
+    b: true,
+    {%- else -%}
+    b: false,
+    {%- endif -%}
+    {%- if security.current_user.key in project.owners -%}
+    o: true,
+    {%- else -%}
+    o: false,
+    {%- endif -%}
+    {%- if security.current_user.key in project.viewers -%}
+    v: true
+    {%- else -%}
+    v: false
+    {%- endif -%}
+  };
 
 </script>
-{% endblock postsouth %}
+{% endblock %}

@@ -6,6 +6,8 @@
     position: fixed
 .absolute
     position: absolute
+.relative
+    position: relative
 .dropshadow
     box-shadow: 2px 2px 3px #333333
 
@@ -144,3 +146,34 @@ a.mod
     & p
         padding: 0px 7px
 
+// Tabset styles
+
+.tabset
+    text-align: center
+
+    .tab-rounded
+        border-top-left-radius: 5px
+        border-top-right-radius: 5px
+
+    .tab-link,
+    .tab-rounded
+        margin: 0 3px
+        padding: 15px 10px
+        border: 1px solid #6f6f66
+        +background(linear-gradient(top, #dfdfdd, #eee))
+        font-size: 11px
+        line-height: 11px
+
+        &.tab-current
+            border-bottom: none !important
+
+    .tab-link
+        display: inline-block
+
+    .tab
+        top: 52px
+        right: 0px
+        bottom: 0px
+        left: 0px
+        text-align: left
+        background-color: #eee

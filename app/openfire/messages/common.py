@@ -27,6 +27,31 @@ class Categories(messages.Message):
     categories = messages.MessageField(Category, 1, repeated=True)
 
 
+class CustomUrl(messages.Message):
+
+    ''' A message to be used for custom urls. '''
+
+    key = messages.StringField(1)
+    slug = messages.StringField(2)
+    target = messages.StringField(3)
+
+
+class CustomUrls(messages.Message):
+
+    ''' A list of custom urls. '''
+
+    urls = messages.MessageField(CustomUrl, 1, repeated=True)
+
+
+class CustomUrlCheck(messages.Message):
+
+    ''' A message to be used for custom url check responses. '''
+
+    slug = messages.StringField(1)
+    taken = messages.BooleanField(2)
+    suggestions = messages.StringField(3, repeated=True)
+
+
 class Goal(messages.Message):
 
     ''' Common to proposals and projects, defines a funding goal. '''

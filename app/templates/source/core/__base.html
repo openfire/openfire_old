@@ -19,6 +19,7 @@
 <head>
 	{% block head %}
 		{% block meta %}
+
 		<!-- Meta -->
 		<meta charset="utf-8">
 		<meta http-equiv="Vary" content="encoding">
@@ -31,42 +32,43 @@
 		{% endif %}
 
 		<!-- Info -->
-		<meta name="author" content="">
-		<meta name="publisher" content="">
-		<meta name="keywords" content="">
-		<meta name="copyright" content="">
-		<meta name="description" content="">
-		<meta name="application-name" content="AppTools">
-		<meta name="google-site-verification" content="" />
-		<meta name="robots" content="index, follow">
+		<meta name="author" content="{%- block meta_author -%}{{ _meta.get('author') }}{%- endblock meta_author -%}">
+		<meta name="publisher" content="{%- block meta_publisher -%}{{ _meta.get('publisher') }}{%- endblock meta_publisher -%}">
+		<meta name="keywords" content="{%- block meta_keywords -%}{{ ','.join(_meta.get('keywords', [])) }}{%- endblock meta_keywords -%}">
+		<meta name="copyright" content="{%- block meta_copyright -%}{{ _meta.get('copyright') }}{%- endblock meta_copyright -%}">
+		<meta name="description" content="{%- block meta_description -%}{{ _meta.get('description') }}{%- endblock meta_description -%}">
+		<meta name="application-name" content="openfire">
+		{% if _meta.get('google', {}).get('site_verification', False) %}<meta name="google-site-verification" content="{{ _meta.get('google').get('site_verification') }}" />{% endif %}
+		<meta name="robots" content="{{ _meta.get('robots', 'index,follow') }}">
 		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,height=device-height">
-		<meta name="revisit-after" content="7 days">
-		<!-- keyword,keyword,keyword -->
+		<meta name="revisit-after" content="{{ _meta.get('revisit', '7 days') }}">
+		<!-- disruption,technology,crowdfunding -->
 
 		{% block opengraph %}
 		<!-- OpenGraph -->
-		<meta property="og:title" content="" />
-		<meta property="og:type" content="website" />
-		<meta property="og:determiner" content="" />
-		<meta propert="og:locale" content="en_US" />
-		<meta property="og:url" content="{{ page.url }}" />
-		<meta property="og:description" content="" />
-		<meta property="og:image" content="" />
+		<meta property="og:title" content="{%- block og_title -%}{{ _opengraph.get('title') }}{%- endblock og_title -%}" />
+		<meta property="og:type" content="{%- block og_type -%}{{ _opengraph.get('type') }}{%- endblock og_type -%}" />
+		<meta property="og:determiner" content="{%- block og_determiner -%}{{ _opengraph.get('determiner') }}{%- endblock og_determiner -%}" />
+		<meta propert="og:locale" content="{%- block og_locale -%}{{ _opengraph.get('locale', 'en_US') }}{%- endblock og_locale -%}" />
+		<meta property="og:url" content="{%- block og_url -%}{%- if page.url -%}{{ page.url }}{%- else -%}{{ _opengraph.get('url') }}{%- endif -%}{%- endblock og_url -%}" />
+		<meta property="og:description" content="{%- block og_description -%}{{ _meta.get('description') }}{%- endblock og_description -%}" />
+		<meta property="og:image" content="{%- block og_image -%}{%- if page.image -%}{{ page.image }}{%- else -%}{{ _opengraph.get('image') }}{%- endif -%}{%- endblock og_image -%}" />
 		<meta property="og:image:width" content="298" />
 		<meta property="og:image:height" content="298" />
-		<meta property="og:site_name" content="" />
-		<meta property="fb:app_id" content="" />
+		<meta property="og:site_name" content="{%- block og_sitename -%}{{ _opengraph.get('site_name') }}{%- endblock og_sitename -%}" />
+		<meta property="fb:app_id" content="{%- block og_fb_appid -%}{{ _opengraph.get('facebook', {}).get('app_id') }}{%- endblock og_fb_appid -%}" />
+		<meta property="fb:admins" content="{%- block og_fb_admins -%}{{ ','.join(_opengraph.get('facebook', {}).get('admins')) }}{%- endblock og_fb_admins -%}" />
 
 		<!-- Location/Geo -->
-		<meta property="og:latitude" content="">
-		<meta property="og:longitude" content="">
-		<meta property="og:street-address" content="">
-		<meta property="og:locality" content="">
-		<meta property="og:region" content="">
-		<meta property="og:postal-code" content="">
-		<meta property="og:country-name" content="">
-		<meta property="og:email" content="">
-		<meta property="og:phone_number" content="">
+		<meta property="og:latitude" content="{%- block og_latitude -%}{{ _location.get('latitude') }}{%- endblock og_latitude -%}">
+		<meta property="og:longitude" content="{%- block og_longitude -%}{{ _location.get('longitude') }}{%- endblock og_longitude -%}">
+		<meta property="og:street-address" content="{%- block og_address -%}{{ _location.get('address') }}{%- endblock og_address -%}">
+		<meta property="og:locality" content="{%- block og_locality -%}{{ _location.get('locality') }}{%- endblock og_locality -%}">
+		<meta property="og:region" content="{%- block og_region -%}{{ _location.get('region') }}{%- endblock og_region -%}">
+		<meta property="og:postal-code" content="{%- block og_zipcode -%}{{ _location.get('zipcode') }}{%- endblock og_zipcode -%}">
+		<meta property="og:country-name" content="{%- block og_country -%}{{ _location.get('country') }}{%- endblock og_country -%}">
+		<meta property="og:email" content="{%- block og_email -%}{{ _location.get('email') }}{%- endblock og_email -%}">
+		<meta property="og:phone_number" content="{%- block og_phone -%}{{ _location.get('phone') }}{%- endblock og_phone -%}">
 		{% endblock %}
 
 		{%- block mobile -%}

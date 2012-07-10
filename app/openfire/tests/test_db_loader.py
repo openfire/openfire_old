@@ -1,4 +1,6 @@
 from openfire.models.project import Proposal, Project, Category
+from openfire.models.assets import CustomURL
+from openfire.models.user import User
 from google.appengine.ext import ndb
 
 '''
@@ -31,3 +33,11 @@ def create_project(name='Test Project', status='o', public=True,
                     pitch=pitch, tech=tech, keywords=keywords, proposal=proposal,
                     category=category, creator=creator
                     ).put()
+
+
+def create_custom_url(slug='test', target_kind='Project', target_id='1'):
+    return CustomURL(key=ndb.Key('CustomURL', slug), slug=slug, target=ndb.Key(target_kind, target_id)).put()
+
+
+def create_user(username='fake', firstname='Fakie', lastname='McFakerton', bio='some bio'):
+    return User(key=ndb.Key('User', username), username=username, firstname=firstname, lastname=lastname, bio=bio).put()

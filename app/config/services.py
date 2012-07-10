@@ -108,7 +108,6 @@ config['apptools.project.services'] = {
                 'security': 'private',
                 'recording': 'none'
             }
-
         },
 
         ## Category API - provides structured information about openfire categories
@@ -126,15 +125,41 @@ config['apptools.project.services'] = {
 
         ## Content API - allows saving/retrieving of small content snippets
         'content': {
-			'enabled': True,
-			'service': 'openfire.services.content.ContentService',
-			'methods': ['save_snippet', 'get_snippet'],
+            'enabled': True,
+            'service': 'openfire.services.content.ContentService',
+            'methods': ['save_snippet', 'get_snippet'],
 
-			'config': {
-				'caching': 'none',
-				'security': 'none',
-				'recording': 'none'
-			}
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
+        ## URL API - Add, delete, and update custom urls.
+        'url': {
+            'enabled': True,
+            'service': 'openfire.services.url.CustomUrlService',
+            'methods': ['get', 'list', 'put', 'delete', 'check'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
+        ## Media API - Add, delete, and update for images, videos, and scripts.
+        'media': {
+            'enabled': True,
+            'service': 'openfire.services.media.MediaService',
+            'methods': ['generate_endpoint', 'attach_image', 'attach_avatar', 'attach_video'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
         },
 
         ## Indexer API - allows programmatic control of openfire's content indexer

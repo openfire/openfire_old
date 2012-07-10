@@ -2,6 +2,7 @@
 from openfire.handlers import WebHandler
 from openfire.models.project import Category, Proposal, Project
 from openfire.models.user import User
+from openfire.models.assets import CustomURL
 
 
 class Moderate(WebHandler):
@@ -12,9 +13,11 @@ class Moderate(WebHandler):
 
         ''' Render moderate.html. '''
 
-        categories = Category.query().fetch()
-        proposals = Proposal.query().fetch()
-        projects = Project.query().fetch()
-        users = User.query().fetch()
-        self.render('bbq/moderate.html', categories=categories, proposals=proposals, projects=projects, users=users)
-        return
+        context = {
+            'categories': Category.query().fetch(),
+            'proposals': Proposal.query().fetch(),
+            'projects': Project.query().fetch(),
+            'users': User.query().fetch(),
+            'custom_urls': CustomURL.query().fetch(),
+        }
+        return self.render('bbq/moderate.html', **context)

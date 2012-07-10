@@ -22,7 +22,18 @@ def run(environment):
             yield u'<script src="%s"></script>' % (
                 context.call(environment.getattr(l_asset, 'script'), 'base', 'apptools'), 
             )
-        yield u'\n\n\n'
+        yield u'<!-- Project Scripts -->'
+        if context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'api'), 'users'), 'is_current_user_admin')):
+            if 0: yield None
+            yield u'<script src="%s"></script>' % (
+                context.call(environment.getattr(l_asset, 'script'), 'admin', 'openfire'), 
+            )
+        else:
+            if 0: yield None
+            yield u'<script src="%s"></script>' % (
+                context.call(environment.getattr(l_asset, 'script'), 'app', 'openfire'), 
+            )
+        yield u'\n<script id=\'google-jssdk\' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>\n<script id=\'facebook-jssdk\' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script>\n\n\n'
         if (environment.getattr(l_page, 'services') or environment.getattr(l_page, 'analytics')):
             if 0: yield None
             yield u'<script>\n'
@@ -42,7 +53,7 @@ def run(environment):
             included_template = environment.get_template('macros/page_object.js', '/source/core/__south.html').module
             l_build_page_object = getattr(included_template, 'build_page_object', missing)
             if l_build_page_object is missing:
-                l_build_page_object = environment.undefined("the template %r (imported on line 26 in '/source/core/__south.html') does not export the requested name 'build_page_object'" % included_template.__name__, name='build_page_object')
+                l_build_page_object = environment.undefined("the template %r (imported on line 35 in '/source/core/__south.html') does not export the requested name 'build_page_object'" % included_template.__name__, name='build_page_object')
             yield u'\n\t'
             yield to_string(context.call(l_build_page_object, environment.getattr(environment.getattr(l_page, 'services'), 'services_manifest'), environment.getattr(environment.getattr(l_page, 'services'), 'config'), l_page))
 
@@ -58,10 +69,10 @@ def run(environment):
                 included_template = environment.get_template('macros/page_analytics.js', '/source/core/__south.html').module
                 l_google_analytics_async = getattr(included_template, 'google_analytics_async', missing)
                 if l_google_analytics_async is missing:
-                    l_google_analytics_async = environment.undefined("the template %r (imported on line 34 in '/source/core/__south.html') does not export the requested name 'google_analytics_async'" % included_template.__name__, name='google_analytics_async')
+                    l_google_analytics_async = environment.undefined("the template %r (imported on line 43 in '/source/core/__south.html') does not export the requested name 'google_analytics_async'" % included_template.__name__, name='google_analytics_async')
                 yield u'\n\t\t'
                 yield to_string(context.call(l_google_analytics_async, environment.getattr(l_page, 'analytics')))
 
     blocks = {'page_services': block_page_services, 'page_analytics': block_page_analytics}
-    debug_info = '2=12&5=13&6=14&7=15&12=17&15=23&22=26&24=29&31=32&24=36&25=40&26=42&27=47&31=49&32=54&33=56&34=58&35=63'
+    debug_info = '2=12&5=13&6=14&7=15&12=17&15=23&19=26&20=29&22=34&31=37&33=40&40=43&33=47&34=51&35=53&36=58&40=60&41=65&42=67&43=69&44=74'
     return locals()

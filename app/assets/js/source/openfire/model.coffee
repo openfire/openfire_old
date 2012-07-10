@@ -1,11 +1,13 @@
 ## Openfire models
 
 # represents javascript key
-class Key extends Model
-    constructor: () ->
+class Key # extends Model
+
+    constructor: (@key) ->
+        return @
 
 # A single project card
-class ProjectCard extends Model
+class ProjectCard # extends Model
 
     name: String()
     project: Key()
@@ -14,7 +16,7 @@ class ProjectCard extends Model
     met: Boolean()
 
 # an activity feed item
-class ActivityItem extends Model
+class ActivityItem # extends Model
 
     timestamp: Date()
     project: Key()
@@ -69,7 +71,7 @@ class Comment extends ActivityItem
     text: String()
 
 # Login dialogue - does sam want to fill these out?
-class Login extends Model
+class Login # extends Model
 
 # Signup - same as ^^^?
-class Signup extends Model
+class Signup # extends Model

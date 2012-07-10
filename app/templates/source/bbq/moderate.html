@@ -3,10 +3,47 @@
 {% block moderate %}
 <div style="padding-bottom: 75px;">
     <h1>We decide all!</h1>
+
+    <div id="drop-image-here" class="pre-uploader editable" style="width:200px; height:200px; border: 1px solid;">
+        DROP AVATAR HERE
+    </div>
+
+{#
     {% include "bbq/bbq_categories.html" %}
-
     {% include "bbq/bbq_proposals.html" %}
-
     {% include "bbq/bbq_projects.html" %}
+    {% include "bbq/bbq_custom_urls.html" %}
+#}
+
+    <div id="bbq-tabs-container" class="pre-tabs" data-options='{"width":"800px"}'>
+
+        <a href="#bbq-tab-1">Categories</a>
+        <a href="#bbq-tab-2">Proposals</a>
+        <a href="#bbq-tab-3">Projects</a>
+        <a href="#bbq-tab-4">Custom URLs</a>
+
+        <div id="bbq-tab-1" style="opacity: 0;">
+            {% include "bbq/bbq_categories.html" %}
+        </div>
+        <div id="bbq-tab-2" style="opacity: 0;">
+            {% include "bbq/bbq_proposals.html" %}
+        </div>
+        <div id="bbq-tab-3" style="opacity: 0;">
+            {% include "bbq/bbq_projects.html" %}
+        </div>
+        <div id="bbq-tab-4" style="opacity: 0;">
+            {% include "bbq/bbq_custom_urls.html" %}
+        </div>
+
+    </div>
+
 </div>
+{% endblock %}
+
+{% block postsouth %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $.apptools.widgets.tabs._init();
+        });
+    </script>
 {% endblock %}

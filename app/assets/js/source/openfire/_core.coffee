@@ -23,12 +23,19 @@ class OpenfireController
 # openfire exception: base error for openfire-level errors
 class OpenfireException extends Error
 
-    constructor: (@controller, @message, @context) ->
+    constructor: (@controller, @message) ->
+
     toString: () ->
         return '[' + @controller + '] OpenfireException: ' + @message
 
+class MediaError extends OpenfireException
+class UserPermissionsError extends OpenfireException
 
+Util = new window.Util()
 
 @__openfire_preinit.abstract_base_objects.push OpenfireObject
 @__openfire_preinit.abstract_base_controllers.push OpenfireController
 @__openfire_preinit.abstract_base_classes.push OpenfireException
+
+@__openfire_preinit.abstract_base_classes.push MediaError
+@__openfire_preinit.abstract_base_classes.push UserPermissionsError

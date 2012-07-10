@@ -30,7 +30,7 @@ class ProposalHome(WebHandler):
 
     ''' openfire proposal home page. '''
 
-    def get(self, token):
+    def get(self, key):
 
         ''' Render proposal_home.html. '''
 

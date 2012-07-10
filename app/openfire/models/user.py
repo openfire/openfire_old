@@ -5,9 +5,6 @@ from google.appengine.ext import ndb
 from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
 
-# Model Imports
-from openfire.models.assets import Avatar
-
 # Model Attachments
 from openfire.messages import user as messages
 from openfire.pipelines.model import user as pipelines
@@ -23,18 +20,21 @@ class User(AppModel):
     _message_class = messages.User
     _pipeline_class = pipelines.UserPipeline
 
+    user = ndb.UserProperty('usr', indexed=True)
     username = ndb.StringProperty('u', indexed=True)
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
     bio = ndb.TextProperty('b', indexed=False)
+    location = ndb.StringProperty('loc', indexed=True)
+    customurl = ndb.KeyProperty('url', indexed=True, default=None)
+    permissions = ndb.KeyProperty('prms', indexed=True, repeated=True)
+    email = ndb.KeyProperty('em', indexed=True, repeated=True)
+    avatar = ndb.KeyProperty('av', repeated=True)
 
-
-## UserAvatar - links an avatar resource to a user profile
-class UserAvatar(Avatar):
-
-    ''' Maps an avatar to a user. '''
-
-    user = ndb.KeyProperty('u', indexed=True, required=True)
+    def get_custom_url(self):
+        if self.customurl:
+            return self.customurl.id()
+        return None
 
 
 ## EmailAddress - links an email address to a user, for the purpose of signin/notifications/contact
@@ -47,7 +47,7 @@ class EmailAddress(AppModel):
 
     user = ndb.KeyProperty('u', indexed=True)
     address = ndb.StringProperty('e', indexed=True)
-    label = ndb.StringProperty('l', indexed=False, choices=['w', 'p', 'o'], default='p')  # work, personal & other
+    label = ndb.StringProperty('l', indexed=False, choices=['d', 'w', 'p', 'o'], default='p')  # work, personal & other
     notify = ndb.BooleanProperty('n', indexed=True, default=False)  # use this email to notify?
     jabber = ndb.BooleanProperty('j', indexed=True, default=False)  # use this email for jabber?
     gravatar = ndb.BooleanProperty('g', indexed=True, default=False)  # use this email for gravatar?

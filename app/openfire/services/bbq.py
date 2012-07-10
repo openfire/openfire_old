@@ -11,7 +11,7 @@ class BBQService(RemoteService):
 
         ''' Grant a permission. '''
 
-        return Echo('Granted')
+        return Echo(message='Granted')
 
 
     @remote.method(message_types.VoidMessage, Echo)
@@ -19,7 +19,7 @@ class BBQService(RemoteService):
 
         ''' Revoke a permission. '''
 
-        return Echo('Revoked')
+        return Echo(message='Revoked')
 
 
     @remote.method(message_types.VoidMessage, Echo)
@@ -27,7 +27,7 @@ class BBQService(RemoteService):
 
         ''' Flush memcache. '''
 
-        return Echo('Flush cache')
+        return Echo(message='Flush cache')
 
 
     @remote.method(message_types.VoidMessage, Echo)
@@ -35,4 +35,4 @@ class BBQService(RemoteService):
 
         ''' Create a user. '''
 
-        return Echo('Create user')
+        return Echo(message='Create user')

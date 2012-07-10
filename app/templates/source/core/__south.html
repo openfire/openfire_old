@@ -17,10 +17,15 @@
 
 <!-- Project Scripts -->
 {%- if util.api.users.is_current_user_admin() -%}
-<script src="{{ asset.script('app', 'openfire') }}"></script>
-{%- else -%}
 <script src="{{ asset.script('admin', 'openfire') }}"></script>
+{%- else -%}
+<script src="{{ asset.script('app', 'openfire') }}"></script>
 {%- endif -%}
+
+{# <!-- Ext Scripts --> #}
+<script id='google-jssdk' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<script id='facebook-jssdk' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script>
+
 
 {# <!-- Services Manifest --> #}
 {%- if page.services or page.analytics -%}

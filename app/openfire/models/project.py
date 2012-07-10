@@ -13,6 +13,9 @@ from openfire.messages import proposal
 from openfire.pipelines.model import project as pipelines
 
 
+_default_contribution_type = ndb.Key('ContributionType', 'money')
+
+
 ######## ======== Top-Level Project Models ======== ########
 
 ## Project Categories
@@ -35,6 +38,41 @@ class Category(AppModel):
     # Counts
     project_count = ndb.IntegerProperty('pc', indexed=True, default=0)
     backer_count = ndb.IntegerProperty('bc', indexed=True, default=0)
+
+
+## Contribution Goals
+class Goal(AppModel):
+
+    ''' Represents a contribution goal for an openfire project. '''
+
+    _message_class = common.Goal
+    _pipeline_class = pipelines.GoalPipeline
+
+    target = ndb.KeyProperty('t', indexed=True, default=None)
+    contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
+    amount = ndb.IntegerProperty('a', indexed=True, required=True)
+    description = ndb.TextProperty('d', indexed=False)
+    backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
+    progress = ndb.IntegerProperty('pg', indexed=True, choices=range(0, 100), default=0)
+    met = ndb.BooleanProperty('m', indexed=True, default=False)
+
+
+## Contribution Tiers
+class Tier(AppModel):
+
+    ''' Represents a contribution tier for an openfire project. '''
+
+    _message_class = common.Tier
+    _pipeline_class = pipelines.TierPipeline
+
+    name = ndb.StringProperty('n', indexed=False)
+    target = ndb.KeyProperty('t', indexed=True, default=None)
+    contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
+    amount = ndb.IntegerProperty('a', indexed=True, required=True)
+    description = ndb.TextProperty('pd', indexed=False)
+    delivery = ndb.DateProperty('d', indexed=True)
+    backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
+    backer_limit = ndb.IntegerProperty('l', indexed=True, default=0)
 
 
 ## Project Proposals
@@ -64,6 +102,10 @@ class Proposal(AppModel):
     public = ndb.BooleanProperty('pp', indexed=True, default=False)
     viewers = ndb.KeyProperty('pv', indexed=True, repeated=True)
 
+    # Tiers + Goals
+    tiers = ndb.LocalStructuredProperty(Tier, 'tr', repeated=True, compressed=True)
+    goals = ndb.LocalStructuredProperty(Goal, 'gl', repeated=True, compressed=True)
+
 
 ## Projects
 class Project(AppModel):
@@ -78,6 +120,7 @@ class Project(AppModel):
     status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c'])  # private, featured, open, closed
     proposal = ndb.KeyProperty('pr', indexed=True, required=True)
     category = ndb.KeyProperty('ct', indexed=True, required=True)
+    customurl = ndb.KeyProperty('url', indexed=True, default=None)
 
     # Content
     summary = ndb.StringProperty('m', indexed=True)
@@ -97,42 +140,23 @@ class Project(AppModel):
     backers = ndb.IntegerProperty('b', default=0)
     followers = ndb.IntegerProperty('f', default=0)
     money = ndb.IntegerProperty('mn', default=0)
-    progress = ndb.IntegerProperty('pr', default=0, choices=set(range(0, 100)))
+    progress = ndb.IntegerProperty('pro', default=0, choices=frozenset(range(0, 100)))
+
+    # Tiers + Goals
+    tiers = ndb.KeyProperty('tr', repeated=True)
+    goals = ndb.KeyProperty('gl', repeated=True)
+
+    # Avatar + Media
+    avatar = ndb.KeyProperty('av', repeated=True)
+    video = ndb.KeyProperty('vi', repeated=True)
 
     def is_private(self):
-        return self.status == 'p'
+        return (self.status not in ['p', 'c']) or self.public
 
-
-## Contribution Goals
-class Goal(AppModel):
-
-    ''' Represents a contribution goal for an openfire project. '''
-
-    _message_class = common.Goal
-    _pipeline_class = pipelines.GoalPipeline
-
-    target = ndb.KeyProperty('t', indexed=True, required=True)
-    contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
-    amount = ndb.IntegerProperty('a', indexed=True, required=True)
-    description = ndb.TextProperty('d', indexed=False)
-    backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
-    progress = ndb.IntegerProperty('pg', indexed=True, choices=range(0, 100), default=0)
-    met = ndb.BooleanProperty('m', indexed=True, default=False)
-
-
-## Contribution Tiers
-class Tier(AppModel):
-
-    ''' Represents a contribution tier for an openfire project. '''
-
-    _message_class = common.Tier
-    _pipeline_class = pipelines.TierPipeline
-
-    target = ndb.KeyProperty('t', indexed=True, required=True)
-    contribution_type = ndb.KeyProperty('p', indexed=True, required=True)
-    amount = ndb.IntegerProperty('a', indexed=True, required=True)
-    description = ndb.TextProperty('d', indexed=False)
-    backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
+    def get_custom_url(self):
+        if self.customurl:
+            return self.customurl.id()
+        return None
 
 
 ######## ======== Project Submodels ======== ########

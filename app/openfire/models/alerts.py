@@ -9,6 +9,7 @@ from openfire.messages import alerts as messages
 from openfire.pipelines.model import alerts as pipelines
 
 
+## Alert - represents a notification to a user of a subscription match
 class Alert(AppModel):
 
     ''' Represents an alert (or a set of alerts) sent to a user. '''

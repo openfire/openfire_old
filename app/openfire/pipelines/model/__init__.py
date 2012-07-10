@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from openfire.pipelines import AppPipeline
 
 
+## ModelPipeline - abstract parent for all model-triggered pipelines
 class ModelPipeline(AppPipeline):
 
     ''' Abstract parent for all model-triggered pipelines. '''

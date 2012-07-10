@@ -19,8 +19,8 @@ def run(environment):
 
     def block_stylesheets(context, environment=environment):
         if 0: yield None
-        yield u'\n\t<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Satisfy">\n\t<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic">\n'
+        yield u'\n'
 
     blocks = {'stylesheets': block_stylesheets}
-    debug_info = '2=11&7=14&8=17&2=20'
+    debug_info = '2=11&5=14&6=17&2=20'
     return locals()

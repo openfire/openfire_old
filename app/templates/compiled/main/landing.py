@@ -14,7 +14,7 @@ def run(environment):
 
     def block_postsouth(context, environment=environment):
         if 0: yield None
-        yield u'\n<script type="text/javascript">\n$(document).ready(function () {\n\t$.apptools.widgets.modal._init();\n});\n</script>\n'
+        yield u'\n<script type="text/javascript">\n$(document).ready(function () {\n\t//$.apptools.widgets.modal._init();\n    //$.apptools.widgets.tabs._init();\n});\n</script>\n'
 
     blocks = {'postsouth': block_postsouth}
     debug_info = '1=9&3=15'
