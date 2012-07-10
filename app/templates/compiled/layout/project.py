@@ -60,40 +60,44 @@ def run(environment):
         l_tiers = context.resolve('tiers')
         l_goals = context.resolve('goals')
         if 0: yield None
-        yield u'\n\n                        <b>project tiers:</b>\n\t\t\t\t\t\t'
-        if environment.getattr(l_project, 'tiers'):
-            if 0: yield None
-            yield u"\n\t\t\t\t\t\t<ul class='naked'>\n\t\t\t\t\t\t\t"
-            l_tier = missing
-            l_currency = context.resolve('currency')
-            for l_tier in l_tiers:
-                if 0: yield None
-                yield u'\n\t\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t\t<b>%s - %s</b>\n\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t    ' % (
-                    environment.getattr(l_tier, 'name'), 
-                    context.call(l_currency, environment.getattr(l_tier, 'amount')), 
-                )
-            l_tier = missing
-            yield u'\n\t\t\t\t\t\t </ul>\n\n\t\t\t\t\t\t'
-        else:
-            if 0: yield None
-            yield u'\n\t\t\t\t\t\t\t<br /><b>no project tiers yet! :(</b><br />\n\t\t\t\t\t\t'
-        yield u'\n\t\t\t\t\t\t<br />\n\n\t\t\t\t\t\t<b>project goals:</b>\n\t\t\t\t\t\t'
+        yield u'\n\n\t\t\t\t\t\t<div id=\'global_progress\'>\n\t\t\t\t\t\t\t<!-- project progress -->\n\t\t\t\t\t\t\t<div id=\'progress\' data-value="%s" data-max="100">\n\t\t\t\t\t\t\t\t<div id=\'progress-inner\' style=\'width: %s%%;\'>%s%%</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div><!-- end #global_progress -->\n\n\t\t\t\t\t\t<div id=\'project_goals\'>\n\t\t\t\t\t\t\t' % (
+            environment.getattr(l_project, 'progress'), 
+            environment.getattr(l_project, 'progress'), 
+            environment.getattr(l_project, 'progress'), 
+        )
         if environment.getattr(l_project, 'goals'):
             if 0: yield None
-            yield u"\n                        <ul class='naked'>\n\t\t\t\t\t\t\t"
+            yield u"\n\t                        <ul class='naked'>\n\t\t\t\t\t\t\t\t"
             l_goal = missing
             l_currency = context.resolve('currency')
             for l_goal in l_goals:
                 if 0: yield None
-                yield u'\n\t\t\t\t\t\t\t\t<li><b>%s</b></li>\n\t\t\t\t\t\t\t' % (
+                yield u'\n\t\t\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t\t\t<b>%s</b>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t' % (
                     context.call(l_currency, environment.getattr(l_goal, 'amount')), 
                 )
             l_goal = missing
-            yield u'\n                        </ul>\n\t\t\t\t\t\t'
+            yield u'\n\t                        </ul>\n\t\t\t\t\t\t\t'
         else:
             if 0: yield None
-            yield u'\n\t\t\t\t\t\t\t<br /><b>no project goals yet! :(</b><br />\n\t\t\t\t\t\t'
-        yield u'\n                    '
+            yield u'\n\t\t\t\t\t\t\t\t<b>no project goals yet! :(</b>\n\t\t\t\t\t\t\t'
+        yield u"\n\t\t\t\t\t\t</div> <!-- end #project_goals -->\n\n\t\t\t\t\t\t<div id='project_tiers'>\n\t\t\t\t\t\t\t"
+        if environment.getattr(l_project, 'tiers'):
+            if 0: yield None
+            yield u"\n\t\t\t\t\t\t\t<ul class='naked'>\n\t\t\t\t\t\t\t\t"
+            l_tier = missing
+            l_currency = context.resolve('currency')
+            for l_tier in l_tiers:
+                if 0: yield None
+                yield u'\n\t\t\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t\t\t<b>%s - %s</b>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t    ' % (
+                    environment.getattr(l_tier, 'name'), 
+                    context.call(l_currency, environment.getattr(l_tier, 'amount')), 
+                )
+            l_tier = missing
+            yield u'\n\t\t\t\t\t\t\t </ul>\n\n\t\t\t\t\t\t\t'
+        else:
+            if 0: yield None
+            yield u'\n\t\t\t\t\t\t\t\t<b>no project tiers yet! :(</b>\n\t\t\t\t\t\t\t'
+        yield u'\n\t\t\t\t\t\t</div>\n\n                    '
 
     def block_description(context, environment=environment):
         l_project = context.resolve('project')
@@ -208,5 +212,5 @@ def run(environment):
         )
 
     blocks = {'presouth': block_presouth, 'right': block_right, 'description': block_description, 'media': block_media, 'stylesheets': block_stylesheets, 'main': block_main}
-    debug_info = '1=9&152=15&157=22&158=24&159=27&161=30&162=32&167=38&172=44&177=50&50=58&53=64&55=69&57=72&68=81&70=86&71=89&129=98&130=102&20=105&21=109&22=112&23=115&24=118&26=123&29=129&30=132&3=144&4=148&7=151&20=156&43=159&45=161&50=165&91=171&94=174&96=176&97=180&98=190&100=194&101=197&115=202&129=204&137=207'
+    debug_info = '1=9&163=15&168=22&169=24&170=27&172=30&173=32&178=38&183=44&188=50&50=58&54=64&55=65&60=68&62=73&64=76&74=84&76=89&78=92&140=102&141=106&20=109&21=113&22=116&23=119&24=122&26=127&29=133&30=136&3=148&4=152&7=155&20=160&43=163&45=165&50=169&102=175&105=178&107=180&108=184&109=194&111=198&112=201&126=206&140=208&148=211'
     return locals()

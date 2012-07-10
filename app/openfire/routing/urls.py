@@ -79,6 +79,9 @@ rules = [
             ])
         ]),
 
-        Route('/<customurl>', name='custom_url', handler='main.CustomUrlHandler'),
+        ## Verification URLs
+        Route('/mu-637494d5-6bf02344-9d641fe0-7c54acf6', name='custom_url', handler='main.VerifyURL'),
+
+        Route('/<customurl>', name='custom_url', handler='main.CustomUrlHandler')
     ])
 ]

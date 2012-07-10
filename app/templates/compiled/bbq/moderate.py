@@ -14,24 +14,28 @@ def run(environment):
 
     def block_moderate(context, environment=environment):
         if 0: yield None
-        yield u'\n<div style="padding-bottom: 75px;">\n    <h1>We decide all!</h1>\n    '
+        yield u'\n<div style="padding-bottom: 75px;">\n    <h1>We decide all!</h1>\n\n    <div id="drop-image-here" class="pre-uploader editable" style="width:200px; height:200px; border: 1px solid;">\n        DROP AVATAR HERE\n    </div>\n\n\n\n    <div id="bbq-tabs-container" class="pre-tabs" data-options=\'{"width":"800px"}\'>\n\n        <a href="#bbq-tab-1">Categories</a>\n        <a href="#bbq-tab-2">Proposals</a>\n        <a href="#bbq-tab-3">Projects</a>\n        <a href="#bbq-tab-4">Custom URLs</a>\n\n        <div id="bbq-tab-1" style="opacity: 0;">\n            '
         template = environment.get_template('bbq/bbq_categories.html', '/source/bbq/moderate.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
-        yield u'\n    '
+        yield u'\n        </div>\n        <div id="bbq-tab-2" style="opacity: 0;">\n            '
         template = environment.get_template('bbq/bbq_proposals.html', '/source/bbq/moderate.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
-        yield u'\n    '
+        yield u'\n        </div>\n        <div id="bbq-tab-3" style="opacity: 0;">\n            '
         template = environment.get_template('bbq/bbq_projects.html', '/source/bbq/moderate.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
-        yield u'\n    '
+        yield u'\n        </div>\n        <div id="bbq-tab-4" style="opacity: 0;">\n            '
         template = environment.get_template('bbq/bbq_custom_urls.html', '/source/bbq/moderate.html')
         for event in template.root_render_func(template.new_context(context.parent, True, locals())):
             yield event
-        yield u'\n\n\n\n</div>\n'
+        yield u'\n        </div>\n\n    </div>\n\n</div>\n'
 
-    blocks = {'moderate': block_moderate}
-    debug_info = '1=9&3=15&6=18&7=22&8=26&9=30'
+    def block_postsouth(context, environment=environment):
+        if 0: yield None
+        yield u'\n    <script type="text/javascript">\n        $(document).ready(function() {\n            $.apptools.widgets.tabs._init();\n        });\n    </script>\n'
+
+    blocks = {'moderate': block_moderate, 'postsouth': block_postsouth}
+    debug_info = '1=9&3=15&26=18&29=22&32=26&35=30&43=35'
     return locals()

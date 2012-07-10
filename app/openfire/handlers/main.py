@@ -55,6 +55,15 @@ class Landing(WebHandler):
         return
 
 
+class VerifyURL(WebHandler):
+
+    ''' Test URL for blitz.io. '''
+
+    def get(self):
+        self.response.write('42')  # that's it folks
+        return
+
+
 class CustomUrlHandler(WebHandler):
 
     ''' openfire custom url handling. '''
