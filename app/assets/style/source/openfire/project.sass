@@ -1,11 +1,5 @@
 @import "../main"
 
-#progress
-	width: 320px
-	position: relative
-	left: -30px
-	height: 30px
-
 #welcomebox
 	z-index: 800
 	position: absolute
@@ -87,6 +81,78 @@
 		position: relative
 		padding: 0 20px
 		margin: 0 !important
+
+		#progress
+			width: 320px
+			position: relative
+			left: -30px
+			height: 30px
+			background-color: white
+			border: none
+			box-shadow: 0px 2px 8px -3px rgba(0,0,0, 0.75)
+			z-index: 900
+
+			&::before,
+			&::after
+				display: block
+				content: ' '
+				position: absolute
+				top: 30px
+				width: 9px
+				height: 9px
+				background-color: transparent
+
+			&::before
+				left: 1px
+				+background(linear-gradient(top right, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
+				clip: rect(0px 10px 8px 2px)
+				box-shadow: inset -2px 3px 11px -5px rgba(0,0,0, 0.75)
+
+			&::after
+				right: 1px
+				+background(linear-gradient(top left, white 0%, white 50%, transparent 50%, transparent 100%))
+				clip: rect(0px 8px 8px 0px)
+				box-shadow: inset 2px 3px 11px -5px rgba(0,0,0, 0.75)
+
+			#progress-inner
+				position: absolute
+				left: 0px
+				height: 30px
+				background-color: #bada55
+				border: none
+				text-align: right
+				color: white
+				line-height: 30px
+				font-size: 20px
+				font-weight: 700
+				text-transform: uppercase
+				font-family: Karla
+
+		#project_goals
+
+			a
+				font-size: 15px
+				font-family: Karla
+				font-weight: 700
+				line-height: 17px
+				color: black
+				text-decoration: none
+				cursor: pointer
+
+				&:link
+					text-decoration: inherit
+					color: inherit
+
+				&.reached
+					color: #444
+
+				&.current
+					color: white
+
+			p
+				padding: 0px
+				margin: 5px
+				background: blue
 
 	#backers
 		position: relative
