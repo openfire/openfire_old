@@ -114,6 +114,8 @@ class BBQProject extends BBQBaseObject
         @dataList = ['key', 'name', 'summary', 'category', 'status', 'pitch',
                      'tech', 'keywords', 'creator', 'owners', 'goals', 'tiers']
         super el
+        @projectKey = @getAttr('project', 'key')
+
         el.find('button.go-live').click ->
             _this.goLive()
         el.find('button.suspend').click ->
@@ -121,12 +123,58 @@ class BBQProject extends BBQBaseObject
         el.find('button.shutdown').click ->
             _this.shutdown()
 
-        """
-        WORK IN PROGRESS. -Ethan
-        $.apptools.widgets.uploader._init()
-        uploader = $.apptools.widgets.uploader.get('drop-image-here')
-        el.find('.drop-image-here').bind 'drop', uploader.upload
-        """
+        document.getElementById('project-' + @projectKey + '-image').addEventListener('drop', @uploadImage, false)
+        document.getElementById('project-' + @projectKey + '-avatar').addEventListener('drop', @uploadAvatar, false)
+
+    uploadImage: (e) =>
+        e.preventDefault()
+        e.stopPropagation()
+
+        file = e.dataTransfer.files[0]
+
+        $.apptools.api.media.attach_image(
+            intake: 'UPLOAD'
+            name: file.name
+            size: file.size
+            target: @projectKey
+        ).fulfill
+            success: (response) =>
+                uploader = $.apptools.widgets.uploader.create
+                    endpoints: [response.endpoint]
+                    finish: (response) =>
+                        ethan = 1
+                        # TODO: Something with the response
+                        #@project.attach(new Image(response.media_key, response.serve_url))
+                        #$.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
+                uploader.upload(file)
+            failure: (error) =>
+                alert 'Failed to attach an image.'
+
+
+    uploadAvatar: (e) =>
+        e.preventDefault()
+        e.stopPropagation()
+
+        file = e.dataTransfer.files[0]
+
+        $.apptools.api.media.attach_avatar(
+            intake: 'UPLOAD'
+            name: file.name
+            size: file.size
+            target: @projectKey
+        ).fulfill
+            success: (response) =>
+                uploader = $.apptools.widgets.uploader.create
+                    endpoints: [response.endpoint]
+                    finish: (response) =>
+                        ethan = 1
+                        # TODO: Something with the response
+                        #@project.attach(new Image(response.media_key, response.serve_url))
+                        #$.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
+                uploader.upload(file)
+            failure: (error) =>
+                alert 'Failed to attach an avatar.'
+
 
     put: () ->
         @loadData()

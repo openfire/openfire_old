@@ -106,7 +106,7 @@ class ProjectController extends OpenfireController
 
                 @add_media(fi, 'image') for fi in files if files?
 
-            if file_or_url.type
+            if file_or_url.size
                 # it's a file!
                 file = file_or_url
 
@@ -115,7 +115,7 @@ class ProjectController extends OpenfireController
                     # a valid file!
                     $.apptools.api.media.attach_image(
 
-                        intake: 'upload'
+                        intake: 'UPLOAD'
                         name: file.name
                         size: file.size
                         target: @project_key

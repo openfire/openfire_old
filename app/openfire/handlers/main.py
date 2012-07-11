@@ -31,21 +31,27 @@ class Landing(WebHandler):
 
                 # append project key and generate subkeys
                 master_key_list.append(pk)
-                master_key_list.append(ndb.Key(assets.Avatar, 'current', parent=pk))
 
             ## prepare media
+            avatars = []
             projects = {}
             data = ndb.get_multi(master_key_list, use_cache=True, use_memcache=True, use_datastore=True)
             for key, entity in zip(master_key_list, data):
-                if key.kind() == 'Project':
-                    projects[key.id()] = entity.to_dict()
-                    projects[key.id()]['slug'] = entity.get_custom_url()
-                elif key.kind() == 'Media':
-                    projects[key.parent().id()]['avatar'] = entity.url
+                projects[key.id()] = entity.to_dict()
+                projects[key.id()]['slug'] = entity.get_custom_url()
+                avatars.append(ndb.Key(urlsafe=entity.avatar.id()))
+
+            project_assets = ndb.get_multi(avatars)
+
+            for e_project, asset in zip(projects.items(), project_assets):
+                key, e_project = e_project
+                if asset.url:
+                    e_project['avatar'] = asset.url
+                elif asset.blob:
+                    extension = asset.mime.split('/')[1]
+                    e_project['avatar'] = self.url_for('serve-blob-filename', action='serve', asset_key=asset.key.urlsafe(), filename='project-avatar-' + entity.get_custom_url() + extension)
 
             projects = [v for k, v in projects.items()]
-
-
             context['projects'] = projects
 
         if False:

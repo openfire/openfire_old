@@ -30,6 +30,7 @@ class User(AppModel):
     permissions = ndb.KeyProperty('prms', indexed=True, repeated=True)
     email = ndb.KeyProperty('em', indexed=True, repeated=True)
     avatar = ndb.KeyProperty('av', repeated=True)
+    images = ndb.KeyProperty('im', repeated=True)
 
     def get_custom_url(self):
         if self.customurl:

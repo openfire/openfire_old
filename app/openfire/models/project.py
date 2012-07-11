@@ -147,7 +147,8 @@ class Project(AppModel):
     goals = ndb.KeyProperty('gl', repeated=True)
 
     # Avatar + Media
-    avatar = ndb.KeyProperty('av', repeated=True)
+    avatar = ndb.KeyProperty('av')
+    images = ndb.KeyProperty('im', repeated=True)
     video = ndb.KeyProperty('vi', repeated=True)
 
     def is_private(self):
