@@ -38,10 +38,9 @@ class ProjectHome(WebHandler):
         _keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False)
 
         # pull avatar, tiers and goals
-        tiers = p.Tier.query(ancestor=project.key).order(p.Tier.amount)
-        goals = p.Goal.query(ancestor=project.key).order(p.Goal.amount)
+        tiers, goals = p.Tier.query(ancestor=project.key).order(p.Tier.amount), p.Goal.query(ancestor=project.key).order(p.Goal.amount)
         avatar = a.Avatar.query(ancestor=project.key).filter(a.Avatar.active == True).filter(a.Avatar.active == True).order(-a.Avatar.modified)
-        avatar = avatar.get(options=ndb.QueryOptions(limit=1, projection=('url', 'asset'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False))
+        avatar = avatar.get(options=ndb.QueryOptions(limit=1, projection=('r', 'a'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False))
         if avatar is not None:
             asset = avatar.asset.get()
             avatar = avatar.to_dict()
@@ -83,9 +82,3 @@ class ProjectHome(WebHandler):
                 tiers=ndb.get_multi(tiers.fetch(options=_keys_only))
             )
             return
-
-
-
-
-
-

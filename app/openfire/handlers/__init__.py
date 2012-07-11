@@ -13,10 +13,7 @@ logic / request handling stuff across your entire app, by putting it here.
 '''
 
 ## General Imports
-import babel
-import random
 import config
-import base64
 import hashlib
 
 ## Webapp2 Imports
@@ -80,25 +77,32 @@ class WebHandler(BaseHandler, SessionsMixin):
         return response
 
     def _format_as_currency(self, number, isPercent):
-        #trunkates the 'number' variable to the 100's place
+
+        #truncates the 'number' variable to the 100's place
         base = int(number)
         remain = number - base
+
         decStep = remain * 100
+
         decimal = int(decStep)
         decimal = float(decimal)
         decimal = decimal / 100
+
         money = base + decimal
         money = str(money)
+
         #conditional that adds an additonal '0' to the number if the decimal
         # only goes to  the 10's place
         zeroChk = remain * 10
         if zeroChk == int(zeroChk):
             money = money + "0"
+
         #conditional that will put in a dollar sign '$' if requested by making
         # isPercent equal to zero, and insert a '%' if isPercent equals 1
         if isPercent == 0:
             #money = str(money)
             money = "$" + money
+
         elif isPercent == 1:
             #money = str(money)
             money = money + "%"

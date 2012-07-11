@@ -4,8 +4,9 @@
 import config as gc
 
 # Webapp2 Imports
-import webapp2
 import base64
+import hashlib
+import webapp2
 
 from webapp2_extras import sessions
 from webapp2_extras import securecookie
@@ -17,6 +18,16 @@ from openfire.core.sessions import manager
 
 # AppTools Imports
 from apptools.util.debug import AppToolsLogger
+
+try:
+    from Crypto.Cipher import AES
+    _crypto = AES
+except ImportError:
+    _crypto = None
+
+_SIMPLE_ENCRYPTION_FLAG = 'b'
+_ADVANCED_ENCRYPTION_FLAG = 's'
+_ENCRYPTION_PAD_CHARACTER = ':'
 
 
 class CoreSessionAPI(CoreAPI):
@@ -176,6 +187,14 @@ class SessionsMixin(object):
 
     __sessions_bridge = None
 
+    @webapp2.cached_property
+    def cipher(self):
+
+        ''' Load AES and return a new cipher object '''
+
+        from Crypto.Cipher import AES
+        return AES.new(hashlib.md5(gc.config.get('openfire.sessions').get('salt', '__SALT__')).hexdigest())
+
     def get_session(self, make=True, cookies=True, headers=True, **kwargs):
 
         ''' Proxy stuff to the Core Sessions API. '''
@@ -198,28 +217,37 @@ class SessionsMixin(object):
         self.logging.info('Saving session: "%s"' % self.session)
         return self.__sessions_bridge.save_session(self.__session_id, self.session, self)
 
-    def encrypt(self, subj):
+    def encrypt(self, subj, simple=True, cipher=True):
 
         ''' Encrypt some string '''
 
-        try:
-            from Crypto.Cipher import AES
-            e = AES.new('openfire_internal')
-            return 's:' + e.encrypt(subj)
-        except:
-            return 'b:' + base64.b64encode(subj)
+        if cipher:
+            try:
+                if (len(subj) % 16) > 0:
+                    subj = subj + ''.join([_ENCRYPTION_PAD_CHARACTER for i in range(1, (len(subj) % 16) - 1)])
+                preb64 = _ENCRYPTION_PAD_CHARACTER.join([_ADVANCED_ENCRYPTION_FLAG, self.cipher.encrypt(subj)])
+            except ImportError, e:
+                if cipher and not simple:
+                    raise ValueError("Strong encryption requested, but AES could not be loaded. Exception encountered: '%s'." % e)
+                preb64 = _ENCRYPTION_PAD_CHARACTER.join([_SIMPLE_ENCRYPTION_FLAG, subj])
+        elif simple:
+            preb64 = _ENCRYPTION_PAD_CHARACTER.join([_SIMPLE_ENCRYPTION_FLAG, subj])
+        else:
+            preb64 = subj  # do nothing for some reason
+
+        return base64.b64encode(preb64)
 
     def decrypt(self, subj):
 
         ''' Decrypt some string '''
 
-        try:
-            if 'e:' in subj:
-                from Crypto.Cipher import AES
-                e = AES.new('openfire_internal')
-                return e.decrypt(subj.split(':')[1])
-        except:
-            pass
-        if 'b:' in subj:
-            return base64.b64decode(subj.split(':')[1])
-
+        subj = base64.b64decode(subj).split(_ENCRYPTION_PAD_CHARACTER)
+        if subj[0] == _ADVANCED_ENCRYPTION_FLAG:
+            if _crypto is not None:
+                return self.cipher.decrypt(subj[1])
+            else:
+                raise ValueError('Failed to decrypt AES-encrypted sequence as AES support is not installed.')
+        elif subj[0] == _SIMPLE_ENCRYPTION_FLAG:
+            return reduce(lambda x, y: x + y, subj[1:])
+        else:
+            return ''.join(subj)  # perhaps it's not encrypted?
