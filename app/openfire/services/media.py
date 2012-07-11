@@ -2,11 +2,9 @@ from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from protorpc import remote
 from apptools.services.builtin import Echo
-from openfire.core.data import CoreDataAPI
 from openfire.services import RemoteService
-from openfire.models.assets import Asset
+from openfire.models.assets import Asset, Video
 import openfire.messages.media as messages
-import base64
 
 class MediaService(RemoteService):
 
@@ -72,4 +70,27 @@ class MediaService(RemoteService):
 
         ''' Attach a video. '''
 
-        return Echo(message='')
+        if not request.target:
+            raise remote.ApplicationError('no target provided for video')
+
+        target_key = ndb.Key(urlsafe=self.decrypt(request.target))
+        if not target_key:
+            raise remote.ApplicationError('no target provided for video')
+
+        target = target_key.get()
+        if not target:
+            raise remote.ApplicationError('no target found for video')
+
+        url = request.reference
+        if request.provider == 0:
+            provider = 'vimeo'
+        else:
+            provider = 'youtube'
+
+        asset = Asset(kind='v', url=url)
+        asset.put()
+        video = Video(asset=asset.key, url=url, provider=provider, parent=target_key, featured=True)
+        video.put()
+        target.video.append(video.key)
+        target.put()
+        return Echo(message='Saved')

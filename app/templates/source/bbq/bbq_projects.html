@@ -43,6 +43,24 @@
                     NO AVATARS.
                 {% endfor %}
             </span>
+            <div id="project-{{ encrypt(project.key.urlsafe()) }}-video">
+                <label>Videos: </label>
+                <span class="project-videos">
+                    {% for each_video in project.video %}
+                        <span class="project-video editable">{{ each_video.get().url }}</span>
+                    {% else %}
+                        NO VIDEOS.
+                    {% endfor %}
+                </span>
+                <div class="add-project-video">
+                    <input type="text" name="video-url">
+                    <span class="vimeo-label">Vimeo</span>
+                    <input type="radio" name="provider" value="VIMEO">
+                    <span class="vimeo-label">YouTube</span>
+                    <input type="radio" name="provider" value="YOUTUBE">
+                    <button id="add-project-{{ encrypt(project.key.urlsafe()) }}-video" type="button" class="add-project-video-btn">+ Add Video</button>
+                </div>
+            </div>
             <div id="project-{{ encrypt(project.key.urlsafe()) }}-avatar" class="drop-box">
                 DROP AVATAR HERE
             </div>

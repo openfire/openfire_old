@@ -366,7 +366,7 @@ class DevModels(BaseHandler):
                             version=1, active=True, url='fatcatmap.png', asset=fcm_avatar, approved=True),
 
                     assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=fatcatmap.key),
-                            url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube', approved=True),
+                            url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube', approved=True, featured=True),
 
                     assets.Avatar(key=ndb.Key(assets.Avatar, 'current', parent=seasteading.key),
                             version=1, active=True, url='seasteading.png', asset=ssd_avatar, approved=True),
@@ -375,11 +375,15 @@ class DevModels(BaseHandler):
                             version=1, active=True, url='urbsly.png', asset=urb_avatar, approved=True),
 
                     assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=urbsly.key),
-                            url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube', approved=True)
+                            url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube', approved=True, featured=True)
 
             ]
 
             ndb.put_multi(avatars)
+
+            fatcatmap.video.append(avatars[1].key)
+            urbsly.video.append(avatars[4].key)
+            ndb.put_multi([fatcatmap, urbsly])
 
             # finally, custom URLS
 

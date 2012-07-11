@@ -4,7 +4,7 @@
 fulfillRequest = (request, errMsg) ->
     request.fulfill
         success: (obj, objType, rawResponse) ->
-            document.location.reload()
+            window.location.reload()
 
         error: (err) ->
             alert 'There was an error: ' + errMsg
@@ -125,6 +125,7 @@ class BBQProject extends BBQBaseObject
 
         document.getElementById('project-' + @projectKey + '-image').addEventListener('drop', @uploadImage, false)
         document.getElementById('project-' + @projectKey + '-avatar').addEventListener('drop', @uploadAvatar, false)
+        document.getElementById('add-project-' + @projectKey + '-video').addEventListener('click', @addVideo, false)
 
     uploadImage: (e) =>
         e.preventDefault()
@@ -176,25 +177,39 @@ class BBQProject extends BBQBaseObject
                 alert 'Failed to attach an avatar.'
 
 
+    addVideo: (e) =>
+        provider = $(e.currentTarget).siblings('[name="provider"]:checked').val()
+        url = $(e.currentTarget).siblings('[name="video-url"]').val()
+
+        $.apptools.api.media.attach_video(
+            target: @projectKey
+            provider: provider
+            reference: url
+        ).fulfill
+            success: (response) =>
+                alert 'Video attached.'
+            failure: (error) =>
+                alert 'Failed to attach a video.'
+
     put: () ->
         @loadData()
         request = $.apptools.api.project.put(@_dataDict)
         fulfillRequest(request, "Failed to put a project")
 
     delete: () ->
-        request = $.apptools.api.project.delete(key: @getAttr 'project', 'key')
+        request = $.apptools.api.project.delete(key: @projectKey)
         fulfillRequest(request, "Failed to delete a project")
 
     goLive: () ->
-        request = $.apptools.api.project.go_live(key: @getAttr 'project', 'key')
+        request = $.apptools.api.project.go_live(key: @projectKey)
         fulfillRequest(request, "Failed to send a project live")
 
     suspend: () ->
-        request = $.apptools.api.project.suspend(key: @getAttr 'project', 'key')
+        request = $.apptools.api.project.suspend(key: @projectKey)
         fulfillRequest(request, "Failed to suspend a project")
 
     shutdown: () ->
-        request = $.apptools.api.project.shutdown(key: @getAttr 'project', 'key')
+        request = $.apptools.api.project.shutdown(key: @projectKey)
         fulfillRequest(request, "Failed to shut down a project")
 
 
