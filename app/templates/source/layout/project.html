@@ -58,13 +58,15 @@
 
 						<div id='project_goals'>
 							{% if project.goals %}
-	                        <ul class='naked'>
+	                        <div id="project-goals-accordion" class='pre-accordion'>
+                                {% set current = false %}
 								{% for goal in goals %}
-									<li>
-										<b>{{ currency(goal.amount) }}</b>
-									</li>
+                                    <a href="#{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current == false %} class="current"{% endif %}{% endif %}>{{ currency(goal.amount) }}</a>
+									<div id="{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current == false %}{% set current = true %} class="current"{% endif %}{% endif %}>
+										<p>{{ goal.description }}</p>
+									</div>
 								{% endfor %}
-	                        </ul>
+	                        </div>
 							{% else %}
 								<b>no project goals yet! :(</b>
 							{% endif %}
