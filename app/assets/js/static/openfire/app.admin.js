@@ -604,10 +604,15 @@
     __extends(BBQProject, _super);
 
     function BBQProject(el) {
+      this.uploadAvatar = __bind(this.uploadAvatar, this);
+
+      this.uploadImage = __bind(this.uploadImage, this);
+
       var _this;
       _this = this;
       this.dataList = ['key', 'name', 'summary', 'category', 'status', 'pitch', 'tech', 'keywords', 'creator', 'owners', 'goals', 'tiers'];
       BBQProject.__super__.constructor.call(this, el);
+      this.projectKey = this.getAttr('project', 'key');
       el.find('button.go-live').click(function() {
         return _this.goLive();
       });
@@ -617,9 +622,67 @@
       el.find('button.shutdown').click(function() {
         return _this.shutdown();
       });
-      "WORK IN PROGRESS. -Ethan\n$.apptools.widgets.uploader._init()\nuploader = $.apptools.widgets.uploader.get('drop-image-here')\nel.find('.drop-image-here').bind 'drop', uploader.upload";
-
+      document.getElementById('project-' + this.projectKey + '-image').addEventListener('drop', this.uploadImage, false);
+      document.getElementById('project-' + this.projectKey + '-avatar').addEventListener('drop', this.uploadAvatar, false);
     }
+
+    BBQProject.prototype.uploadImage = function(e) {
+      var file,
+        _this = this;
+      e.preventDefault();
+      e.stopPropagation();
+      file = e.dataTransfer.files[0];
+      return $.apptools.api.media.attach_image({
+        intake: 'UPLOAD',
+        name: file.name,
+        size: file.size,
+        target: this.projectKey
+      }).fulfill({
+        success: function(response) {
+          var uploader;
+          uploader = $.apptools.widgets.uploader.create({
+            endpoints: [response.endpoint],
+            finish: function(response) {
+              var ethan;
+              return ethan = 1;
+            }
+          });
+          return uploader.upload(file);
+        },
+        failure: function(error) {
+          return alert('Failed to attach an image.');
+        }
+      });
+    };
+
+    BBQProject.prototype.uploadAvatar = function(e) {
+      var file,
+        _this = this;
+      e.preventDefault();
+      e.stopPropagation();
+      file = e.dataTransfer.files[0];
+      return $.apptools.api.media.attach_avatar({
+        intake: 'UPLOAD',
+        name: file.name,
+        size: file.size,
+        target: this.projectKey
+      }).fulfill({
+        success: function(response) {
+          var uploader;
+          uploader = $.apptools.widgets.uploader.create({
+            endpoints: [response.endpoint],
+            finish: function(response) {
+              var ethan;
+              return ethan = 1;
+            }
+          });
+          return uploader.upload(file);
+        },
+        failure: function(error) {
+          return alert('Failed to attach an avatar.');
+        }
+      });
+    };
 
     BBQProject.prototype.put = function() {
       var request;
@@ -907,6 +970,8 @@
 
     ProjectController.project_key = null;
 
+    ProjectController.uploader = null;
+
     function ProjectController(openfire) {
       this.update = __bind(this.update, this);
 
@@ -934,11 +999,13 @@
       this.project = new Project(k = new Key(this._state.ke));
       this.project_key = this.project.key.key;
       this._init = function() {
-        document.getElementById('follow').addEventListener('click', _this.follow, false);
-        document.getElementById('share').addEventListener('click', _this.share, false);
-        document.getElementById('back').addEventListener('click', _this.back, false);
-        if (_this._state.o) {
-          document.body.addEventListener('drop', _this.add_media, false);
+        if (window._cp) {
+          document.getElementById('follow').addEventListener('click', _this.follow, false);
+          document.getElementById('share').addEventListener('click', _this.share, false);
+          document.getElementById('back').addEventListener('click', _this.back, false);
+          if (_this._state.o) {
+            document.body.addEventListener('drop', _this.add_media, false);
+          }
         }
         return _this.get();
       };
@@ -960,25 +1027,31 @@
             }
           }
         }
-        if (file_or_url.type) {
+        if (file_or_url.size) {
           file = file_or_url;
           if (/^image\/(png|jpeg|gif)$/gi.test(file.type)) {
             return $.apptools.api.media.attach_image({
-              intake: 'upload',
-              name: file.name,
-              size: file.size,
               target: this.project_key
             }).fulfill({
               success: function(response) {
                 var uploader;
-                uploader = $.apptools.widgets.uploader.create({
-                  endpoints: [response.endpoint],
-                  session: $.openfire.sys.state.session.data || false,
-                  finish: function(response) {
-                    _this.project.attach(new Image(response.media_key, response.serve_url));
+                if (!(_this.uploader != null)) {
+                  uploader = $.apptools.widgets.uploader.create('data', {
+                    id: 'body',
+                    endpoints: [response.endpoint],
+                    finish: function(response) {
+                      _this.project.attach(new Image(response.media_key, response.serve_url));
+                      return $.apptools.events.trigger('PROJECT_MEDIA_ADDED', _this);
+                    }
+                  });
+                  _this.uploader = uploader;
+                } else {
+                  uploader = _this.uploader.add_endpoint(response.endpoint);
+                  uploader = uploader.add_callback(function(rsp) {
+                    _this.project.attach(new Image(rsp.media_key, rsp.serve_url));
                     return $.apptools.events.trigger('PROJECT_MEDIA_ADDED', _this);
-                  }
-                });
+                  });
+                }
                 return uploader.upload(file);
               },
               failure: function(error) {
