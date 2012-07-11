@@ -79,6 +79,10 @@ rules = [
             ])
         ]),
 
+        ## == Tests == ##
+        Route('/_test/multipart', name='multipart-test', handler='dev.TestMultipart'),
+        Route('/_test/multipart/passthrough', name='multipart-test-passthrough', handler='dev.TestPassthrough'),
+
         ## Verification URLs
         Route('/mu-637494d5-6bf02344-9d641fe0-7c54acf6', name='custom_url', handler='main.VerifyURL'),
 

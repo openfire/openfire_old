@@ -1,7 +1,38 @@
 import datetime
+from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import ndb
 from apptools import BaseHandler
-from openfire.models import user, project, assets, system, contribution, indexer
+from openfire.models import system, contribution
+from openfire.models import user, project, assets
+from openfire.models.indexer import index, entry, map as mapping
+
+
+class TestMultipart(BaseHandler):
+
+    ''' Test multipart uploads. '''
+
+    def get(self):
+
+        ''' Return the form. '''
+
+        from google.appengine.ext import blobstore
+        return self.render('test/multipart.html', endpoint=blobstore.create_upload_url('/_test/multipart/passthrough'))
+
+
+
+class TestPassthrough(blobstore_handlers.BlobstoreUploadHandler):
+
+    ''' Test the blobstore passthrough. '''
+
+    def post(self):
+
+        ''' Passthrough. '''
+
+        import pdb; pdb.set_trace()
+
+        uploads = self.get_uploads()
+
+        return self.response.write('<pre>' + str(self.request) + '</pre>')
 
 
 class DevModels(BaseHandler):
@@ -22,21 +53,21 @@ class DevModels(BaseHandler):
         if run:
 
             ## indexer models
-            if hasattr(indexer.Index, 'new'):
+            if hasattr(index.Index, 'new'):
 
-                indexer.IndexEvent(id='_init_').put()
+                index.IndexEvent(id='_init_').put()
 
                 ## indexes
-                meta_i = indexer.Index.new('_meta_')
-                user_i = indexer.Index.new('user')
-                update_i = indexer.Index.new('update')
-                project_i = indexer.Index.new('project')
-                category_i = indexer.Index.new('category')
-                activity_i = indexer.Index.new('activity')
+                meta_i = index.Index.new('_meta_')
+                user_i = index.Index.new('user')
+                update_i = index.Index.new('update')
+                project_i = index.Index.new('project')
+                category_i = index.Index.new('category')
+                activity_i = index.Index.new('activity')
 
                 ndb.put_multi([meta_i, user_i, update_i, project_i, category_i, activity_i])
 
-                indexer.IndexEvent(id='_indexes_init_').put()
+                index.IndexEvent(id='_indexes_init_').put()
 
                 ## entries
                 user_i_entry = meta_i.add('user')
@@ -47,7 +78,7 @@ class DevModels(BaseHandler):
 
                 ndb.put_multi([user_i_entry, update_i_entry, project_i_entry, category_i_entry, activity_i_entry])
 
-                indexer.IndexEvent(id='_entries_init_').put()
+                index.IndexEvent(id='_entries_init_').put()
 
                 ## mappings
                 user_i_mapping = user_i_entry.map(user_i.key)
@@ -58,7 +89,7 @@ class DevModels(BaseHandler):
 
                 ndb.put_multi([user_i_mapping, update_i_mapping, project_i_mapping, category_i_mapping, activity_i_mapping])
 
-                indexer.IndexEvent(id='_mappings_init_').put()
+                index.IndexEvent(id='_mappings_init_').put()
 
             ## contribution types
             money = contribution.ContributionType(id='money', slug='money', name='Money', unit='dollar', plural='dollars', subunit='cent', subunit_plural='cents')
