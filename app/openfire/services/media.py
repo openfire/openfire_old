@@ -6,6 +6,7 @@ from openfire.core.data import CoreDataAPI
 from openfire.services import RemoteService
 from openfire.models.assets import Asset
 import openfire.messages.media as messages
+import base64
 
 class MediaService(RemoteService):
 
@@ -29,17 +30,41 @@ class MediaService(RemoteService):
     @remote.method(messages.AttachImage, messages.AttachImageEndpoint)
     def attach_image(self, request):
 
-        ''' Attach and image. '''
+        ''' Attach an image to a project or profile. '''
 
-        return messages.AttachImageEndpoint()
+        target_key = ndb.Key(urlsafe=self.decrypt(request.target))
+        if not target_key:
+            raise remote.ApplicationError('no target provided for image')
+
+        target = target_key.get()
+        if not target:
+            raise remote.ApplicationError('no target found for image')
+
+        asset = Asset(kind='i').put()
+
+        handler_url = '/_assets/blob_uploaded/%s/%s' % (asset.urlsafe(), target_key.urlsafe())
+
+        return messages.AttachImageEndpoint(endpoint=blobstore.create_upload_url(handler_url))
 
 
     @remote.method(messages.AttachAvatar, messages.AttachAvatarEndpoint)
     def attach_avatar(self, request):
 
-        ''' Attach and avatar. '''
+        ''' Attach an avatar to a project or profile. '''
 
-        return messages.AttachAvatarEndpoint()
+        target_key = ndb.Key(urlsafe=self.decrypt(request.target))
+        if not target_key:
+            raise remote.ApplicationError('no target provided for image')
+
+        target = target_key.get()
+        if not target:
+            raise remote.ApplicationError('no target found for image')
+
+        asset = Asset(kind='a').put()
+
+        handler_url = '/_assets/blob_uploaded/%s/%s' % (asset.urlsafe(), target_key.urlsafe())
+
+        return messages.AttachAvatarEndpoint(endpoint=blobstore.create_upload_url(handler_url))
 
 
     @remote.method(messages.AttachVideo, Echo)

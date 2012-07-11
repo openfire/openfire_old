@@ -25,7 +25,7 @@ class Asset(AppModel):
     cdn = ndb.StringProperty('c', indexed=True, default=None)
     name = ndb.StringProperty('f', indexed=True, default=None)
     mime = ndb.StringProperty('mt', indexed=True, default=None)
-    kind = ndb.StringProperty('t', indexed=True, choices=['i', 's', 't', 'v'], default='i')  # image, style, script, video
+    kind = ndb.StringProperty('t', indexed=True, choices=['a', 'i', 's', 't', 'v'], default='i')  # avatar, image, style, script, video
     blob = ndb.BlobKeyProperty('b', indexed=True)
     versions = ndb.KeyProperty('v', indexed=True, repeated=True)
     pending = ndb.BooleanProperty('p', indexed=True, default=True)
@@ -43,6 +43,7 @@ class Media(polymodel.PolyModel):
     asset = ndb.KeyProperty('a', indexed=True, required=True)
     caption = ndb.StringProperty('c', indexed=True, required=False)
     description = ndb.TextProperty('d', indexed=False, required=False)
+    approved = ndb.BooleanProperty('ap', indexed=True, default=False)
 
 
 ######## ======== Media Submodels ======== ########
@@ -58,7 +59,6 @@ class Avatar(Media):
     version = ndb.IntegerProperty('v', indexed=True, default=1)
     active = ndb.BooleanProperty('e', indexed=True, default=False)
     content = ndb.BlobProperty('bc', indexed=False)
-    approved = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
 ## Image - a piece of content that is a video or movie (always external, never has an Asset attachment)
@@ -70,7 +70,6 @@ class Image(Media):
     _pipeline_class = pipelines.ImagePipeline
 
     content = ndb.BlobProperty('bc', indexed=False)
-    approved = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
 ## Video - a piece of content that is a video or movie (always external, never has an Asset attachment)
@@ -83,7 +82,6 @@ class Video(Media):
 
     ext_id = ndb.StringProperty('pid', indexed=True)
     provider = ndb.StringProperty('p', indexed=True, choices=['youtube', 'vimeo'])
-    approved = ndb.BooleanProperty('a', indexed=True, default=False)
 
 
 ######## ======== Custom URLs ======== ########

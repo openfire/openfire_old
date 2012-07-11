@@ -76,6 +76,8 @@ rules = [
                 Route('/blob_uploaded/<asset_key>', name='blob-uploaded', handler='BlobstoreUploaded'),
                 Route('/blob_uploaded/<asset_key>/<target_key>', name='blob-uploaded', handler='BlobstoreUploaded'),
                 Route('/get/<asset_key>', name='get-asset', handler='MediaStorage'),
+                Route('/blob/<action>/<asset_key>', name='serve-asset', handler='AssetServer'),
+                Route('/blob/<action>/<asset_key>/<filename>', name='serve-asset-filename', handler='AssetServer'),
             ])
         ]),
 
