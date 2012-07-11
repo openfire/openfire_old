@@ -39,17 +39,17 @@ class Landing(WebHandler):
             for key, entity in zip(master_key_list, data):
                 projects[key.id()] = entity.to_dict()
                 projects[key.id()]['slug'] = entity.get_custom_url()
-                avatars.append(entity.avatar.id())
+                avatars.append(ndb.Key(urlsafe=entity.avatar.id()))
 
             project_assets = ndb.get_multi(avatars)
 
-            for e_project, asset in zip(project.items(), project_assets):
+            for e_project, asset in zip(projects.items(), project_assets):
                 key, e_project = e_project
                 if asset.url:
-                    project['avatar'] = asset.url
+                    e_project['avatar'] = asset.url
                 elif asset.blob:
                     extension = asset.mime.split('/')[1]
-                    project['avatar'] = self.url_for('serve-blob-filename', action='serve', asset_key=asset.key.urlsafe(), filename='project-avatar-' + entity.get_custom_url() + extension)
+                    e_project['avatar'] = self.url_for('serve-blob-filename', action='serve', asset_key=asset.key.urlsafe(), filename='project-avatar-' + entity.get_custom_url() + extension)
 
             projects = [v for k, v in projects.items()]
             context['projects'] = projects

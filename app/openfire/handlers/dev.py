@@ -352,26 +352,14 @@ class DevModels(BaseHandler):
             urb_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/urbsly.png', name='urbsly.png', mime='image/png', kind='i', pending=False).put()
             urb_video = assets.Asset(url='http://www.youtube.com/watch?v=bnyiMnG62OI', name='bnyiMnG62OI', mime='external/youtube', kind='v', pending=False).put()
 
-            avatars = [
+            fcm_media = assets.Avatar(key=ndb.Key(assets.Avatar, fcm_avatar.urlsafe(), parent=fatcatmap.key), version=1, active=True, url='/assets/img/static/projects/cardstock/fatcatmap.png', asset=fcm_avatar, approved=True)
+            urb_media = assets.Avatar(key=ndb.Key(assets.Avatar, urb_avatar.urlsafe(), parent=urbsly.key), version=1, active=True, url='/assets/img/static/projects/cardstock/urbsly.png', asset=urb_avatar, approved=True)
+            ssd_media = assets.Avatar(key=ndb.Key(assets.Avatar, ssd_avatar.urlsafe(), parent=seasteading.key), version=1, active=True, url='/assets/img/static/projects/cardstock/seasteading.png', asset=ssd_avatar, approved=True)
 
-                    assets.Avatar(key=ndb.Key(assets.Avatar, fcm_avatar.urlsafe(), parent=fatcatmap.key),
-                            version=1, active=True, url='/assets/img/static/projects/cardstock/fatcatmap.png', asset=fcm_avatar, approved=True),
+            fcm_video_media = assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=fatcatmap.key), url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube', approved=True)
+            urb_video_media = assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=urbsly.key), url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube', approved=True)
 
-                    assets.Video(key=ndb.Key(assets.Video, fcm_avatar.urlsafe(), parent=fatcatmap.key),
-                            url='https://www.youtube.com/embed/bnyiMnG62OI', asset=fcm_video, provider='youtube', approved=True),
-
-                    assets.Avatar(key=ndb.Key(assets.Avatar, fcm_avatar.urlsafe(), parent=seasteading.key),
-                            version=1, active=True, url='/assets/img/static/projects/cardstock/seasteading.png', asset=ssd_avatar, approved=True),
-
-                    assets.Avatar(key=ndb.Key(assets.Avatar, fcm_avatar.urlsafe(), parent=urbsly.key),
-                            version=1, active=True, url='/assets/img/static/projects/cardstock/urbsly.png', asset=urb_avatar, approved=True),
-
-                    assets.Video(key=ndb.Key(assets.Video, 'mainvideo', parent=urbsly.key),
-                            url='https://www.youtube.com/embed/rQkTI7XXYvw', asset=urb_video, provider='youtube', approved=True)
-
-            ]
-
-            ndb.put_multi(avatars)
+            ndb.put_multi([fcm_media, urb_media, ssd_media, fcm_video_media, urb_video_media])
 
             # finally, custom URLS
 
@@ -393,6 +381,13 @@ class DevModels(BaseHandler):
             fatcatmap.customurl = fcm_url.key
             seasteading.customurl = ssd_url.key
             urbsly.customurl = urb_url.key
+
+            fatcatmap.avatar = fcm_media.key
+            seasteading.avatar = ssd_media.key
+            urbsly.avatar = urb_media.key
+
+            fatcatmap.video = [fcm_video_media.key]
+            urbsly.video = [urb_video_media.key]
 
             sam_obj = sam.get()
             david_obj = david.get()

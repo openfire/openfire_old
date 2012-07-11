@@ -44,6 +44,8 @@ class Media(polymodel.PolyModel):
     caption = ndb.StringProperty('c', indexed=True, required=False)
     description = ndb.TextProperty('d', indexed=False, required=False)
     approved = ndb.BooleanProperty('ap', indexed=True, default=False)
+    modified = ndb.DateTimeProperty('_tm', indexed=True, auto_now=True)
+    created = ndb.DateTimeProperty('_tc', indexed=True, auto_now_add=True)
 
 
 ######## ======== Media Submodels ======== ########

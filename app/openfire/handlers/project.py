@@ -41,7 +41,7 @@ class ProjectHome(WebHandler):
         tiers = p.Tier.query(ancestor=project.key).order(p.Tier.amount)
         goals = p.Goal.query(ancestor=project.key).order(p.Goal.amount)
         avatar = a.Avatar.query(ancestor=project.key).filter(a.Avatar.active == True).filter(a.Avatar.active == True).order(-a.Avatar.modified)
-        avatar = avatar.get(options=ndb.QueryOptions(limit=1, projection=('url', 'asset'), default_options=_keys_only))
+        avatar = avatar.get(options=ndb.QueryOptions(limit=1, projection=('url', 'asset'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False))
         if avatar is not None:
             asset = avatar.asset.get()
             avatar = avatar.to_dict()
