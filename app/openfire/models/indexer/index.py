@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from webapp2 import import_string
+from google.appengine.ext import ndb
 from openfire.models.indexer import IndexerModel
 
 from openfire.models.indexer.entry import IndexEntry
+
+_DEFAULT_ENTRY_PATH = 'openfire.models.indexer.entry.IndexEntry'
 
 
 ######## ======== Index Structure ======== ########
@@ -17,11 +20,11 @@ class Index(IndexerModel):
     description = ndb.StringProperty('d', indexed=False)
 
     # Attachment Info
-    model_base = ndb.StringProperty('m', default='openire.models.AppModel', indexed=True)
+    model_base = ndb.StringProperty('m', default='openfire.models.AppModel', indexed=True)
 
-	# Entry Info    
+    # Entry Info
     entry_count = ndb.IntegerProperty('ec', default=0, indexed=True)
-    entry_base = ndb.StringProperty('eb', default='openfire.models.indexer.entry.IndexEntry', indexed=True)
+    entry_base = ndb.StringProperty('eb', default=_DEFAULT_ENTRY_PATH, indexed=True)
     entry_kind = ndb.StringProperty('ek', repeated=True, indexed=True)
 
     @classmethod
@@ -34,6 +37,27 @@ class Index(IndexerModel):
     def add(self, value, entry=IndexEntry, **kwargs):
 
         ''' Shortcut factory method to add an IndexEntry to an index. '''
+
+        if entry == IndexEntry:
+            if self.entry_base != _DEFAULT_ENTRY_PATH:
+                entry = import_string(self.entry_base)
+        else:
+            ## validate base
+            for k in self.entry_kind:
+                found = False
+                try:
+                    m = import_string(k)
+                    assert m == entry
+                except AssertionError:
+                    continue
+                except ImportError:
+                    continue
+                else:
+                    found = True
+                    break
+
+                if not found:
+                    raise ValueError("Must pass in the EntryBase or a compatible EntryKind for this Index upon add.")
 
         return entry.new(self, value, **kwargs)
 

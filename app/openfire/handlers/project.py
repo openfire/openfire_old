@@ -31,17 +31,21 @@ class ProjectHome(WebHandler):
 
         # calculate keys to pull
         pr = ndb.Key(urlsafe=key)
-        av = ndb.Key(a.Avatar, 'current', parent=pr)
         vi = ndb.Key(a.Video, 'mainvideo', parent=pr)
 
         # pull project and attachments
-        project, avatar, video = tuple(ndb.get_multi([pr, av, vi], use_cache=True, use_memcache=True, use_datastore=True))
+        project, video = tuple(ndb.get_multi([pr, vi], use_cache=True, use_memcache=True, use_datastore=True))
+        _keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False)
 
-        _keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=True)
-
-        # pull tiers and goals
+        # pull avatar, tiers and goals
         tiers = p.Tier.query(ancestor=project.key).order(p.Tier.amount)
         goals = p.Goal.query(ancestor=project.key).order(p.Goal.amount)
+        avatar = a.Avatar.query(ancestor=project.key).filter(a.Avatar.active == True).filter(a.Avatar.active == True).order(-a.Avatar.modified)
+        avatar = avatar.get(options=ndb.QueryOptions(limit=1, projection=('url', 'asset'), default_options=_keys_only))
+        if avatar is not None:
+            asset = avatar.asset.get()
+            avatar = avatar.to_dict()
+            avatar['asset'] = asset
 
         # 404 if project not found
         if project is None:
@@ -72,9 +76,9 @@ class ProjectHome(WebHandler):
                 'projects/project_home.html',
                 project=project,
                 video=video,
-                avatar=avatar,
                 owners=owners,
                 viewers=viewers,
+                avatar=avatar,
                 goals=ndb.get_multi(goals.fetch(options=_keys_only)),
                 tiers=ndb.get_multi(tiers.fetch(options=_keys_only))
             )

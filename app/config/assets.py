@@ -138,8 +138,8 @@ config['apptools.project.assets'] = {
             'assets': {
                 'main': {'version': 0.1},  # reset, main, layout, forms
                 'ie': {'version': 0.1},    # fixes for internet explorer (grrr...)
-                'print': {'version': 0.1}, # proper format for printing
-                'admin':{'version': 0.1}   # admin
+                'print': {'version': 0.1},  # proper format for printing
+                'admin': {'version': 0.1}   # admin
             }
 
         },
@@ -165,5 +165,96 @@ config['apptools.project.assets'] = {
     # Other Assets
     'ext': {
      },
+
+}
+
+
+config['js.loader'] = {
+
+    # loader config
+    "config": {
+
+        "enabled": False,
+        "autoload": False,
+        "modules": ['search', 'picker', 'visualization'],
+        "externals": ['channel', 'maps_v3', 'plusone', 'fbjssdk'],
+
+        "context": {
+            "key": "AIzaSyAtnLmsmOnkw8NQZROonSjvam6KqaD3UY0",
+            "appid": "468309289847671"
+        }
+
+    },
+
+    # external JS scripts
+    "external": [
+
+        ("fbjssdk", "//connect.facebook.net/en_US/all.js#xfbml=1&appId=%(appid)s"),
+        ("maps_v3", "//maps.googleapis.com/maps/api/js?key=%(key)s&sensor=false"),
+        ("channel", "//open-fire-staging.appspot.com/channel.js?s=%(sid)s"),
+        ("plusone", "//apis.google.com/js/plusone.js")
+
+    ],
+
+    # loader-compatible modules
+    "modules": [
+
+        {
+            "name": "search",
+            "version": "1.0",
+            "language": "en"
+        },
+
+        {
+            "name": "maps",
+            "version": "2.x",
+            "language": "en"
+        },
+
+        {
+            "name": "feeds",
+            "version": "1.0",
+            "language": "en"
+        },
+
+        {
+            "name": "language",
+            "version": "1.0",
+            "language": "en",
+        },
+
+        {
+            "name": "data",
+            "version": "1.0",
+            "language": "en",
+        },
+
+        {
+            "name": "earth",
+            "version": "1.0",
+            "language": "en",
+        },
+
+        {
+            "name": "visualization",
+            "version": "1.0",
+            "language": "en",
+            "packages": [
+
+                'corechart',
+                'geochart',
+                'map',
+                'table'
+
+            ]
+        },
+
+        {
+            "name": "picker",
+            "version": "1.0",
+            "language": "en",
+        }
+
+    ]
 
 }
