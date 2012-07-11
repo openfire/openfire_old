@@ -71,6 +71,7 @@ class ProjectController extends OpenfireController
     ]
     @project = null
     @project_key = null
+    @uploader = null
 
     constructor: (openfire) ->
 
@@ -81,12 +82,14 @@ class ProjectController extends OpenfireController
 
         @_init = () =>
 
-            document.getElementById('follow').addEventListener('click', @follow, false)
-            document.getElementById('share').addEventListener('click', @share, false)
-            document.getElementById('back').addEventListener('click', @back, false)
+            if window._cp
 
-            if @_state.o
-                document.body.addEventListener('drop', @add_media, false)
+                document.getElementById('follow').addEventListener('click', @follow, false)
+                document.getElementById('share').addEventListener('click', @share, false)
+                document.getElementById('back').addEventListener('click', @back, false)
+
+                if @_state.o
+                    document.body.addEventListener('drop', @add_media, false)
 
             return @get()
 
@@ -113,23 +116,25 @@ class ProjectController extends OpenfireController
                 if /^image\/(png|jpeg|gif)$/gi.test(file.type)
 
                     # a valid file!
-                    $.apptools.api.media.attach_image(
-
-                        intake: 'UPLOAD'
-                        name: file.name
-                        size: file.size
-                        target: @project_key
-
-                    ).fulfill
+                    $.apptools.api.media.attach_image(target: @project_key).fulfill
 
                         success: (response) =>
 
-                            uploader = $.apptools.widgets.uploader.create
-                                endpoints: [response.endpoint]
-                                session: $.openfire.sys.state.session.data or false
-                                finish: (response) =>
+                            if not @uploader?
+                                uploader = $.apptools.widgets.uploader.create 'data',
+                                    id: 'body'
+                                    endpoints: [response.endpoint]
+                                    finish: (response) =>
 
-                                    @project.attach(new Image(response.media_key, response.serve_url))
+                                        @project.attach(new Image(response.media_key, response.serve_url))
+                                        $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
+
+                                @uploader = uploader
+
+                            else
+                                uploader = @uploader.add_endpoint(response.endpoint)
+                                uploader = uploader.add_callback (rsp) =>
+                                    @project.attach(new Image(rsp.media_key, rsp.serve_url))
                                     $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
 
                             uploader.upload(file)
