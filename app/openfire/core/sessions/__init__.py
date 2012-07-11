@@ -5,6 +5,7 @@ import config as gc
 
 # Webapp2 Imports
 import webapp2
+import base64
 
 from webapp2_extras import sessions
 from webapp2_extras import securecookie
@@ -196,3 +197,29 @@ class SessionsMixin(object):
 
         self.logging.info('Saving session: "%s"' % self.session)
         return self.__sessions_bridge.save_session(self.__session_id, self.session, self)
+
+    def encrypt(self, subj):
+
+        ''' Encrypt some string '''
+
+        try:
+            from Crypto.Cipher import AES
+            e = AES.new('openfire_internal')
+            return 's:' + e.encrypt(subj)
+        except:
+            return 'b:' + base64.b64encode(subj)
+
+    def decrypt(self, subj):
+
+        ''' Decrypt some string '''
+
+        try:
+            if 'e:' in subj:
+                from Crypto.Cipher import AES
+                e = AES.new('openfire_internal')
+                return e.decrypt(subj.split(':')[1])
+        except:
+            pass
+        if 'b:' in subj:
+            return base64.b64decode(subj.split(':')[1])
+

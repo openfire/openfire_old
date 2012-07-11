@@ -32,7 +32,7 @@ class MediaService(RemoteService):
 
         ''' Attach an image to a project or profile. '''
 
-        target_key = ndb.Key(urlsafe=base64.b64decode(request.target.split(':')[1]))
+        target_key = ndb.Key(urlsafe=self.decrypt(request.target))
         if not target_key:
             raise remote.ApplicationError('no target provided for image')
 
@@ -52,7 +52,7 @@ class MediaService(RemoteService):
 
         ''' Attach an avatar to a project or profile. '''
 
-        target_key = ndb.Key(urlsafe=base64.b64decode(request.target.split(':')[1]))
+        target_key = ndb.Key(urlsafe=self.decrypt(request.target))
         if not target_key:
             raise remote.ApplicationError('no target provided for image')
 
