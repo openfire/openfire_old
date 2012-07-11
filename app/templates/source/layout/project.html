@@ -67,7 +67,7 @@
                                 {% for goal in goals %}
                                     <a href="#{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %} class="current"{% endif %}{% endif %}>{{ currency(goal.amount) }}</a>
                                     <div id="{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %}{% set current_goal = true %} class="current"{% endif %}{% endif %}>
-                                        {#<p>{{ goal.description }}</p> --commented out by sam (i don't think we use this property at all?)  #}
+                                        <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -83,7 +83,7 @@
                                 {% for tier in tiers %}
                                     <a href="#{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %} class="current"{% endif %}>{{ tier.name }} - {{ currency(tier.amount) }}</a>
                                     <div id="{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %}{% set current_tier = true %} class="current"{% endif %}>
-                                        <p>{{ tier.description }}</p>
+                                        <p>{% autoescape off %}{{ tier.description }}{% endautoescape %}</p>
                                     </div>
                                 {% endfor %}
                              </div>

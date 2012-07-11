@@ -217,7 +217,7 @@ class SessionsMixin(object):
         self.logging.info('Saving session: "%s"' % self.session)
         return self.__sessions_bridge.save_session(self.__session_id, self.session, self)
 
-    def encrypt(self, subj, simple=True, cipher=True):
+    def encrypt(self, subj, simple=gc.config.get('openfire.security', {}).get('encryption', {}).get('simple', True), cipher=gc.config.get('openfire.security', {}).get('encryption', {}).get('advanced', True)):
 
         ''' Encrypt some string '''
 
