@@ -3,7 +3,7 @@
     {% for project in projects %}
     <div class="project">
         <div class="project-info">
-            <span class="project-key" style="display: none;">{{ project.key.urlsafe() }}</span>
+            <span class="project-key" style="display: none;">{{ encrypt(project.key.urlsafe()) }}</span>
             <label>Name: </label>
             <span class="project-name editable">{{ project.name }}</span>
             <label>Summary: </label>
@@ -26,7 +26,30 @@
             <span class="project-goals editable">{{ project.goals }}</span>
             <label>Tiers: </label>
             <span class="project-tiers editable">{{ project.tiers }}</span>
-
+            <label>Images: </label>
+            <span class="project-images">
+                {% for image in project.images %}
+                    {# FUTURE <img data-key="{{ image.urlsafe() }}" src="{{ link('serve-asset', image.get().asset.urlsafe()) }}"> #}
+                    <img data-key="{{ image.urlsafe() }}" src="/_assets/blob/serve/{{ image.get().asset.urlsafe() }}">
+                {% else %}
+                    NO IMAGES.
+                {% endfor %}
+            </span>
+            <label>Avatars: </label>
+            <span class="project-avatars">
+                {% for each_avatar in project.avatar %}
+                    <img data-key="{{ each_avatar.urlsafe() }}" src="/_assets/blob/serve/{{ each_avatar.get().asset.urlsafe() }}">
+                {% else %}
+                    NO AVATARS.
+                {% endfor %}
+            </span>
+            <div id="project-{{ encrypt(project.key.urlsafe()) }}-avatar" class="drop-box">
+                DROP AVATAR HERE
+            </div>
+            <div id="project-{{ encrypt(project.key.urlsafe()) }}-image" class="drop-box">
+                DROP IMAGE HERE
+            </div>
+        </div>
         <div>
             <button class="delete" type="button">delete</button>
             <button class="start-edit" type="button">edit</button>
