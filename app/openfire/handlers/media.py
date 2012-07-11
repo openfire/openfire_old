@@ -20,9 +20,25 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler):
             asset.pending = False
             asset.put()
 
-        # TODO: Do more with the target when possible. -Ethan
+        # If there is a target, attach this media to a project or user.
         if target_key:
-            target_key = ndb.Key(urlsafe=target_key)
+            target = ndb.Key(urlsafe=target_key).get()
+            if target:
+                # TODO: Populate a few more fields of Image and Avatar here, like size and name. -Ethan
+                if asset.kind == 'i' and hasattr(target, 'images'):
+                    image = Image(asset=asset_key)
+                    image.put()
+                    target.images.append(image.key)
+                    target.put()
+                elif asset.kind == 'a' and hasattr(target, 'avatar'):
+                    avatar = Avatar(asset=asset_key, active=True)
+                    avatar.put()
+                    target.avatar.append(avatar.key)
+                    target.put()
+                else:
+                    # We do not currently support any kind other than image.
+                    # Eventually we will support 's', 't', 'v' (style, script, video)
+                    pass
 
         return self.redirect('/_assets/get/%s' % asset_key.urlsafe())
 
