@@ -89,8 +89,8 @@ class MediaService(RemoteService):
 
         asset = Asset(kind='v', url=url)
         asset.put()
-        video = Video(asset=asset.key, url=url, provider=provider, parent=target_key, featured=True)
+        video = Video(id='mainvideo', asset=asset.key, url=url, provider=provider, parent=target_key, featured=True)
         video.put()
-        target.video.append(video.key)
+        target.video = video.key
         target.put()
         return Echo(message='Saved')

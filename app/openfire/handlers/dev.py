@@ -377,10 +377,10 @@ class DevModels(BaseHandler):
             fatcatmap.put()
 
             # fif, assets, avatars + videos
-            fcm_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/fatcatmap.png', name='fatcatmap.png', mime='image/png', kind='i', pending=False).put()
+            fcm_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/fatcatmap.png', name='fatcatmap.png', mime='image/png', kind='a', pending=False).put()
             fcm_video = assets.Asset(url='http://www.youtube.com/watch?v=bnyiMnG62OI', name='bnyiMnG62OI', mime='external/youtube', kind='v', pending=False).put()
-            ssd_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/seasteading.png', name='seasteading.png', mime='image/png', kind='i', pending=False).put()
-            urb_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/urbsly.png', name='urbsly.png', mime='image/png', kind='i', pending=False).put()
+            ssd_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/seasteading.png', name='seasteading.png', mime='image/png', kind='a', pending=False).put()
+            urb_avatar = assets.Asset(url='/assets/img/static/projects/cardstock/urbsly.png', name='urbsly.png', mime='image/png', kind='a', pending=False).put()
             urb_video = assets.Asset(url='http://www.youtube.com/watch?v=bnyiMnG62OI', name='bnyiMnG62OI', mime='external/youtube', kind='v', pending=False).put()
 
             fcm_media = assets.Avatar(key=ndb.Key(assets.Avatar, fcm_avatar.urlsafe(), parent=fatcatmap.key), version=1, active=True, url='/assets/img/static/projects/cardstock/fatcatmap.png', asset=fcm_avatar, approved=True)
@@ -417,8 +417,8 @@ class DevModels(BaseHandler):
             seasteading.avatar = ssd_media.key
             urbsly.avatar = urb_media.key
 
-            fatcatmap.video = [fcm_video_media.key]
-            urbsly.video = [urb_video_media.key]
+            fatcatmap.video = fcm_video_media.key
+            urbsly.video = urb_video_media.key
 
             sam_obj = sam.get()
             david_obj = david.get()
