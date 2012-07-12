@@ -122,10 +122,7 @@ class DevModels(BaseHandler):
             ]
             user_perms = ndb.put_multi(user_perms)
 
-            pug = pug.get()
-            sam = sam.get()
-            david = david.get()
-            ethan = ethan.get()
+            pug, sam, david, ethan = tuple(ndb.get_multi([pug, sam, david, ethan]))
 
             pug.email = [user_emails[0]]
             sam.email = [user_emails[1]]
