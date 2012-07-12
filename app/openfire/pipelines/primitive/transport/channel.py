@@ -8,7 +8,7 @@ class ChannelPipeline(TransportPipeline):
 
     ''' Abstract parent class for low-level channel pipelines. '''
 
-    pass
+    api = channel
 
 
 ## ChannelConnect - fired when a channel is connected
@@ -16,7 +16,11 @@ class ChannelConnect(ChannelPipeline):
 
     ''' Fired when a channel is connected. '''
 
-    pass
+    def run(self):
+
+        ''' Tracks a new channel connection. '''
+
+        pass
 
 
 ## ChannelDisconnect - fired when a channel is disconnected
@@ -24,7 +28,11 @@ class ChannelDisconnect(ChannelPipeline):
 
     ''' Fired when a channel is disconnected. '''
 
-    pass
+    def run(self):
+
+        ''' Updates a connection as 'disconnected. '''
+
+        pass
 
 
 ## ChannelPush - pushes a message to a connected client
@@ -32,4 +40,8 @@ class ChannelPush(ChannelPipeline):
 
     ''' Push a channel message to a client. '''
 
-    pass
+    def run(self, client_id, message):
+
+        ''' Pushes a message to a connected push channel. '''
+
+        return self.api.send_message(client_id, message)

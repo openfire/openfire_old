@@ -36,8 +36,8 @@ class Category(AppModel):
     keywords = ndb.StringProperty('k', indexed=True, repeated=True)
 
     # Counts
-    project_count = ndb.IntegerProperty('pc', indexed=True, default=1)
-    backer_count = ndb.IntegerProperty('bc', indexed=True, default=1)
+    project_count = ndb.IntegerProperty('pc', indexed=True, default=0)
+    backer_count = ndb.IntegerProperty('bc', indexed=True, default=0)
 
 
 ## Contribution Goals
@@ -147,7 +147,7 @@ class Project(AppModel):
     goals = ndb.KeyProperty('gl', repeated=True)
 
     # Avatar + Media
-    avatar = ndb.KeyProperty('av', repeated=True)
+    avatar = ndb.KeyProperty('av')
     images = ndb.KeyProperty('im', repeated=True)
     video = ndb.KeyProperty('vi', repeated=True)
 

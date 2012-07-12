@@ -82,6 +82,20 @@ config['openfire.meta'] = {
 
 }
 
+config['openfire.security'] = {
+
+    'encryption': {
+        'simple': True,    # simple b64 encryption for development
+        'advanced': False  # advanced AES symmetrical encryption for production
+    },
+
+    'config': {
+        'cipher': 'AES',
+        'pad16': True
+    }
+
+}
+
 config['openfire.sessions'] = {
 
     'ttl': 86400,  # timeout in seconds for stale session records
@@ -147,6 +161,6 @@ config['openfire.datamodel.integration.pipelines'] = {
     'enable': True,  # enable/disable pipelines integration
     'logging': False,  # enable/disable logging
     'autostart': False,  # automatically kick off bound pipelines
-    'trigger_queue': 'default'  # task queue to send pipelines to
+    'trigger_queue': 'trigger'  # task queue to send pipelines to
 
 }

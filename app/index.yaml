@@ -15,6 +15,16 @@ indexes:
   properties:
   - name: a
 
+- kind: Media
+  ancestor: yes
+  properties:
+  - name: class
+  - name: e
+  - name: _tm
+    direction: desc
+  - name: r
+  - name: a
+
 - kind: _AE_Pipeline_Record
   properties:
   - name: class_path

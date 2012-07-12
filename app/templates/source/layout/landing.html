@@ -35,7 +35,7 @@
                         <a href="{{ link('custom_url', customurl=project.slug) }}">
                             <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
                                 {% if project.avatar %}
-                                    <img src="{{ asset.image('projects/cardstock', project.avatar) }}" title="{{ project.name }} - {{ project.summary }}" />
+                                    <img src="{{ project.avatar }}" title="{{ project.name }} - {{ project.summary }}" />
                                 {% else %}
                                     <img src="http://placehold.it/140x120" />
                                 {% endif %}

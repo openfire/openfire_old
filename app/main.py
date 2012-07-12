@@ -9,6 +9,7 @@ except ImportError:
     pass
 
 import warmup as w
+from pipeline.handlers import _APP as pipeline_wsgi
 from apptools import dispatch
 
 
@@ -24,6 +25,13 @@ def warmup(environ=None, start_response=None):
     ''' Instance warmup '''
 
     return w.Warmup(environ, start_response)
+
+
+def pipelines(environ=None, start_response=None):
+
+    ''' GAE Pipelines '''
+
+    return pipeline_wsgi(environ, start_response)
 
 if __name__ == '__main__':
     main()
