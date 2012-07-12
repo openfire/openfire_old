@@ -1,410 +1,453 @@
 @import "../main"
 
 #welcomebox
-	z-index: 800
-	position: absolute
-	left: 5%
-	top: -100px
+    z-index: 800
+    position: absolute
+    left: 5%
+    top: -100px
 
 #promote
-	position: absolute
-	top: -40px
-	height: 35px
-	width: 640px
-	text-align: right
-	background-color: #ccc
-	border-top-right-radius: 3px
-	border-bottom-right-radius: 3px
+    position: absolute
+    top: -40px
+    height: 35px
+    width: 640px
+    text-align: right
+    background-color: #ccc
+    border-top-right-radius: 3px
+    border-bottom-right-radius: 3px
 
-	&::before
-		width: 35px
-		display: block
-		content: attr(data-section-title)
-		color: #888
-		font-family: Karla
-		font-size: 11px
-		text-transform: uppercase
-		transform: rotate(-90deg)
-		-webkit-transform: rotate(-90deg)
-		-moz-transform: rotate(-90deg)
-		-o-transform: rotate(-90deg)
-		float: left
-		margin-top: 11px
-		margin-left: -24px
-		background-color: #ccc
-		text-align: right
-		border-top-left-radius: 3px
-		border-top-right-radius: 3px
+    &::before
+        width: 35px
+        display: block
+        content: attr(data-section-title)
+        color: #888
+        font-family: Karla
+        font-size: 11px
+        text-transform: uppercase
+        transform: rotate(-90deg)
+        -webkit-transform: rotate(-90deg)
+        -moz-transform: rotate(-90deg)
+        -o-transform: rotate(-90deg)
+        float: left
+        margin-top: 11px
+        margin-left: -24px
+        background-color: #ccc
+        text-align: right
+        border-top-left-radius: 3px
+        border-top-right-radius: 3px
 
-	button
-		border-radius: 10px
-		margin: 6px
-		font-family: Karla
-		font-size: 11pt
-		text-transform: uppercase
-		color: #404044
-		background-color: #ccc
+    button
+        border-radius: 10px
+        margin: 6px
+        font-family: Karla
+        font-size: 11pt
+        text-transform: uppercase
+        color: #404044
+        background-color: #ccc
 
-		&:hover,
-		&:active
-			background-color: #bada55
+        &:hover,
+        &:active
+            background-color: #bada55
 
 #owners
-	position: absolute
-	bottom: -150px
-	width: 240px
-	margin-left: auto
-	margin-right: auto
-	height: 150px
+    position: absolute
+    bottom: -150px
+    width: 240px
+    margin-left: auto
+    margin-right: auto
+    height: 150px
 
 .nametag
-	display: inline
+    display: inline
 
-	.byline
-		color: #999
-		font-size: 11pt
+    .byline
+        color: #999
+        font-size: 11pt
 
 .hr-inset
-	margin: 15px auto
-	width: 100%
-	height: 1px
-	background-color: #e9e9ee
-	border: 0px solid #e9e9ee
+    margin: 15px auto
+    width: 100%
+    height: 1px
+    background-color: #e9e9ee
+    border: 0px solid #e9e9ee
 
-	&::after
-		display: block
-		content: ''
-		width: 99%
-		margin: 0 auto
-		background-color: #9f9f99
-		height: 1px
-		position: relative
-		top: -1px
+    &::after
+        display: block
+        content: ''
+        width: 99%
+        margin: 0 auto
+        background-color: #9f9f99
+        height: 1px
+        position: relative
+        top: -1px
 
-	&.half
-		width: 50%
+    &.half
+        width: 50%
 
-	&.quarter
-		width: 25%
+    &.quarter
+        width: 25%
 
-	&.most
-		width: 75%
+    &.most
+        width: 75%
 
 
 #sidebar
 
-	border-radius: 10px
-	-moz-border-radius: 10px
-	-webkit-border-radius: 10px
-	-ms-border-radius: 10px
-	-o-border-radius: 10px
-	z-index: 900
-	position: absolute
-	background: #CCC
-	width: 300px
-	height: 650px
-	right: 5%
-	top: -170px
+    border-radius: 10px
+    -moz-border-radius: 10px
+    -webkit-border-radius: 10px
+    -ms-border-radius: 10px
+    -o-border-radius: 10px
+    z-index: 900
+    position: absolute
+    background: #CCC
+    width: 300px
+    height: 650px
+    right: 5%
+    top: -170px
 
 
-	&::after
-		display: block
-		content: ''
-		width: 100%
-		position: absolute
-		bottom: 0px
-		height: 15px
-		border-bottom-left-radius: 10px
-		border-bottom-right-radius: 10px
-		+background(linear-gradient(top center, rgba(204,204,204, 0), rgba(204,204,204, 1)))
+    &::after
+        display: block
+        content: ''
+        width: 100%
+        position: absolute
+        bottom: 0px
+        height: 15px
+        border-bottom-left-radius: 10px
+        border-bottom-right-radius: 10px
+        +background(linear-gradient(top center, rgba(204,204,204, 0), rgba(204,204,204, 1)))
 
-	&.fixed
-		position: fixed !important
+    &.fixed
+        position: fixed !important
 
-	header
+    header
 
-		#sidetitle
-			margin-left: 20px
-			text-align: left
+        #sidetitle
+            margin-left: 20px
+            text-align: left
 
-			h1
-				font:
-					family: 'Karla'
-					size: 240%
-				color: black
+            h1
+                font:
+                    family: 'Karla'
+                    size: 240%
+                color: black
 
-		#sidebuttons
-			display: inline
-			position: absolute
-			right: 20px
-			top: 25px
-			width: 70px
-			text-align: center
+        #sidebuttons
+            display: inline
+            position: absolute
+            right: 20px
+            top: 25px
+            width: 70px
+            text-align: center
 
-			button
-				color: #222
-				padding: 0px
-				margin-right: 3px
+            button
+                color: #222
+                padding: 0px
+                margin-right: 3px
 
-				&.following
-					color: #f57220
+                &.following
+                    color: #f57220
 
-					&:hover
-						color: #f79331
+                    &:hover
+                        color: #f79331
 
-				&:hover
-					color: #f79331
+                &:hover
+                    color: #f79331
 
-				&:active,
-				&:visited
-					color: #f57220
+                &:active,
+                &:visited
+                    color: #f57220
 
-	section
-		min-height: 50px
+    section
+        min-height: 50px
 
-	#quickinfo
-		position: relative
-		padding: 0 20px
-		margin: 0 !important
+    #quickinfo
+        position: relative
+        padding: 0 20px
+        margin: 0 !important
 
-		#progress
-			width: 320px
-			position: relative
-			left: -30px
-			height: 30px
-			background-color: white
-			border: none
-			box-shadow: 0px 2px 8px -3px rgba(0,0,0, 0.75)
-			z-index: 900
+        #progress
+            width: 320px
+            position: relative
+            left: -30px
+            height: 30px
+            background-color: white
+            border: none
+            box-shadow: 0px 2px 8px -3px rgba(0,0,0, 0.75)
+            z-index: 900
 
-			&::before,
-			&::after
-				display: block
-				content: ' '
-				position: absolute
-				top: 30px
-				width: 9px
-				height: 9px
-				background-color: transparent
+            &::before,
+            &::after
+                display: block
+                content: ' '
+                position: absolute
+                top: 30px
+                width: 9px
+                height: 9px
+                background-color: transparent
 
-			&::before
-				left: 1px
-				+background(linear-gradient(top right, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
-				clip: rect(0px 10px 8px 2px)
-				box-shadow: inset -2px 3px 11px -5px rgba(0,0,0, 0.75)
+            &::before
+                left: 1px
+                +background(linear-gradient(top right, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
+                clip: rect(0px 10px 8px 2px)
+                box-shadow: inset -2px 3px 11px -5px rgba(0,0,0, 0.75)
 
-			&::after
-				right: 1px
-				+background(linear-gradient(top left, white 0%, white 50%, transparent 50%, transparent 100%))
-				clip: rect(0px 8px 8px 0px)
-				box-shadow: inset 2px 3px 11px -5px rgba(0,0,0, 0.75)
+            &::after
+                right: 1px
+                +background(linear-gradient(top left, white 0%, white 50%, transparent 50%, transparent 100%))
+                clip: rect(0px 8px 8px 0px)
+                box-shadow: inset 2px 3px 11px -5px rgba(0,0,0, 0.75)
 
-			&.done
-				&::after
-					background: none
-					+background(linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
-
-
-			#progress-inner
-				position: absolute
-				left: 0px
-				height: 30px
-				background-color: #bada55
-				border: none
-				text-align: right
-				color: white
-				line-height: 30px
-				font-size: 20px
-				font-weight: 700
-				text-transform: uppercase
-				font-family: Karla
-
-		#project_goals,
-		#project_tiers
-
-			margin-bottom: 10px
-			margin-top: 10px
-
-			a
-				font-size: 15px
-				font-family: Karla
-				font-weight: 700
-				line-height: 17px
-				color: #666
-				text-decoration: none
-				cursor: pointer
-				display: block
-				width: 100%
-
-				&:link
-					text-decoration: inherit
-					color: inherit
-
-				&.reached
-					color: #999
-
-				&.current
-					color: black
+            &.done
+                &::after
+                    background: none
+                    +background(linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
 
 
-			p
-				padding: 5px
-				margin: 5px
-				font-size: 11px
-				background: #eee
-				border-radius: 3px
+            #progress-inner
+                position: absolute
+                left: 0px
+                height: 30px
+                background-color: #bada55
+                border: none
+                text-align: right
+                color: white
+                line-height: 30px
+                font-size: 20px
+                font-weight: 700
+                text-transform: uppercase
+                font-family: Karla
 
-			&::before
-				width: 35px
-				display: block
-				content: attr(data-section-title)
-				color: #888
-				font-family: Karla
-				font-size: 11px
-				text-transform: uppercase
-				transform: rotate(-90deg)
-				-webkit-transform: rotate(-90deg)
-				-moz-transform: rotate(-90deg)
-				-o-transform: rotate(-90deg)
-				position: relative
-				background-color: #ccc
-				left: -45px
-				top: 25px
-				text-align: right
-				padding-right: 3px
-				border-top-left-radius: 3px
-				border-top-right-radius: 3px
+        #project_goals,
+        #project_tiers
+
+            margin-bottom: 10px
+            margin-top: 10px
+
+            a
+                font-size: 15px
+                font-family: Karla
+                font-weight: 700
+                line-height: 17px
+                color: #666
+                text-decoration: none
+                cursor: pointer
+                display: block
+                width: 100%
+
+                &:link
+                    text-decoration: inherit
+                    color: inherit
+
+                &.reached
+                    color: #999
+
+                &.current
+                    color: black
+
+
+            p
+                padding: 5px
+                margin: 5px
+                font-size: 11px
+                background: #eee
+                border-radius: 3px
+
+            &::before
+                width: 35px
+                display: block
+                content: attr(data-section-title)
+                color: #888
+                font-family: Karla
+                font-size: 11px
+                text-transform: uppercase
+                transform: rotate(-90deg)
+                -webkit-transform: rotate(-90deg)
+                -moz-transform: rotate(-90deg)
+                -o-transform: rotate(-90deg)
+                position: relative
+                background-color: #ccc
+                left: -45px
+                top: 25px
+                text-align: right
+                padding-right: 3px
+                border-top-left-radius: 3px
+                border-top-right-radius: 3px
 
 
 
 
-	#backers
-		position: relative
-		width: 100%
-		margin-top: 15px
-		height: 130px
-		text-align: center
+    #backers
+        position: relative
+        width: 100%
+        margin-top: 15px
+        height: 130px
+        text-align: center
 
-		#backproject
-			height: 50px
+        #backproject
+            height: 50px
 
-			#back
-				font-family: Karla
-				font-size: 18px
-				font-weight: 700
-				line-height: 40px
-				color: white
-				margin: 0 10px
-				width: 80%
-				border-radius: 10px
-				text-transform: uppercase
-				+background(linear-gradient(top center, #f79331, #f57220))
+            #back
+                font-family: Karla
+                font-size: 18px
+                font-weight: 700
+                line-height: 40px
+                color: white
+                margin: 0 10px
+                width: 80%
+                border-radius: 10px
+                text-transform: uppercase
+                +background(linear-gradient(top center, #f79331, #f57220))
 
-				&:hover
-					+background(linear-gradient(top center, #ffd468, #ffb246))
+                &:hover
+                    +background(linear-gradient(top center, #ffd468, #ffb246))
 
-				&.backed
-					+background(linear-gradient(top center, #bada55, green))
+                &.backed
+                    +background(linear-gradient(top center, #bada55, green))
 
-		#backer_summary
-			margin-top: 15px
-			height: 40px
-			text-align: center
+        #backer_summary
+            margin-top: 15px
+            height: 40px
+            text-align: center
 
 
 .contentwrap
-	padding: 20px
+    padding: 20px
 
 #project
 
-	z-index: 700
-	position: relative
-	height: 100%
-	width: 85%
-	margin-left: auto
-	margin-right: auto
-	max-width: 1120px
+    z-index: 700
+    position: relative
+    height: 100%
+    width: 85%
+    margin-left: auto
+    margin-right: auto
+    max-width: 1120px
 
-	article
-		section
-			width: 100% !important
-			margin: 0 !important
+    article
+        section
+            width: 100% !important
+            margin: 0 !important
 
-	#deets
-		width: 640px
-		left: 5%
-		top: 275px
-		position: relative
+    #deets
+        width: 640px
+        left: 5%
+        top: 275px
+        position: relative
+        margin-bottom: 100px
 
-		.prsection
-			min-height: 85px
-			padding: 10px
+        .prsection
+            min-height: 85px
+            padding: 10px
 
-		#projecttitle
-			height: 50px
-			margin-top: 15px
-			margin-bottom: 10px
-			display: block
-			width: 100%
-			background-color: #ccc
+        #projecttitle
+            height: 50px
+            margin-top: 15px
+            margin-bottom: 10px
+            display: block
+            width: 100%
+            background-color: #ccc
 
-			h1
-				font-size: 32pt !important
-				font-family: Karla
-				font-weight: 700
-				text-transform: uppercase
-				color: black !important
-				margin: 0 !important
-				float: left
-				clear: left
+            h1
+                font-size: 32pt !important
+                font-family: Karla
+                font-weight: 700
+                text-transform: uppercase
+                color: black !important
+                margin: 0 0 0 5px !important
+                float: left
+                clear: left
 
-			#deetactions
-				float: right
-				height: 50px
-				line-height: 30px
-				padding: 0
+            #deetactions
+                float: right
+                height: 50px
+                line-height: 30px
+                padding: 0
 
-				.buttongroup
-					text-align: right
-					margin-right: 3px
+                .buttongroup
+                    text-align: right
+                    margin-right: 3px
 
-					&::before
-						display: block
-						content: attr(data-action)
-						width: 100%
-						height: 13px
-						font-size: 11px
-						text-align: center
-						border: none
-						background-color: #ddd
-						font-family: Karla
-						font-weight: 700
-						text-transform: uppercase
-						line-height: 13px
-						margin: 3px 0
-						max-width: 150px
+                    &::before
+                        display: block
+                        content: attr(data-action)
+                        width: 100%
+                        height: 13px
+                        font-size: 11px
+                        text-align: center
+                        border: none
+                        background-color: #eee
+                        font-family: Karla
+                        font-weight: 700
+                        text-transform: uppercase
+                        line-height: 13px
+                        margin: 3px 0
+                        max-width: 150px
+
+                    button
+                        margin: 0
+                        padding: 0
+
+        #project-tabset
+            margin-bottom: 100px
+
+            &.tabset
+                text-align: center
+
+                a
+                    &:link,
+                    &:visited,
+                    &:active
+                        text-decoration: none
+                        color: #e9e9e9
+
+                    &:hover
+                        color: white
+
+                    &.current-tab
+                        background-color: #eee
+                        color: black
+
+                .tab-rounded
+                    border-top-left-radius: 3px
+                    border-top-right-radius: 3px
+
+                .tab-rounded,
+                .tab-link
+                    cursor: pointer
+                    margin-top: 5px
+                    font-family: Karla
+                    font-weight: 400
+                    text-transform: uppercase
+                    margin-right: 2%
+                    width: 25%
+                    display: inline-block
+                    border: none !important
+                    padding: 15px 10px
+                    background-color: #797977
+                    color: white
+                    font-size: 16px
+                    line-height: 18px
 
 
+                .tab
+                    top: 52px
+                    right: 0px
+                    bottom: 0px
+                    left: 0px
+                    text-align: left
+                    background-color: #eee
 
-					button
-						margin: 0
-						padding: 0
-
-		#intro
-			background: transparent !important
-			p
-				padding: 0
-				margin: 0
-				display: inline
 
 
 #project-image-drop-avatar,
 #project-image-drop-image,
 #project-image-drop-no
 
-	width: 30%
-	margin: 5px
-	font-family: Karla
-	font-size: 11pt
-	text-transform: uppercase
-	color: #404044
+    width: 30%
+    margin: 5px
+    font-family: Karla
+    font-size: 11pt
+    text-transform: uppercase
+    color: #404044

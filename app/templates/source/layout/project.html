@@ -143,7 +143,7 @@
 
                 <!-- project title -->
                 <div id='projecttitle'>
-                    <h1>{{ project.name }}</h1>
+                    <h1 class="mini-editable" id="project-title-header">{{ project.name }}</h1>
                     <div id='deetactions'>
                         <div class='buttongroup' data-action="Share This">
                             <button id='fbshare' class='zocial facebook sharebutton icon'></button>
@@ -153,25 +153,41 @@
                     </div> <!-- end #deetactions -->
                 </div> <!-- end #projecttitle -->
 
-                <!-- intro/pitch -->
-                <section id='intro' class='prsection'>
-                    <h2 class="mini-editable" id="header-intro">Project Intro</h2>
-                    {% block description %}
-                      <p>{{ project.summary }}</p>
-                    {% endblock %}
-                </section><!-- end #intro -->
+                <!-- project info tabset -->
+                <div id='project-tabset' class='pre-tabs relative tabset' data-options='{"div_string":"section","width":"640px"}'>
+                    <a href='#details-tab' class='tab-rounded'>project details</a>
+                    <a href='#members-tab' class='tab-rounded'>project members</a>
+                    <a href='#openfire-tab' class='tab-rounded'>social reach</a>
 
-                <!-- technologies -->
-                <section id='technologies' class='prsection'>
-                    <h2>Technologies</h2>
-                    <p>{{ project.tech }}</p>
-                </section><!-- end #technologies -->
+                    <!-- details-tab -->
+                    <section id='details-tab' class='prsection absolute tab' style="opacity: 0">
+                        <h2>Project Details</h2>
+                        {% block description %}
+                            <h3>Summary</h3>
+                            <p>{{ project.summary }}</p>
+                            <h3>Pitch</h3>
+                            <p>{{ project.pitch }}</p>
+                            <h3>Specifics</h3>
+                            <ul class='naked'>
+                                <li>Category: {{ project.category }}</li>
+                                <li>Technology: {{ project.tech }}</li>
+                                <li>Keywords: {{ project.keywords }}</li>
+                            </ul>
+                        {% endblock %}
+                    </section><!-- end #details-tab -->
 
-                <!-- team -->
-                <section id='team' class='prsection'>
-                    <h2>Team</h2>
-                    <p>TEAM</p>
-                </section><!-- end #team -->
+                    <!-- members-tab-->
+                    <section id='members-tab' class='prsection absolute tab' style="opacity: 0">
+                        <h2>Project Members</h2>
+                        <p>This project has team members and an owner.</p>
+                        <p>It was made possible by {{ project.backers }} generous backers, who have donated {{ currency(project.money) }} to date, placing this project {{ project.progress }}% of the way to its next support goal!</p>
+                    </section><!-- end #members-tab-->
+
+                    <!-- team -->
+                    <section id='openfire-tab' class='prsection absolute tab' style="opacity: 0">
+                        <h2>Social Reach</h2>
+                        <p>TEAM</p>
+                    </section><!-- end #team -->
 
                 <p></p>
                 <p></p>
