@@ -15,7 +15,13 @@
         <div id='project'>
 
             <div id='welcomebox'>
-                <div id='promote'>
+                <div id='promote' data-section-title="admin">
+                    <button id='promote-avatar' value="avatar">add avatar</button>
+                    <button id='promote-image' value="image">add image</button>
+                    <button id='promote-video' value="video">add video</button>
+                    <button id='promote-goals' value="goals">edit goals</button>
+                    <button id='promote-tiers' value="tiers">edit tiers</button>
+                    <button id='promote-tiers' value="tiers">all&nbsp;&raquo;</button>
                 </div>
                 {% block media %}
                     {% if video %}
@@ -42,7 +48,7 @@
                 {% endblock media %}
             </div>
 
-            <div id='sidebar'>
+            <div id='sidebar' class='pre-sticky'>
                 <header>
                     <div id='sidetitle' class='fancy title'><h1>{{ project.name }}</h1></div>
                     <div id='sidebuttons' class='buttons'>
@@ -50,23 +56,26 @@
                         <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                 </header> <!-- end header -->
+
+                <hr class="hr-inset most">
+
                 <section id='quickinfo'>
                     {% block right %}
 
                         <div id='global_progress'>
                             <!-- project progress -->
-                            <div id='progress' data-value="{{ project.progress }}" data-max="100">
+                            <div id='progress' data-value="{{ project.progress }}" data-max="100"{% if project.progress == 100 %} class="done"{% endif %}>
                                 <div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
                             </div>
                         </div><!-- end #global_progress -->
 
-                        <div id='project_goals'>
+                        <div id='project_goals' data-section-title="goals">
                             {% if project.goals %}
                             <div id="project-goals-accordion" class='pre-accordion' data-options='{"axis":"vertical"}'>
                                 {% set current_goal = false %}
                                 {% for goal in goals %}
                                     <a href="#{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %} class="current"{% endif %}{% endif %}>{{ currency(goal.amount) }}</a>
-                                    <div id="{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %}{% set current_goal = true %} class="current"{% endif %}{% endif %}>
+                                    <div id="{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached none"{% else %}{% if current_goal == false %}{% set current_goal = true %} class="current none"{% else %} class="none"{% endif %}{% endif %}>
                                         <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
                                     </div>
                                 {% endfor %}
@@ -76,14 +85,14 @@
                             {% endif %}
                         </div> <!-- end #project_goals -->
 
-                        <div id='project_tiers'>
+                        <div id='project_tiers'  data-section-title="tiers">
                             {% if project.tiers %}
                             <div id="project-tiers-accordion" class='pre-accordion' data-options='{"axis":"vertical"}'>
                                 {% set current_tier = false %}
                                 {% for tier in tiers %}
                                     <a href="#{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %} class="current"{% endif %}>{{ tier.name }} - {{ currency(tier.amount) }}</a>
-                                    <div id="{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %}{% set current_tier = true %} class="current"{% endif %}>
-                                        <p>{% autoescape off %}{{ tier.description }}{% endautoescape %}</p>
+                                    <div id="{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %}{% set current_tier = true %} class="current none"{% else %} class="none"{% endif %}>
+                                        <p>{{ tier.description|safe }}</p>
                                     </div>
                                 {% endfor %}
                              </div>
@@ -95,16 +104,19 @@
 
                     {% endblock %}
                 </section> <!-- end #quickinfo -->
+
+                <hr class="hr-inset most"></span>
+
                 <section id='backers'>
                     <div id='backproject'>
-                        <button id='back'>Back</button>
+                        <button id='back'><span id="back-text">Back this project</span></button>
                     </div> <!-- end #backproject -->
                     <div id='backer_summary'>
                         backerz
                     </div> <!-- end #backer_summary -->
                 </section> <!-- end #backers -->
 
-                <div id='owners'>
+                <div id='owners' >
                     <b>project owners:</b>
                     <ul class='naked'>
                         {% for owner in owners %}
@@ -133,8 +145,7 @@
                 <div id='projecttitle'>
                     <h1>{{ project.name }}</h1>
                     <div id='deetactions'>
-                        <div class='buttongroup'>
-                            <h6>Share This</h6>
+                        <div class='buttongroup' data-action="Share This">
                             <button id='fbshare' class='zocial facebook sharebutton icon'></button>
                             <button id='twshare' class='zocial twitter sharebutton icon'></button>
                             <button id='g+share' class='zocial googleplus sharebutton icon'></button>
@@ -144,7 +155,7 @@
 
                 <!-- intro/pitch -->
                 <section id='intro' class='prsection'>
-                    <h2>Project Intro</h2>
+                    <h2 class="mini-editable" id="header-intro">Project Intro</h2>
                     {% block description %}
                       <p>{{ project.summary }}</p>
                     {% endblock %}
@@ -161,6 +172,25 @@
                     <h2>Team</h2>
                     <p>TEAM</p>
                 </section><!-- end #team -->
+
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
 
             </article><!-- end #project -->
         </div><!-- end #content -->

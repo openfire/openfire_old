@@ -634,6 +634,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'tabs.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'editor.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'uploader.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'sticky.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling AppTools JS for admins...'
@@ -663,6 +664,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'tabs.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'editor.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'uploader.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'sticky.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'admin', '_core.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'admin', 'blog.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'admin', 'page.coffee'),
