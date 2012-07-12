@@ -199,10 +199,17 @@ class SessionsMixin(object):
 
         ''' Proxy stuff to the Core Sessions API. '''
 
+        from openfire.handlers import WebHandler
+        from openfire.services import RemoteService
+
         if self.__sessions_bridge is None:
             if not hasattr(self, 'session_store'):
-                self.session_store = sessions.get_store(request=self.request)
-            self.__sessions_bridge = CoreSessionAPI(self.session_store)
+                if isinstance(self, WebHandler):
+                    self.session_store = sessions.get_store(request=self.request)
+                    self.__sessions_bridge = CoreSessionAPI(self.session_store)
+                elif isinstance(self, RemoteService):
+                    self.handler.session_store = sessions.get_store(request=self.handler.request)
+                    self.__sessions_bridge = CoreSessionAPI(self.handler.session_store)
 
         session = self.__sessions_bridge.get_session(self.request, create=make, cookies=cookies, headers=headers, **kwargs)
         if session is not None:
