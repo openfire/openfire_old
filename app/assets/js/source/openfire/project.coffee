@@ -116,7 +116,11 @@ class ProjectController extends OpenfireController
                 if /^image\/(png|jpeg|gif)$/gi.test(file.type)
 
                     # a valid file!
-                    $.apptools.api.media.attach_image(target: @project_key).fulfill
+                    $.apptools.api.media.attach_image(
+                        target: @project_key
+                        size: file.size
+                        name: file.name
+                    ).fulfill
 
                         success: (response) =>
 
