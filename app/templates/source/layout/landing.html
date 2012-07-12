@@ -35,9 +35,15 @@
                         <a href="{{ link('custom_url', customurl=project.slug) }}">
                             <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
                                 {% if project.avatar %}
-                                    <img src="{{ project.avatar }}" title="{{ project.name }} - {{ project.summary }}" />
-                                {% else %}
-                                    <img src="http://placehold.it/140x120" />
+                                    {% if project.avatar.location %}
+                                    <img src="{{ project.avatar.location }}" title="{{ project.name }} - {{ project.summary }}" />
+                                    {% else %}
+                                        {% if project.avatar.url %}
+                                            <img src="{{ project.avatar.url }}" title="{{ project.name }} - {{ project.summary }}" />
+                                        {% else %}
+                                            <img src="http://placehold.it/140x120" />
+                                        {% endif %}
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </a>
@@ -66,21 +72,8 @@
                     </li>
                 </ul>-->
 
-                <div class="pre-tabs" id="tabset-test-1" data-options='{"width":"400px"}'>
-                    <a href="#tab-1">Tab 1</a>
-                    <a href="#tab-2">Tab 2</a>
-                    <a href="#tab-3">Tab 3</a>
-                    <a href="#tab-4">Tab 4</a>
-                    <div id="tab-1" class='pre-uploader'>
-                        <h3>I am the first tab</h3>
-                    </div>
-                    <div id="tab-2" class="mini-editable">
-                        <h3>UND I AM ZE SECUND TAB</h3>
-                        <div>und we are testing NESTING</div>
-                        <div>und also mini-editability?</div>
-                    </div>
-                    <div id="tab-3">ahnd ah ahm thah thahrd tahb</div>
-                    <div id="tab-4">.....</div>
+                <div class='ohnoes'>
+                    Oh noez, no projects!
                 </div>
             </div>
 
