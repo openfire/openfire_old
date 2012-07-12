@@ -29,8 +29,6 @@ class TestPassthrough(blobstore_handlers.BlobstoreUploadHandler):
 
         ''' Passthrough. '''
 
-        import pdb; pdb.set_trace()
-
         uploads = self.get_uploads()
 
         return self.response.write('<pre>' + str(self.request) + '</pre>')
