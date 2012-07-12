@@ -29,7 +29,7 @@ class User(AppModel):
     customurl = ndb.KeyProperty('url', indexed=True, default=None)
     permissions = ndb.KeyProperty('prms', indexed=True, repeated=True)
     email = ndb.KeyProperty('em', indexed=True, repeated=True)
-    avatar = ndb.KeyProperty('av', repeated=True)
+    avatar = ndb.KeyProperty('av')
     images = ndb.KeyProperty('im', repeated=True)
 
     def get_custom_url(self):

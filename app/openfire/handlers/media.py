@@ -29,6 +29,8 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
         if asset:
             asset.pending = False
             asset.blob = upload.key()
+            asset.mime = upload.content_type
+            asset.url = self.url_for('serve-asset-filename', action='serve', asset_key=asset.key.urlsafe(), filename=upload.filename)
             asset.put()
 
         # If there is a target, attach this media to a project or user.
@@ -43,9 +45,9 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
                     target.put()
                 elif asset.kind == 'a' and hasattr(target, 'avatar'):
                     # TODO: Set all other avatars as inactive?
-                    avatar = Avatar(asset=asset_key, active=True, parent=target.key)
+                    avatar = Avatar(id=asset_key.urlsafe(), asset=asset_key, active=True, parent=target.key)
                     avatar.put()
-                    target.avatar.append(avatar.key)
+                    target.avatar = avatar.key
                     target.put()
                 else:
                     # We do not currently support any kind other than image.
@@ -74,8 +76,13 @@ class AssetServer(WebHandler):
         asset = asset_key.get()
         if not asset:
             return self.error(404)
+        if not asset.blob:
+            return self.error(404)
 
         blob_info = blobstore.get(asset.blob)
+        if not blob_info:
+            return self.error(404)
+
         value = BlobReader(blob_info.key(), buffer_size=blob_info.size).read()
 
         # The code works with or without the following line.

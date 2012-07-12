@@ -54,21 +54,13 @@
         </div>
         <div class="project-info">
             <span class="project-avatars">
-                {% for each_avatar in project.avatar %}
-                    <img data-key="{{ each_avatar.urlsafe() }}" src="/_assets/blob/serve/{{ each_avatar.get().asset.urlsafe() }}">
-                {% else %}
-                    NO AVATARS.
-                {% endfor %}
+                <img data-key="{{ project.avatar.urlsafe() }}" src="/_assets/blob/serve/{{ project.avatar.id() }}">
             </span>
         </div>
         <div class="project-info">
             <div id="project-{{ encrypt(project.key.urlsafe()) }}-video">
                 <span class="project-videos">
-                    {% for each_video in project.video %}
-                        <span class="project-video bbq-not-editable">{{ each_video.get().url }}</span>
-                    {% else %}
-                        NO VIDEOS.
-                    {% endfor %}
+                    <span class="project-video bbq-not-editable">{{ project.video and project.video.get().url or '' }}</span>
                 </span>
                 <div class="add-project-video">
                     <input type="text" name="video-url">

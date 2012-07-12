@@ -149,7 +149,7 @@ class Project(AppModel):
     # Avatar + Media
     avatar = ndb.KeyProperty('av')
     images = ndb.KeyProperty('im', repeated=True)
-    video = ndb.KeyProperty('vi', repeated=True)
+    video = ndb.KeyProperty('vi')
 
     def is_private(self):
         return (self.status not in ['p', 'c']) or self.public
