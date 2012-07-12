@@ -16,6 +16,7 @@ import bootstrap
 bootstrap.AppBootstrapper.prepareImports()
 from apptools import dispatch
 
+from test_util import encrypt, decrypt
 
 class FixturesTestCase(unittest.TestCase):
 

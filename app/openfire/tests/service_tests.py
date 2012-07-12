@@ -18,6 +18,7 @@ import test_db_loader as db_loader
 from openfire.models.project import Category
 from openfire.models.assets import CustomURL
 
+from test_util import encrypt, decrypt
 
 API_DICT = {
     'id':1,
@@ -245,7 +246,7 @@ class ProposalServiceTestCase(unittest.TestCase):
         ''' Add one private and one public proposal to the database then query. '''
         proposal_key = db_loader.create_proposal()
         key = proposal_key.urlsafe()
-        response = generic_service_method_success_test(self, 'proposal', 'get', params={'key':key})
+        response = generic_service_method_success_test(self, 'proposal', 'get', params={'key':encrypt(key)})
         self.assertEqual(response['response']['type'], 'Proposal',
             'Proposal get service method failed.')
         self.assertEqual(response['response']['content']['key'], key,
@@ -278,7 +279,7 @@ class ProposalServiceTestCase(unittest.TestCase):
 
         params['name'] = name_2
         params['pitch'] = pitch_2
-        params['key'] = response['response']['content']['key']
+        params['key'] = encrypt(response['response']['content']['key'])
 
         response = generic_service_method_success_test(self, 'proposal', 'put', params=params)
         self.assertEqual(response['response']['type'], 'Proposal',
@@ -352,7 +353,7 @@ class CategoryServiceTestCase(unittest.TestCase):
 
         params['name'] = name_2
         params['description'] = description_2
-        params['key'] = response['response']['content']['key']
+        params['key'] = encrypt(response['response']['content']['key'])
 
         response = generic_service_method_success_test(self, 'category', 'put', params=params)
         self.assertEqual(response['response']['type'], 'Category',
@@ -369,7 +370,7 @@ class CategoryServiceTestCase(unittest.TestCase):
         slug = 'test-slug'
         category_key = db_loader.create_category(slug=slug)
         params = {
-            'key': category_key.urlsafe(),
+            'key': encrypt(category_key.urlsafe()),
         }
         response = generic_service_method_success_test(self, 'category', 'delete', params=params)
         self.assertEqual(response['response']['type'], 'Echo',
@@ -421,7 +422,7 @@ class CustomUrlServiceTestCase(unittest.TestCase):
         target = db_loader.create_project()
         params = {
             'slug': 'test',
-            'target': target.urlsafe(),
+            'target': encrypt(target.urlsafe()),
         }
 
         response = generic_service_method_success_test(self, 'url', 'put', params=params)
@@ -440,7 +441,7 @@ class CustomUrlServiceTestCase(unittest.TestCase):
         slug = 'test-slug'
         custom_url_key = db_loader.create_custom_url(slug=slug)
         params = {
-            'key': custom_url_key.urlsafe(),
+            'key': encrypt(custom_url_key.urlsafe()),
         }
         response = generic_service_method_success_test(self, 'url', 'delete', params=params)
         self.assertEqual(response['response']['type'], 'Echo',

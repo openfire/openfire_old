@@ -14,6 +14,7 @@ import webapp2
 
 import test_db_loader as db_loader
 
+from test_util import encrypt, decrypt
 
 class DatastoreSessionLoaderTestCase(unittest.TestCase):
 

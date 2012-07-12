@@ -17,6 +17,11 @@ from google.appengine.ext import ndb
 
 import test_db_loader as db_loader
 
+AES = None
+try:
+    from Crypto.Cipher import AES
+except:
+    pass
 
 class BasicEncryptTestCase(unittest.TestCase):
 
@@ -104,7 +109,6 @@ class AdvancedEncryptTestCase(unittest.TestCase):
     def test_aes_support(self):
 
         # Try to import AES
-        from Crypto.Cipher import AES
         self.assertTrue(AES, 'Could not load PyCrypt AES support. All advanced encryption tests will fail.')
 
     @unittest.expectedFailure
