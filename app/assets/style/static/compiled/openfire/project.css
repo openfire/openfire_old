@@ -712,7 +712,7 @@ p {
 }
 
 .dropshadow {
-  box-shadow: 2px 2px 3px #333333;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);
 }
 
 .overlay {
@@ -731,10 +731,6 @@ p {
 
 .none {
   display: none;
-}
-
-.dropshadow {
-  box-shadow: 2px 2px 3px #333333;
 }
 
 .in-table {
@@ -1540,15 +1536,50 @@ button:-moz-focus-inner {
 
 #promote {
   position: absolute;
-  top: -30px;
-  height: 25px;
-  width: 300px;
-  text-align: left;
+  top: -40px;
+  height: 35px;
+  width: 640px;
+  text-align: right;
+  background-color: #cccccc;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+#promote::before {
+  width: 35px;
+  display: block;
+  content: attr(data-section-title);
+  color: #888888;
+  font-family: Karla;
+  font-size: 11px;
+  text-transform: uppercase;
+  transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  float: left;
+  margin-top: 11px;
+  margin-left: -24px;
+  background-color: #cccccc;
+  text-align: right;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+#promote button {
+  border-radius: 10px;
+  margin: 6px;
+  font-family: Karla;
+  font-size: 11pt;
+  text-transform: uppercase;
+  color: #404044;
+  background-color: #cccccc;
+}
+#promote button:hover, #promote button:active {
+  background-color: #bada55;
 }
 
 #owners {
-  position: relative;
-  bottom: -175px;
+  position: absolute;
+  bottom: -150px;
   width: 240px;
   margin-left: auto;
   margin-right: auto;
@@ -1561,6 +1592,33 @@ button:-moz-focus-inner {
 .nametag .byline {
   color: #999999;
   font-size: 11pt;
+}
+
+.hr-inset {
+  margin: 15px auto;
+  width: 100%;
+  height: 1px;
+  background-color: #e9e9ee;
+  border: 0px solid #e9e9ee;
+}
+.hr-inset::after {
+  display: block;
+  content: "";
+  width: 99%;
+  margin: 0 auto;
+  background-color: #9f9f99;
+  height: 1px;
+  position: relative;
+  top: -1px;
+}
+.hr-inset.half {
+  width: 50%;
+}
+.hr-inset.quarter {
+  width: 25%;
+}
+.hr-inset.most {
+  width: 75%;
 }
 
 #sidebar {
@@ -1576,6 +1634,24 @@ button:-moz-focus-inner {
   height: 650px;
   right: 5%;
   top: -170px;
+}
+#sidebar::after {
+  display: block;
+  content: "";
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  height: 15px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(204, 204, 204, 0)), color-stop(100%, #cccccc));
+  background: -webkit-linear-gradient(top center, rgba(204, 204, 204, 0), #cccccc);
+  background: -moz-linear-gradient(top center, rgba(204, 204, 204, 0), #cccccc);
+  background: -o-linear-gradient(top center, rgba(204, 204, 204, 0), #cccccc);
+  background: linear-gradient(top center, rgba(204, 204, 204, 0), #cccccc);
+}
+#sidebar.fixed {
+  position: fixed !important;
 }
 #sidebar header #sidetitle {
   margin-left: 20px;
@@ -1599,11 +1675,17 @@ button:-moz-focus-inner {
   padding: 0px;
   margin-right: 3px;
 }
-#sidebar header #sidebuttons button:hover {
-  color: blue !important;
-}
 #sidebar header #sidebuttons button.following {
-  color: green !important;
+  color: #f57220;
+}
+#sidebar header #sidebuttons button.following:hover {
+  color: #f79331;
+}
+#sidebar header #sidebuttons button:hover {
+  color: #f79331;
+}
+#sidebar header #sidebuttons button:active, #sidebar header #sidebuttons button:visited {
+  color: #f57220;
 }
 #sidebar section {
   min-height: 50px;
@@ -1652,6 +1734,14 @@ button:-moz-focus-inner {
   clip: rect(0px 8px 8px 0px);
   box-shadow: inset 2px 3px 11px -5px rgba(0, 0, 0, 0.75);
 }
+#sidebar #quickinfo #progress.done::after {
+  background: none;
+  background: -webkit-gradient(linear, 0% 0%, 100% 100%, color-stop(0%, #bada55), color-stop(50%, #bada55), color-stop(50%, transparent), color-stop(100%, transparent));
+  background: -webkit-linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%);
+  background: -moz-linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%);
+  background: -o-linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%);
+  background: linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%);
+}
 #sidebar #quickinfo #progress #progress-inner {
   position: absolute;
   left: 0px;
@@ -1669,6 +1759,7 @@ button:-moz-focus-inner {
 #sidebar #quickinfo #project_goals,
 #sidebar #quickinfo #project_tiers {
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 #sidebar #quickinfo #project_goals a,
 #sidebar #quickinfo #project_tiers a {
@@ -1676,7 +1767,7 @@ button:-moz-focus-inner {
   font-family: Karla;
   font-weight: 700;
   line-height: 17px;
-  color: black;
+  color: #666666;
   text-decoration: none;
   cursor: pointer;
   display: block;
@@ -1689,15 +1780,11 @@ button:-moz-focus-inner {
 }
 #sidebar #quickinfo #project_goals a.reached,
 #sidebar #quickinfo #project_tiers a.reached {
-  color: #666666;
+  color: #999999;
 }
 #sidebar #quickinfo #project_goals a.current,
 #sidebar #quickinfo #project_tiers a.current {
-  color: white;
-}
-#sidebar #quickinfo #project_goals a.current-fold,
-#sidebar #quickinfo #project_tiers a.current-fold {
-  background-color: #dedede;
+  color: black;
 }
 #sidebar #quickinfo #project_goals p,
 #sidebar #quickinfo #project_tiers p {
@@ -1707,9 +1794,27 @@ button:-moz-focus-inner {
   background: #eeeeee;
   border-radius: 3px;
 }
-#sidebar #quickinfo #project_goals a.current-fold,
-#sidebar #quickinfo #project_tiers a.current-fold {
-  background-color: #dedede;
+#sidebar #quickinfo #project_goals::before,
+#sidebar #quickinfo #project_tiers::before {
+  width: 35px;
+  display: block;
+  content: attr(data-section-title);
+  color: #888888;
+  font-family: Karla;
+  font-size: 11px;
+  text-transform: uppercase;
+  transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  position: relative;
+  background-color: #cccccc;
+  left: -45px;
+  top: 25px;
+  text-align: right;
+  padding-right: 3px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
 }
 #sidebar #backers {
   position: relative;
@@ -1722,9 +1827,34 @@ button:-moz-focus-inner {
   height: 50px;
 }
 #sidebar #backers #backproject #back {
+  font-family: Karla;
+  font-size: 18px;
+  font-weight: 700;
   line-height: 40px;
-  margin: 10px;
-  width: 280px;
+  color: white;
+  margin: 0 10px;
+  width: 80%;
+  border-radius: 10px;
+  text-transform: uppercase;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220));
+  background: -webkit-linear-gradient(top center, #f79331, #f57220);
+  background: -moz-linear-gradient(top center, #f79331, #f57220);
+  background: -o-linear-gradient(top center, #f79331, #f57220);
+  background: linear-gradient(top center, #f79331, #f57220);
+}
+#sidebar #backers #backproject #back:hover {
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffd468), color-stop(100%, #ffb246));
+  background: -webkit-linear-gradient(top center, #ffd468, #ffb246);
+  background: -moz-linear-gradient(top center, #ffd468, #ffb246);
+  background: -o-linear-gradient(top center, #ffd468, #ffb246);
+  background: linear-gradient(top center, #ffd468, #ffb246);
+}
+#sidebar #backers #backproject #back.backed {
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bada55), color-stop(100%, #008000));
+  background: -webkit-linear-gradient(top center, #bada55, #008000);
+  background: -moz-linear-gradient(top center, #bada55, #008000);
+  background: -o-linear-gradient(top center, #bada55, #008000);
+  background: linear-gradient(top center, #bada55, #008000);
 }
 #sidebar #backers #backer_summary {
   margin-top: 15px;
@@ -1760,40 +1890,47 @@ button:-moz-focus-inner {
   padding: 10px;
 }
 #project #deets #projecttitle {
-  height: 75px;
+  height: 50px;
   margin-top: 15px;
   margin-bottom: 10px;
   display: block;
+  width: 100%;
+  background-color: #cccccc;
 }
 #project #deets #projecttitle h1 {
   font-size: 32pt !important;
+  font-family: Karla;
+  font-weight: 700;
+  text-transform: uppercase;
   color: black !important;
   margin: 0 !important;
   float: left;
   clear: left;
 }
 #project #deets #projecttitle #deetactions {
-  float: left;
-  clear: right;
-  width: 60%;
+  float: right;
   height: 50px;
   line-height: 30px;
-  padding: 0 15px 0 15px;
-  margin-left: 10px;
+  padding: 0;
 }
 #project #deets #projecttitle #deetactions .buttongroup {
-  float: left;
-  margin-right: 20px;
+  text-align: right;
+  margin-right: 3px;
 }
-#project #deets #projecttitle #deetactions .buttongroup h6 {
-  margin: 0;
-  margin-bottom: 5px !important;
-  -webkit-margin-before: 0;
-  -webkit-margin-after: 0;
+#project #deets #projecttitle #deetactions .buttongroup::before {
   display: block;
-  height: 16px;
-  line-height: 20px;
-  border-bottom: 1px solid #222222;
+  content: attr(data-action);
+  width: 100%;
+  height: 13px;
+  font-size: 11px;
+  text-align: center;
+  border: none;
+  background-color: #dddddd;
+  font-family: Karla;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 13px;
+  margin: 3px 0;
   max-width: 150px;
 }
 #project #deets #projecttitle #deetactions .buttongroup button {
@@ -1807,4 +1944,15 @@ button:-moz-focus-inner {
   padding: 0;
   margin: 0;
   display: inline;
+}
+
+#project-image-drop-avatar,
+#project-image-drop-image,
+#project-image-drop-no {
+  width: 30%;
+  margin: 5px;
+  font-family: Karla;
+  font-size: 11pt;
+  text-transform: uppercase;
+  color: #404044;
 }

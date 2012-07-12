@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from openfire.models import user
 from openfire.models import assets
-from openfire.models import project
+from openfire.models import project as p
 from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.handlers.project import ProjectHome
@@ -12,47 +12,90 @@ class Landing(WebHandler):
 
     ''' openfire landing page. '''
 
+    projects_per_page = 5
+
     def get(self):
 
         ''' Render landing.html or landing_noauth.html. '''
 
-        ## fetch projects
-        master_key_list = []
-        pq = project.Project.query().order(project.Project.name)
-        pc = pq.count()
+        import pdb; pdb.set_trace()
 
-        context = {
-        }
+        ## fetch projects
+        pq = p.Project.query().order(p.Project.name)
+
+        if not self.projects_per_page:
+            pc = pq.count()
+        else:
+            pc = self.projects_per_page
+
+        context = {}
 
         if pc > 0:
-            projects = pq.fetch(pq.count(), keys_only=True)
+            k_projects = pq.fetch(pc, keys_only=True)
 
-            for pk in projects:
+            ## prepare media (fetch avatars, videos + assets for both)
+            _assets, avatars, videos, projects = [], [], [], {}
+            data = ndb.get_multi(k_projects, use_cache=True, use_memcache=True, use_datastore=True)
+            for key, entity in ((entity.key, entity) for entity in data if entity is not None):
 
-                # append project key and generate subkeys
-                master_key_list.append(pk)
-
-            ## prepare media
-            avatars = []
-            projects = {}
-            data = ndb.get_multi(master_key_list, use_cache=True, use_memcache=True, use_datastore=True)
-            for key, entity in zip(master_key_list, data):
+                # create the project context entry
                 projects[key.id()] = entity.to_dict()
+                projects[key.id()]['model'] = entity
                 projects[key.id()]['slug'] = entity.get_custom_url()
-                avatars.append(ndb.Key(urlsafe=entity.avatar.id()))
 
-            project_assets = ndb.get_multi(avatars)
+                # build a list of keys to pull, for avatars, videos, and assets
+                avatars.append(entity.avatar)
+                videos.append(entity.video)
+                _assets.append(ndb.Key(urlsafe=entity.avatar.id()))
 
-            for e_project, asset in zip(projects.items(), project_assets):
-                key, e_project = e_project
-                if asset.url:
-                    e_project['avatar'] = asset.url
-                elif asset.blob:
-                    extension = asset.mime.split('/')[1]
-                    e_project['avatar'] = self.url_for('serve-blob-filename', action='serve', asset_key=asset.key.urlsafe(), filename='project-avatar-' + entity.get_custom_url() + extension)
+            ## batch pull media
+            asset_keys = [k for k in (avatars + _assets + videos) if isinstance(k, (ndb.Key, ndb.Model))]
+            project_assets = ndb.get_multi(asset_keys, use_cache=True, use_memcache=True, use_datastore=True)
 
-            projects = [v for k, v in projects.items()]
-            context['projects'] = projects
+            ## parse out query results
+            _assets = {}
+            for _key, _asset in zip(asset_keys, project_assets):
+                if _asset is None:
+                    continue
+                else:
+                    if isinstance(_asset, assets.Asset):
+                        _assets[_key] = _asset
+                    elif isinstance(_asset, assets.Avatar):
+                        projects[_asset.key.parent().id()]['avatar'] = _asset.to_dict()
+                        projects[_asset.key.parent().id()]['avatar']['model'] = _asset
+                    elif isinstance(_asset, assets.Video):
+                        projects[_asset.key.parent().id()]['video'] = _asset
+
+            ## build project structs
+            for key_id, project in projects.items():
+
+                # copy over avatar assets
+                if project.get('avatar'):
+                    if project.get('avatar').get('model'):
+                        asset_id = project.get('avatar').get('model').key.id()
+                    elif isinstance(project.get('avatar'), ndb.Key):
+                        asset_id = project.get('avatar').id()
+
+                    # grab the avatar location
+                    if asset_id in _assets:
+
+                        # find the asset first
+                        project['avatar']['asset'] = _assets.get(asset_id)
+
+                        # if the avatar record has a URL on it, use that
+                        if project['avatar'].get('url'):
+                            project['avatar']['location'] = project['avatar'].get('url')
+
+                        # fallback to an asset URL next
+                        elif project['avatar']['asset'].get('url'):
+                            project['avatar']['location'] = project['avatar']['asset'].get('url')
+
+                        # finally, if it's just a blob link with no URL, calculate the serving URL
+                        elif project['avatar']['asset'].get('blob'):
+                            extension = project['avatar']['asset'].get('mime').split('/')[1]
+                            project['avatar']['location'] = self.url_for('serve-blob-filename', action='serve', asset_key=project['avatar']['asset']['key'].urlsafe(), filename='project-avatar-' + project['model'].get_custom_url() + '.' + extension)
+
+            context['projects'] = projects.values()
 
         if False:
             self.render('main/landing_noauth.html', **context)
@@ -85,13 +128,13 @@ class CustomUrlHandler(WebHandler):
         url_key = ndb.Key('CustomURL', customurl)
         url_object = url_key.get()
         if not url_object:
-            return self.error(404) # Failed to find custom url
+            return self.error(404)  # Failed to find custom url
 
         kind = url_object.target.kind()
         context = {}
         handler = None
         if kind not in ('Project', 'User'):
-            return self.error(404) # Invalid kind
+            return self.error(404)  # Invalid kind
 
         elif kind == 'Project':
             handler = self._project_handler_class()
@@ -102,7 +145,7 @@ class CustomUrlHandler(WebHandler):
             context['username'] = url_object.target.id()
 
         if not handler:
-            return self.error(500) # Failed to instantiate handler?
+            return self.error(500)  # Failed to instantiate handler?
 
         # Initialize the new handler with the current request and response.
         handler.initialize(self.request, self.response)
