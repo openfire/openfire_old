@@ -18,8 +18,6 @@ class Landing(WebHandler):
 
         ''' Render landing.html or landing_noauth.html. '''
 
-        import pdb; pdb.set_trace()
-
         ## fetch projects
         pq = p.Project.query().order(p.Project.name)
 
