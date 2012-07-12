@@ -17,7 +17,7 @@ class NewAsset(AssetPipeline):
 
     def run(self):
 
-        pass
+        raise NotImplemented  # @TODO
 
 
 ## UpdateAsset - update an asset record
@@ -27,7 +27,7 @@ class UpdateAsset(AssetPipeline):
 
     def run(self):
 
-        pass
+        raise NotImplemented  # @TODO
 
 
 ## NewAvatar - create a new avatar record
@@ -37,7 +37,7 @@ class NewAvatar(AssetPipeline):
 
     def run(self):
 
-        pass
+        raise NotImplemented  # @TODO
 
 
 ## UpdateAvatar - update an avatar record
@@ -47,7 +47,7 @@ class UpdateAvatar(AssetPipeline):
 
     def run(self):
 
-        pass
+        raise NotImplemented  # @TODO
 
 
 ## SetAvatar - set an avatar for a project or user
@@ -57,4 +57,4 @@ class SetAvatar(AssetPipeline):
 
     def run(self):
 
-        pass
+        raise NotImplemented  # @TODO

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
-from openfire.models import AppModel
+from openfire.models.transport import TransportModel
 
 
 ## EmailBody - represents a section of an email body, either in plaintext or HTML
@@ -22,7 +22,7 @@ class EmailHeader(ndb.Model):
 
 
 ## OutgoingEmail - created for each email sent from openfire
-class OutgoingEmail(AppModel):
+class OutgoingEmail(TransportModel):
 
     ''' Represents a queued (and possibly, sent) outgoing email. '''
 
@@ -41,7 +41,7 @@ class OutgoingEmail(AppModel):
 
 
 ## IncomingEmail - created for each email received by openfire
-class IncomingEmail(AppModel):
+class IncomingEmail(TransportModel):
 
     ''' Represents a queued (and possibly, processed) incoming email. '''
 

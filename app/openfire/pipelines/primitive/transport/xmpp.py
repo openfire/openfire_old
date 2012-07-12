@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from google.appengine.api import xmpp
+
+from openfire.models.transport import xmpp as models
 from openfire.pipelines.primitive import TransportPipeline
 
 
@@ -16,11 +18,11 @@ class XMPPError(XMPPPipeline):
 
     ''' Handle an XMPP error notification. '''
 
-    def run(self):
+    def run(self, sender, stanza):
 
         ''' Document the error. '''
 
-        pass
+        return models.XMPPError(sender=sender, stanza=stanza).put().urlsafe()
 
 
 ## SendXMPP - send an XMPP message to the given jabber ID
@@ -76,11 +78,27 @@ class ReceiveXMPP(XMPPPipeline):
 
     ''' Process an incoming XMPP message. '''
 
-    def run(self):
+    def run(self, to, sender, body, stanza=None, message_type='normal', raw_xml=False):
 
         ''' Process an incoming XMPP message. '''
 
-        pass
+        ## resolve channel or create
+        channel = models.XMPPChannel.get_by_id(sender)
+        if channel is not None:
+            channel = channel.key
+
+        return models.XMPPMessage(**{
+
+            'direction': 'inbound',
+            'jid': to,
+            'channel': channel,
+            'from_jid': sender,
+            'message_type': message_type,
+            'body': body,
+            'stanza': stanza,
+            'raw_xml': raw_xml
+
+        })
 
 
 ## SubscribeXMPP - subscribe a JID via XMPP
@@ -92,7 +110,7 @@ class SubscribeXMPP(XMPPPipeline):
 
         ''' Process an incoming subscribe request. '''
 
-        pass
+        raise NotImplemented  # not needed yet (@TODO)
 
 
 ## UnSubscribeXMPP - unsubscribe a JID via XMPP
@@ -104,4 +122,4 @@ class UnSubscribeXMPP(XMPPPipeline):
 
         ''' Process an incoming unsubscribe request. '''
 
-        pass
+        raise NotImplemented  # not needed yet (@TODO)

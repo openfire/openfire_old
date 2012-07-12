@@ -28,7 +28,7 @@ class NewDocument(FulltextPipeline):
 
     def run(self, *args, **kwargs):
 
-        pass
+        raise NotImplemented  # @TODO
 
 
 ## ListDocuments
@@ -36,9 +36,9 @@ class ListDocuments(FulltextPipeline):
 
     ''' List available documents in an index. '''
 
-    def run(self, *args, **kwargs):
+    def run(self, index_name, *args, **kwargs):
 
-        pass
+        return self.api.Index(index_name).list_documents(*args, **kwargs)
 
 
 ## Search
@@ -48,4 +48,4 @@ class Search(FulltextPipeline):
 
     def run(self, *args, **kwargs):
 
-        pass
+        raise NotImplemented  # @TODO

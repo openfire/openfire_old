@@ -1,2 +1,10 @@
 # -*- coding: utf-8 -*-
-## transport models (mail/xmpp/channel)
+from google.appengine.ext import ndb
+
+
+## TransportModel - abstract parent for all transport models
+class TransportModel(ndb.Model):
+
+    ''' Abstract parent for all transport models. '''
+
+    pass
