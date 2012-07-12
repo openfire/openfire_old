@@ -22,14 +22,14 @@ class BBQBaseObject
             _this._element.find('.save-edit').show()
             _this._element.find('.start-edit').hide()
             _this._element.find('.cancel-edit').show()
-            _this._element.find('.editable').each () ->
+            _this._element.find('.bbq-editable').each () ->
                 $(this).replaceWith('<textarea class="' + this.className + '">' + $(this).html() + '</textarea>')
 
         this._element.find('button.cancel-edit').click () ->
             _this._element.find('.start-edit').show()
             _this._element.find('.save-edit').hide()
             _this._element.find('.cancel-edit').hide()
-            _this._element.find('.editable').each () ->
+            _this._element.find('.bbq-editable').each () ->
                 $(this).replaceWith('<span class="' + this.className + '">' + $(this).html() + '</span>')
 
         this._element.find('button.save-edit').click () ->
@@ -39,18 +39,20 @@ class BBQBaseObject
             _this.delete()
 
     getAttr: (prefix, name) ->
-        this._element.find('.' + prefix + '-' + name).val() or this._element.find('.' + prefix + '-' + name).html()
+        return this._element.find('.' + prefix + '-' + name).val() or this._element.find('.' + prefix + '-' + name).html()
 
     loadData: () ->
         for dataName in @dataList
-            @_dataDict[dataName] = @getAttr 'category', dataName
+            @_dataDict[dataName] = @getAttr @dataPrefix, dataName
 
 
 class BBQCategory extends BBQBaseObject
 
     constructor: (el) ->
         @dataList = ['key', 'name', 'slug', 'description']
+        @dataPrefix = 'category'
         super el
+        @categoryKey = @getAttr('category', 'key')
 
     put: () ->
         @loadData()
@@ -58,7 +60,7 @@ class BBQCategory extends BBQBaseObject
         fulfillRequest(request)
 
     delete: () ->
-        request = $.apptools.api.category.delete(key: @getAttr 'category', 'key')
+        request = $.apptools.api.category.delete(key: @categoryKey)
         fulfillRequest(request)
 
     '''
@@ -77,7 +79,10 @@ class BBQProposal extends BBQBaseObject
     constructor: (el) ->
         _this = this
         @dataList = ['key', 'name', 'summary', 'category', 'status', 'pitch', 'tech', 'keywords', 'creator']
+        @dataPrefix = 'proposal'
         super el
+        @proposalKey = @getAttr 'proposal', 'key'
+
         el.find('button.promote-to-project').click ->
             _this.promote()
         el.find('button.suspend').click ->
@@ -91,19 +96,19 @@ class BBQProposal extends BBQBaseObject
         fulfillRequest(request, "Failed to put a proposal")
 
     delete: () ->
-        request = $.apptools.api.proposal.delete(key: @getAttr 'proposal', 'key')
+        request = $.apptools.api.proposal.delete(key: @proposalKey)
         fulfillRequest(request, "Failed to delete a proposal")
 
     promote: () ->
-        request = $.apptools.api.proposal.promote(key: @getAttr 'proposal', 'key')
+        request = $.apptools.api.proposal.promote(key: @proposalKey)
         fulfillRequest(request, "Failed to promote a proposal to a project")
 
     suspend: () ->
-        request = $.apptools.api.proposal.suspend(key: @getAttr 'proposal', 'key')
+        request = $.apptools.api.proposal.suspend(key: @proposalKey)
         fulfillRequest(request, "Failed to suspend a proposal")
 
     reject: () ->
-        request = $.apptools.api.proposal.reject(key: @getAttr 'proposal', 'key')
+        request = $.apptools.api.proposal.reject(key: @proposalKey)
         fulfillRequest(request, "Failed to reject a proposal")
 
 
@@ -113,6 +118,7 @@ class BBQProject extends BBQBaseObject
         _this = this
         @dataList = ['key', 'name', 'summary', 'category', 'status', 'pitch',
                      'tech', 'keywords', 'creator', 'owners', 'goals', 'tiers']
+        @dataPrefix = 'project'
         super el
         @projectKey = @getAttr('project', 'key')
 
@@ -217,14 +223,16 @@ class BBQCustomUrl extends BBQBaseObject
 
     constructor: (el) ->
         @dataList = ['key', 'slug', 'target']
+        @dataPrefix = 'custom-url'
         super el
+        @customURLKey = @getAttr 'custom-url', 'key'
 
     put: () ->
-        request = $.apptools.api.url.delete(key: @getAttr 'custom-url', 'key')
+        request = $.apptools.api.url.delete(key: @customURLKey)
         fulfillRequest(request)
 
     delete: () ->
-        request = $.apptools.api.url.delete(key: @getAttr 'custom-url', 'key')
+        request = $.apptools.api.url.delete(key: @customURLKey)
         fulfillRequest(request)
 
 
@@ -255,6 +263,11 @@ class BBQController
             newProposal = new BBQProposal($(this))
             _this.proposals.push newProposal
 
+        $('#start-add-new-category').click (e) ->
+            self = $(this)
+            self.hide()
+            self.next('.dialog-form').show()
+
         $('.project').each () ->
             newProject = new BBQProject($(this))
             _this.projects.push newProject
@@ -266,17 +279,13 @@ class BBQController
 
     initBbqNewInlines: () ->
         _this = this
-        $('button.show-new-inline').click ->
-            self = $(this)
-            self.hide()
-            self.next('.inline-form').show()
 
-        $('button.cancel-new-inline').click ->
-            self = $(this)
-            self.parents('.inline-form').hide()
-            self.parents('.inline-form').prev('.show-new-inline').show()
+        $('button.cancel-new-dialog').click ->
+            $.apptools.widgets.modal.get('new-category-dialog')?.close()
+            $.apptools.widgets.modal.get('new-proposal-dialog')?.close()
+            $.apptools.widgets.modal.get('new-custom-url-dialog')?.close()
 
-        $('button.save-new-inline').click ->
+        $('button.save-new-dialog').click ->
             reqeust = null
             switch @id
                 when 'save-new-category-btn'

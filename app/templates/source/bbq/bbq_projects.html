@@ -1,41 +1,58 @@
 <h2>Projects!</h2>
 <div id="project-container">
+    <div class="project-header">
+        <div class="bbq-col">Name</div>
+        <div class="bbq-col">Summary</div>
+        <div class="bbq-col">Category</div>
+        <div class="bbq-col">Status</div>
+        <div class="bbq-col">Pitch</div>
+        <div class="bbq-col">Tech</div>
+        <div class="bbq-col">Keywords</div>
+        <div class="bbq-col">Creator</div>
+        <div class="bbq-col">Owners</div>
+        <div class="bbq-col">Goals</div>
+        <div class="bbq-col">Tiers</div>
+        <div class="bbq-col">Avatar</div>
+        <div class="bbq-col">Video</div>
+        <div class="bbq-col">Images</div>
+    </div>
     {% for project in projects %}
     <div class="project">
         <div class="project-info">
             <span class="project-key" style="display: none;">{{ encrypt(project.key.urlsafe()) }}</span>
-            <label>Name: </label>
-            <span class="project-name editable">{{ project.name }}</span>
-            <label>Summary: </label>
-            <span class="project-summary editable">{{ project.summary }}</span>
-            <label>Category: </label>
-            <span class="project-category editable">{{ project.category }}</span>
-            <label>Status: </label>
-            <span class="project-status editable">{{ project.status }}</span>
-            <label>Pitch: </label>
-            <span class="project-pitch editable">{{ project.pitch }}</span>
-            <label>Tech: </label>
-            <span class="project-tech editable">{{ project.tech }}</span>
-            <label>Keywords: </label>
-            <span class="project-keywords editable">{{ project.keywords }}</span>
-            <label>Creator: </label>
-            <span class="project-creator editable">{{ project.creator }}</span>
-            <label>Owners: </label>
-            <span class="project-owners editable">{{ project.owners }}</span>
-            <label>Goals: </label>
-            <span class="project-goals editable">{{ project.goals }}</span>
-            <label>Tiers: </label>
-            <span class="project-tiers editable">{{ project.tiers }}</span>
-            <label>Images: </label>
-            <span class="project-images">
-                {% for image in project.images %}
-                    {# FUTURE <img data-key="{{ image.urlsafe() }}" src="{{ link('serve-asset', image.get().asset.urlsafe()) }}"> #}
-                    <img data-key="{{ image.urlsafe() }}" src="/_assets/blob/serve/{{ image.get().asset.urlsafe() }}">
-                {% else %}
-                    NO IMAGES.
-                {% endfor %}
-            </span>
-            <label>Avatars: </label>
+            <span class="project-name bbq-editable">{{ project.name }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-summary bbq-editable">{{ project.summary }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-category bbq-not-editable">{{ project.category }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-status bbq-editable">{{ project.status }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-pitch bbq-editable">{{ project.pitch }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-tech bbq-editable">{{ project.tech }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-keywords bbq-editable">{{ project.keywords }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-creator bbq-not-editable">{{ project.creator }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-owners bbq-not-editable">{{ project.owners }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-goals bbq-not-editable">{{ project.goals }}</span>
+        </div>
+        <div class="project-info">
+            <span class="project-tiers bbq-not-editable">{{ project.tiers }}</span>
+        </div>
+        <div class="project-info">
             <span class="project-avatars">
                 {% for each_avatar in project.avatar %}
                     <img data-key="{{ each_avatar.urlsafe() }}" src="/_assets/blob/serve/{{ each_avatar.get().asset.urlsafe() }}">
@@ -43,11 +60,12 @@
                     NO AVATARS.
                 {% endfor %}
             </span>
+        </div>
+        <div class="project-info">
             <div id="project-{{ encrypt(project.key.urlsafe()) }}-video">
-                <label>Videos: </label>
                 <span class="project-videos">
                     {% for each_video in project.video %}
-                        <span class="project-video editable">{{ each_video.get().url }}</span>
+                        <span class="project-video bbq-not-editable">{{ each_video.get().url }}</span>
                     {% else %}
                         NO VIDEOS.
                     {% endfor %}
@@ -61,14 +79,18 @@
                     <button id="add-project-{{ encrypt(project.key.urlsafe()) }}-video" type="button" class="add-project-video-btn">+ Add Video</button>
                 </div>
             </div>
-            <div id="project-{{ encrypt(project.key.urlsafe()) }}-avatar" class="drop-box">
-                DROP AVATAR HERE
-            </div>
-            <div id="project-{{ encrypt(project.key.urlsafe()) }}-image" class="drop-box">
-                DROP IMAGE HERE
-            </div>
         </div>
-        <div>
+        <div class="project-info">
+            <span class="project-images">
+                {% for image in project.images %}
+                    {# FUTURE <img data-key="{{ image.urlsafe() }}" src="{{ link('serve-asset', image.get().asset.urlsafe()) }}"> #}
+                    <img data-key="{{ image.urlsafe() }}" src="/_assets/blob/serve/{{ image.get().asset.urlsafe() }}">
+                {% else %}
+                    NO IMAGES.
+                {% endfor %}
+            </span>
+        </div>
+        <div class="project-actions">
             <button class="delete" type="button">delete</button>
             <button class="start-edit" type="button">edit</button>
             <button class="cancel-edit" type="button" style="display: none;">cancel</button>
@@ -76,6 +98,12 @@
             <button class="go-live" type="button">Go-Live!</button>
             <button class="suspend" type="button">Suspend</button>
             <button class="shutdown" type="button">Shut Down</button>
+            <div id="project-{{ encrypt(project.key.urlsafe()) }}-avatar" class="drop-box">
+                DROP AVATAR HERE
+            </div>
+            <div id="project-{{ encrypt(project.key.urlsafe()) }}-image" class="drop-box">
+                DROP IMAGE HERE
+            </div>
         </div>
     </div>
     {% else %}

@@ -1,13 +1,18 @@
 <h2>Custom URLs!</h2>
+<a id="a-new-custom-url-dialog" href="#new-custom-url-dialog">+ Add New Custom Url</a>
 <div id="custom-url-container">
+    <div class="custom-url-header">
+        <div class="bbq-col">Slug</div>
+        <div class="bbq-col">Target</div>
+    </div>
     {% for custom_url in custom_urls %}
     <div class="custom-url">
         <div class="custom-url-info">
-            <span class="custom-url-key" style="display: none;">{{ custom_url.key.urlsafe() }}</span>
-            <label>Slug: </label>
-            <span class="custom-url-slug">{{ custom_url.slug }}</span>
-            <label>Target: </label>
-            <span class="custom-url-name">{{ custom_url.target }}</span>
+            <span class="custom-url-slug bbq-editable">{{ custom_url.slug }}</span>
+        </div>
+        <div class="custom-url-info">
+            <span class="custom-url-name bbq-editable">{{ custom_url.target }}</span>
+            <span class="custom-url-key" style="display: none;">{{ encrypt(custom_url.key.urlsafe()) }}</span>
         </div>
         <div class="custom-url-actions">
             <button class="delete" type="button">delete</button>
@@ -15,34 +20,35 @@
     </div>
     {% endfor %}
 </div>
-<button id="show-new-custom-url-btn" class="show-new-inline">+ Add New Custom URL</button>
-<div id="new-custom-url-inline" class="inline-form" style="display: none;">
-    <form id="new-custom-url-frm">
-        <p>
-            <label for="new-custom-url-slug-input">Slug:</label>
-            <input id="new-custom-url-slug-input" type="text" name="slug">
-        </p>
-        <p>
-            <label for="new-custom-url-target-input">Target:</label>
-            <select id="new-custom-url-target-input" name="target">
-                <option value="" selected="selected">CHOOSE A TARGET:</option>
-                <option disabled="disabled">PROJECTS:</option>
-                {% for project in projects %}
-                <option value="{{ project.key.urlsafe() }}">&nbsp;&nbsp;&nbsp;&nbsp;{{ project.name }}</option>
-                {% else %}
-                <option disabled="disabled">...no projects</option>
-                {% endfor %}
-                <option disabled="disabled">USERS:</option>
-                {% for user in users %}
-                <option value="{{ user.key.urlsafe() }}">&nbsp;&nbsp;&nbsp;&nbsp;{{ user.username }}</option>
-                {% else %}
-                <option disabled="disabled">...no users</option>
-                {% endfor %}
-            </select>
-        </p>
-        <p>
-            <button id="save-new-custom-url-btn" class="save-new-inline" type="button">Yeah, add that!</button>
-            <button id="cancel-new-custom-url-btn" class="cancel-new-inline" type="button">Never mind.</button>
-        </p>
-    </form>
+<div id="new-custom-url-dialog" class="pre-modal" style="opacity: 0;">
+    <div class="bbq-dialog-content">
+        <form id="new-custom-url-frm">
+            <p>
+                <label for="new-custom-url-slug-input">Slug:</label>
+                <input id="new-custom-url-slug-input" type="text" name="slug">
+            </p>
+            <p>
+                <label for="new-custom-url-target-input">Target:</label>
+                <select id="new-custom-url-target-input" name="target">
+                    <option value="" selected="selected">CHOOSE A TARGET:</option>
+                    <option disabled="disabled">PROJECTS:</option>
+                    {% for project in projects %}
+                    <option value="{{ encrypt(project.key.urlsafe()) }}">&nbsp;&nbsp;&nbsp;&nbsp;{{ project.name }}</option>
+                    {% else %}
+                    <option disabled="disabled">...no projects</option>
+                    {% endfor %}
+                    <option disabled="disabled">USERS:</option>
+                    {% for user in users %}
+                    <option value="{{ encrypt(user.key.urlsafe()) }}">&nbsp;&nbsp;&nbsp;&nbsp;{{ user.username }}</option>
+                    {% else %}
+                    <option disabled="disabled">...no users</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <button id="save-new-custom-url-btn" class="save-new-dialog" type="button">Yeah, add that!</button>
+                <button id="cancel-new-custom-url-btn" class="cancel-new-dialog" type="button">Never mind.</button>
+            </p>
+        </form>
+    </div>
 </div>

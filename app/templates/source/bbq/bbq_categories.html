@@ -1,15 +1,22 @@
 <h2>Categories!</h2>
+<a id="a-new-category-dialog" href="#new-category-dialog">+ Add New Category</a>
 <div id="category-container">
+    <div class="category-header">
+        <div class="bbq-col">Name</div>
+        <div class="bbq-col">Slug</div>
+        <div class="bbq-col">Description</div>
+    </div>
     {% for category in categories %}
-    <div class="category">
+    <div id="category-{{ encrypt(category.key.urlsafe()) }}" class="category">
         <div class="category-info">
-            <span class="category-key" style="display: none;">{{ category.key.urlsafe() }}</span>
-            <label>Name: </label>
-            <span class="category-name editable">{{ category.name }}</span>
-            <label>Slug: </label>
-            <span class="category-slug editable">{{ category.slug }}</span>
-            <label>Description: </label>
-            <span class="category-description editable">{{ category.description }}</span>
+            <span class="category-name bbq-editable">{{ category.name }}</span>
+        </div>
+        <div class="category-info">
+            <span class="category-slug bbq-not-editable">{{ category.slug }}</span>
+        </div>
+        <div class="category-info">
+            <span class="category-description bbq-editable">{{ category.description }}</span>
+            <span class="category-key" style="display: none;">{{ encrypt(category.key.urlsafe()) }}</span>
         </div>
         <div class="category-actions">
             <button class="delete" type="button">delete</button>
@@ -20,8 +27,7 @@
     </div>
     {% endfor %}
 </div>
-<button id="show-new-category-btn" class="show-new-inline">+ Add New Category</button>
-<div id="new-category-inline" class="inline-form" style="display: none;">
+<div id="new-category-dialog" class="pre-modal bbq-dialog" style="opacity: 0;">
     <form id="new-category-frm">
         <p>
             <label for="new-category-name-input">Name:</label>
@@ -36,8 +42,8 @@
             <input type="text" id="new-category-description-input" name="description">
         </p>
         <p>
-            <button id="save-new-category-btn" class="save-new-inline" type="button">Yeah, add that!</button>
-            <button id="cancel-new-category-btn" class="cancel-new-inline" type="button">Never mind.</button>
+            <button id="save-new-category-btn" class="save-new-dialog" type="button">Yeah, add that!</button>
+            <button id="cancel-new-category-btn" class="cancel-new-dialog" type="button">Never mind.</button>
         </p>
     </form>
 </div>

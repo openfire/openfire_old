@@ -1,22 +1,48 @@
+#category-container,
+#proposal-container,
+#project-container,
+#custom-url-container
+    display: table
+
+#category-container .category-header,
+#proposal-container .proposal-header,
+#project-container .project-header,
+#custom-url-container .custom-url-header
+    display: table-row
+
+#category-container .category-header .bbq-col,
+#proposal-container .proposal-header .bbq-col,
+#project-container .project-header .bbq-col,
+#custom-url-container .custom-url-header .bbq-col
+    display: table-cell
+
 #category-container .category,
 #proposal-container .proposal,
 #project-container .project,
 #custom-url-container .custom-url
-    display: inline-block
-    border: 2px solid black
+    display: table-row
 
 #category-container .category .category-info,
+#category-container .category .category-actions,
 #proposal-container .proposal .proposal-info,
+#proposal-container .proposal .proposal-actions,
 #project-container .project .project-info,
-#custom-url-container .custom-url .custom-url-info
-    span, textarea
-        display: inline
-    label
-        display: block
-        text-decoration: underline
+#project-container .project .project-actions,
+#custom-url-container .custom-url .custom-url-info,
+#custom-url-container .custom-url .custom-url-actions
+    display: table-cell
+    padding: 5px
+    border: 1px solid #333333
 
-#project-container .project .project-info .drop-box
+
+.bbq-dialog-content
+    height: 300px
+    overflow: auto
+
+
+#project-container .project .project-actions .drop-box
     width: 100px
     height: 100px
     border: 1px solid red
     display: inline-block
+

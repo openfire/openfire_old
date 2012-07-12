@@ -81,12 +81,13 @@ class ProjectController extends OpenfireController
 
         @_init = () =>
 
-            document.getElementById('follow').addEventListener('click', @follow, false)
-            document.getElementById('share').addEventListener('click', @share, false)
-            document.getElementById('back').addEventListener('click', @back, false)
+            if window._cp
+                document.getElementById('follow').addEventListener('click', @follow, false)
+                document.getElementById('share').addEventListener('click', @share, false)
+                document.getElementById('back').addEventListener('click', @back, false)
 
-            if @_state.o
-                document.body.addEventListener('drop', @add_media, false)
+                if @_state.o
+                    document.body.addEventListener('drop', @add_media, false)
 
             return @get()
 

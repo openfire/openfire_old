@@ -37,13 +37,13 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
             if target:
                 # TODO: Populate a few more fields of Image and Avatar here, like size and name. -Ethan
                 if asset.kind == 'i' and hasattr(target, 'images'):
-                    image = Image(asset=asset_key)
+                    image = Image(asset=asset_key, parent=target.key)
                     image.put()
                     target.images.append(image.key)
                     target.put()
                 elif asset.kind == 'a' and hasattr(target, 'avatar'):
                     # TODO: Set all other avatars as inactive?
-                    avatar = Avatar(asset=asset_key, active=True)
+                    avatar = Avatar(asset=asset_key, active=True, parent=target.key)
                     avatar.put()
                     target.avatar.append(avatar.key)
                     target.put()
