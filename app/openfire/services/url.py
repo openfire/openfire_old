@@ -46,7 +46,7 @@ class CustomUrlService(RemoteService):
             # Url is already in use.
             raise remote.ApplicationError('Custom URL already exists.')
 
-        target = ndb.Key(urlsafe=request.target)
+        target = ndb.Key(urlsafe=self.decrypt(request.target))
         target_obj = target.get()
         if not target_obj:
             # Target object not found.
@@ -65,7 +65,7 @@ class CustomUrlService(RemoteService):
     def delete(self, request):
 
         ''' Remove a custom URL from a target, if it exists. '''
-        url_key = ndb.Key(urlsafe=request.key)
+        url_key = ndb.Key(urlsafe=self.decrypt(request.key))
         url_obj = url_key.get()
         if not url_obj:
             raise remote.ApplicationError('no url found to delete')

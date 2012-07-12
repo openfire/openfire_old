@@ -27,7 +27,7 @@ class ProposalService(RemoteService):
 
         ''' Return a proposal. '''
 
-        proposal_key = ndb.Key(urlsafe=request.key)
+        proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         proposal = proposal_key.get()
         return proposal.to_message()
 
@@ -42,7 +42,7 @@ class ProposalService(RemoteService):
             proposal = Proposal()
         else:
             # Get the proposal to edit.
-            proposal_key = ndb.Key(urlsafe=request.key)
+            proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
             proposal = proposal_key.get()
 
         if not proposal:
@@ -62,7 +62,7 @@ class ProposalService(RemoteService):
 
         ''' Remove a category. '''
 
-        proposal_key = ndb.Key(urlsafe=request.key)
+        proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         proposal_key.delete()
         return Echo(message='Proposal removed')
 
@@ -93,7 +93,7 @@ class ProposalService(RemoteService):
         and copy over the relevent info. For now, just create and link the project.
         '''
 
-        proposal_key = ndb.Key(urlsafe=request.key)
+        proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         proposal = proposal_key.get()
 
         new_project = Project(
@@ -122,7 +122,7 @@ class ProposalService(RemoteService):
 
         ''' Suspend a proposal. '''
 
-        proposal_key = ndb.Key(urlsafe=request.key)
+        proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         proposal = proposal_key.get()
 
         if not proposal:
@@ -140,7 +140,7 @@ class ProposalService(RemoteService):
 
         ''' Reject a proposal. '''
 
-        proposal_key = ndb.Key(urlsafe=request.key)
+        proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         proposal = proposal_key.get()
 
         if not proposal:

@@ -42,7 +42,7 @@ class CategoryService(RemoteService):
             category = Category(key=ndb.Key('Category', request.slug))
         else:
             # Get the category to edit.
-            category_key = ndb.Key(urlsafe=request.key)
+            category_key = ndb.Key(urlsafe=self.decrypt(request.key))
             category = category_key.get()
 
         if not category:
@@ -61,6 +61,6 @@ class CategoryService(RemoteService):
 
         ''' Remove a category. '''
 
-        category_key = ndb.Key(urlsafe=request.key)
+        category_key = ndb.Key(urlsafe=self.decrypt(request.key))
         category_key.delete()
         return Echo(message='Category removed')

@@ -32,7 +32,11 @@ class ProjectService(RemoteService):
         is_owner = False
         is_admin = True
 
-        project_key = ndb.Key(urlsafe=request.key)
+
+        try:
+            project_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        except:
+            project_key = ndb.Key(urlsafe=request.key)
         project = project_key.get()
 
         if not project:
@@ -55,8 +59,14 @@ class ProjectService(RemoteService):
             # TODO: How to return error?
             return project_messages.Project()
 
-        project_key = ndb.Key(urlsafe=request.key)
+        try:
+            project_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        except:
+            project_key = ndb.Key(urlsafe=request.key)
         project = project_key.get()
+
+        if not project:
+            raise remote.ApplicationError('Failed to find project')
 
         # Update the project.
         project.mutate_from_message(request)
@@ -76,7 +86,7 @@ class ProjectService(RemoteService):
             # TODO: How to return error?
             return project_messages.Project()
 
-        project_key = ndb.Key(urlsafe=request.key)
+        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
         project = project_key.get()
 
         if not project:
@@ -95,7 +105,7 @@ class ProjectService(RemoteService):
 
         ''' Remove a category. '''
 
-        project_key = ndb.Key(urlsafe=request.key)
+        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
         project_key.delete()
         return Echo(message='Project removed')
 
@@ -168,7 +178,7 @@ class ProjectService(RemoteService):
 
         ''' Suspend a project. '''
 
-        project_key = ndb.Key(urlsafe=request.key)
+        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
         project = project_key.get()
 
         if not project:
@@ -185,7 +195,7 @@ class ProjectService(RemoteService):
 
         ''' Shut down a project. '''
 
-        project_key = ndb.Key(urlsafe=request.key)
+        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
         project = project_key.get()
 
         if not project:

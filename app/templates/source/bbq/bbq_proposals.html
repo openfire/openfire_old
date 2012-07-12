@@ -1,27 +1,44 @@
 <h2>Proposals!</h2>
+<a id="a-new-proposal-dialog" href="#new-proposal-dialog">+ Add New Proposal</a>
 <div id="proposal-container">
+    <div class="proposal-header">
+        <div class="bbq-col">Name</div>
+        <div class="bbq-col">Summary</div>
+        <div class="bbq-col">Category</div>
+        <div class="bbq-col">Status</div>
+        <div class="bbq-col">Pitch</div>
+        <div class="bbq-col">Tech</div>
+        <div class="bbq-col">Keywords</div>
+        <div class="bbq-col">Creator</div>
+    </div>
     {% for proposal in proposals %}
     <div class="proposal">
         <div class="proposal-info">
-            <span class="proposal-key" style="display: none;">{{ proposal.key.urlsafe() }}</span>
-            <label>Name: </label>
-            <span class="proposal-name editable">{{ proposal.name }}</span>
-            <label>Summary: </label>
-            <span class="proposal-summary editable">{{ proposal.summary }}</span>
-            <label>Category: </label>
-            <span class="proposal-category editable">{{ proposal.category }}</span>
-            <label>Status: </label>
-            <span class="proposal-status editable">{{ proposal.status }}</span>
-            <label>Pitch: </label>
-            <span class="proposal-pitch editable">{{ proposal.pitch }}</span>
-            <label>Tech: </label>
-            <span class="proposal-tech editable">{{ proposal.tech }}</span>
-            <label>Keywords: </label>
-            <span class="proposal-keywords editable">{{ proposal.keywords }}</span>
-            <label>Creator: </label>
-            <span class="proposal-creator editable">{{ proposal.creator }}</span>
+            <span class="proposal-key" style="display: none;">{{ encrypt(proposal.key.urlsafe()) }}</span>
+            <span class="proposal-name bbq-editable">{{ proposal.name }}</span>
         </div>
-        <div>
+        <div class="proposal-info">
+            <span class="proposal-summary bbq-editable">{{ proposal.summary }}</span>
+        </div>
+        <div class="proposal-info">
+            <span class="proposal-category bbq-not-editable">{{ proposal.category.urlsafe() }}</span>
+        </div>
+        <div class="proposal-info">
+            <span class="proposal-status bbq-editable">{{ proposal.status }}</span>
+        </div>
+        <div class="proposal-info">
+            <span class="proposal-pitch bbq-editable">{{ proposal.pitch }}</span>
+        </div>
+        <div class="proposal-info">
+            <span class="proposal-tech bbq-editable">{{ proposal.tech }}</span>
+        </div>
+        <div class="proposal-info">
+            <span class="proposal-keywords bbq-editable">{{ proposal.keywords }}</span>
+        </div>
+        <div class="proposal-info">
+            <span class="proposal-creator bbq-not-editable">{{ proposal.creator.urlsafe() }}</span>
+        </div>
+        <div class="proposal-actions">
             <button class="delete" type="button">delete</button>
             <button class="start-edit" type="button">edit</button>
             <button class="cancel-edit" type="button" style="display: none;">cancel</button>
@@ -35,60 +52,61 @@
     <div>No proposals yet!</div>
     {% endfor %}
 </div>
-<button id="show-new-proposal-btn" class="show-new-inline">+ Add New Proposal (does not work yet)</button>
-<div id="new-proposal-inline" class="inline-form" style="display: none;">
-    <form id="new-proposal-frm">
-        <p>
-            <label for="new-proposal-name-input">Name:</label>
-            <input type="text" id="new-proposal-name-input" name="name">
-        </p>
-        <p>
-            <label for="new-proposal-url-input">URL Slug:</label>
-            <input type="text" id="new-proposal-url-input" name="url">
-        </p>
-        <p>
-            <label for="new-proposal-summary-input">Summary:</label>
-            <input type="text" id="new-proposal-summary-input" name="summary">
-        </p>
-        <p>
-            <label for="new-proposal-category-input">category:</label>
-            <select id="new-proposal-category-input" name="category">
-                {% for category in categories %}
-                <option value="{{ category.key.urlsafe() }}">{{ category.name }}</option>
-                {% else %}
-                <option value="">Add a category first...</option>
-                {% endfor %}
-            </select>
-        </p>
-        <p>
-            <label for="new-proposal-status-input">status:</label>
-            <input type="text" id="new-proposal-status-input" name="status">
-        </p>
-        <p>
-            <label for="new-proposal-pitch-input">pitch:</label>
-            <input type="text" id="new-proposal-pitch-input" name="pitch">
-        </p>
-        <p>
-            <label for="new-proposal-tech-input">tech:</label>
-            <input type="text" id="new-proposal-tech-input" name="tech">
-        </p>
-        <p>
-            <label for="new-proposal-keywords-input">keywords:</label>
-            <input type="text" id="new-proposal-keywords-input" name="keywords">
-        </p>
-        <p>
-            <label for="new-proposal-creator-input">creator:</label>
-            <select id="new-proposal-creator-input" name="category">
-                {% for user in users %}
-                <option value="{{ user.key.urlsafe() }}">{{ user.username }}</option>
-                {% else %}
-                <option value="">Add some users first...</option>
-                {% endfor %}
-            </select>
-        </p>
-        <p>
-            <button id="save-new-proposal-btn" class="save-new-inline" type="button">Yeah, add that!</button>
-            <button id="cancel-new-proposal-btn" class="cancel-new-inline" type="button">Never mind.</button>
-        </p>
-    </form>
+<div id="new-proposal-dialog" class="pre-modal" style="opacity: 0;">
+    <div class="bbq-dialog-content">
+        <form id="new-proposal-frm">
+            <p>
+                <label for="new-proposal-name-input">Name:</label>
+                <input type="text" id="new-proposal-name-input" name="name">
+            </p>
+            <p>
+                <label for="new-proposal-url-input">URL Slug:</label>
+                <input type="text" id="new-proposal-url-input" name="url">
+            </p>
+            <p>
+                <label for="new-proposal-summary-input">Summary:</label>
+                <input type="text" id="new-proposal-summary-input" name="summary">
+            </p>
+            <p>
+                <label for="new-proposal-category-input">category:</label>
+                <select id="new-proposal-category-input" name="category">
+                    {% for category in categories %}
+                    <option value="{{ category.key.urlsafe() }}">{{ category.name }}</option>
+                    {% else %}
+                    <option value="">Add a category first...</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <label for="new-proposal-status-input">status:</label>
+                <input type="text" id="new-proposal-status-input" name="status">
+            </p>
+            <p>
+                <label for="new-proposal-pitch-input">pitch:</label>
+                <input type="text" id="new-proposal-pitch-input" name="pitch">
+            </p>
+            <p>
+                <label for="new-proposal-tech-input">tech:</label>
+                <input type="text" id="new-proposal-tech-input" name="tech">
+            </p>
+            <p>
+                <label for="new-proposal-keywords-input">keywords:</label>
+                <input type="text" id="new-proposal-keywords-input" name="keywords">
+            </p>
+            <p>
+                <label for="new-proposal-creator-input">creator:</label>
+                <select id="new-proposal-creator-input" name="category">
+                    {% for user in users %}
+                    <option value="{{ user.key.urlsafe() }}">{{ user.username }}</option>
+                    {% else %}
+                    <option value="">Add some users first...</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <button id="save-new-proposal-btn" class="save-new-dialog" type="button">Yeah, add that!</button>
+                <button id="cancel-new-proposal-btn" class="cancel-new-dialog" type="button">Never mind.</button>
+            </p>
+        </form>
+    </div>
 </div>

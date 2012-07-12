@@ -86,6 +86,7 @@ class AttachVideo(messages.Message):
         VIMEO = 0
         YOUTUBE = 1
 
-    provider = messages.EnumField(VideoProvider, 1)
-    reference = messages.StringField(2)
-    primary = messages.StringField(3)
+    target = messages.StringField(1)
+    provider = messages.EnumField(VideoProvider, 2)
+    reference = messages.StringField(3)
+    primary = messages.StringField(4)
