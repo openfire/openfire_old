@@ -20,14 +20,18 @@
                 {% block media %}
                     {% if video %}
                         {% if video.provider == 'vimeo' %}
+                        <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
                             {% if video.ext_id %}
                                 <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
                             {% else %}
                                 <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
                             {% endif %}
+                        </div>
                         {% else %}
                             {% if video.provider == 'youtube' %}
+                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
                                 <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                            </div>
                             {% else %}
                                 <img src="http://placehold.it/640x360/222222&text=video" />
                             {% endif %}
@@ -49,41 +53,45 @@
                 <section id='quickinfo'>
                     {% block right %}
 
-						<div id='global_progress'>
-							<!-- project progress -->
-							<div id='progress' data-value="{{ project.progress }}" data-max="100">
-								<div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
-							</div>
-						</div><!-- end #global_progress -->
+                        <div id='global_progress'>
+                            <!-- project progress -->
+                            <div id='progress' data-value="{{ project.progress }}" data-max="100">
+                                <div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
+                            </div>
+                        </div><!-- end #global_progress -->
 
-						<div id='project_goals'>
-							{% if project.goals %}
-	                        <ul class='naked'>
-								{% for goal in goals %}
-									<li>
-										<b>{{ currency(goal.amount) }}</b>
-									</li>
-								{% endfor %}
-	                        </ul>
-							{% else %}
-								<b>no project goals yet! :(</b>
-							{% endif %}
-						</div> <!-- end #project_goals -->
+                        <div id='project_goals'>
+                            {% if project.goals %}
+                            <div id="project-goals-accordion" class='pre-accordion' data-options='{"axis":"vertical"}'>
+                                {% set current_goal = false %}
+                                {% for goal in goals %}
+                                    <a href="#{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %} class="current"{% endif %}{% endif %}>{{ currency(goal.amount) }}</a>
+                                    <div id="{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %}{% set current_goal = true %} class="current"{% endif %}{% endif %}>
+                                        <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                                <b>no project goals yet! :(</b>
+                            {% endif %}
+                        </div> <!-- end #project_goals -->
 
-						<div id='project_tiers'>
-							{% if project.tiers %}
-							<ul class='naked'>
-								{% for tier in tiers %}
-									<li>
-										<b>{{ tier.name }} - {{ currency(tier.amount) }}</b>
-									</li>
-							    {% endfor %}
-							 </ul>
+                        <div id='project_tiers'>
+                            {% if project.tiers %}
+                            <div id="project-tiers-accordion" class='pre-accordion' data-options='{"axis":"vertical"}'>
+                                {% set current_tier = false %}
+                                {% for tier in tiers %}
+                                    <a href="#{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %} class="current"{% endif %}>{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                    <div id="{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %}{% set current_tier = true %} class="current"{% endif %}>
+                                        <p>{% autoescape off %}{{ tier.description }}{% endautoescape %}</p>
+                                    </div>
+                                {% endfor %}
+                             </div>
 
-							{% else %}
-								<b>no project tiers yet! :(</b>
-							{% endif %}
-						</div>
+                            {% else %}
+                                <b>no project tiers yet! :(</b>
+                            {% endif %}
+                        </div>
 
                     {% endblock %}
                 </section> <!-- end #quickinfo -->
@@ -97,26 +105,26 @@
                 </section> <!-- end #backers -->
 
                 <div id='owners'>
-		            <b>project owners:</b>
-		            <ul class='naked'>
-		                {% for owner in owners %}
-		                    <li>
-								<div class='ownercard'>
-									<img src="{{ gravatarify(owner.key.id(), 'jpg', '32') }}" width='32' height='32' alt='{{ owner.key.id() }}' />
+                    <b>project owners:</b>
+                    <ul class='naked'>
+                        {% for owner in owners %}
+                            <li>
+                                <div class='ownercard'>
+                                    <img src="{{ gravatarify(owner.key.id(), 'jpg', '32') }}" width='32' height='32' alt='{{ owner.key.id() }}' />
 
-									<div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
-										{%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
-										{%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
-										{%- endif -%}
-										{%- if owner.location -%}
-											<span class='location byline'>{{ owner.location }}</span>
-										{%- endif -%}
-									</div>
-								</div>
-							</li>
-		                {% endfor %}
-		            </ul>
-		        </div> <!-- end #owners -->
+                                    <div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
+                                        {%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- endif -%}
+                                        {%- if owner.location -%}
+                                            <span class='location byline'>{{ owner.location }}</span>
+                                        {%- endif -%}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div> <!-- end #owners -->
             </div> <!-- end #sidebar -->
 
             <article id='deets'>

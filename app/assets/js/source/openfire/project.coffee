@@ -71,6 +71,7 @@ class ProjectController extends OpenfireController
     ]
     @project = null
     @project_key = null
+    @uploader = null
 
     constructor: (openfire) ->
 
@@ -115,22 +116,28 @@ class ProjectController extends OpenfireController
 
                     # a valid file!
                     $.apptools.api.media.attach_image(
-
-                        intake: 'UPLOAD'
-                        name: file.name
-                        size: file.size
                         target: @project_key
-
+                        size: file.size
+                        name: file.name
                     ).fulfill
 
                         success: (response) =>
 
-                            uploader = $.apptools.widgets.uploader.create
-                                endpoints: [response.endpoint]
-                                session: $.openfire.sys.state.session.data or false
-                                finish: (response) =>
+                            if not @uploader?
+                                uploader = $.apptools.widgets.uploader.create 'data',
+                                    id: 'body'
+                                    endpoints: [response.endpoint]
+                                    finish: (response) =>
 
-                                    @project.attach(new Image(response.media_key, response.serve_url))
+                                        @project.attach(new Image(response.media_key, response.serve_url))
+                                        $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
+
+                                @uploader = uploader
+
+                            else
+                                uploader = @uploader.add_endpoint(response.endpoint)
+                                uploader = uploader.add_callback (rsp) =>
+                                    @project.attach(new Image(rsp.media_key, rsp.serve_url))
                                     $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
 
                             uploader.upload(file)

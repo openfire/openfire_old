@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ## Project Pipelines Init
-from apptools import BasePipeline
+from pipeline import pipeline
 
 
-class AppPipeline(BasePipeline):
+class AppPipeline(pipeline.Pipeline):
 
     ''' Abstract pipeline for all openfire pipelines. '''
 

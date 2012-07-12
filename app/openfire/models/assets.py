@@ -23,6 +23,8 @@ class Asset(AppModel):
 
     url = ndb.StringProperty('u', indexed=True, default=None)
     cdn = ndb.StringProperty('c', indexed=True, default=None)
+    name = ndb.StringProperty('f', indexed=True, default=None)
+    mime = ndb.StringProperty('mt', indexed=True, default=None)
     kind = ndb.StringProperty('t', indexed=True, choices=['a', 'i', 's', 't', 'v'], default='i')  # avatar, image, style, script, video
     blob = ndb.BlobKeyProperty('b', indexed=True)
     versions = ndb.KeyProperty('v', indexed=True, repeated=True)
@@ -42,6 +44,8 @@ class Media(polymodel.PolyModel):
     caption = ndb.StringProperty('c', indexed=True, required=False)
     description = ndb.TextProperty('d', indexed=False, required=False)
     approved = ndb.BooleanProperty('ap', indexed=True, default=False)
+    modified = ndb.DateTimeProperty('_tm', indexed=True, auto_now=True)
+    created = ndb.DateTimeProperty('_tc', indexed=True, auto_now_add=True)
 
 
 ######## ======== Media Submodels ======== ########
