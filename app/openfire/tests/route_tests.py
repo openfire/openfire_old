@@ -14,6 +14,7 @@ import webapp2
 
 import test_db_loader as db_loader
 
+from test_util import encrypt, decrypt
 
 def generic_view_success_test(test_case, url, error="generic view error"):
     """ A generic success test for a given url.
