@@ -220,6 +220,130 @@ class ProjectServiceTestCase(unittest.TestCase):
     """
 
 
+    #############################################
+    # Project Goal Tests.
+    #############################################
+
+    def test_project_get_goal_method(self):
+
+        ''' Add a project and a goal then query for it. '''
+
+        project_key = db_loader.create_project()
+        goal_key = db_loader.create_goal(target_id=project_key.id())
+        params = {'key': encrypt(goal_key.urlsafe())}
+        response = generic_service_method_success_test(self, 'project', 'get_goal', params=params)
+        self.assertEqual(response['response']['type'], 'Goal',
+            'System project get goal service method failed.')
+        self.assertEqual(response['response']['content']['target'], project_key.urlsafe(),
+            'Failed to return the correct project goal.')
+
+    def test_project_list_goals_method(self):
+
+        ''' Add a project and a few goals then query for them. '''
+
+        project_key = db_loader.create_project()
+        db_loader.create_goal(target_id=project_key.id())
+        db_loader.create_goal(target_id=project_key.id())
+        db_loader.create_goal(target_id=project_key.id())
+        params = {'project': encrypt(project_key.urlsafe())}
+        response = generic_service_method_success_test(self, 'project', 'list_goals', params=params)
+        self.assertEqual(response['response']['type'], 'Goals',
+            'Project list goals service method failed.')
+        self.assertEqual(len(response['response']['content']['goals']), 3,
+            'Project list goals returned the wrong number of goals.')
+
+    def test_project_put_goal_method(self):
+
+        ''' Add a project through the api and then edit it. '''
+
+        '''
+        TODO
+        goal_dict = {
+            'target_id': project_key.id(),
+            'contribution_type_id': 'CASH',
+            'amount': 1000,
+            'description': 'TEST DESCRIPTION',
+        }
+        '''
+        pass
+
+    def test_project_delete_goal_method(self):
+
+        ''' Add a project and a goal then delete it. '''
+
+        project_key = db_loader.create_project()
+        goal_key = db_loader.create_goal(target_id=project_key.id())
+        self.assertTrue(goal_key.get(), 'Failed to init project goal object for delete test.')
+
+        params = {'key': encrypt(goal_key.urlsafe())}
+        response = generic_service_method_success_test(self, 'project', 'delete_goal', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'System project get goal service method failed.')
+        self.assertFalse(goal_key.get(), 'Failed to delete project goal.')
+
+
+    #############################################
+    # Project Tier Tests.
+    #############################################
+
+    def test_project_get_tier_method(self):
+
+        ''' Add a project and a tier then query for it. '''
+
+        project_key = db_loader.create_project()
+        tier_key = db_loader.create_tier(target_id=project_key.id())
+        params = {'key': encrypt(tier_key.urlsafe())}
+        response = generic_service_method_success_test(self, 'project', 'get_tier', params=params)
+        self.assertEqual(response['response']['type'], 'Tier',
+            'System project get tier service method failed.')
+        self.assertEqual(response['response']['content']['target'], project_key.urlsafe(),
+            'Failed to return the correct project tier.')
+
+    def test_project_list_tiers_method(self):
+
+        ''' Add a project and a few tiers then query for them. '''
+
+        project_key = db_loader.create_project()
+        db_loader.create_tier(target_id=project_key.id())
+        db_loader.create_tier(target_id=project_key.id())
+        db_loader.create_tier(target_id=project_key.id())
+        params = {'project': encrypt(project_key.urlsafe())}
+        response = generic_service_method_success_test(self, 'project', 'list_tiers', params=params)
+        self.assertEqual(response['response']['type'], 'Tiers',
+            'Project list tiers service method failed.')
+        self.assertEqual(len(response['response']['content']['tiers']), 3,
+            'Project list tiers returned the wrong number of tiers.')
+
+    def test_project_put_tier_method(self):
+
+        ''' Add a project through the api and then edit it. '''
+
+        '''
+        TODO
+        tier_dict = {
+            'target_id': project_key.id(),
+            'contribution_type_id': 'CASH',
+            'amount': 1000,
+            'description': 'TEST DESCRIPTION',
+        }
+        '''
+        pass
+
+    def test_project_delete_tier_method(self):
+
+        ''' Add a project and a tier then delete it. '''
+
+        project_key = db_loader.create_project()
+        tier_key = db_loader.create_tier(target_id=project_key.id())
+        self.assertTrue(tier_key.get(), 'Failed to init project tier object for delete test.')
+
+        params = {'key': encrypt(tier_key.urlsafe())}
+        response = generic_service_method_success_test(self, 'project', 'delete_tier', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'System project get tier service method failed.')
+        self.assertFalse(tier_key.get(), 'Failed to delete project tier.')
+
+
 class ProposalServiceTestCase(unittest.TestCase):
     ''' Test cases for the proposal service.
     '''

@@ -5,7 +5,7 @@ from openfire.services import RemoteService
 from openfire.messages import project as project_messages
 from openfire.messages import common as common_messages
 from openfire.messages import media as media_messages
-from openfire.models.project import Project
+from openfire.models.project import Project, Tier, Goal
 
 
 class ProjectService(RemoteService):
@@ -206,3 +206,107 @@ class ProjectService(RemoteService):
         project.put()
 
         return Echo(message='Project shut down')
+
+
+    #############################################
+    # Project Goals
+    #############################################
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def get_goal(self, request):
+
+        ''' Get a project goal. '''
+
+        goal_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        goal = goal_key.get()
+        if not goal:
+            raise remote.ApplicationError('Could not find goal.')
+        return goal.to_message()
+
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goals)
+    def list_goals(self, request):
+
+        ''' List all goals for a project. '''
+
+        project_key = ndb.Key(urlsafe=self.decrypt(request.project))
+        project = project_key.get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to list goals for.')
+
+        messages = []
+        for goal in project.goals:
+            goal_obj = goal.get()
+            if goal_obj:
+                messages.append(goal_obj.to_message())
+        return common_messages.Goals(goals=messages)
+
+
+    @remote.method(common_messages.Goal, Echo)
+    def put_goal(self, request):
+
+        ''' Create or edit a project goal. '''
+
+        return Echo(message='OK')
+
+
+    @remote.method(common_messages.GoalRequest, Echo)
+    def delete_goal(self, request):
+
+        ''' Create or edit a project goal. '''
+
+        goal_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        goal_key.delete()
+        return Echo(message='OK')
+
+
+    #############################################
+    # Project Tiers
+    #############################################
+
+    @remote.method(common_messages.TierRequest, common_messages.Tier)
+    def get_tier(self, request):
+
+        ''' Get a project tier. '''
+
+        tier_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        tier = tier_key.get()
+        if not tier:
+            raise remote.ApplicationError('Could not find tier.')
+        return tier.to_message()
+
+
+    @remote.method(common_messages.TierRequest, common_messages.Tiers)
+    def list_tiers(self, request):
+
+        ''' List all tiers for a project. '''
+
+        project_key = ndb.Key(urlsafe=self.decrypt(request.project))
+        project = project_key.get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to list tiers for.')
+
+        messages = []
+        for tier in project.tiers:
+            tier_obj = tier.get()
+            if tier_obj:
+                messages.append(tier_obj.to_message())
+        return common_messages.Tiers(tiers=messages)
+
+
+    @remote.method(common_messages.Tier, Echo)
+    def put_tier(self, request):
+
+        ''' Create or edit a project tier. '''
+
+        return Echo(message='OK')
+
+
+    @remote.method(common_messages.TierRequest, Echo)
+    def delete_tier(self, request):
+
+        ''' Delete a project tier. '''
+
+        tier_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        tier_key.delete()
+        return Echo(message='OK')
