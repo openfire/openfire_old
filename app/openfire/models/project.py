@@ -70,7 +70,7 @@ class Tier(AppModel):
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
     amount = ndb.IntegerProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('pd', indexed=False)
-    delivery = ndb.DateProperty('d', indexed=True)
+    delivery = ndb.StringProperty('d', indexed=False)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
     backer_limit = ndb.IntegerProperty('l', indexed=True, default=0)
 

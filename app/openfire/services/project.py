@@ -242,12 +242,34 @@ class ProjectService(RemoteService):
         return common_messages.Goals(goals=messages)
 
 
-    @remote.method(common_messages.Goal, Echo)
+    @remote.method(common_messages.Goal, common_messages.Goal)
     def put_goal(self, request):
 
         ''' Create or edit a project goal. '''
 
-        return Echo(message='OK')
+        if not request.target:
+            raise remote.ApplicationError('No target to attach goal to.')
+        target_key = ndb.Key(urlsafe=request.target)
+        target = target_key.get()
+        if not target:
+            raise remote.ApplicationError('Could not find target for goal.')
+
+        if not request.key:
+            # Create a new goal.
+            goal = Goal(parent=target_key)
+        else:
+            # Get the goal to edit.
+            goal_key = ndb.Key(urlsafe=request.key)
+            goal = goal_key.get()
+
+        if not goal:
+            raise remote.ApplicationError('Failed to create goal or find goal to edit.')
+
+        # Update the goal.
+        goal.mutate_from_message(request)
+        goal.put()
+
+        return goal.to_message()
 
 
     @remote.method(common_messages.GoalRequest, Echo)
@@ -294,12 +316,34 @@ class ProjectService(RemoteService):
         return common_messages.Tiers(tiers=messages)
 
 
-    @remote.method(common_messages.Tier, Echo)
+    @remote.method(common_messages.Tier, common_messages.Tier)
     def put_tier(self, request):
 
         ''' Create or edit a project tier. '''
 
-        return Echo(message='OK')
+        if not request.target:
+            raise remote.ApplicationError('No target to attach tier to.')
+        target_key = ndb.Key(urlsafe=request.target)
+        target = target_key.get()
+        if not target:
+            raise remote.ApplicationError('Could not find target for tier.')
+
+        if not request.key:
+            # Create a new tier.
+            tier = Tier(parent=target_key)
+        else:
+            # Get the tier to edit.
+            tier_key = ndb.Key(urlsafe=request.key)
+            tier = tier_key.get()
+
+        if not tier:
+            raise remote.ApplicationError('Failed to create tier or find tier to edit.')
+
+        # Update the tier.
+        tier.mutate_from_message(request)
+        tier.put()
+
+        return tier.to_message()
 
 
     @remote.method(common_messages.TierRequest, Echo)

@@ -15,7 +15,7 @@ import json
 import copy
 
 import test_db_loader as db_loader
-from openfire.models.project import Category
+from openfire.models.project import Category, Goal, Tier
 from openfire.models.assets import CustomURL
 
 from test_util import encrypt, decrypt
@@ -256,16 +256,47 @@ class ProjectServiceTestCase(unittest.TestCase):
 
         ''' Add a project through the api and then edit it. '''
 
-        '''
-        TODO
+        description_1 = 'TEST DESCRIPTION'
+        description_2 = 'SOMETHING NEW'
+
+        project_key = db_loader.create_project()
+        contribution_type_key = db_loader.create_contribution_type()
         goal_dict = {
-            'target_id': project_key.id(),
-            'contribution_type_id': 'CASH',
+            'target': project_key.urlsafe(),
+            'contribution_type': contribution_type_key.urlsafe(),
             'amount': 1000,
-            'description': 'TEST DESCRIPTION',
+            'description': description_1,
+            'backer_count': 0,
+            'progress': 23,
+            'met': False,
         }
-        '''
-        pass
+
+        self.assertEqual(len(Goal.query().fetch()), 0, 'Goals existed before put test.')
+
+        response = generic_service_method_success_test(self, 'project', 'put_goal', params=goal_dict)
+
+        self.assertEqual(response['response']['type'], 'Goal', 'Project list goals service method failed.')
+        goals = Goal.query().fetch()
+        self.assertEqual(len(goals), 1, 'Failed to actually put goal.')
+        self.assertEqual(goals[0].description, description_1, 'Failed to save goal description.')
+
+        goal_key = response['response']['content']['key']
+        goal_dict['key'] = goal_key
+        goal_dict['description'] = description_2
+
+        change_dict = {
+            'key': goal_key,
+            'target': project_key.urlsafe(),
+            'description': description_2,
+        }
+
+        response = generic_service_method_success_test(self, 'project', 'put_goal', params=change_dict)
+
+        self.assertEqual(response['response']['type'], 'Goal', 'Project list goals service method failed.')
+        goals = Goal.query().fetch()
+        self.assertEqual(len(goals), 1, 'Failure. Put another goal instead of editing existing one.')
+        self.assertEqual(goals[0].description, description_2, 'Failed to update goal description.')
+
 
     def test_project_delete_goal_method(self):
 
@@ -318,16 +349,47 @@ class ProjectServiceTestCase(unittest.TestCase):
 
         ''' Add a project through the api and then edit it. '''
 
-        '''
-        TODO
+        description_1 = 'TEST DESCRIPTION'
+        description_2 = 'SOMETHING NEW'
+
+        project_key = db_loader.create_project()
+        contribution_type_key = db_loader.create_contribution_type()
         tier_dict = {
-            'target_id': project_key.id(),
-            'contribution_type_id': 'CASH',
+            'target': project_key.urlsafe(),
+            'name': 'NAME',
+            'contribution_type': contribution_type_key.urlsafe(),
             'amount': 1000,
-            'description': 'TEST DESCRIPTION',
+            'description': description_1,
+            'delivery': '02-12-2013',
+            'backer_count': 23,
+            'backer_limit': 100,
         }
-        '''
-        pass
+
+        self.assertEqual(len(Tier.query().fetch()), 0, 'Tiers existed before put test.')
+
+        response = generic_service_method_success_test(self, 'project', 'put_tier', params=tier_dict)
+
+        self.assertEqual(response['response']['type'], 'Tier', 'Project list tiers service method failed.')
+        tiers = Tier.query().fetch()
+        self.assertEqual(len(tiers), 1, 'Failed to actually put tier.')
+        self.assertEqual(tiers[0].description, description_1, 'Failed to save tier description.')
+
+        tier_key = response['response']['content']['key']
+
+        change_dict = {
+            'key': tier_key,
+            'target': project_key.urlsafe(),
+            'description': description_2,
+            'delivery': 'YESTERDAY',
+        }
+
+        response = generic_service_method_success_test(self, 'project', 'put_tier', params=change_dict)
+
+        self.assertEqual(response['response']['type'], 'Tier', 'Project list tiers service method failed.')
+        tiers = Tier.query().fetch()
+        self.assertEqual(len(tiers), 1, 'Failure. Put another tier instead of editing existing one.')
+        self.assertEqual(tiers[0].description, description_2, 'Failed to update tier description.')
+        self.assertEqual(tiers[0].delivery, 'YESTERDAY', 'Failed to update tier delivery.')
 
     def test_project_delete_tier_method(self):
 
