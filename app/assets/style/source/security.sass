@@ -1,0 +1,209 @@
+@import "compass/utilities/sprites/sprite-img"
+@import "compass/css3/images"
+
+@import _core/config
+@import _core/_fonts.sass
+@import _partials/social.sass
+
+a
+  color: #15C !important
+  text-decoration: none
+
+  &:hover
+    text-decoration: underline !important
+
+h4
+  font-family: 'Karla'
+  text-transform: uppercase
+  font-size: 10pt
+  font-weight: normal
+  position: relative
+  margin: 0
+  -webkit-margin-before: 0
+  -webkit-margin-after: 0
+  top: 0
+  margin-bottom: 50px
+
+.woops
+  padding: 5px
+  background: #FF9494
+  margin-bottom: 35px !important
+
+.snapall
+  position: fixed
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+
+.page-bg
+  background-color: #e0e0e0
+
+.rounded-big
+  border-radius: 20px
+  -moz-border-radius: 20px
+  -webkit-border-radius: 20px
+  -o-border-radius: 20px
+  -ms-border-radius: 20px
+
+.center-all
+  position: absolute
+  top: 50%
+  left: 50%
+
+#splash
+  background-color: #fff
+  height: 325px
+  width: 800px
+  text-align: center
+  vertical-align: middle
+  margin-top: -175px
+  margin-left: -400px
+
+#logobox
+  position: absolute
+  top: 85px
+  width: 100%
+  text-align: center
+
+math
+  display: none
+
+#login_wrapper
+
+  margin: 30px
+  position: absolute
+  top: 0
+  right: 0
+  left: 0
+  bottom: 0
+
+  .loginbox
+
+    .federated
+      width: 50%
+      overflow: hidden
+
+      button
+        margin-top: 10px
+
+      div.disabled
+        position: relative
+        top: 0
+        bottom: 0
+        right: 0
+        left: 0
+        background: #333
+        opacity: 0.6
+        z-index: 1000
+        height: 100%
+        padding-top: 40px
+        display: block
+
+        h4
+          display: none
+
+        &:before
+          content: 'Federated logon is disabled.'
+          font-size: 12pt
+          color: white
+          font-family: 'Karla'
+          text-transform: uppercase
+
+        button
+          opacity: 0.4
+
+          &.disabled
+            z-index: 500
+            background: inherit !important
+
+            &:hover
+              background: inherit !important
+              cursor: default !important
+
+            &:active
+              background: inherit !important
+
+    .securelogon
+      font-family: 'Karla'
+      position: absolute
+      width: 50%
+      top: 0
+      bottom: 0
+      right: 0
+      border-left: 1px solid #999
+
+      .oflogon
+        padding: 20px
+        top: 45px
+        bottom: 30px
+        position: absolute
+
+        input
+          font-weight: bold
+          display: block
+          height: 30px
+          width: 300px
+          margin-top: 10px
+          padding-left: 10px
+          padding-right: 10px
+          font-size: 12pt
+
+        a
+          font-family: 'Arial'
+          font-size: 10pt
+          text-decoration: none
+          display: inline
+          position: absolute
+          bottom: 35px
+          left: 30px
+
+        button
+          width: 110px
+          margin-top: 20px
+          height: 30px
+          float: right
+          margin-left: 10px
+          border-radius: 5px
+          -webkit-border-radius: 5px
+          -moz-border-radius: 5px
+          -o-border-radius: 5px
+          -ms-border-radius: 5px
+          text-transform: uppercase
+          font-family: 'Karla'
+          font-size: 11pt
+          font-weight: 700
+
+          &.login
+            +background(linear-gradient(top center, #ffd468, #ffb246))
+            border: 2px solid #FFB246
+
+            &:hover
+              +background(linear-gradient(top center, #ffd468, #ffb246))
+
+            &:active
+              +background(linear-gradient(bottom center, #ffd468, #ffb246))
+
+
+          &.signup
+            +background(linear-gradient(top center, #bada55, green))
+            border: 2px solid #BADA55
+
+            &:hover
+              +background(linear-gradient(top center, #bada55, green))
+
+            &:active
+              +background(linear-gradient(bottom center, #bada55, green))
+
+.loginbox
+
+  height: 100%
+
+  .federated
+
+    height: 100%
+
+    button
+
+      text-align: center
+      width: 245px

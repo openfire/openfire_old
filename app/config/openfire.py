@@ -84,14 +84,125 @@ config['openfire.meta'] = {
 
 config['openfire.security'] = {
 
+    'config': {
+        'cipher': 'AES',
+        'pad16': True,
+        'bad_logon_limit': 5,
+
+        'extensions': {
+
+            ## enable/disable openid and openid providers completely
+            'openid': {
+                'enabled': True
+            },
+
+            ## enable/disable oauth and oauth providers completely
+            'oauth': {
+                'enabled': True
+            },
+
+            ## enable/disable appengine/google integrated auth completely
+            'appengine': {
+                'enabled': True
+            }
+
+        }
+    },
+
+    ## openid-based logon
+    'authentication': {
+
+        ## enable/disable simple authentication
+        'debug': False,
+        'simple': False,
+        'logging': False,
+
+        'federation': {
+
+            'enabled': True,
+
+            'providers': [
+
+                {'name': 'googleplus',
+                    'label': 'Google',
+                    'mode': 'openid',
+                    'enabled': True,
+                    'key': '483525084916-mvr4tcfceh2gfko0tvu7fcu3n1mg7kjp.apps.googleusercontent.com',
+                    'secret': '1_1CnL7xof86FaCAk-Cu7Vnv',
+                    'endpoint': 'www.google.com/accounts/o8/id'
+                },
+
+                {'name': 'facebook',
+                    'label': 'Facebook',
+                    'mode': 'oauth',
+                    'enabled': True,
+                    'key': '468309289847671',  # must match your App ID, above!
+                    'secret': 'be5bb557db98c34e4959ab32cb7761c2',
+
+                    'scopes': [
+
+                        {'name': 'email', 'enabled': True},
+                        {'name': 'user_about_me', 'enabled': True},
+                        {'name': 'user_hometown', 'enabled': True},
+                        {'name': 'user_interests', 'enabled': True},
+                        {'name': 'user_likes', 'enabled': True},
+                        {'name': 'user_location', 'enabled': True},
+                        {'name': 'user_website', 'enabled': True},
+                        {'name': 'publish_stream', 'enabled': True}
+
+                    ]
+                },
+
+                {'name': 'github',
+                    'label': 'GitHub',
+                    'mode': 'oauth',
+                    'enabled': False,
+                    'key': '405567cb2d2d69fc4726',
+                    'secret': '7d8016fed2e1294b0ff13de8ed71e73007a98e76',
+
+                    'endpoints': {
+                        'authorize': 'https://github.com/login/oauth/authorize',
+                        'access_token': 'https://github.com/login/oauth/access_token'
+                    }
+                },
+
+                {'name': 'linkedin',
+                    'label': 'LinkedIn',
+                    'mode': 'oauth',
+                    'enabled': False,
+                    'key': '',
+                    'secret': ''
+                },
+
+                {'name': 'twitter',
+                    'label': 'Twitter',
+                    'mode': 'oauth',
+                    'enabled': True,
+                    'key': 'g33xdYigl64t87rF4NS2Q',
+                    'secret': 'G6OyizYQDJTRVGmRbdKFDKiwRxJ8Dv0eTlE3KMMAk',
+
+                    'endpoints': {
+                        'token': 'https://api.twitter.com/oauth/request_token',
+                        'authorize': 'https://api.twitter.com/oauth/authorize',
+                        'access_token': 'https://api.twitter.com/oauth/access_token'
+                    }
+                },
+
+                {'name': 'angellist',
+                    'label': 'AngelList',
+                    'mode': 'oauth',
+                    'enabled': False,
+                    'key': '',
+                    'secret': ''
+                }
+            ]
+        }
+
+    },
+
     'encryption': {
         'simple': True,    # simple b64 encryption for development
         'advanced': False  # advanced AES symmetrical encryption for production
-    },
-
-    'config': {
-        'cipher': 'AES',
-        'pad16': True
     }
 
 }

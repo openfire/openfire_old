@@ -1,0 +1,20 @@
+{% extends "core/__base.html" %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset.style('security', 'compiled') }}">
+{% endblock stylesheets %}
+
+{% block body %}
+
+<div class="snapall page-bg">
+
+    <div id="logobox">
+        <img src="https://d2ipw8y1masjpy.cloudfront.net/static/branding/openfire_transparent_optimized.png" alt='openfire!' width="600" height="173" />
+    </div>
+
+    <div id='splash' class="rounded-big center-all">
+        {% block content %}<b>SECURITY</b>{% endblock %}
+    </div> <!-- end #splash -->
+</div> <!-- end .snapall -->
+
+{% endblock %}

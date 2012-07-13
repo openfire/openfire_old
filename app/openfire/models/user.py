@@ -22,6 +22,7 @@ class User(AppModel):
 
     user = ndb.UserProperty('usr', indexed=True)
     username = ndb.StringProperty('u', indexed=True)
+    password = ndb.StringProperty('p', indexed=True, default=None)
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
     bio = ndb.TextProperty('b', indexed=False)
