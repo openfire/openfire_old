@@ -54,7 +54,10 @@ class CustomUrlCheck(messages.Message):
 
 class Goal(messages.Message):
 
-    ''' Common to proposals and projects, defines a funding goal. '''
+    '''
+    Common to proposals and projects, defines a funding goal.
+    Required: (key, target)
+    '''
 
     key = messages.StringField(1)
     target = messages.StringField(2)
@@ -76,7 +79,7 @@ class Goals(messages.Message):
 
 class GoalRequest(messages.Message):
 
-    ''' Request a project goal by key. '''
+    ''' Request a project goal by key, or a list of goals by project. '''
 
     key = messages.StringField(1)
     project = messages.StringField(2)
@@ -84,7 +87,10 @@ class GoalRequest(messages.Message):
 
 class Tier(messages.Message):
 
-    ''' Common to proposals and projects, defines a contribution tier. '''
+    '''
+    Common to proposals and projects, defines a contribution tier.
+    Required: (key, target)
+    '''
 
     key = messages.StringField(1)
     target = messages.StringField(2)
@@ -107,7 +113,7 @@ class Tiers(messages.Message):
 
 class TierRequest(messages.Message):
 
-    ''' Request a project tier by key. '''
+    ''' Request a project tier by key or a list of tiers by project. '''
 
     key = messages.StringField(1)
     project = messages.StringField(2)

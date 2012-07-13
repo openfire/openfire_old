@@ -1,8 +1,8 @@
 from openfire.models.project import Proposal, Project, Category, Tier, Goal
+from openfire.models.contribution import ContributionType
 from openfire.models.assets import CustomURL
 from openfire.models.user import User
 from google.appengine.ext import ndb
-import datetime
 
 '''
 This module is used to create database entities for testing purposes.
@@ -45,6 +45,7 @@ def create_user(username='fake', firstname='Fakie', lastname='McFakerton', bio='
 
 
 def create_goal(target_id='fake', contribution_type_id='fake', amount=100, description='DESCRIPTION', backer_count=0, progress=50, met=False):
+
     target = ndb.Key('Project', target_id)
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     goal = Goal(target=target, contribution_type=contribution_type, amount=amount, description=description, backer_count=backer_count, progress=progress, met=met, parent=target).put()
@@ -55,12 +56,16 @@ def create_goal(target_id='fake', contribution_type_id='fake', amount=100, descr
     return goal
 
 
-def create_tier(target_id='fake', name='NAME', contribution_type_id='fake', amount=100, description='DESCRIPTION', delivery=datetime.date.today(), backer_count=100, backer_limit=100):
+def create_tier(target_id='fake', name='NAME', contribution_type_id='fake', amount=100, description='DESCRIPTION', delivery="tomorrow", backer_count=100, backer_limit=100):
+
     target = ndb.Key('Project', target_id)
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     tier = Tier(target=target, name=name, contribution_type=contribution_type, amount=amount, description=description, delivery=delivery, backer_count=backer_count, backer_limit=backer_limit, parent=target).put()
     if target and target.get():
         target = target.get()
         target.tiers.append(tier)
-        target.put()
     return tier
+
+
+def create_contribution_type(slug='slug', name='NAME', unit='CASH', plural='CASH', subunit='DOLLAR', subunit_plural='DOLLARS'):
+    return ContributionType(id=slug, slug=slug, name=name,  unit=unit, plural=plural, subunit=subunit, subunit_plural=subunit_plural).put()

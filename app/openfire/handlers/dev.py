@@ -168,49 +168,49 @@ class DevModels(BaseHandler):
                             name='Friend',
                             amount=10,
                             description="We'll give you an invite to the private beta!",
-                            delivery=datetime.date(year=2012, month=9, day=1)
+                            delivery=str(datetime.date(year=2012, month=9, day=1))
                         ),
                         project.Tier(
                             name='Supporter',
                             amount=35,
                             description="Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
-                            delivery=datetime.date(year=2012, month=9, day=1)
+                            delivery=str(datetime.date(year=2012, month=9, day=1))
                         ),
                         project.Tier(
                             name='Backer',
                             amount=50,
                             description="Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
-                            delivery=datetime.date(year=2012, month=9, day=1)
+                            delivery=str(datetime.date(year=2012, month=9, day=1))
                         ),
                         project.Tier(
                             name='Sponsor',
                             amount=100,
                             description="Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
-                            delivery=datetime.date(year=2012, month=8, day=1)
+                            delivery=str(datetime.date(year=2012, month=8, day=1))
                         ),
                         project.Tier(
                             name='Investor',
                             amount=300,
                             description="Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
-                            delivery=datetime.date(year=2012, month=8, day=1)
+                            delivery=str(datetime.date(year=2012, month=8, day=1))
                         ),
                         project.Tier(
                             name='Inner Circle',
                             amount=500,
                             description="Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
-                            delivery=datetime.date(year=2012, month=8, day=1)
+                            delivery=str(datetime.date(year=2012, month=8, day=1))
                         ),
                         project.Tier(
                             name='Transparency Warrior',
                             amount=1000,
                             description="As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
-                            delivery=datetime.date(year=2012, month=7, day=15)
+                            delivery=str(datetime.date(year=2012, month=7, day=15))
                         ),
                         project.Tier(
                             name='Fat Cat',
                             amount=10000,
                             description="Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
-                            delivery=datetime.date(year=2012, month=7, day=10)
+                            delivery=str(datetime.date(year=2012, month=7, day=10))
                         )
                     ]
             ).put()
@@ -311,56 +311,56 @@ class DevModels(BaseHandler):
                     name='Friend',
                     amount=10,
                     description="We'll give you an invite to the private beta!",
-                    delivery=datetime.date(year=2012, month=9, day=1)
+                    delivery=str(datetime.date(year=2012, month=9, day=1))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Supporter',
                     amount=35,
                     description="Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
-                    delivery=datetime.date(year=2012, month=9, day=1)
+                    delivery=str(datetime.date(year=2012, month=9, day=1))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Backer',
                     amount=50,
                     description="Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
-                    delivery=datetime.date(year=2012, month=9, day=1)
+                    delivery=str(datetime.date(year=2012, month=9, day=1))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Sponsor',
                     amount=100,
                     description="Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
-                    delivery=datetime.date(year=2012, month=8, day=1)
+                    delivery=str(datetime.date(year=2012, month=9, day=1))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Investor',
                     amount=300,
                     description="Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
-                    delivery=datetime.date(year=2012, month=8, day=1)
+                    delivery=str(datetime.date(year=2012, month=9, day=1))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Inner Circle',
                     amount=500,
                     description="Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
-                    delivery=datetime.date(year=2012, month=8, day=1)
+                    delivery=str(datetime.date(year=2012, month=9, day=1))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Transparency Warrior',
                     amount=1000,
                     description="As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
-                    delivery=datetime.date(year=2012, month=7, day=15)
+                    delivery=str(datetime.date(year=2012, month=7, day=15))
                 ),
                 project.Tier(
                     parent=fatcatmap.key,
                     name='Fat Cat',
                     amount=10000,
                     description="Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
-                    delivery=datetime.date(year=2012, month=7, day=10)
+                    delivery=str(datetime.date(year=2012, month=7, day=10))
                 )
             ]
 
