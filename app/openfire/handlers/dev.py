@@ -1,3 +1,4 @@
+import hashlib
 import datetime
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import ndb
@@ -99,10 +100,10 @@ class DevModels(BaseHandler):
             ndb.put_multi([money, time, code, advocacy])
 
             ## users first
-            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', firstname='David', lastname='Anderson', location='San Francisco, CA', bio='hola yo soy pug').put()
-            sam = user.User(key=ndb.Key(user.User, 'sam@openfi.re'), username='sam', firstname='Sam', lastname='Gammon', location='San Francisco, CA', bio='fiesta ayayayay').put()
-            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', firstname='David', lastname='Rekow', location='San Francisco, CA', bio='hi i is david').put()
-            ethan = user.User(key=ndb.Key(user.User, 'ethan@openfi.re'), username='ethan', firstname='Ethan', lastname='Leland', location='San Francisco, CA', bio='i am mister ethan').put()
+            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', password=hashlib.sha256('pugiscool').hexdigest(), firstname='David', lastname='Anderson', location='San Francisco, CA', bio='hola yo soy pug').put()
+            sam = user.User(key=ndb.Key(user.User, 'sam@openfi.re'), username='sam', password=hashlib.sha256('samiscool').hexdigest(), firstname='Sam', lastname='Gammon', location='San Francisco, CA', bio='fiesta ayayayay').put()
+            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', password=hashlib.sha256('davidiscool').hexdigest(), firstname='David', lastname='Rekow', location='San Francisco, CA', bio='hi i is david').put()
+            ethan = user.User(key=ndb.Key(user.User, 'ethan@openfi.re'), username='ethan', password=hashlib.sha256('ethaniscool').hexdigest(), firstname='Ethan', lastname='Leland', location='San Francisco, CA', bio='i am mister ethan').put()
 
             ## user emails
             user_emails = [

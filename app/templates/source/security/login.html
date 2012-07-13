@@ -1,0 +1,9 @@
+{% extends "layout/security.html" %}
+
+{% block content %}
+
+	<div id="login_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}">
+		{% include "snippets/login_box.html" with context %}
+	</div>
+
+{% endblock %}

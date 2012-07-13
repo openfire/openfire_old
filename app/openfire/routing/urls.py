@@ -60,6 +60,11 @@ rules = [
             Route('/login', name='auth/login', handler='Login'),
             Route('/logout', name='auth/logout', handler='Logout'),
             Route('/register', name='auth/register', handler='Register'),
+            Route('/login/with/<provider>', name='auth/login-with', handler='Login'),
+            Route('/thirdparty/<provider>', name='auth/provider', handler='Provider'),
+            Route('/_auth/<action>', name='auth/action', handler='FederatedAction'),
+            Route('/_auth/<action>/<provider>', name='auth/action-provider', handler='FederatedAction'),
+            Route('/_ah/login_required', name='appengine/federated', handler='Login')
         ]),
 
         ## === Internal URLs === ##
