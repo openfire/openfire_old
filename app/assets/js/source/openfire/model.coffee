@@ -41,37 +41,12 @@ class Update extends ActivityItem
     timestamp: Date()
     project: Key()
 
-## project updates
-class MediaUpdate extends Update
+## media
+class Asset
 
-class GoalReached extends Update
+    constructor: (hash) ->
 
-class ThresholdReached extends Update
+        if hash? and Util.is_object hash
+            @[prop] = val for prop, val of hash
 
-class ProjectOpened extends Update
-
-class ProjectClosed extends Update
-
-
-## proposal activities
-class CreateProposal extends ActivityItem
-
-class ProposalPromoted extends Update
-
-class ProposalDenied extends Update
-
-class ProposalReturned extends Update
-
-## common activities
-class AddUserRole extends ActivityItem # project or proposal
-
-class Comment extends ActivityItem
-
-    username: String()
-    text: String()
-
-# Login dialogue - does sam want to fill these out?
-class Login # extends Model
-
-# Signup - same as ^^^?
-class Signup # extends Model
+        return @

@@ -1,19 +1,23 @@
 ## openfire project classes & controllers
 
-class Asset
-
-    constructor: (hash) ->
-
-        if hash? and Util.is_object hash
-            @[prop] = val for prop, val of hash
-
-        return @
-
+# project media
 class ProjectImage extends Asset
 
 class ProjectVideo extends Asset
 
 class ProjectAvatar extends Asset
+
+# project object classes
+
+class Goal
+
+    constructor: (@key) ->
+        return @
+
+class Tier
+
+    constructor: (@key) ->
+        return @
 
 
 
@@ -35,13 +39,28 @@ class Project # extends Model
     ###
 
     constructor: (@key) ->
+
         @assets = []
-        @assets_by_key = {}
+        @goals = []
+        @tiers = []
+
+        @index =
+            assets_by_key: {}
+            goals_by_key: {}
+            tiers_by_key: {}
 
         return @
 
-    attach: (asset) =>
-        @assets_by_key[asset.key] = @assets.push(asset) - 1
+    attach_asset: (a) =>
+        @index.assets_by_key[a.key] = @assets.push(a) - 1
+        return @
+
+    attach_goal: (g) =>
+        @index.goals_by_key[g.key] = @goals.push(g) - 1
+        return @
+
+    attach_tier: (t) =>
+        @index.tiers_by_key[t.key] = @tiers.push(t) - 1
         return @
 
     from_message: (message) =>
@@ -83,6 +102,8 @@ class ProjectController extends OpenfireController
 
         @project = new Project(k = new Key(@_state.ke))
         @project_key = @project.key.key
+        @goals = {}
+        @tiers = {}
 
         @_init = () =>
 
@@ -126,10 +147,6 @@ class ProjectController extends OpenfireController
                     Util.get('project-image-drop-preview').setAttribute('src', e.target.result)
 
                 choice = $.apptools.widgets.modal.create (() =>
-                    options = JSON.stringify
-                        ratio:
-                            x: 0.3
-                            y: 0.3
                     docfrag = Util.create_doc_frag (() =>
                         return Util.create_element_string('div',
                             id: 'project-image-drop-choice'
@@ -386,6 +403,42 @@ class ProjectController extends OpenfireController
         ## edit an existing project
         # content api?
 
+    edit_goal: (key) =>
+
+        goal_editor = $.apptools.widgets.modal.create (() =>
+            docfrag = Util.create_doc_frag([
+                '<div id="project-goal-editor-modal" class="pre-modal" style="text-align: center" data-title="editing goal...">',
+                    '<div id="project-goal-editor-title" class="mini-editable"></div>',
+                    '<div id="project-goal-editor-contribution-type" class="mini-editable"></div>',
+                    '<div id="project-goal-editor-amount" class="mini-editable"></div>',
+                    '<div id="project-goal-editor-description" class="mini-editable"></div>',
+                    '<button id="project-goal-editor-save" value="save all">save all</button>'
+                '</div>'
+            ].join(''))
+            document.body.appendChild(docfrag)
+            return document.getElementById('project-goal-editor-modal')
+        )(),(() =>
+            docfrag = Util.create_doc_frag((() =>
+                return Util.create_element_string 'a',
+                    href: '#project-goal-editor-modal'
+                    id: 'a-project-goal-editor-modal'
+                    style: 'display: none;'
+            )())
+            document.body.appendChild(docfrag)
+            return document.getElementById('a-project-goal-editor-modal')
+        )(), (m) ->
+
+            $.apptools.widgets.editor.create(field) for field in document.getElementById('project-goal-editor-modal').children
+            return m.open()
+
+        Util.get()
+
+
+
+    edit_tier: () =>
+
+        ## edit a project
+
 
     follow: () =>
 
@@ -453,6 +506,57 @@ class ProjectController extends OpenfireController
             failure: (error) =>
                 alert 'get_updates() failure'
 
+    goals:
+
+        get: (key, callback) =>
+
+            ## get goal by key
+            $.apptools.api.project.get_goal({}).fulfill
+
+                success: (response) =>
+                    alert 'goals.get() success'
+                    callback.call(@, response) if callback?
+
+                failure: (error) =>
+                    alert 'goals.get() failure'
+
+
+        list: (callback) =>
+
+            ## list goals by project key
+            $.apptools.api.project.list_goals({}).fulfill
+
+                success: () =>
+                    alert 'goals.list() success'
+                    callback.call(@, response) if callback?
+
+                failure: (error) =>
+                    alert 'goals.list() failure'
+
+        put: (key, callback) =>
+
+            ## put goal by key
+            $.apptools.api.project.put_goal({}).fulfill
+
+                success: () =>
+                    alert 'goals.put() success'
+                    callback.call(@, response) if callback?
+
+                failure: (error) =>
+                    alert 'goals.put() failure'
+
+        delete: (key, callback) =>
+
+            ## delete goal by key
+            $.apptools.api.project.delete_goal({}).fulfill
+
+                success: () =>
+                    alert 'goals.delete() success'
+                    callback.call(@, response) if callback?
+
+                failure: (error) =>
+                    alert 'goals.delete() failure'
+
 
     share: (sm_service) =>
 
@@ -460,6 +564,52 @@ class ProjectController extends OpenfireController
         # what do?
 
         alert 'Testing social sharing!'
+
+    tiers:
+
+        get: () =>
+
+            ## get tier by key
+            $.apptools.api.project.get_tier({}).fulfill
+
+                success: () =>
+                    alert 'tiers.get() success'
+
+                failure: (error) =>
+                    alert 'tiers.get() failure'
+
+        list: () =>
+
+            ## list tiers by project key
+            $.apptools.api.project.list_tiers({}).fulfill
+
+                success: () =>
+                    alert 'tiers.list() success'
+
+                failure: (error) =>
+                    alert 'tiers.list() failure'
+
+        put: () =>
+
+            ## put tier by key
+            $.apptools.api.project.put_tier({}).fulfill
+
+                success: () =>
+                    alert 'tiers.put() success'
+
+                failure: (error) =>
+                    alert 'tiers.put() failure'
+
+        delete: () =>
+
+            ## delete tier by key
+            $.apptools.api.project.delete_tier({}).fulfill
+
+                success: () =>
+                    alert 'tiers.delete() success'
+
+                failure: (error) =>
+                    alert 'tiers.delete() failure'
 
 
     update: () =>
