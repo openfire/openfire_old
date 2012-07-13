@@ -10,21 +10,21 @@ config = {}
 
 config['openfire'] = {
 
-    'version': '0.1-alpha'
+    'version': '0.2-alpha'
 
 }
 
 config['openfire.meta'] = {
 
-    'icon': '',
-    'logo': '',
+    'icon': 'https://d2ipw8y1masjpy.cloudfront.net/static/branding/icons/of_favicon_32x32.ico',
+    'logo': 'https://d2ipw8y1masjpy.cloudfront.net/static/branding/openfire_transparent_optimized.png',
     'author': 'a collaboration between labor lapsus L3C + momentum labs',
     'publisher': 'openfire now!',
     'copyright': 'openfire, (c) 2012',
     'robots': 'index,follow',
     'revisit': '7 days',
 
-    'description': '',
+    'description': 'openfire brings technologists, investors, developers and crowdfunders together around one thing: putting momentum behind disruptive innovation.',
 
     'keywords': [
         'positive disruption',
@@ -115,7 +115,7 @@ config['openfire.sessions'] = {
             'ttl': '86400',
             'name': 'ofsn',
             'enabled': False
-        },
+        }
 
     },
 

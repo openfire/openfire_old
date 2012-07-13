@@ -48,7 +48,7 @@ _config['webapp2_extras.sessions'] = {
 
     'secret_key': 'vbvyfb(&!B(&#bcoubcoo2n38b7cb73v2B^C1iv(&&X',
     'default_backend': 'securecookie',
-    'cookie_name':     'appsession',
+    'cookie_name':     'ofsession',
     'session_max_age': None,
     'cookie_args': {
         'max_age':     86400,

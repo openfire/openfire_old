@@ -753,8 +753,8 @@ task 'minify:coffee', 'minify js codebase', (options) ->
 		["BackboneJS", fixpath(js_prefix, 'static', 'core', 'backbone.min.js'), fixpath(js_prefix, 'static', 'core', 'backbone.js')],
 		["jQuery", fixpath(js_prefix, 'static', 'core', 'jquery.min.js'), fixpath(js_prefix, 'static', 'core', 'jquery.js')],
 		["Lawnchair", fixpath(js_prefix, 'static', 'core', 'lawnchair.min.js'), fixpath(js_prefix, 'static', 'core', 'lawnchair.js')],
-		["Modernizr", fixpath(js_prefix, 'static', 'core', 'modernizr.min.js'), fixpath(js_prefix, 'static', 'core', 'modernizr.js')]
-
+		["openfire", fixpath(js_prefix, 'static', 'openfire', 'app.min.js'), fixpath(js_prefix, 'static', 'openfire', 'app.js')],
+		["openfire admin", fixpath(js_prefix, 'static', 'openfire', 'app.admin.min.js'), fixpath(js_prefix, 'static', 'openfire', 'app.admin.js')]
 		## PUT YER FILES HERE FOR MINIFICATION
 
 	]
@@ -764,7 +764,7 @@ task 'minify:coffee', 'minify js codebase', (options) ->
 	for file in files_to_minify
 		total_ops = total_ops + 1
 		out.say 'uglifyjs', 'Minifying '+file[0]+'...'
-		out.spawn 'uglify', 'node', [fixpath(__dirname, 'node_modules', 'uglify-js', 'bin', 'uglifyjs'), '-o', file[1], file[2]], minify_done, minify_data, minify_err
+		out.spawn 'uglify', 'node', [fixpath(__dirname, 'node_modules', 'uglify-js', 'bin', 'uglifyjs'), '-nm', '-o', file[1], file[2]], minify_done, minify_data, minify_err
 
 
 ######## =======  Templates  ========== ########

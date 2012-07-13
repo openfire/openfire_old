@@ -3543,83 +3543,64 @@
           anchor.setAttribute('id', anchor_id);
           anchor.classList.add('accordion-link');
           return _this._state.folds.push(fold_id);
-        },
-        find_match: function(element_array) {
-          var base, base_matches, el, elem, element, k, key, match, matched, v, _i, _j, _k, _len, _len1, _len2, _name, _ref;
-          base_matches = {};
-          matched = null;
-          for (_i = 0, _len = element_array.length; _i < _len; _i++) {
-            element = element_array[_i];
-            ((_ref = base_matches[_name = base = element.getAttribute('id').split('-').pop()]) != null ? _ref : base_matches[_name] = []).push(element);
-          }
-          for (k in base_matches) {
-            v = base_matches[k];
-            if (v.length < 2) {
-              delete base_matches[k];
-            }
-          }
-          for (key in base_matches) {
-            match = base_matches[key];
-            if (matched == null) {
-              matched = match;
-            }
-          }
-          for (_j = 0, _len1 = element_array.length; _j < _len1; _j++) {
-            el = element_array[_j];
-            el.classList.remove('current-fold');
-          }
-          for (_k = 0, _len2 = matched.length; _k < _len2; _k++) {
-            elem = matched[_k];
-            elem.classList.add('current-fold');
-          }
-          return matched;
         }
       };
       this.fold = function(e) {
-        var accordion, axis, c, close_anim, closed, current, current_a, current_div, open_anim, opened, prop, same, target_div, target_id, test, trigger;
+        var accordion, axis, block_tabs, close_anim, closed, curr_tabs, current, current_fold, open_anim, open_tab, opened, prop, same, tab, tabs, target_div, target_id, trigger, unique_tabs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
         if (e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
         }
         trigger = e.target;
         target_div = Util.get(target_id = trigger.getAttribute('id').split('-').splice(1).join('-'));
+        current_fold = Util.get(_this._state.current_fold) || false;
         current = false;
-        same = false;
+        same = target_div === current_fold;
         accordion = Util.get(_this._state.element_id);
-        if ((c = Util.get('current-fold', accordion)) != null) {
-          c = Util.filter(c, test = function(el) {
-            return el.parentNode === accordion;
-          });
-          if (c.length > 2) {
-            c = _this.internal.find_match(c);
+        _ref = [Util.get('current-fold', accordion), Util.get('block', accordion)], curr_tabs = _ref[0], block_tabs = _ref[1];
+        _ref1 = [curr_tabs, block_tabs];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          tabs = _ref1[_i];
+          if (tabs != null) {
+            tabs = Util.filter(tabs, function(el) {
+              return el.parentNode === accordion;
+            });
           }
-          current_div = Util.filter(c, function(x) {
-            return x.tagName.toLowerCase() === 'div';
-          })[0];
-          current_a = Util.filter(c, function(x) {
-            return x.tagName.toLowerCase() === 'a';
-          })[0];
+        }
+        unique_tabs = curr_tabs;
+        if (block_tabs) {
+          for (_j = 0, _len1 = block_tabs.length; _j < _len1; _j++) {
+            tab = block_tabs[_j];
+            if (!Util.in_array(tab, unique_tabs)) {
+              unique_tabs.push(tab);
+            }
+          }
+        }
+        if (unique_tabs != null) {
           current = true;
         }
         _this._state.active = true;
         opened = _this._state.config[axis = _this._state.config.axis].opened;
         closed = _this._state.config[axis].closed;
         open_anim = (close_anim = Util.prep_animation());
-        if (current) {
-          same = current_div === target_div;
-          close_anim.complete = function() {
-            var closed_div;
-            closed_div = current_div !== target_div ? current_div : target_div;
-            closed_div.classList.remove('block');
-            closed_div.classList.add('none');
-            closed_div.classList.remove('current-fold');
-            Util.get('a-' + closed_div.getAttribute('id')).classList.remove('current-fold');
-            _this._state.active = false;
-            return _this;
-          };
+        if (unique_tabs != null) {
+          for (_k = 0, _len2 = unique_tabs.length; _k < _len2; _k++) {
+            open_tab = unique_tabs[_k];
+            $(open_tab).animate(closed, {
+              duration: 400,
+              complete: function() {
+                var cls, _l, _len3, _ref2;
+                _ref2 = ['current-fold', 'block'];
+                for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
+                  cls = _ref2[_l];
+                  open_tab.classList.remove(cls);
+                }
+                return open_tab.classList.add('none');
+              }
+            });
+          }
         }
         open_anim.complete = function() {
-          trigger.classList.add('current-fold');
           target_div.classList.add('current-fold');
           _this._state.active = false;
           return _this;
@@ -3631,9 +3612,6 @@
           target_div.classList.remove('none');
           target_div.classList.add('block');
         }
-        if (current) {
-          $(current_div).animate(closed, close_anim);
-        }
         if (!same) {
           $(target_div).animate(opened, open_anim);
         }
@@ -3641,30 +3619,22 @@
         return _this;
       };
       this._init = function() {
-        var accordion, c, current_fold, link, links, test, _i, _len;
+        var accordion, e, link, links, _i, _len;
         accordion = Util.get(_this._state.element_id);
-        links = Util.filter(Util.get('a', accordion), (test = function(el) {
-          if (el.parentNode === accordion) {
-            return true;
-          } else {
-            return false;
-          }
-        }));
+        links = Util.filter(Util.get('a', accordion), function(el) {
+          return el.parentNode === accordion;
+        });
         if (links != null) {
           for (_i = 0, _len = links.length; _i < _len; _i++) {
             link = links[_i];
             _this.internal.register_fold(link);
           }
         }
-        current_fold = (c = Util.filter(Util.filter(Util.get('current', accordion), function(x) {
-          return x.tagName.toLowerCase() === 'a';
-        }), test)) != null ? c[0] : null;
-        /*if current_fold?
-            e = {}
-            e.target = current_fold
-            @fold(e)
-        */
-
+        if (typeof current_fold !== "undefined" && current_fold !== null) {
+          e = {};
+          e.target = links[0];
+          _this.fold(e);
+        }
         _this._state.init = true;
         return _this;
       };
@@ -3929,15 +3899,17 @@
         init: false,
         config: {
           rounded: true,
-          width: '500px'
+          width: '500px',
+          div_string: null
         }
       };
       this._state.config = Util.extend(true, this._state.config, options);
       this.internal = {
         classify: function() {
-          var cls, tab, tabs, test, trigger, triggers, _cls, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
+          var cls, div_string, tab, tabs, test, trigger, triggers, _cls, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
+          div_string = _this._state.config.div_string;
           target = Util.get(_this._state.element_id);
-          tabs = Util.filter(Util.get('div', target), (test = function(el) {
+          tabs = Util.filter(Util.get(div_string, target), (test = function(el) {
             if (el.parentNode === target) {
               return true;
             } else {
@@ -3997,8 +3969,9 @@
         return _this.internal.classify();
       };
       this["switch"] = function(e) {
-        var c, current, current_a, current_div, tabset, target_div, target_id, test, trigger;
+        var c, current, current_a, current_div, div_string, tabset, target_div, target_id, test, trigger;
         tabset = Util.get(_this._state.element_id);
+        div_string = _this._state.config.div_string;
         current = false;
         if (e != null) {
           if (e.preventDefault) {
@@ -4023,7 +3996,7 @@
             c = _this.internal.find_match(c);
           }
           current_div = Util.filter(c, function(x) {
-            return x.tagName.toLowerCase() === 'div';
+            return x.tagName.toLowerCase() === div_string;
           })[0];
           current_a = Util.filter(c, function(x) {
             return x.tagName.toLowerCase() === 'a';
@@ -4851,7 +4824,7 @@
         window_offset = offset_side === 'top' ? window.scrollY : window.scrollX;
         past_offset = _this._state.cache.past_offset || 0;
         _this._state.cache.past_offset = window_offset;
-        distance = _this._state.cache.original_offset[offset_side] - 5;
+        distance = _this._state.cache.original_offset[offset_side] - 8;
         achieved = window_offset - distance;
         scroll = window_offset - past_offset;
         if (scroll > 0) {
@@ -4881,7 +4854,7 @@
           _this._state.cache.style[prop] = val;
         }
         el.classList.add('fixed');
-        el.style.top = -5 + 'px';
+        el.style.top = -8 + 'px';
         el.style.left = _this._state.cache.original_offset.left + 'px';
         return _this;
       };

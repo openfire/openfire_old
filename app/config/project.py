@@ -14,14 +14,14 @@ config = {}
 ## App settings
 config['apptools.project'] = {
 
-    'name': 'AppTools',        # Change this to your app's name
+    'name': 'openfire',        # Change this to your app's name
 
     'version': {               # Change this according to your app's version
-        'major': 1,
-        'minor': 0,
+        'major': 0,
+        'minor': 2,
         'micro': 0,
-        'build': 20120321,
-        'release': 'BETA'
+        'build': 20120712,
+        'release': 'ALPHA'
     }
 
 }
@@ -41,8 +41,8 @@ config['apptools.project.output'] = {
     'standalone': False,  # whether to render only the current template, or the whole context (ignores "extends")
 
     'analytics': {  # Analytics Settings
-        'enable': False,              # whether to insert analytics code
-        'account_id': 'UA-XXXXX-X'   # your google anlytics site ID
+        'enable': True,              # whether to insert analytics code
+        'account_id': 'UA-31611943-2'   # your google anlytics site ID
     },
 
     'appcache': {  # HTML5 appcaching
@@ -51,7 +51,7 @@ config['apptools.project.output'] = {
     },
 
     'assets': {  # Asset API
-        'minified': False,        # whether to switch to minified assets or not
+        'minified': True,        # whether to switch to minified assets or not
         'serving_mode': 'local',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
         'cdn_prefix': []          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
     },

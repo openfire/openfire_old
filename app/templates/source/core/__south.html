@@ -2,9 +2,8 @@
 <script>window.jQuery || document.write('<script src="{{ asset.script('jquery', 'core') }}"><\/script>')</script>
 
 <!-- Core Scripts -->
-<!-- <script src="{{ asset.script('modernizr', 'core') }}"></script> -->
+<script src="{{ asset.script('modernizr', 'core') }}"></script>
 <script src="{{ asset.script('underscore', 'core') }}"></script>
-<script src="{{ asset.script('backbone', 'core') }}"></script>
 <script src="/assets/js/static/core/jquery/easing.min.js"></script>
 
 <!-- Base Scripts -->
@@ -23,8 +22,8 @@
 {%- endif -%}
 
 {# <!-- Ext Scripts --> #}
-<script id='google-jssdk' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-<script id='facebook-jssdk' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script>
+{#<script id='google-jssdk' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<script id='facebook-jssdk' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script> #}
 
 
 {# <!-- Services Manifest --> #}
@@ -38,11 +37,9 @@
 {% endblock %}
 
 {% block page_analytics %}
-	{%- if not util.config.debug -%} {# // No analytics on the dev server... #}
 	{%- if page.analytics -%}
 		{% from "macros/page_analytics.js" import google_analytics_async %}
 		{{ google_analytics_async(page.analytics) }}
-	{%- endif -%}
 	{%- endif -%}
 {% endblock %}
 </script>

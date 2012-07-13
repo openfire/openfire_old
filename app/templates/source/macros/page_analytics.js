@@ -3,6 +3,8 @@
 	{%- if config.enable -%}
 	  var _gaq = _gaq || [];
 	  _gaq.push(['_setAccount', '{{ config.account_id }}']);
+	  _gaq.push(['_setDomainName', "{{ util.request.env.get('HTTP_HOST', 'open-fire-staging.appspot.com') }}"]);
+	  _gaq.push(['_setAllowLinker', true]);
 	  _gaq.push(['_trackPageview']);
 
 	  (function() {

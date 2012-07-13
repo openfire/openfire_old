@@ -144,7 +144,7 @@ class WebHandler(BaseHandler, SessionsMixin):
             self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
-    def handle_exception2(self, exception, debug):
+    def handle_exception(self, exception, debug):
 
         ''' Handle an unhandled exception '''
 
@@ -156,6 +156,7 @@ class WebHandler(BaseHandler, SessionsMixin):
         else:
             self.response.write('<b>Unhandled exception encountered:</b><br />')
             self.response.write(str(exception))
+            self.response.write('<h2>quick, get the developers</h2>')
             raise exception
 
         return self.error(500)
