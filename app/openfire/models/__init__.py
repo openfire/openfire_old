@@ -136,6 +136,8 @@ class MessageConverterMixin(ModelMixin):
             if hasattr(response, k):
                 if isinstance(v, ndb.Key):
                     setattr(response, k, v.urlsafe())
+                elif hasattr(v, 'isoformat'):
+                    setattr(response, k, v.isoformat())
                 else:
                     setattr(response, k, v)
 

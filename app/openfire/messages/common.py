@@ -56,21 +56,61 @@ class Goal(messages.Message):
 
     ''' Common to proposals and projects, defines a funding goal. '''
 
-    contribution_type = messages.StringField(1)
-    amount = messages.IntegerField(2)
-    description = messages.StringField(3)
-    backer_count = messages.IntegerField(4)
-    progress = messages.StringField(5)
-    met = messages.BooleanField(6)
+    key = messages.StringField(1)
+    target = messages.StringField(2)
+    contribution_type = messages.StringField(3)
+    amount = messages.IntegerField(4)
+    description = messages.StringField(5)
+    backer_count = messages.IntegerField(6)
+    progress = messages.IntegerField(7)
+    met = messages.BooleanField(8)
+
+
+class Goals(messages.Message):
+
+    ''' A list of project goals. '''
+
+    goals = messages.MessageField(Goal, 1, repeated=True)
+    project = messages.StringField(2)
+
+
+class GoalRequest(messages.Message):
+
+    ''' Request a project goal by key. '''
+
+    key = messages.StringField(1)
+    project = messages.StringField(2)
 
 
 class Tier(messages.Message):
 
     ''' Common to proposals and projects, defines a contribution tier. '''
 
-    amount = messages.IntegerField(1)
-    description = messages.StringField(2)
-    backer_count = messages.IntegerField(3)
+    key = messages.StringField(1)
+    target = messages.StringField(2)
+    name = messages.StringField(3)
+    contribution_type = messages.StringField(4)
+    amount = messages.IntegerField(5)
+    description = messages.StringField(6)
+    delivery = messages.StringField(7)
+    backer_count = messages.IntegerField(8)
+    backer_limit = messages.IntegerField(9)
+
+
+class Tiers(messages.Message):
+
+    ''' A list of project tiers. '''
+
+    tiers = messages.MessageField(Tier, 1, repeated=True)
+    project = messages.StringField(2)
+
+
+class TierRequest(messages.Message):
+
+    ''' Request a project tier by key. '''
+
+    key = messages.StringField(1)
+    project = messages.StringField(2)
 
 
 class Comment(messages.Message):
