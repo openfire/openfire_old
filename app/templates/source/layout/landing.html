@@ -70,19 +70,54 @@
                             &nbsp;
                         </span>
                     </li>
-                </ul>-->
+                </ul>
 
                 <div class='ohnoes'>
                     Oh noez, no activity!
+                </div>-->
+
+                <div class='activity-table'>
+                    <div class='activity-row dropshadow'>
+                        <div class='activity-cell'>
+                            <label>Spark Line</label>
+                            <div id="spark-graph"></div>
+                        </div>
+                        <div class='activity-cell'>
+                            <label>Where Money is Going (bubble graph)</label>
+                            <div id="category-graph"></div>
+                        </div>
+                    </div>
+                    <div class='activity-row dropshadow'>
+                        <div class='activity-cell'>Recent Backers (face pile)</div>
+                        <div class='activity-cell'>Metrics (numbers)</div>
+                    </div>
                 </div>
             </div>
-
         </section><!-- #activity -->
 
      </div><!-- #content -->
 
 <div class="pre-modal" id="how-it-works" data-title="How it works!" data-options='{"ratio":{"x":0.7,"y":0.7}}'>
-    <h1>How it works!</h1>
-    <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>
+    <h1>Welcome to openfire!</h1>
+    <p>Hello early <a href="http://openfi.re">openfi.re</a> user!</p>
+
+    <p>You must be interested in disruptive innovation... and boy, have you come to the right place.</p>
+
+    <p>We're building a crowdfunding platform from the ground up, and that takes a while.</p>
+
+    <p>When we have some visual design help, we'll be turning this into a tour much like this: <a href="http://www.google.com/green/storyofsend">http://www.google.com/green/storyofsend</a></p>
+
+    <p>Won't that be cool?</p>
+
+    <p>Love,</p>
+    <p>the openfi.re team</p>
 </div>
+{% endblock %}
+
+{% block postsouth %}
+    <script type="text/javascript">
+        window.setTimeout(function() {
+            var graph = new ActivityGraph();
+        }, 250);
+    </script>
 {% endblock %}
