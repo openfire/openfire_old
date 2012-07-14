@@ -1,4 +1,5 @@
 {% extends "core/base_web.html" %}
+{% from "macros/eggs.html" import random_greeting %}
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
@@ -23,10 +24,10 @@
 	{% block rightnav %}
 	<ul class='right'>
 
-		{% if api.users.get_current_user() != none %}  {# if the user is logged in... @TODO #}
+		{% if security.current_user %}  {# if the user is logged in... @TODO #}
 			<li class='profiletab'>
-				<a href="/me" title='Profile'>{{ api.users.get_current_user().nickname() }}</a>
-				<img src="{{ gravatarify(api.users.get_current_user().email(), 'jpg', '32') }}" width='32' height='32' alt='you!' />
+				<a href="/me" title='Profile'>{{ random_greeting(security.current_user, security.session) }}</a>
+				<img src="{{ gravatarify(security.current_user.email.id(), 'jpg', '32') }}" width='32' height='32' alt='you!' />
 			</li>
 		{% else %}
 			<li><a id='signup_trigger' href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>

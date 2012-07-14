@@ -10,6 +10,8 @@ from openfire.models import assets
 from openfire.handlers import WebHandler
 from google.appengine.ext import ndb
 
+from webapp2_extras import security as wsec
+
 
 class SecurityConfigProvider(object):
 
@@ -124,7 +126,7 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ## do routing
         if provider is not None:
-            logging.info('AUTH: Received callback from provider "%s".' % provider)
+            logging.info('AUTH: User requested federated logon from provider "%s".' % provider)
             return {
 
                 # run code for whatever provider we're doing
@@ -415,7 +417,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         if action == 'callback':
             if provider is not None:
                 return {
-                    'google': self.callback_google,
+                    'googleplus': self.callback_google,
                     'facebook': self.callback_facebook,
                     'twitter': self.callback_twitter
                 }.get(provider, lambda: self.error(404))()
