@@ -705,7 +705,7 @@ class ProjectController extends OpenfireController
                                                     editor.hide()
                                         , 200)
 
-                                        return @project.attach('goals', new Goal.from_message(response))
+                                        return @project.attach('goals', goal.from_message(response))
 
                                     failure: (error) =>
                                         _el.style.backgroundColor = 'red'
@@ -978,6 +978,7 @@ class ProjectController extends OpenfireController
                                     tier = @project.get_attached('tiers', _idx)
                                     _key = tier.key
 
+                                tier.target = @project_key
                                 tier.amount = parseInt(document.getElementById('tier-amount-'+_idx).innerHTML)
                                 tier.description = document.getElementById('tier-description-'+_idx).innerHTML
 
