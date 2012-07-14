@@ -7,7 +7,10 @@
 			{
 				$(document).ready(function ()
 				{
-					w.location.href = $('.button[data-provider-name="'+p+'"]').attr('data-action');
+					var provider = $('.button[data-provider-name="'+p+'"]');
+					if ($(provider).attr('disabled') == 'disabled') {
+						w.location.href = $(provider).attr('data-action');
+					}
 				});
 			};
 		})(window);
@@ -28,8 +31,8 @@
 						'data-provider-label': provider.label,
 						'data-provider-mode': provider.mode,
 						'disabled': none if not disabled,
-						'data-action': link('auth/login-with', provider=provider.name),
-						'onclick': ("javascript:window._initExtAuth('%(name)s', '%(mode)s');" % provider)|safe
+						'data-action': none if disabled else link('auth/login-with', provider=provider.name),
+						'onclick': none if disabled else ("javascript:window._initExtAuth('%(name)s', '%(mode)s');" % provider)|safe
 					}|xmlattr
 				}}>Login with {{ provider.label }}</button>
 			{% endif %}

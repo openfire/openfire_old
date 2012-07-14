@@ -324,8 +324,6 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         ''' Finish processing Facebook auth. '''
 
-        import pdb; pdb.set_trace()
-
         # pull POST fields from fb
         csrf = self.request.get('csrf')
         code = self.request.get('code')
