@@ -68,7 +68,8 @@ config['apptools.project.assets'] = {
                 'modernizr': {'min': False, 'version': '2.0.6'},  # Modernizr - browser polyfill + compatibility testing
                 'lawnchair': {'min': False, 'version': '0.6.3'},  # Lawnchair: Client-side persistent storage
                 'jquery': {'min': True, 'version': '1.7.1'},      # jQuery: Write Less, Do More!
-                'underscore': {'min': True, 'version': '1.3.1'}   # Underscore: JavaScript's utility belt
+                'underscore': {'min': True, 'version': '1.3.1'},  # Underscore: JavaScript's utility belt
+                'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},   # D3 - Visualizations
             }
 
         },

@@ -5,6 +5,7 @@
 <script src="{{ asset.script('modernizr', 'core') }}"></script>
 <script src="{{ asset.script('underscore', 'core') }}"></script>
 <script src="/assets/js/static/core/jquery/easing.min.js"></script>
+<script src="{{ asset.script('d3', 'core') }}"></script>
 
 <!-- Base Scripts -->
 <script src="/_ah/channel/jsapi"></script>
@@ -16,7 +17,7 @@
 
 <!-- Project Scripts -->
 {%- if util.api.users.is_current_user_admin() -%}
-<script src="{{ asset.script('admin', 'openfire') }}"></script>
+<script src="/assets/js/static/openfire/app.admin.js"></script>
 {%- else -%}
 <script src="{{ asset.script('app', 'openfire') }}"></script>
 {%- endif -%}
