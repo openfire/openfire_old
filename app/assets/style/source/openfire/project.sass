@@ -49,6 +49,29 @@
         &:active
             background-color: #bada55
 
+    .dropzone
+        position: absolute
+        top: 5px
+        left: 5px
+        bottom: 5px
+        right: 212px
+        background-color: transparent
+        border-radius: 5px
+        border: 1px dashed #888
+        color: #888
+        text-align: center
+        line-height: 16pt
+        vertical-align: middle
+        font-family: Karla
+        font-size: 11pt
+        text-transform: uppercase
+        font-style: italic
+
+        &.hover
+            border-color: #444
+            border-style: solid
+            color: #444
+
 #owners
     position: absolute
     bottom: -150px
@@ -451,3 +474,38 @@
     font-size: 11pt
     text-transform: uppercase
     color: #404044
+
+
+#project-goal-editor,
+#project-goal-editor-modal-content,
+#project-tier-editor,
+#project-tier-editor-modal-content
+
+    text-align: center
+    overflow-y: scroll
+
+    .goal,
+    .tier
+        background-color: #ddd
+        padding-bottom: 10px
+
+        .amount
+
+            display: block
+            width: 100%
+            background-color: #ccc
+            text-transform: uppercase
+
+        .description
+            background-color: #eee
+            margin: 10px
+
+        .goal-button,
+        .tier-button
+            padding: 4px
+            margin: 2px
+            font-family: Karla
+            font-size: 13px
+            font-weight: 700
+            text-transform: uppercase
+            border-radius: 5px
