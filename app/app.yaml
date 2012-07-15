@@ -1,5 +1,5 @@
-application: open-fire
-version: 0-2-alpha
+application: open-fire-staging
+version: auth
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -64,6 +64,9 @@ pagespeed:
   - open-fire-staging.appspot.com
   - staging.openfi.re
   - www-beta.openfi.re
+  - open-fire.appspot.com
+  - www.openfi.re
+  - openfi.re
   enabled_rewriters:
   - ProxyCss
   - ProxyImages

@@ -140,7 +140,8 @@ config['apptools.project.assets'] = {
                 'main': {'version': 0.2},  # reset, main, layout, forms
                 'ie': {'version': 0.2},    # fixes for internet explorer (grrr...)
                 'print': {'version': 0.2},  # proper format for printing
-                'admin': {'version': 0.2}   # admin
+                'admin': {'version': 0.2},   # admin
+                'security': {'version': 0.1}  # login/register/etc
             }
 
         },

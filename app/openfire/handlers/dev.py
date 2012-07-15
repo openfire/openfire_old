@@ -1,3 +1,4 @@
+import hashlib
 import datetime
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import ndb
@@ -99,17 +100,17 @@ class DevModels(BaseHandler):
             ndb.put_multi([money, time, code, advocacy])
 
             ## users first
-            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', firstname='David', lastname='Anderson', location='San Francisco, CA', bio='hola yo soy pug').put()
-            sam = user.User(key=ndb.Key(user.User, 'sam@openfi.re'), username='sam', firstname='Sam', lastname='Gammon', location='San Francisco, CA', bio='fiesta ayayayay').put()
-            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', firstname='David', lastname='Rekow', location='San Francisco, CA', bio='hi i is david').put()
-            ethan = user.User(key=ndb.Key(user.User, 'ethan@openfi.re'), username='ethan', firstname='Ethan', lastname='Leland', location='San Francisco, CA', bio='i am mister ethan').put()
+            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', password=hashlib.sha256('pugiscool').hexdigest(), firstname='David', lastname='Anderson', location='San Francisco, CA', bio='hola yo soy pug').put()
+            sam = user.User(key=ndb.Key(user.User, 'samuel.gammon@gmail.com'), username='sam', password=hashlib.sha256('samiscool').hexdigest(), firstname='Sam', lastname='Gammon', location='San Francisco, CA', bio='fiesta ayayayay').put()
+            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', password=hashlib.sha256('davidiscool').hexdigest(), firstname='David', lastname='Rekow', location='San Francisco, CA', bio='hi i is david').put()
+            ethan = user.User(key=ndb.Key(user.User, 'ethan.leland@gmail.com'), username='ethan', password=hashlib.sha256('ethaniscool').hexdigest(), firstname='Ethan', lastname='Leland', location='San Francisco, CA', bio='i am mister ethan').put()
 
             ## user emails
             user_emails = [
                 user.EmailAddress(id='david@openfi.re', parent=pug, user=pug, address='david@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
-                user.EmailAddress(id='sam@openfi.re', parent=sam, user=sam, address='sam@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
+                user.EmailAddress(id='samuel.gammon@gmail.com', parent=sam, user=sam, address='samuel.gammon@gmail.com', label='d', notify=True, jabber=True, gravatar=True),
                 user.EmailAddress(id='davidr@openfi.re', parent=david, user=david, address='davidr@openfi.re', label='d', notify=True, jabber=True, gravatar=True),
-                user.EmailAddress(id='ethan@openfi.re', parent=ethan, user=ethan, address='ethan@openfi.re', label='d', notify=True, jabber=True, gravatar=True)
+                user.EmailAddress(id='ethan.leland@gmail.com', parent=ethan, user=ethan, address='ethan.leland@gmail.com', label='d', notify=True, jabber=True, gravatar=True)
             ]
             user_emails = ndb.put_multi(user_emails)
 

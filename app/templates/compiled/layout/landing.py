@@ -1,12 +1,12 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source/layout/landing.html'
+    name = '/source\\layout\\landing.html'
 
     def root(context, environment=environment):
         parent_template = None
         if 0: yield None
-        parent_template = environment.get_template('layout/layout_base.html', '/source/layout/landing.html')
+        parent_template = environment.get_template('layout/layout_base.html', '/source\\layout\\landing.html')
         for name, parent_block in parent_template.blocks.iteritems():
             context.blocks.setdefault(name, []).append(parent_block)
         for event in parent_template.root_render_func(context):
@@ -29,7 +29,6 @@ def run(environment):
             l_project = missing
             l_util = context.resolve('util')
             l_link = context.resolve('link')
-            l_asset = context.resolve('asset')
             for l_project in l_projects:
                 if 0: yield None
                 yield u'\n                    <!-- project card for %s -->\n                    <div class=\'project-card\' data-project=\'%s\'>\n                        <a href="%s">\n                            <div class=\'project-icon\' data-name=\'%s\' data-description=\'%s\'>\n                                ' % (
@@ -41,14 +40,29 @@ def run(environment):
                 )
                 if environment.getattr(l_project, 'avatar'):
                     if 0: yield None
-                    yield u'\n                                    <img src="%s" title="%s - %s" />\n                                ' % (
-                        context.call(environment.getattr(l_asset, 'image'), 'projects/cardstock', environment.getattr(l_project, 'avatar')), 
-                        environment.getattr(l_project, 'name'), 
-                        environment.getattr(l_project, 'summary'), 
-                    )
-                else:
-                    if 0: yield None
-                    yield u'\n                                    <img src="http://placehold.it/140x120" />\n                                '
+                    yield u'\n                                    '
+                    if environment.getattr(environment.getattr(l_project, 'avatar'), 'location'):
+                        if 0: yield None
+                        yield u'\n                                    <img src="%s" title="%s - %s" />\n                                    ' % (
+                            environment.getattr(environment.getattr(l_project, 'avatar'), 'location'), 
+                            environment.getattr(l_project, 'name'), 
+                            environment.getattr(l_project, 'summary'), 
+                        )
+                    else:
+                        if 0: yield None
+                        yield u'\n                                        '
+                        if environment.getattr(environment.getattr(l_project, 'avatar'), 'url'):
+                            if 0: yield None
+                            yield u'\n                                            <img src="%s" title="%s - %s" />\n                                        ' % (
+                                environment.getattr(environment.getattr(l_project, 'avatar'), 'url'), 
+                                environment.getattr(l_project, 'name'), 
+                                environment.getattr(l_project, 'summary'), 
+                            )
+                        else:
+                            if 0: yield None
+                            yield u'\n                                            <img src="http://placehold.it/140x120" />\n                                        '
+                        yield u'\n                                    '
+                    yield u'\n                                '
                 yield u"\n                            </div>\n                        </a>\n                        <div class='project-progress' style='width: %s%%'>\n                        </div>\n                    </div> <!-- end project card for %s -->\n                " % (
                     context.call(environment.getattr(environment.getattr(l_util, 'random'), 'randint'), 1, 100), 
                     environment.getattr(l_project, 'slug'), 
@@ -58,7 +72,7 @@ def run(environment):
         else:
             if 0: yield None
             yield u"\n                <div class='ohnoes'>\n                    Oh noez, no projects!\n                </div>\n            "
-        yield u'\n            </div>\n\n        </section><!-- #projects -->\n\n        <section id=\'activity\' class=\'newsfeed\' role=\'region\'>\n\n            <h2>Activity</h2>\n            <div class="section-wrap">\n                <!--<ul class=\'feed\'>\n                    <li class=\'feed-item\'>\n                        <span class="datetime">\n                            &nbsp;\n                        </span>\n                    </li>\n                </ul>-->\n\n                <div class="pre-tabs" id="tabset-test-1" data-options=\'{"width":"400px"}\'>\n                    <a href="#tab-1">Tab 1</a>\n                    <a href="#tab-2">Tab 2</a>\n                    <a href="#tab-3">Tab 3</a>\n                    <a href="#tab-4">Tab 4</a>\n                    <div id="tab-1" class=\'pre-uploader\'>\n                        <h3>I am the first tab</h3>\n                    </div>\n                    <div id="tab-2" class="mini-editable">\n                        <h3>UND I AM ZE SECUND TAB</h3>\n                        <div>und we are testing NESTING</div>\n                        <div>und also mini-editability?</div>\n                    </div>\n                    <div id="tab-3">ahnd ah ahm thah thahrd tahb</div>\n                    <div id="tab-4">.....</div>\n                </div>\n            </div>\n\n        </section><!-- #activity -->\n\n     </div><!-- #content -->\n\n<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options=\'{"ratio":{"x":0.7,"y":0.7}}\'>\n    <h1>How it works!</h1>\n    <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>\n</div>\n'
+        yield u'\n            </div>\n\n        </section><!-- #projects -->\n\n        <section id=\'activity\' class=\'newsfeed\' role=\'region\'>\n\n            <h2>Activity</h2>\n            <div class="section-wrap">\n                <!--<ul class=\'feed\'>\n                    <li class=\'feed-item\'>\n                        <span class="datetime">\n                            &nbsp;\n                        </span>\n                    </li>\n                </ul>-->\n\n                <div class=\'ohnoes\'>\n                    Oh noez, no activity!\n                </div>\n            </div>\n\n        </section><!-- #activity -->\n\n     </div><!-- #content -->\n\n<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options=\'{"ratio":{"x":0.7,"y":0.7}}\'>\n    <h1>How it works!</h1>\n    <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>\n</div>\n'
 
     def block_tinylogo(context, environment=environment):
         if 0: yield None
@@ -67,5 +81,5 @@ def run(environment):
         if 0: yield None
 
     blocks = {'stylesheets': block_stylesheets, 'main': block_main, 'tinylogo': block_tinylogo, 'leftnav': block_leftnav}
-    debug_info = '1=9&3=15&4=19&11=22&31=26&32=33&33=36&34=37&35=38&36=39&37=42&38=45&44=53&46=54&9=63&8=66'
+    debug_info = '1=9&3=15&4=19&11=22&31=26&32=32&33=35&34=36&35=37&36=38&37=41&38=44&39=47&41=54&42=57&50=67&52=68&9=77&8=80'
     return locals()

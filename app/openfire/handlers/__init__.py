@@ -35,10 +35,13 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
-    user = User
+    user = None
     scope = None
     session = None
     permissions = None
+    force_session = True
+    authenticated = False
+    auth_provider = None
 
     ## ++ Internal Shortcuts ++ ##
     @webapp2.cached_property
@@ -108,43 +111,92 @@ class WebHandler(BaseHandler, SessionsMixin):
             money = money + "%"
         return money
 
+    def build_session2(self):
+
+        ''' Build an initial session object and create an SID, if needed '''
+
+        if hasattr(self, 'session') and self.session is not None and len(self.session) > 0:
+            return self.session  # somehow we already have a session, wtf?
+
+        else:
+            self.session = self.get_session()
+
+            if self.session.get('authenticated', False):
+
+                ## we've authenticated
+                self.authenticated = True
+
+                if self.session.get('ukey'):
+                    try:
+                        self.user, self.permissions = tuple(ndb.get_multi([
+                                ndb.Key(urlsafe=self.session.get('ukey')),
+                                ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))],
+                                use_cache=True, use_memcache=True, use_datastore=True))
+
+                    except:
+
+                        ## UKEY IS BAD, send them to register again
+                        self.user = None
+
+                    # user not found/bad key
+                    if self.user is None:
+
+                        # if they have a continue url, use it
+                        if self.session.get('continue_url'):
+                            registration_url = self.url_for('auth/register', go=self.session.get('continue_url'))
+
+                        # otherwise bring them back here afterwards
+                        else:
+                            registration_url = self.url_for('auth/register', go=self.request.path_qs)
+
+                        return self.redirect(registration_url)
+
+                    # user found!
+                    else:
+                        pass
+
+        # for now @(TODO): START BACK HERE ON AUTH
+        return self.session
+
     def build_session(self):
 
         ''' Build an initial session object and create an SID '''
 
-        ## build a session no matter what, yo
-        self.session = self.get_session()
+        if hasattr(self, 'force_session') and self.force_session:
+            ## build a session no matter what, yo
+            self.session = self.get_session()
 
-        if self.session.get('ukey', None) is None:
-            u = self.api.users.get_current_user()
-            if u is not None:
+            if self.session.get('ukey', None) is None:
+                u = self.api.users.get_current_user()
+                if u is not None:
 
-                ## we have an authenticated user
-                self.session['authenticated'] = True
+                    ## we have an authenticated user
+                    self.session['authenticated'] = True
+                    self.authenticated = True
 
-                ## sometimes this returns none (when federated identity auth is enabled), but then the email is a persistent token
-                self.session['uid'] = u.email()
+                    ## sometimes this returns none (when federated identity auth is enabled), but then the email is a persistent token
+                    self.session['uid'] = u.email()
 
-                user, permissions = tuple(ndb.get_multi([ndb.Key(User, self.session['uid']), ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))]))
-                if user is None:
-                    self.session['redirect'] = self.url_for('auth/register')
-                    self.session['returnto'] = self.request.url
-                    self.session['register'] = True
-                else:
-                    self.user = user
-                    self.permissions = permissions
-                    self.session['ukey'] = user.key.urlsafe()
-                    self.session['email'] = u.email()
-                    self.session['nickname'] = u.nickname()
-                    if self.api.users.is_current_user_admin():
-                        self.session['root'] = True
-        else:
-            self.user = ndb.Key(urlsafe=self.session['ukey'])
-            self.permissions = ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))
-            self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
+                    user, permissions = tuple(ndb.get_multi([ndb.Key(User, self.session['uid']), ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))]))
+                    if user is None:
+                        self.session['redirect'] = self.url_for('auth/register')
+                        self.session['returnto'] = self.request.url
+                        self.session['register'] = True
+                    else:
+                        self.user = user
+                        self.permissions = permissions
+                        self.session['ukey'] = user.key.urlsafe()
+                        self.session['email'] = u.email()
+                        self.session['nickname'] = u.nickname()
+                        if self.api.users.is_current_user_admin():
+                            self.session['root'] = True
+            else:
+                self.user = ndb.Key(urlsafe=self.session['ukey'])
+                self.permissions = ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))
+                self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
-    def handle_exception(self, exception, debug):
+    def handle_exception2(self, exception, debug):
 
         ''' Handle an unhandled exception '''
 
@@ -188,7 +240,8 @@ class WebHandler(BaseHandler, SessionsMixin):
         # retrieves current user model + permissions
         context['security'] = {
             'permissions': self.permissions,
-            'current_user': self.user
+            'current_user': self.user,
+            'session': self.session
         }
 
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)

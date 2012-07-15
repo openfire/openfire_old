@@ -1,0 +1,13 @@
+{%- macro random_greeting(user, session) -%}
+{%- set _greeting_template = util.random.choice([
+
+		"Hey %s!",
+		"Bonjour, %s!",
+		"Welcome back, %s!",
+		"We missed you, %s!"
+
+	])
+-%}
+{%- if user.firstname -%}{{ _greeting_template % user.firstname }}{%- else -%}
+{%- if session.nickname -%}{{ _greeting_template % session.nickname }}{%- endif -%}{%- endif -%}
+{%- endmacro -%}
