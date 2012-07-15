@@ -1,12 +1,12 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\layout\\project.html'
+    name = '/source/layout/project.html'
 
     def root(context, environment=environment):
         parent_template = None
         if 0: yield None
-        parent_template = environment.get_template('layout/layout_base.html', '/source\\layout\\project.html')
+        parent_template = environment.get_template('layout/layout_base.html', '/source/layout/project.html')
         for name, parent_block in parent_template.blocks.iteritems():
             context.blocks.setdefault(name, []).append(parent_block)
         for event in parent_template.root_render_func(context):
@@ -232,7 +232,7 @@ def run(environment):
         l_currency = context.resolve('currency')
         l_owners = context.resolve('owners')
         if 0: yield None
-        yield u'\n\n    <!-- Main Masthead -->\n    <div id=\'masthead\'>\n    </div><!-- #masthead -->\n\n    <div id=\'content\'>\n        <div id="fb-root"></div>\n        <div id=\'project\'>\n\n            <div id=\'welcomebox\'>\n                <div id=\'promote\' data-section-title="admin">\n                    <button id=\'promote-avatar\' value="avatar">add avatar</button>\n                    <button id=\'promote-image\' value="image">add image</button>\n                    <button id=\'promote-video\' value="video">add video</button>\n                    <button id=\'promote-goals\' value="goals">edit goals</button>\n                    <button id=\'promote-tiers\' value="tiers">edit tiers</button>\n                    <button id=\'promote-tiers\' value="tiers">all&nbsp;&raquo;</button>\n                </div>\n                '
+        yield u'\n\n    <!-- Main Masthead -->\n    <div id=\'masthead\'>\n    </div><!-- #masthead -->\n\n    <div id=\'content\'>\n        <div id="fb-root"></div>\n        <div id=\'project\'>\n\n            <div id=\'welcomebox\'>\n                <div id=\'promote\' data-section-title="admin">\n                    <div id=\'promote-dropzone\' class=\'dropzone\'>drop images here</div>\n                    <button id=\'promote-goals\' value="goals">edit goals</button>\n                    <button id=\'promote-tiers\' value="tiers">edit tiers</button>\n                </div>\n                '
         for event in context.blocks['media'][0](context):
             yield event
         yield u"\n            </div>\n\n            <div id='sidebar' class='pre-sticky'>\n                <header>\n                    <div id='sidetitle' class='fancy title'><h1>%s</h1></div>\n                    <div id='sidebuttons' class='buttons'>\n                        <button id='follow' class='momentron" % (
@@ -290,5 +290,5 @@ def run(environment):
         )
 
     blocks = {'presouth': block_presouth, 'right': block_right, 'description': block_description, 'media': block_media, 'stylesheets': block_stylesheets, 'main': block_main}
-    debug_info = '1=9&217=15&222=22&223=24&224=27&226=30&227=32&232=38&237=44&242=50&63=58&67=67&68=73&73=76&75=79&76=85&77=88&78=100&79=115&89=129&91=132&92=138&93=141&94=149&95=159&165=169&167=173&169=174&172=175&173=176&174=177&26=180&27=185&28=188&29=191&30=193&31=196&33=201&37=207&38=210&39=211&3=223&4=227&7=230&26=236&53=239&55=241&63=245&122=251&125=254&127=256&128=260&129=270&131=274&132=277&146=282&165=284&183=287'
+    debug_info = '1=9&214=15&219=22&220=24&221=27&223=30&224=32&229=38&234=44&239=50&60=58&64=67&65=73&70=76&72=79&73=85&74=88&75=100&76=115&86=129&88=132&89=138&90=141&91=149&92=159&162=169&164=173&166=174&169=175&170=176&171=177&23=180&24=185&25=188&26=191&27=193&28=196&30=201&34=207&35=210&36=211&3=223&4=227&7=230&23=236&50=239&52=241&60=245&119=251&122=254&124=256&125=260&126=270&128=274&129=277&143=282&162=284&180=287'
     return locals()

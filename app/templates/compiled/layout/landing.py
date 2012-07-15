@@ -1,12 +1,12 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\layout\\landing.html'
+    name = '/source/layout/landing.html'
 
     def root(context, environment=environment):
         parent_template = None
         if 0: yield None
-        parent_template = environment.get_template('layout/layout_base.html', '/source\\layout\\landing.html')
+        parent_template = environment.get_template('layout/layout_base.html', '/source/layout/landing.html')
         for name, parent_block in parent_template.blocks.iteritems():
             context.blocks.setdefault(name, []).append(parent_block)
         for event in parent_template.root_render_func(context):
@@ -72,14 +72,18 @@ def run(environment):
         else:
             if 0: yield None
             yield u"\n                <div class='ohnoes'>\n                    Oh noez, no projects!\n                </div>\n            "
-        yield u'\n            </div>\n\n        </section><!-- #projects -->\n\n        <section id=\'activity\' class=\'newsfeed\' role=\'region\'>\n\n            <h2>Activity</h2>\n            <div class="section-wrap">\n                <!--<ul class=\'feed\'>\n                    <li class=\'feed-item\'>\n                        <span class="datetime">\n                            &nbsp;\n                        </span>\n                    </li>\n                </ul>-->\n\n                <div class=\'ohnoes\'>\n                    Oh noez, no activity!\n                </div>\n            </div>\n\n        </section><!-- #activity -->\n\n     </div><!-- #content -->\n\n<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options=\'{"ratio":{"x":0.7,"y":0.7}}\'>\n    <h1>How it works!</h1>\n    <p>I will eventually be content that explains what the heck this awesome-looking site is about!</p>\n</div>\n'
+        yield u'\n            </div>\n\n        </section><!-- #projects -->\n\n        <section id=\'activity\' class=\'newsfeed\' role=\'region\'>\n\n            <h2>Activity</h2>\n            <div class="section-wrap">\n                <!--<ul class=\'feed\'>\n                    <li class=\'feed-item\'>\n                        <span class="datetime">\n                            &nbsp;\n                        </span>\n                    </li>\n                </ul>\n\n                <div class=\'ohnoes\'>\n                    Oh noez, no activity!\n                </div>-->\n\n                <div class=\'activity-table\'>\n                    <div class=\'activity-row dropshadow\'>\n                        <div class=\'activity-cell\'>\n                            <label>Spark Lines</label>\n                            <div id="spark-graph"></div>\n                        </div>\n                        <div class=\'activity-cell\'>\n                            <label>Where Donations are Going</label>\n                            <div id="category-graph"></div>\n                        </div>\n                    </div>\n                    <div class=\'activity-row dropshadow\'>\n                        <div class=\'activity-cell\'>\n                            <label>Recent Backers</label>\n                            <div id="backers-graph"></div>\n                        </div>\n                        <div class=\'activity-cell\'>\n                            <label>Metrics</label>\n                            <div id="activity-metrics">\n                                <div>\n                                    <label class="projects-lbl">disrupting projects:</label>\n                                    <div class="project-count">37</div>\n                                </div>\n                                <div>\n                                    <label class="raised-lbl">total raised for disruption:</label>\n                                    <div class="total-raised">$32,102,712</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </section><!-- #activity -->\n\n     </div><!-- #content -->\n\n<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options=\'{"ratio":{"x":0.7,"y":0.7}}\'>\n    <h1>Welcome to openfire!</h1>\n    <p>Hello early <a href="http://openfi.re">openfi.re</a> user!</p>\n\n    <p>You must be interested in disruptive innovation... and boy, have you come to the right place.</p>\n\n    <p>We\'re building a crowdfunding platform from the ground up, and that takes a while.</p>\n\n    <p>When we have some visual design help, we\'ll be turning this into a tour much like this: <a href="http://www.google.com/green/storyofsend">http://www.google.com/green/storyofsend</a></p>\n\n    <p>Won\'t that be cool?</p>\n\n    <p>Love,</p>\n    <p>the openfi.re team</p>\n</div>\n'
 
     def block_tinylogo(context, environment=environment):
         if 0: yield None
 
+    def block_postsouth(context, environment=environment):
+        if 0: yield None
+        yield u'\n    <script type="text/javascript">\n        window.setTimeout(function() {\n            var graph = new ActivityGraph();\n        }, 250);\n    </script>\n'
+
     def block_leftnav(context, environment=environment):
         if 0: yield None
 
-    blocks = {'stylesheets': block_stylesheets, 'main': block_main, 'tinylogo': block_tinylogo, 'leftnav': block_leftnav}
-    debug_info = '1=9&3=15&4=19&11=22&31=26&32=32&33=35&34=36&35=37&36=38&37=41&38=44&39=47&41=54&42=57&50=67&52=68&9=77&8=80'
+    blocks = {'stylesheets': block_stylesheets, 'main': block_main, 'tinylogo': block_tinylogo, 'postsouth': block_postsouth, 'leftnav': block_leftnav}
+    debug_info = '1=9&3=15&4=19&11=22&31=26&32=32&33=35&34=36&35=37&36=38&37=41&38=44&39=47&41=54&42=57&50=67&52=68&9=77&132=80&8=84'
     return locals()

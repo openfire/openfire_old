@@ -119,7 +119,7 @@ config['openfire.security'] = {
 
         'federation': {
 
-            'enabled': True,
+            'enabled': False,
 
             'providers': [
 

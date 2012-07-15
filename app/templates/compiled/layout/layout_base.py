@@ -1,28 +1,35 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\layout\\layout_base.html'
+    name = '/source/layout/layout_base.html'
 
     def root(context, environment=environment):
         parent_template = None
         if 0: yield None
-        parent_template = environment.get_template('core/base_web.html', '/source\\layout\\layout_base.html')
+        parent_template = environment.get_template('core/base_web.html', '/source/layout/layout_base.html')
         for name, parent_block in parent_template.blocks.iteritems():
             context.blocks.setdefault(name, []).append(parent_block)
+        included_template = environment.get_template('macros/eggs.html', '/source/layout/layout_base.html').module
+        l_random_greeting = getattr(included_template, 'random_greeting', missing)
+        if l_random_greeting is missing:
+            l_random_greeting = environment.undefined("the template %r (imported on line 2 in '/source/layout/layout_base.html') does not export the requested name 'random_greeting'" % included_template.__name__, name='random_greeting')
+        context.vars['random_greeting'] = l_random_greeting
+        context.exported_vars.discard('random_greeting')
         for event in parent_template.root_render_func(context):
             yield event
 
     def block_rightnav(context, environment=environment):
         l_gravatarify = context.resolve('gravatarify')
-        l_api = context.resolve('api')
+        l_random_greeting = context.resolve('random_greeting')
         l_link = context.resolve('link')
+        l_security = context.resolve('security')
         if 0: yield None
         yield u"\n\t<ul class='right'>\n\n\t\t"
-        if context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')) != None:
+        if environment.getattr(l_security, 'current_user'):
             if 0: yield None
             yield u'  \n\t\t\t<li class=\'profiletab\'>\n\t\t\t\t<a href="/me" title=\'Profile\'>%s</a>\n\t\t\t\t<img src="%s" width=\'32\' height=\'32\' alt=\'you!\' />\n\t\t\t</li>\n\t\t' % (
-                context.call(environment.getattr(context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')), 'nickname')), 
-                context.call(l_gravatarify, context.call(environment.getattr(context.call(environment.getattr(environment.getattr(l_api, 'users'), 'get_current_user')), 'email')), 'jpg', '32'), 
+                context.call(l_random_greeting, environment.getattr(l_security, 'current_user'), environment.getattr(l_security, 'session')), 
+                context.call(l_gravatarify, context.call(environment.getattr(environment.getattr(l_security, 'session'), 'get'), 'email'), 'jpg', '32'), 
             )
         else:
             if 0: yield None
@@ -92,5 +99,5 @@ def run(environment):
         yield u'\n'
 
     blocks = {'rightnav': block_rightnav, 'tinylogo': block_tinylogo, 'footerleft': block_footerleft, 'leftnav': block_leftnav, 'footerright': block_footerright, 'footer': block_footer, 'stylesheets': block_stylesheets, 'header': block_header, 'main': block_main}
-    debug_info = '1=9&23=15&26=21&28=24&29=25&32=30&33=31&8=35&10=40&46=44&16=48&18=52&19=53&52=56&44=60&46=63&52=66&3=70&4=74&7=77&8=80&16=83&23=86&41=90'
+    debug_info = '1=9&2=12&24=21&27=28&29=31&30=32&33=37&34=38&9=42&11=47&47=51&17=55&19=59&20=60&53=63&45=67&47=70&53=73&4=77&5=81&8=84&9=87&17=90&24=93&42=97'
     return locals()
