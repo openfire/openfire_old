@@ -203,11 +203,13 @@ class Login(WebHandler, SecurityConfigProvider):
                         logging.info('AUTH: Passwords match. Logon successful.')
 
                         # log them in
-                        self.session['authenticated'] = True
-                        self.session['uid'] = user.key.id()
-                        self.session['ukey'] = user.key.urlsafe()
-                        self.session['email'] = user.key.id()
-                        self.session['nickname'] = ' '.join([user.firstname, user.lastname])
+                        self.build_authenticated_session(
+                            email=user.key.id(),
+                            nickname=' '.join([user.firstname, user.lastname]),
+                            ukey=user.key.urlsafe(),
+                            uid=user.key.id()
+                        )
+
                         if 'bad_logon_count' in self.session:
                             self.session['bad_logon_count'] = 0
 
@@ -323,6 +325,22 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
     ''' Description/policy page for a login provider. '''
 
+    ### === Redirect Methods === ###
+    def redirect_failure(self, error_message=None, error_code=None):
+
+        ''' Redirect to login with an error message or code '''
+
+        if error_message:
+            logging.error('AUTH: Redirecting back to logon with error_message "%s".' % error_message)
+            redirect_url = self.url_for('auth/login', fdmg=error_message)
+        elif error_code:
+            logging.error('AUTH: Redirecting back to logon with error_code "%s".' % error_code)
+            redirect_url = self.url_for('auth/login', fder=error_code)
+        else:
+            logging.error('AUTH: Redirecting back to logon because of a generic failure.')
+            redirect_url = self.url_for('auth/login', fder='generic')
+        return self.redirect(redirect_url)
+
     def redirect_success(self):
 
         ''' Redirect to continue_url or homepage after successful logon '''
@@ -334,6 +352,24 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         return self.redirect(continue_url)
 
+    ### === Session Functions === ###
+    def build_authenticated_session(self, email, nickname, ukey, uid):
+
+        ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
+
+        self.authenticated = True
+        self.session['authenticated'] = True
+        self.session['email'] = email
+        self.session['uid'] = email
+        if isinstance(ukey, ndb.Key):
+            self.session['ukey'] = ukey.urlsafe()
+        else:
+            self.session['ukey'] = ukey
+        self.session['nickname'] = nickname
+
+        return self.session
+
+    ### === Callback Functions === ###
     def callback_facebook(self):
 
         ''' Finish processing Facebook auth. '''
@@ -417,11 +453,12 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         logging.info('FB: Loggin in user with email "%s" and nickname "%s" and derived ukey "%s".' % (email, nickname, ukey))
 
                         # log them in
-                        self.session['authenticated'] = True
-                        self.session['uid'] = ukey.id()
-                        self.session['ukey'] = ukey.urlsafe()
-                        self.session['email'] = email
-                        self.session['nickname'] = nickname
+                        self.build_authenticated_session(
+                            email=email,
+                            nickname=nickname,
+                            ukey=ukey.urlsafe(),
+                            uid=ukey.id()
+                        )
 
                         return self.redirect_success()
 
@@ -442,6 +479,40 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         ''' Finish processing Google auth. '''
 
+        u = self.api.users.get_current_user()
+
+        # federated/openid
+        if u is not None:
+
+            self.build_authenticated_session(
+                email=u.email(),
+                nickname=u.nickname(),
+                ukey=ndb.Key(user_models.User, u.email()),
+                uid=u.email()
+            )
+
+            return self.redirect_success()
+
+        else:
+
+            try:
+                # federated/oauth
+                u = self.api.oauth.get_current_user()
+                assert u is not None
+
+                self.build_authenticated_session(
+                    email=u.email(),
+                    nickname=u.nickname(),
+                    ukey=ndb.Key(user_models.User, u.email()),
+                    uid=u.email()
+                )
+
+            ## everything failed
+            except AssertionError:
+
+                ## redirect to login page w/ error
+                return self.redirect_failure(error_code='hybrid_login_failed')
+
         return self.response.write('<pre>' + str(self.request) + '</pre>')
 
     def callback_twitter(self):
@@ -450,6 +521,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         return self.response.write('<pre>' + str(self.request) + '</pre>')
 
+    ### === HTTP Methods === ###
     def get(self, action=None, provider=None):
 
         ''' Return a test message. '''
