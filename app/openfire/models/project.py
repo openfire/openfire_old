@@ -152,7 +152,7 @@ class Project(AppModel):
     video = ndb.KeyProperty('vi')
 
     def is_private(self):
-        return (self.status not in ['p', 'c']) or self.public
+        return (self.status in ['p', 'c']) or (not self.public)
 
     def get_custom_url(self):
         if self.customurl:

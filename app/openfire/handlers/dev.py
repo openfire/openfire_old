@@ -3,6 +3,7 @@ import datetime
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import ndb
 from apptools import BaseHandler
+from webapp2_extras import security as wsec
 
 from openfire.models import system, contribution
 from openfire.models import user, project, assets
@@ -19,7 +20,6 @@ class TestMultipart(BaseHandler):
 
         from google.appengine.ext import blobstore
         return self.render('test/multipart.html', endpoint=blobstore.create_upload_url('/_test/multipart/passthrough'))
-
 
 
 class TestPassthrough(blobstore_handlers.BlobstoreUploadHandler):
@@ -100,10 +100,10 @@ class DevModels(BaseHandler):
             ndb.put_multi([money, time, code, advocacy])
 
             ## users first
-            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', password=hashlib.sha256('pugiscool').hexdigest(), firstname='David', lastname='Anderson', location='San Francisco, CA', bio='hola yo soy pug').put()
-            sam = user.User(key=ndb.Key(user.User, 'samuel.gammon@gmail.com'), username='sam', password=hashlib.sha256('samiscool').hexdigest(), firstname='Sam', lastname='Gammon', location='San Francisco, CA', bio='fiesta ayayayay').put()
-            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', password=hashlib.sha256('davidiscool').hexdigest(), firstname='David', lastname='Rekow', location='San Francisco, CA', bio='hi i is david').put()
-            ethan = user.User(key=ndb.Key(user.User, 'ethan.leland@gmail.com'), username='ethan', password=hashlib.sha256('ethaniscool').hexdigest(), firstname='Ethan', lastname='Leland', location='San Francisco, CA', bio='i am mister ethan').put()
+            pug = user.User(key=ndb.Key(user.User, 'david@openfi.re'), username='pug', password=wsec.hash_password('pugiscool', 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal'), firstname='David', lastname='Anderson', location='San Francisco, CA', bio='hola yo soy pug').put()
+            sam = user.User(key=ndb.Key(user.User, 'samuel.gammon@gmail.com'), username='sam', password=wsec.hash_password('samiscool', 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal'), firstname='Sam', lastname='Gammon', location='San Francisco, CA', bio='fiesta ayayayay').put()
+            david = user.User(key=ndb.Key(user.User, 'davidr@openfi.re'), username='david', password=wsec.hash_password('davidiscool', 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal'), firstname='David', lastname='Rekow', location='San Francisco, CA', bio='hi i is david').put()
+            ethan = user.User(key=ndb.Key(user.User, 'ethan.leland@gmail.com'), username='ethan', password=wsec.hash_password('ethaniscool', 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal'), firstname='Ethan', lastname='Leland', location='San Francisco, CA', bio='i am mister ethan').put()
 
             ## user emails
             user_emails = [

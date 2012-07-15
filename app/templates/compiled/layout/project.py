@@ -230,9 +230,14 @@ def run(environment):
     def block_main(context, environment=environment):
         l_project = context.resolve('project')
         l_currency = context.resolve('currency')
+        l_security = context.resolve('security')
         l_owners = context.resolve('owners')
         if 0: yield None
-        yield u'\n\n    <!-- Main Masthead -->\n    <div id=\'masthead\'>\n    </div><!-- #masthead -->\n\n    <div id=\'content\'>\n        <div id="fb-root"></div>\n        <div id=\'project\'>\n\n            <div id=\'welcomebox\'>\n                <div id=\'promote\' data-section-title="admin">\n                    <div id=\'promote-dropzone\' class=\'dropzone\'>drop images here</div>\n                    <button id=\'promote-goals\' value="goals">edit goals</button>\n                    <button id=\'promote-tiers\' value="tiers">edit tiers</button>\n                </div>\n                '
+        yield u'\n\n    <!-- Main Masthead -->\n    <div id=\'masthead\'>\n    </div><!-- #masthead -->\n\n    <div id=\'content\'>\n        <div id="fb-root"></div>\n        <div id=\'project\'>\n\n            <div id=\'welcomebox\'>\n\t\t\t\t'
+        if environment.getattr(environment.getattr(l_security, 'current_user'), 'key') in environment.getattr(l_project, 'owners'):
+            if 0: yield None
+            yield u'\n                <div id=\'promote\' data-section-title="admin">\n                    <div id=\'promote-dropzone\' class=\'dropzone\'>drop images here</div>\n                    <button id=\'promote-goals\' value="goals">edit goals</button>\n                    <button id=\'promote-tiers\' value="tiers">edit tiers</button>\n                </div>\n                '
+        yield u'\n                '
         for event in context.blocks['media'][0](context):
             yield event
         yield u"\n            </div>\n\n            <div id='sidebar' class='pre-sticky'>\n                <header>\n                    <div id='sidetitle' class='fancy title'><h1>%s</h1></div>\n                    <div id='sidebuttons' class='buttons'>\n                        <button id='follow' class='momentron" % (
@@ -290,5 +295,5 @@ def run(environment):
         )
 
     blocks = {'presouth': block_presouth, 'right': block_right, 'description': block_description, 'media': block_media, 'stylesheets': block_stylesheets, 'main': block_main}
-    debug_info = '1=9&214=15&219=22&220=24&221=27&223=30&224=32&229=38&234=44&239=50&60=58&64=67&65=73&70=76&72=79&73=85&74=88&75=100&76=115&86=129&88=132&89=138&90=141&91=149&92=159&162=169&164=173&166=174&169=175&170=176&171=177&23=180&24=185&25=188&26=191&27=193&28=196&30=201&34=207&35=210&36=211&3=223&4=227&7=230&23=236&50=239&52=241&60=245&119=251&122=254&124=256&125=260&126=270&128=274&129=277&143=282&162=284&180=287'
+    debug_info = '1=9&216=15&221=22&222=24&223=27&225=30&226=32&231=38&236=44&241=50&62=58&66=67&67=73&72=76&74=79&75=85&76=88&77=100&78=115&88=129&90=132&91=138&92=141&93=149&94=159&164=169&166=173&168=174&171=175&172=176&173=177&25=180&26=185&27=188&28=191&29=193&30=196&32=201&36=207&37=210&38=211&3=223&4=227&7=230&18=237&25=241&52=244&54=246&62=250&121=256&124=259&126=261&127=265&128=275&130=279&131=282&145=287&164=289&182=292'
     return locals()

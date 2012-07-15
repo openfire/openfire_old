@@ -41,7 +41,11 @@ class WebHandler(BaseHandler, SessionsMixin):
     permissions = None
     force_session = True
     authenticated = False
-    auth_provider = None
+    auth_provider = False
+
+    channel_id = None
+    channel_token = None
+    channel_timeout = 120
 
     ## ++ Internal Shortcuts ++ ##
     @webapp2.cached_property
@@ -242,6 +246,26 @@ class WebHandler(BaseHandler, SessionsMixin):
             'permissions': self.permissions,
             'current_user': self.user,
             'session': self.session
+        }
+
+        # setup transport config
+        context['transport'] = {
+            
+            ## services config
+            'services': {
+                'secure': False,
+                'endpoint': self.request.environ.get('HTTP_HOST'),
+                'consumer': 'ofapp',
+                'scope': 'readonly'
+            },
+
+            ## push config
+            'realtime': {
+                'enabled': False,
+                'channel': self.channel_token,
+                'timeout': self.channel_timeout
+            }
+
         }
 
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)

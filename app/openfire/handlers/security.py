@@ -78,12 +78,17 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ''' Redirect the user to Google-based login. '''
 
+        if 'staging' in self.request.environ.get('HTTP_HOST'):
+            return self.do_auth_redirect(*[                
+                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+            ])
+
         return self.do_auth_redirect(*[
 
             self.api.users.create_login_url(
 
                 # google auth callback
-                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha1(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid'))),
+                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid'))),
 
                 # federated identity endpoint
                 federated_identity=self._resolveProvider('googleplus').get('endpoint')
@@ -181,9 +186,9 @@ class Login(WebHandler, SecurityConfigProvider):
         if 'username' in self.request.params and 'password' in self.request.params:
 
             try:
-                hashed_password = hashlib.sha256(self.request.params.get('password'))
+                hashed_password = wsec.hash_password(self.request.params.get('password'), 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal')
                 user_key = ndb.Key(user_models.User, self.request.params.get('username'))
-            except:
+            except NotImplementedError:
                 context['error'] = 'Woops! Something went wrong. Please try again.'
                 return self.render('security/login.html', **context)
             else:
@@ -198,7 +203,7 @@ class Login(WebHandler, SecurityConfigProvider):
                     logging.info('AUTH: User found at username "%s".' % user.username)
 
                     # password match?
-                    if user.password == hashed_password.hexdigest():
+                    if user.password == hashed_password:
 
                         logging.info('AUTH: Passwords match. Logon successful.')
 

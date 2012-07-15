@@ -21,15 +21,14 @@ def run(environment):
 
     def block_body(context, environment=environment):
         if 0: yield None
-        yield u'\n\n<div class="snapall page-bg">\n\n    <div id="logobox">\n        <img src="https://d2ipw8y1masjpy.cloudfront.net/static/branding/openfire_transparent_optimized.png" alt=\'openfire!\' width="600" height="173" />\n    </div>\n\n    <div id=\'splash\' class="rounded-big center-all">\n        '
+        yield u'\n\n<div class="snapall page-bg">\n\t'
         for event in context.blocks['content'][0](context):
             yield event
-        yield u'\n    </div> <!-- end #splash -->\n</div> <!-- end .snapall -->\n\n'
+        yield u'\n</div> <!-- end .snapall -->\n\n'
 
     def block_content(context, environment=environment):
         if 0: yield None
-        yield u'<b>SECURITY</b>'
 
     blocks = {'stylesheets': block_stylesheets, 'body': block_body, 'content': block_content}
-    debug_info = '1=9&3=15&4=19&7=22&16=25'
+    debug_info = '1=9&3=15&4=19&7=22&10=25'
     return locals()
