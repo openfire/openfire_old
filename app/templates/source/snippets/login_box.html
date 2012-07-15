@@ -14,7 +14,6 @@
 				});
 			};
 		})(window);
-
 	</script>
 
 	<!-- left column: 3rd part logon -->
@@ -31,8 +30,8 @@
 						'data-provider-label': provider.label,
 						'data-provider-mode': provider.mode,
 						'disabled': none if not disabled,
-						'data-action': none if disabled else link('auth/login-with', provider=provider.name),
-						'onclick': none if disabled else ("javascript:window._initExtAuth('%(name)s', '%(mode)s');" % provider)|safe
+						'data-action': link('auth/login-with', provider=provider.name),
+						'onclick': ("javascript:window._initExtAuth('%(name)s', '%(mode)s');" % provider)|safe
 					}|xmlattr
 				}}>Login with {{ provider.label }}</button>
 			{% endif %}

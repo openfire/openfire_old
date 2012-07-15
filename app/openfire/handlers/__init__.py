@@ -35,7 +35,7 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
-    user = User
+    user = None
     scope = None
     session = None
     permissions = None
@@ -133,7 +133,7 @@ class WebHandler(BaseHandler, SessionsMixin):
                                 ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))],
                                 use_cache=True, use_memcache=True, use_datastore=True))
 
-                    except Exception, e:
+                    except:
 
                         ## UKEY IS BAD, send them to register again
                         self.user = None

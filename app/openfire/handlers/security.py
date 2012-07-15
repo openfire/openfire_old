@@ -10,6 +10,7 @@ from openfire.models import assets
 from openfire.handlers import WebHandler
 from google.appengine.ext import ndb
 
+import json
 from webapp2_extras import security as wsec
 
 
@@ -322,6 +323,17 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
     ''' Description/policy page for a login provider. '''
 
+    def redirect_success(self):
+
+        ''' Redirect to continue_url or homepage after successful logon '''
+
+        if self.session.get('continue_url') or 'continue' in self.request.params:
+            continue_url = self.request.get('continue', self.session.get('continue_url'))
+        else:
+            continue_url = self.url_for('landing')
+
+        return self.redirect(continue_url)
+
     def callback_facebook(self):
 
         ''' Finish processing Facebook auth. '''
@@ -360,7 +372,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     'redirect': ''.join([
                             self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
                             self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                            self.url_for('auth/action-provider', action='renew', provider='facebook')
+                            self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=csrf)
                     ]),
                     'secret': self._resolveProvider('facebook').get('secret'),
                     'code': code
@@ -372,18 +384,46 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
                 # successful reup
                 if access_token.status_code == 200:
+                    logging.info('FB: Access code endpoint fetch success.')
                     params = {}
                     for b_item in access_token.content.split('&'):
-                        for k, v in b_item.split('='):
-                            params[k] = v
+                        k, v = b_item.split('=')
+                        params[k] = v
+
+                    logging.info('FB: Access code: "%s". Expiration: "%s".' % (params.get('access_token'), params.get('expires')))
 
                     access_token = params['access_token']
-                    expiration = params['expiration']
+                    expires = params['expires']
 
                     self.session['fb_access_token'] = access_token
-                    self.session['fb_token_expire'] = expiration
+                    self.session['fb_token_expire'] = expires
                     self.session['fb_token_establish'] = time.time()
-                    return self.response.write('<pre>' + access_token.content + '</pre>')
+
+                    ## get the 'me'
+                    me_endpoint = "https://graph.facebook.com/me?access_token=%s" % access_token
+                    user_info = self.api.urlfetch.fetch(me_endpoint)
+
+                    ## check for user existence via facebook email address
+                    if user_info.status_code == 200:
+                        logging.info('FB: Graph `me` request success.')
+                        user_struct = json.loads(user_info.content)
+
+                        # Copy over user struct stuff
+                        email = user_struct['email']
+                        nickname = user_struct['name']
+                        ukey = ndb.Key(user_models.User, email)
+
+                        # Log it
+                        logging.info('FB: Loggin in user with email "%s" and nickname "%s" and derived ukey "%s".' % (email, nickname, ukey))
+
+                        # log them in
+                        self.session['authenticated'] = True
+                        self.session['uid'] = ukey.id()
+                        self.session['ukey'] = ukey.urlsafe()
+                        self.session['email'] = email
+                        self.session['nickname'] = nickname
+
+                        return self.redirect_success()
 
                 else:
                     logging.critical('FB: ERROR! Failed to get persistent auth token.')

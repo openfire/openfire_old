@@ -27,7 +27,7 @@
 		{% if security.current_user %}  {# if the user is logged in... @TODO #}
 			<li class='profiletab'>
 				<a href="/me" title='Profile'>{{ random_greeting(security.current_user, security.session) }}</a>
-				<img src="{{ gravatarify(security.current_user.email.id(), 'jpg', '32') }}" width='32' height='32' alt='you!' />
+				<img src="{{ gravatarify(security.session.get('email'), 'jpg', '32') }}" width='32' height='32' alt='you!' />
 			</li>
 		{% else %}
 			<li><a id='signup_trigger' href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>
