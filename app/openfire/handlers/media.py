@@ -18,9 +18,11 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
 
         ''' Handle google blobstore repsonses. '''
 
+        import pdb; pdb.set_trace()
+
         upload = None
         try:
-            upload = self.get_uploads('filename')[0]
+            upload = self.get_uploads('file')[0]
         except:
             logging.critical('Failed to get call "self.get_uploads()"')
 
@@ -84,11 +86,6 @@ class AssetServer(WebHandler):
             return self.error(404)
 
         value = BlobReader(blob_info.key(), buffer_size=blob_info.size).read()
-
-        # The code works with or without the following line.
-        #value = unicode(value.decode('utf8')).encode('utf8')[0:-2]
-        value = base64.b64decode(value.split('base64,')[1])
-
         self.response.body = value
 
         self.response.headers['Content-Type'] = str(blob_info.content_type)

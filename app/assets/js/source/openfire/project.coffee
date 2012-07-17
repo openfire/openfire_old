@@ -90,24 +90,29 @@ class Project # extends Model
 
             else throw 'Too few arguments passed to attach(): function(store_name, object_to_store){}'
 
-        @from_message = (message) =>
+        @from_message = (message, strict=false) =>
 
             ## updates model with RPC responses
             # should eventually live on Model API
             # can't be simple extend - must compare against 'model' property on prototype to type-validate
-            model = @::model
+            # if strict isnt false, validate just discards non-model properties and returns modelsafed object
+            try
+                if @::validate(message, @::model, false)
+                    @[prop] = val for own prop, val of message
 
-            validate = (k, v) =>
-                if k? and v?
+            catch error
+                console.log 'Validation error: ', error.toString()
 
-                    return false if k not of model
-                    return false if v.constructor.name isnt model[k].constructor.name
-                    return true
+                if not strict
+                    try
+                        modsafe = @::validate(message, @::model, true)
+                        @[p] = v for own p, v of modsafe
 
-                else throw 'Too few arguments passed to validate(): function(key, value){}'
+                    catch err
+                        console.log 'Model-safing RPC message failed: ', err.toString()
 
-            (@[key] = value if validate(key, value)) for own key, value of message
-            return @
+            finally
+                return @
 
         @to_message = () =>
 
@@ -313,7 +318,7 @@ class ProjectController extends OpenfireController
                             ).fulfill
                                 success: (response) =>
                                     if not @uploader?
-                                        uploader = $.apptools.widgets.uploader.create 'data',
+                                        uploader = $.apptools.widgets.uploader.create 'array',
                                             id: 'body'
                                             endpoints: [response.endpoint]
                                             finish: callback
@@ -1097,26 +1102,26 @@ class ProjectController extends OpenfireController
                     document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
                     document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
 
-                    document.getElementById('promote-dropzone').addEventListener('dragenter', (d_on = (ev) ->
+                    document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
-                        ev.target.classList.add('hover'))
+                        ev.target.classList.add('hover')
                     , false)
                     document.getElementById('promote-dropzone').addEventListener('dragover', d_on, false)
-                    document.getElementById('promote-dropzone').addEventListener('dragleave', (d_off = (ev) ->
+                    document.getElementById('promote-dropzone').addEventListener('dragleave', d_off = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
-                        ev.target.className = 'dropzone')
+                        ev.target.className = 'dropzone'
                     , false)
                     document.getElementById('promote-dropzone').addEventListener('dragexit', d_off, false)
                     document.getElementById('promote-dropzone').addEventListener('drop', ((ev) =>
                         d_off(ev)
                         return @add_media(ev)
-                    ))
+                    ), false)
 
             return @get()
 
