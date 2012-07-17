@@ -1,0 +1,76 @@
+============  STATIC ASSET URLS ============
+
+PRODUCTION -- open-fire.appspot.com
+
+cdn.lyr9.net
+1.cdn.lyr9.net
+2.cdn.lyr9.net
+3.cdn.lyr9.net
+4.cdn.lyr9.net
+5.cdn.lyr9.net
+
+
+MOBILE PRODUCTION -- www-mobile.open-fire.appspot.com
+
+mcdn.lyr9.net
+1.mcdn.lyr9.net
+2.mcdn.lyr9.net
+3.mcdn.lyr9.net
+4.mcdn.lyr9.net
+5.mcdn.lyr9.net
+
+
+STAGING -- open-fire-staging.appspot.com
+
+staging.lyr9.net
+1.staging.lyr9.net
+2.staging.lyr9.net
+3.staging.lyr9.net
+4.staging.lyr9.net
+5.staging.lyr9.net
+
+
+
+============  CLOUDFRONT/S3 URLS ============
+
+PRODUCTION -- d23utmox8kj1zc.cloudfront.net
+
+west-1.usa.lyr9.net
+1.west-1.usa.lyr9.net
+2.west-1.usa.lyr9.net
+3.west-1.usa.lyr9.net
+4.west-1.usa.lyr9.net
+5.west-1.usa.lyr9.net
+
+
+STAGING -- d2d3v83fgqizie.cloudfront.net
+
+staging.usw-1.cdn.static.ext.openfi.re
+1.staging.usw-1.cdn.static.ext.openfi.re
+2.staging.usw-1.cdn.static.ext.openfi.re
+3.staging.usw-1.cdn.static.ext.openfi.re
+4.staging.usw-1.cdn.static.ext.openfi.re
+5.staging.usw-1.cdn.static.ext.openfi.re
+
+
+S3 -- d2ipw8y1masjpy.cloudfront.net
+
+usw-1.cdn.static.ext.openfi.re
+1.usw-1.cdn.static.ext.openfi.re
+2.usw-1.cdn.static.ext.openfi.re
+3.usw-1.cdn.static.ext.openfi.re
+4.usw-1.cdn.static.ext.openfi.re
+5.usw-1.cdn.static.ext.openfi.re
+
+
+============  CLOUD STORAGE URLS ============
+
+PRODUCTION -- commondatastorage.googleapis.com/ext.lyr9.net
+
+ext.lyr9.net
+
+
+STAGING -- commondatastorage.googleapis.com/storage.static.ext.openfi.re
+
+storage.static.ext.openfi.re
+
