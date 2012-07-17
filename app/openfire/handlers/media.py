@@ -18,8 +18,6 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
 
         ''' Handle google blobstore repsonses. '''
 
-        import pdb; pdb.set_trace()
-
         upload = None
         try:
             upload = self.get_uploads('file')[0]
