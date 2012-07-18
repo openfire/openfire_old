@@ -207,6 +207,26 @@ config['openfire.security'] = {
 
 }
 
+config['openfire.output'] = {
+
+    'extensions': {
+
+		'config': {
+            'debug': False,
+            'logging': False
+        },
+
+        'installed': [
+            ('FragmentCache', 'openfire.core.output.extensions.fragment.FragmentCache'),
+            ('DynamicContent', 'openfire.core.output.extensions.content.DynamicContent'),
+            ('ThreadedBytecodeCache', 'openfire.core.output.extensions.bytecache.ThreadedBytecodeCache'),
+            ('MemcacheBytecodeCache', 'openfire.core.output.extensions.memcache.MemcachedBytecodeCache')
+        ]
+
+    }
+
+}
+
 config['openfire.sessions'] = {
 
     'ttl': 86400,  # timeout in seconds for stale session records
@@ -254,7 +274,19 @@ config['openfire.sessions'] = {
 config['openfire.classes.WebHandler'] = {
 
     'debug': False,
-    'logging': False
+    'logging': False,
+
+    'integrations': {
+
+        'gravatar': {
+            'enabled': True,
+            'endpoints': {
+                'http': 'http://www.gravatar.com',
+                'https': 'https://secure.gravatar.com'
+            }
+        }
+
+    }
 
 }
 

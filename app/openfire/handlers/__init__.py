@@ -35,19 +35,37 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ''' Handler for desktop web requests. '''
 
+    # Session Properties
+    session = None
+    force_session = True
+
+    # Security Properties
     user = None
     scope = None
-    session = None
     permissions = None
-    force_session = True
     authenticated = False
     auth_provider = False
 
+    # Channel Properties
     channel_id = None
     channel_token = None
     channel_timeout = 120
 
     ## ++ Internal Shortcuts ++ ##
+    @webapp2.cached_property
+    def __webHandlerConfig(self):
+
+        ''' Cached access to this handler's config. '''
+
+        return config.config.get('openfire.classes.WebHandler')
+
+    @webapp2.cached_property
+    def __integrationConfig(self):
+
+        ''' Cached access to this handler's integration config. '''
+
+        return self.__webHandlerConfig.get('integrations')
+
     @webapp2.cached_property
     def logging(self):
 
@@ -79,41 +97,31 @@ class WebHandler(BaseHandler, SessionsMixin):
                 response = _super.dispatch()
 
         finally:
+
+            # Always save the session.
             self.save_session()
 
         return response
 
-    def _format_as_currency(self, number, isPercent):
+    def _format_as_currency(self, number, isPercent=False):
 
-        #truncates the 'number' variable to the 100's place
-        base = int(number)
-        remain = number - base
+        ''' Format a number as a currency or percentage. '''
 
-        decStep = remain * 100
+        # create result array
+        formatted_number = [i for i in reversed(list(str(number)))]
 
-        decimal = int(decStep)
-        decimal = float(decimal)
-        decimal = decimal / 100
+        # format with commas
+        map(lambda x: formatted_number.insert(x, ','), [
+                i for i in reversed([
+                        b for (b, i) in enumerate(formatted_number[:])
+                        if ((b % 3) == 0)])
+            if (i != 0)])
 
-        money = base + decimal
-        money = str(money)
-
-        #conditional that adds an additonal '0' to the number if the decimal
-        # only goes to  the 10's place
-        zeroChk = remain * 10
-        if zeroChk == int(zeroChk):
-            money = money + "0"
-
-        #conditional that will put in a dollar sign '$' if requested by making
-        # isPercent equal to zero, and insert a '%' if isPercent equals 1
-        if isPercent == 0:
-            #money = str(money)
-            money = "$" + money
-
-        elif isPercent == 1:
-            #money = str(money)
-            money = money + "%"
-        return money
+        # build, format as currency/percentage, return
+        return ''.join([char for char in filter(lambda x: x is not None,
+                ['$' if not isPercent else None,
+                 ''.join([i for i in reversed(formatted_number)]),
+                 '%' if isPercent else None])])
 
     def build_session2(self):
 
@@ -125,7 +133,7 @@ class WebHandler(BaseHandler, SessionsMixin):
         else:
             self.session = self.get_session()
 
-            if self.session.get('authenticated', False):
+            if self.session.get('authenticated', False) == True:
 
                 ## we've authenticated
                 self.authenticated = True
@@ -200,74 +208,61 @@ class WebHandler(BaseHandler, SessionsMixin):
                 self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
-    def handle_exception2(self, exception, debug):
-
-        ''' Handle an unhandled exception '''
-
-        self.logging.critical('Unhandled exception encountered.')
-        self.logging.critical(str(exception))
-
-        if not config.debug:
-            self.response.write('Woops! Error.<br />')
-        else:
-            self.response.write('<b>Unhandled exception encountered:</b><br />')
-            self.response.write(str(exception))
-            self.response.write('<h2>quick, get the developers</h2>')
-            raise exception
-
-        return self.error(500)
-
     def _bindRuntimeTemplateContext(self, context):
 
         ''' Bind in the session '''
 
-        if 'user' not in context:
-            context['user'] = {}
-        context['user']['session'] = self.session
+        context.update({
 
-        # install meta config
-        context['_meta'] = config.config.get('openfire.meta')
-        context['_opengraph'] = context['_meta'].get('opengraph', {})
-        context['_location'] = context['_opengraph'].get('location', {})
+            # head meta config
+            '_meta': config.config.get('openfire.meta'),
+            '_opengraph': config.config.get('openfire.meta').get('opengraph'),
+            '_location': config.config.get('openfire.meta').get('opengraph').get('location'),
 
-        # install encryption shim
-        context['encrypt'] = lambda x: self.encrypt(x)
-        context['decrypt'] = lambda x: self.decrypt(x)
+            # encryption/decryption utilities
+            'encrypt': lambda x: self.encrypt(x),
+            'decrypt': lambda x: self.decrypt(x),
 
-        # install currency + percentage formatters
-        context['currency'] = lambda x: self._format_as_currency(x, False)
-        context['percentage'] = lambda x: self._format_as_currency(x, True)
+            # formatter shortcuts (also installed as filters)
+            'currency': lambda x: self._format_as_currency(x, False),
+            'percentage': lambda x: self._format_as_currency(x, True),
 
-        # converts an email address into a gravatar img src url
-        context['gravatarify'] = lambda x, y, z: ''.join(['https://secure.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
+            # media utils
+            'gravatarify': lambda email, ext, size: ''.join([
+	                ':'.join([self.request.environ.get('wsgi.url_scheme', 'http'), '//']),
+                    '/'.join([self.__integrationConfig.get('gravatar').get('endpoints').get(self.request.environ.get('wsgi.url_scheme', 'http').lower()),
+                        'avatar',
+                        hashlib.md5(email).hexdigest()]),
+                    '.%s' % ext,
+                    '?s=%s&d=http://placehold.id/%s/ffffff.png' % (size, size)
+                ]),
 
-        # retrieves current user model + permissions
-        context['security'] = {
-            'permissions': self.permissions,
-            'current_user': self.user,
-            'session': self.session
-        }
-
-        # setup transport config
-        context['transport'] = {
-
-            ## services config
-            'services': {
-                'secure': False,
-                'endpoint': self.request.environ.get('HTTP_HOST'),
-                'consumer': 'ofapp',
-                'scope': 'readonly'
+            # openfire security extensions
+            'security': {
+                'session': self.session,
+                'permissions': self.permissions,
+                'current_user': self.user
             },
 
-            ## push config
-            'realtime': {
-                'enabled': False,
-                'channel': self.channel_token,
-                'timeout': self.channel_timeout
+            # openfire transport extensions
+            'transport': {
+
+                # services config
+                'services': {
+                    'secure': False,
+                    'endpoint': self.request.environ.get('HTTP_HOST'),
+                    'consumer': 'ofapp',
+                    'scope': 'readonly'
+                },
+
+                # realtime/push config
+                'realtime': {
+                    'enabled': False,
+                    'channel': self.channel_token,
+                    'timeout': self.channel_timeout
+                }
             }
-
-        }
-
+        })
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)
 
     ## ++ HTTP Methods ++ ##
@@ -283,7 +278,7 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         ''' Return available methods '''
 
-        return
+        return self.response.write(','.join([i for i in frozenset(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']) if hasattr(self, i.lower())]))
 
 
 class MobileHandler(BaseHandler):

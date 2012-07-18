@@ -99,7 +99,9 @@ _config['apptools.system'] = {
         ('project', 'config.project'),  # Project config
         ('openfire', 'config.openfire'),  # Openfire config
         ('services', 'config.services'),  # Global + site services (RPC/API) config
-        ('assets', 'config.assets')       # Asset manangement layer config
+        ('assets', 'config.assets'),       # Asset manangement layer config
+        ('middleware', 'config.middleware'),  # Service middleware config
+        ('extensions', 'config.extensions')  # Output extension config
     ]
 
 }
