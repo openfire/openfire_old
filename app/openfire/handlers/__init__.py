@@ -239,7 +239,7 @@ class WebHandler(BaseHandler, SessionsMixin):
         context['percentage'] = lambda x: self._format_as_currency(x, True)
 
         # converts an email address into a gravatar img src url
-        context['gravatarify'] = lambda x, y, z: ''.join(['http://www.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
+        context['gravatarify'] = lambda x, y, z: ''.join(['https://secure.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
 
         # retrieves current user model + permissions
         context['security'] = {
@@ -250,7 +250,7 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         # setup transport config
         context['transport'] = {
-            
+
             ## services config
             'services': {
                 'secure': False,

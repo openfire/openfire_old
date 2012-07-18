@@ -195,14 +195,13 @@ class SessionsMixin(object):
         from Crypto.Cipher import AES
         return AES.new(hashlib.md5(gc.config.get('openfire.sessions').get('salt', '__SALT__')).hexdigest())
 
-    def get_session(self, make=True, cookies=True, headers=True, **kwargs):
+    def __acquire_session_bridge(self):
 
-        ''' Proxy stuff to the Core Sessions API. '''
-
-        from openfire.handlers import WebHandler
-        from openfire.services import RemoteService
+        ''' Instantiate the CoreSessionAPI and link to the handler. '''
 
         if self.__sessions_bridge is None:
+            from openfire.handlers import WebHandler
+            from openfire.services import RemoteService
             if not hasattr(self, 'session_store'):
                 if isinstance(self, WebHandler):
                     self.session_store = sessions.get_store(request=self.request)
@@ -210,8 +209,13 @@ class SessionsMixin(object):
                 elif isinstance(self, RemoteService):
                     self.handler.session_store = sessions.get_store(request=self.handler.request)
                     self.__sessions_bridge = CoreSessionAPI(self.handler.session_store)
+        return self.__sessions_bridge
 
-        session = self.__sessions_bridge.get_session(self.request, create=make, cookies=cookies, headers=headers, **kwargs)
+    def get_session(self, make=True, cookies=True, headers=True, **kwargs):
+
+        ''' Proxy stuff to the Core Sessions API. '''
+
+        session = self.__acquire_session_bridge().get_session(self.request, create=make, cookies=cookies, headers=headers, **kwargs)
         if session is not None:
             self.__session_id = session['sid']
 
@@ -222,7 +226,7 @@ class SessionsMixin(object):
         ''' Proxy stuff to the Core Sessions API. '''
 
         self.logging.info('Saving session: "%s"' % self.session)
-        return self.__sessions_bridge.save_session(self.__session_id, self.session, self)
+        return self.__acquire_session_bridge().save_session(self.__session_id, self.session, self)
 
     def encrypt(self, subj, simple=gc.config.get('openfire.security', {}).get('encryption', {}).get('simple', True), cipher=gc.config.get('openfire.security', {}).get('encryption', {}).get('advanced', True)):
 
