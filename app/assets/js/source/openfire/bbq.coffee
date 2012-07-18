@@ -146,7 +146,7 @@ class BBQProject extends BBQBaseObject
             target: @projectKey
         ).fulfill
             success: (response) =>
-                uploader = $.apptools.widgets.uploader.create
+                uploader = $.apptools.widgets.uploader.create 'array',
                     endpoints: [response.endpoint]
                     finish: (response) =>
                         ethan = 1
@@ -171,7 +171,7 @@ class BBQProject extends BBQBaseObject
             target: @projectKey
         ).fulfill
             success: (response) =>
-                uploader = $.apptools.widgets.uploader.create
+                uploader = $.apptools.widgets.uploader.create 'array',
                     endpoints: [response.endpoint]
                     finish: (response) =>
                         ethan = 1
