@@ -89,6 +89,27 @@
   &:hover
     color: #aaa
 
+@-webkit-keyframes rotate
+  from
+    -webkit-transform: rotate(0deg)
+  to
+    -webkit-transform: rotate(360deg)
+
+span
+  &.loading
+    &.spinner
+      display: inline-block
+      margin: 10px
+      padding: 0
+      height: 16px
+      width: 16px
+      -webkit-animation:
+        name: rotate
+        duration: 0.5s
+        timing-function: linear
+        iteration-count: infinite
+
+
 // scroller
 .scroller-frame
   width: 250px
