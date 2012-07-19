@@ -10,6 +10,9 @@ from openfire.models import assets
 from openfire.handlers import WebHandler
 from google.appengine.ext import ndb
 
+import json
+from webapp2_extras import security as wsec
+
 
 class SecurityConfigProvider(object):
 
@@ -75,12 +78,17 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ''' Redirect the user to Google-based login. '''
 
+        if 'staging' in self.request.environ.get('HTTP_HOST'):
+            return self.do_auth_redirect(*[                
+                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+            ])
+
         return self.do_auth_redirect(*[
 
             self.api.users.create_login_url(
 
                 # google auth callback
-                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha1(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid'))),
+                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid'))),
 
                 # federated identity endpoint
                 federated_identity=self._resolveProvider('googleplus').get('endpoint')
@@ -124,7 +132,7 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ## do routing
         if provider is not None:
-            logging.info('AUTH: Received callback from provider "%s".' % provider)
+            logging.info('AUTH: User requested federated logon from provider "%s".' % provider)
             return {
 
                 # run code for whatever provider we're doing
@@ -178,9 +186,9 @@ class Login(WebHandler, SecurityConfigProvider):
         if 'username' in self.request.params and 'password' in self.request.params:
 
             try:
-                hashed_password = hashlib.sha256(self.request.params.get('password'))
+                hashed_password = wsec.hash_password(self.request.params.get('password'), 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal')
                 user_key = ndb.Key(user_models.User, self.request.params.get('username'))
-            except:
+            except NotImplementedError:
                 context['error'] = 'Woops! Something went wrong. Please try again.'
                 return self.render('security/login.html', **context)
             else:
@@ -195,16 +203,18 @@ class Login(WebHandler, SecurityConfigProvider):
                     logging.info('AUTH: User found at username "%s".' % user.username)
 
                     # password match?
-                    if user.password == hashed_password.hexdigest():
+                    if user.password == hashed_password:
 
                         logging.info('AUTH: Passwords match. Logon successful.')
 
                         # log them in
-                        self.session['authenticated'] = True
-                        self.session['uid'] = user.key.id()
-                        self.session['ukey'] = user.key.urlsafe()
-                        self.session['email'] = user.key.id()
-                        self.session['nickname'] = ' '.join([user.firstname, user.lastname])
+                        self.build_authenticated_session(
+                            email=user.key.id(),
+                            nickname=' '.join([user.firstname, user.lastname]),
+                            ukey=user.key.urlsafe(),
+                            uid=user.key.id()
+                        )
+
                         if 'bad_logon_count' in self.session:
                             self.session['bad_logon_count'] = 0
 
@@ -320,11 +330,54 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
     ''' Description/policy page for a login provider. '''
 
+    ### === Redirect Methods === ###
+    def redirect_failure(self, error_message=None, error_code=None):
+
+        ''' Redirect to login with an error message or code '''
+
+        if error_message:
+            logging.error('AUTH: Redirecting back to logon with error_message "%s".' % error_message)
+            redirect_url = self.url_for('auth/login', fdmg=error_message)
+        elif error_code:
+            logging.error('AUTH: Redirecting back to logon with error_code "%s".' % error_code)
+            redirect_url = self.url_for('auth/login', fder=error_code)
+        else:
+            logging.error('AUTH: Redirecting back to logon because of a generic failure.')
+            redirect_url = self.url_for('auth/login', fder='generic')
+        return self.redirect(redirect_url)
+
+    def redirect_success(self):
+
+        ''' Redirect to continue_url or homepage after successful logon '''
+
+        if self.session.get('continue_url') or 'continue' in self.request.params:
+            continue_url = self.request.get('continue', self.session.get('continue_url'))
+        else:
+            continue_url = self.url_for('landing')
+
+        return self.redirect(continue_url)
+
+    ### === Session Functions === ###
+    def build_authenticated_session(self, email, nickname, ukey, uid):
+
+        ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
+
+        self.authenticated = True
+        self.session['authenticated'] = True
+        self.session['email'] = email
+        self.session['uid'] = email
+        if isinstance(ukey, ndb.Key):
+            self.session['ukey'] = ukey.urlsafe()
+        else:
+            self.session['ukey'] = ukey
+        self.session['nickname'] = nickname
+
+        return self.session
+
+    ### === Callback Functions === ###
     def callback_facebook(self):
 
         ''' Finish processing Facebook auth. '''
-
-        import pdb; pdb.set_trace()
 
         # pull POST fields from fb
         csrf = self.request.get('csrf')
@@ -360,7 +413,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     'redirect': ''.join([
                             self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
                             self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                            self.url_for('auth/action-provider', action='renew', provider='facebook')
+                            self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=csrf)
                     ]),
                     'secret': self._resolveProvider('facebook').get('secret'),
                     'code': code
@@ -372,18 +425,47 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
                 # successful reup
                 if access_token.status_code == 200:
+                    logging.info('FB: Access code endpoint fetch success.')
                     params = {}
                     for b_item in access_token.content.split('&'):
-                        for k, v in b_item.split('='):
-                            params[k] = v
+                        k, v = b_item.split('=')
+                        params[k] = v
+
+                    logging.info('FB: Access code: "%s". Expiration: "%s".' % (params.get('access_token'), params.get('expires')))
 
                     access_token = params['access_token']
-                    expiration = params['expiration']
+                    expires = params['expires']
 
                     self.session['fb_access_token'] = access_token
-                    self.session['fb_token_expire'] = expiration
+                    self.session['fb_token_expire'] = expires
                     self.session['fb_token_establish'] = time.time()
-                    return self.response.write('<pre>' + access_token.content + '</pre>')
+
+                    ## get the 'me'
+                    me_endpoint = "https://graph.facebook.com/me?access_token=%s" % access_token
+                    user_info = self.api.urlfetch.fetch(me_endpoint)
+
+                    ## check for user existence via facebook email address
+                    if user_info.status_code == 200:
+                        logging.info('FB: Graph `me` request success.')
+                        user_struct = json.loads(user_info.content)
+
+                        # Copy over user struct stuff
+                        email = user_struct['email']
+                        nickname = user_struct['name']
+                        ukey = ndb.Key(user_models.User, email)
+
+                        # Log it
+                        logging.info('FB: Loggin in user with email "%s" and nickname "%s" and derived ukey "%s".' % (email, nickname, ukey))
+
+                        # log them in
+                        self.build_authenticated_session(
+                            email=email,
+                            nickname=nickname,
+                            ukey=ukey.urlsafe(),
+                            uid=ukey.id()
+                        )
+
+                        return self.redirect_success()
 
                 else:
                     logging.critical('FB: ERROR! Failed to get persistent auth token.')
@@ -402,6 +484,40 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         ''' Finish processing Google auth. '''
 
+        u = self.api.users.get_current_user()
+
+        # federated/openid
+        if u is not None:
+
+            self.build_authenticated_session(
+                email=u.email(),
+                nickname=u.nickname(),
+                ukey=ndb.Key(user_models.User, u.email()),
+                uid=u.email()
+            )
+
+            return self.redirect_success()
+
+        else:
+
+            try:
+                # federated/oauth
+                u = self.api.oauth.get_current_user()
+                assert u is not None
+
+                self.build_authenticated_session(
+                    email=u.email(),
+                    nickname=u.nickname(),
+                    ukey=ndb.Key(user_models.User, u.email()),
+                    uid=u.email()
+                )
+
+            ## everything failed
+            except AssertionError:
+
+                ## redirect to login page w/ error
+                return self.redirect_failure(error_code='hybrid_login_failed')
+
         return self.response.write('<pre>' + str(self.request) + '</pre>')
 
     def callback_twitter(self):
@@ -410,6 +526,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         return self.response.write('<pre>' + str(self.request) + '</pre>')
 
+    ### === HTTP Methods === ###
     def get(self, action=None, provider=None):
 
         ''' Return a test message. '''
@@ -417,7 +534,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         if action == 'callback':
             if provider is not None:
                 return {
-                    'google': self.callback_google,
+                    'googleplus': self.callback_google,
                     'facebook': self.callback_facebook,
                     'twitter': self.callback_twitter
                 }.get(provider, lambda: self.error(404))()

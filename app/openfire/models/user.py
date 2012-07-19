@@ -83,7 +83,6 @@ class SocialAccount(polymodel.PolyModel):
     ext_id = ndb.StringProperty('e', indexed=True)
     login = ndb.BooleanProperty('a', indexed=True, default=True)
     public = ndb.BooleanProperty('p', indexed=True, default=True)
-    token = ndb.StringProperty('t', indexed=False)
     link = ndb.StringProperty('l', indexed=False)
 
 
@@ -92,7 +91,7 @@ class GoogleAccount(SocialAccount):
 
     ''' Describes a Google account that is attached to an openfire user. '''
 
-    pass
+    identity = ndb.UserProperty('a', indexed=True)
 
 
 ## FacebookAccount - account federation from Facebook via OAuth
@@ -100,7 +99,10 @@ class FacebookAccount(SocialAccount):
 
     ''' Describes a Facebook account that is attached to an openfire user. '''
 
-    pass
+    identity = ndb.StringProperty('a', indexed=True)  # opengraph account URL
+    auth_token = ndb.StringProperty('tt', indexed=False)    # most recent auth token
+    access_token = ndb.StringProperty('at', indexed=False)  # most recent access token
+    expiration = ndb.DateTimeProperty('e', indexed=True)   # access token expiration
 
 
 ## TwitterAccount - account federation from Twitter via OAuth

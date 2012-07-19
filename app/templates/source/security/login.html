@@ -2,8 +2,14 @@
 
 {% block content %}
 
-	<div id="login_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}">
+<div id='splash' class="rounded-big center-all">
+
+	<div id="login_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}" data-csrf="{{ encrypt(security.session.get('sid', '__DEV__')) }}">
+
 		{% include "snippets/login_box.html" with context %}
-	</div>
+
+	</div><!-- end #login_wrapper -->
+
+</div><!-- end #splash -->
 
 {% endblock %}

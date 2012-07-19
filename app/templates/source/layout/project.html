@@ -15,14 +15,13 @@
         <div id='project'>
 
             <div id='welcomebox'>
+				{% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">
-                    <button id='promote-avatar' value="avatar">add avatar</button>
-                    <button id='promote-image' value="image">add image</button>
-                    <button id='promote-video' value="video">add video</button>
+                    <div id='promote-dropzone' class='dropzone'>drop images here</div>
                     <button id='promote-goals' value="goals">edit goals</button>
                     <button id='promote-tiers' value="tiers">edit tiers</button>
-                    <button id='promote-tiers' value="tiers">all&nbsp;&raquo;</button>
                 </div>
+                {% endif %}
                 {% block media %}
                     {% if video %}
                         {% if video.provider == 'vimeo' %}

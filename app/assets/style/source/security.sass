@@ -48,7 +48,7 @@ h4
 
 .center-all
   position: absolute
-  top: 50%
+  top: 55%
   left: 50%
 
 #splash
@@ -59,12 +59,23 @@ h4
   vertical-align: middle
   margin-top: -175px
   margin-left: -400px
+  z-index: 500
 
-#logobox
-  position: absolute
-  top: 85px
-  width: 100%
+  &:before
+    display: block
+    content: ''
+    position: relative
+    left: 0
+    right: 0
+    top: -185px
+    background: transparent url('https://d2ipw8y1masjpy.cloudfront.net/static/branding/openfire_transparent_optimized.png') no-repeat 50% 0%
+    height: 173px
+    z-index: 100
+
+.logobox
+  margin-top: 10%
   text-align: center
+  z-index: 100
 
 math
   display: none
@@ -104,7 +115,7 @@ math
           display: none
 
         &:before
-          content: 'Federated logon is disabled.'
+          content: 'Federated logon coming soon!'
           font-size: 12pt
           color: white
           font-family: 'Karla'

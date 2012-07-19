@@ -53,7 +53,7 @@ config['apptools.project.output'] = {
     'assets': {  # Asset API
         'minified': False,        # whether to switch to minified assets or not
         'serving_mode': 'local',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
-        'cdn_prefix': []          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
+        'cdn_prefix': ['d2d3v83fgqizie.cloudfront.net']          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
     },
 
     'headers': {  # Default Headers (only supported headers are shown)

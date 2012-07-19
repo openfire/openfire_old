@@ -30,6 +30,7 @@ class OpenfireException extends Error
 
 class MediaError extends OpenfireException
 class UserPermissionsError extends OpenfireException
+class ProjectEditError extends OpenfireException
 
 Util = new window.Util()
 

@@ -1,0 +1,46 @@
+[
+    {
+        "name": "fat cat map",
+        "status": "o",
+        "category_key": "category__transparency",
+        "proposal_key": "proposal__fat cat map",
+        "summary": "ever wonder where your local congressman gets his money?",
+        "pitch": "cool fat pitch herr",
+        "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
+        "keywords": ["transparency", "politics", "opendata", "visualization"],
+        "creator_key": "user__sam",
+        "owners_keys": ["user__sam", "user__david"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__ethan"],
+        "progress": 73,
+        "money": 17261
+    },
+    {
+        "name": "SeaSteading",
+        "status": "o",
+        "category_key": "category__law",
+        "proposal_key": "proposal__SeaSteading",
+        "summary": "ever take issue with H1B visa policy in the united states! well then help us buy a cruise ship.",
+        "pitch": "cool sea pitch herr",
+        "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
+        "keywords": ["business", "law", "policy"],
+        "creator_key": "user__david",
+        "owners_keys": ["user__david", "user__ethan"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__sam"]
+    },
+    {
+        "name": "urbsly",
+        "status": "o",
+        "category_key": "category__business",
+        "proposal_key": "proposal__urbsly",
+        "summary": "ever hate on monsanto a bunch? duke on them some more with this thing",
+        "pitch": "cool urbs pitch herr",
+        "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
+        "keywords": ["ecology", "seeds-and-shit", "yup"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan", "user__sam"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__david"]
+    }
+]

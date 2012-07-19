@@ -1,7 +1,7 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\core\\__north.html'
+    name = '/source/core/__north.html'
 
     def root(context, environment=environment):
         l_page = context.resolve('page')

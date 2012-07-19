@@ -53,7 +53,11 @@ class ProjectHome(WebHandler):
         allowed_viewers = ndb.get_multi(project.owners + project.viewers)
 
         # make sure the user is allowed to view
-        if project.is_private() and (self.user.key not in project.owners) and (self.user.key not in project.viewers):
+        if self.user is not None:
+            userkey = self.user.key
+        else:
+            userkey = None
+        if project.is_private() and (userkey not in project.owners) and (userkey not in project.viewers):
             logging.critical('User does not have permissions to view the specified project.')
             if config.debug:
                 return self.error(403)

@@ -69,7 +69,7 @@ _config['webapp2_extras.jinja2'] = {
     'environment_args': {  # Jinja constructor arguments
         'optimized': True,   # enable jinja2's builtin optimizer (recommended)
         'autoescape': True,  # Global Autoescape. BE CAREFUL WITH THIS.
-        'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_', 'jinja2.ext.i18n'],
+        'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
     }
 
 }

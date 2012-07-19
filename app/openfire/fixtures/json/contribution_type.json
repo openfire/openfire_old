@@ -1,0 +1,34 @@
+[
+    {
+        "slug": "money",
+        "name": "Money",
+        "unit": "dollar",
+        "plural": "dollars",
+        "subunit": "cent",
+        "subunit_plural": "cents"
+    },
+    {
+        "slug": "time",
+        "name": "Time",
+        "unit": "hour",
+        "plural": "hours",
+        "subunit": "minute",
+        "subunit_plural": "minutes"
+    },
+    {
+        "slug": "code",
+        "name": "Code",
+        "unit": "line",
+        "plural": "lines",
+        "subunit": "line",
+        "subunit_plural": "lines"
+    },
+    {
+        "slug": "advocacy",
+        "name": "Advocacy",
+        "unit": "dollar",
+        "plural": "dollars",
+        "subunit": "cent",
+        "subunit_plural": "cents"
+    }
+]

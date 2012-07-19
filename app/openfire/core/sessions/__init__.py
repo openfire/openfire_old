@@ -228,6 +228,10 @@ class SessionsMixin(object):
 
         ''' Encrypt some string '''
 
+        # TODO: Encryption is disabled for now. Let's enable it when we're ready.
+        if True:
+            return subj
+
         if cipher:
             try:
                 if (len(subj) % 16) > 0:
@@ -247,6 +251,10 @@ class SessionsMixin(object):
     def decrypt(self, subj):
 
         ''' Decrypt some string '''
+
+        # TODO: Decryption is disabled for now. Let's enable it when we're ready.
+        if True:
+            return subj
 
         subj = base64.b64decode(subj).split(_ENCRYPTION_PAD_CHARACTER)
         if subj[0] == _ADVANCED_ENCRYPTION_FLAG:

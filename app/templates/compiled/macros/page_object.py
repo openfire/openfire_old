@@ -1,95 +1,101 @@
 from __future__ import division
 from jinja2.runtime import LoopContext, TemplateReference, Macro, Markup, TemplateRuntimeError, missing, concat, escape, markup_join, unicode_join, to_string, identity, TemplateNotFound
 def run(environment):
-    name = '/source\\macros\\page_object.js'
+    name = '/source/macros/page_object.js'
 
     def root(context, environment=environment):
+        t_1 = environment.filters['safe']
         if 0: yield None
         def macro(l_services, l_config, l_page):
-            t_1 = []
+            t_2 = []
             l_sys = context.resolve('sys')
             l_null = context.resolve('null')
             pass
-            t_1.append(
+            t_2.append(
                 u'$(document).ready(function (){\n\n\t', 
             )
             for event in context.blocks['platform_statement'][0](context):
-                t_1.append(event)
-            t_1.append(
+                t_2.append(event)
+            t_2.append(
                 u'\n\n\t', 
             )
             if l_services != l_null:
                 pass
+                t_2.append(
+                    u'\n\t$.apptools.api.rpc.factory([', 
+                )
                 l_action = l_cfg = l_opts = l_service = missing
+                l_util = context.resolve('util')
                 l_enumerate = context.resolve('enumerate')
-                for (l_service, l_action, l_cfg, l_opts) in l_services:
+                for (l_service, l_action, l_cfg, l_opts), l_loop in LoopContext(l_services):
                     pass
-                    t_1.extend((
-                        u"$.apptools.api.rpc.factory('", 
+                    t_2.extend((
+                        u"{\n\t\t\t\tname: '", 
                         to_string(l_service), 
-                        u"', '", 
+                        u"',\n\t\t\t\tbase_uri: '", 
                         to_string(l_action), 
-                        u"', [", 
+                        u"',\n\t\t\t\tmethods: [", 
                     ))
+                    t_3 = l_loop
                     l_i = l_method = missing
                     l_len = context.resolve('len')
                     for (l_i, l_method) in context.call(l_enumerate, environment.getattr(l_cfg, 'methods')):
                         pass
-                        t_1.extend((
+                        t_2.extend((
                             u"'", 
                             to_string(l_method), 
                             u"'", 
                         ))
                         if l_i != (context.call(l_len, environment.getattr(l_cfg, 'methods')) - 1):
                             pass
-                            t_1.append(
+                            t_2.append(
                                 u',', 
                             )
+                    l_loop = t_3
                     l_i = l_method = missing
-                    t_1.append(
-                        u'],', 
-                    )
-                    l_util = context.resolve('util')
-                    pass
-                    t_2 = context.eval_ctx.save()
-                    context.eval_ctx.autoescape = False
-                    t_1.append(
-                        to_string(context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'converters'), 'json'), 'dumps'), l_opts)), 
-                    )
-                    context.eval_ctx.revert(t_2)
-                    t_1.append(
-                        u');', 
-                    )
+                    t_2.extend((
+                        u'],\n\t\t\t\tconfig: ', 
+                        to_string(t_1(context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'converters'), 'json'), 'dumps'), l_opts))), 
+                        u'\n\t\t\t}', 
+                    ))
+                    if (not environment.getattr(l_loop, 'last')):
+                        pass
+                        t_2.append(
+                            u',', 
+                        )
                 l_action = l_cfg = l_opts = l_service = missing
-            t_1.append(
+                t_2.append(
+                    u']);\n\t', 
+                )
+            t_2.append(
                 u'\n\n\t', 
             )
             if environment.getattr(l_page, 'open_channel'):
                 pass
-                t_1.append(
+                t_2.append(
                     u'\n\t', 
                 )
                 if environment.getattr(l_page, 'channel_token'):
                     pass
-                    t_1.extend((
+                    t_2.extend((
                         u'\n\t\t$.apptools.push.channel.establish("', 
                         to_string(environment.getattr(l_page, 'channel_token')), 
                         u'").listen();\n\t', 
                     ))
-                t_1.append(
+                t_2.append(
                     u'\n\t', 
                 )
-            t_1.append(
+            t_2.append(
                 u'\n\n\t', 
             )
             for event in context.blocks['userobj'][0](context):
-                t_1.append(event)
-            t_1.extend((
+                t_2.append(event)
+            t_2.extend((
                 u'\n\n\t_PLATFORM_VERSION = "', 
                 to_string(environment.getattr(l_sys, 'version')), 
                 u'";\n\t$.apptools.events.trigger(\'API_READY\');\n\n});', 
             ))
-            return concat(t_1)
+            return concat(t_2)
         context.exported_vars.add('build_page_object')
         context.vars['build_page_object'] = l_build_page_object = Macro(environment, macro, 'build_page_object', ('services', 'config', 'page'), (), False, False, False)
 
@@ -109,10 +115,10 @@ def run(environment):
             yield u'debug: '
             l_off = context.resolve('off')
             if 0: yield None
-            t_3 = context.eval_ctx.save()
+            t_4 = context.eval_ctx.save()
             context.eval_ctx.autoescape = l_off
             yield (context.eval_ctx.autoescape and escape or to_string)(context.call(environment.getattr(environment.getattr(environment.getattr(l_util, 'converters'), 'json'), 'dumps'), environment.getattr(environment.getattr(l_util, 'config'), 'debug')))
-            context.eval_ctx.revert(t_3)
+            context.eval_ctx.revert(t_4)
         yield u'};'
         if (environment.getattr(environment.getattr(l_util, 'config'), 'debug') or context.call(environment.getattr(environment.getattr(l_api, 'users'), 'is_current_user_admin'))):
             if 0: yield None
@@ -144,5 +150,5 @@ def run(environment):
             yield u'});'
 
     blocks = {'platform_statement': block_platform_statement, 'userobj': block_userobj}
-    debug_info = '1=8&5=16&19=21&20=25&21=29&25=67&26=72&27=76&31=85&52=89&5=96&7=102&8=107&9=114&12=117&31=124&32=130&36=133&37=135&39=137&40=138&42=139'
+    debug_info = '1=9&5=17&19=22&21=30&23=34&24=36&25=42&26=58&27=61&32=73&33=78&34=82&38=91&59=95&5=102&7=108&8=113&9=120&12=123&38=130&39=136&43=139&44=141&46=143&47=144&49=145'
     return locals()

@@ -5,13 +5,13 @@
 		{
 			w._initExtAuth = function (p, m)
 			{
-				$(document).ready(function ()
-				{
-					w.location.href = $('.button[data-provider-name="'+p+'"]').attr('data-action');
-				});
+				var selector = [p, 'federated', 'logon', 'trigger'].join('-'),
+					provider = document.getElementById(selector),
+					disabled = provider.getAttribute('disabled'),
+					location = provider.getAttribute('data-action');
+					if (disabled !== 'disabled') { w.location.href = location; }
 			};
 		})(window);
-
 	</script>
 
 	<!-- left column: 3rd part logon -->
@@ -23,11 +23,12 @@
 				{%- if not security_config.authentication.federation.enabled -%}{%- set disabled = "disabled" -%}{%- else -%}{%- set disabled = "thirdparty" -%}{%- endif -%}
 				<button {{
 					{
+						'id': '%s-federated-logon-trigger' % provider.name,
 						'class': ' '.join([disabled, 'zocial', provider.name, 'logon', 'button']),
 						'data-provider-name': provider.name,
 						'data-provider-label': provider.label,
 						'data-provider-mode': provider.mode,
-						'disabled': none if not disabled,
+						'disabled': none if not disabled else 'disabled',
 						'data-action': link('auth/login-with', provider=provider.name),
 						'onclick': ("javascript:window._initExtAuth('%(name)s', '%(mode)s');" % provider)|safe
 					}|xmlattr
@@ -39,7 +40,7 @@
 
 	<!-- right column: tour -->
 	<div class="securelogon">
-		{% if not error %}<h4>Or, sign in using your openfire account</h4>{% else %}<h4 class="woops">{{ error|safe }}</h4>{% endif %}
+		{% if not error %}<h4>Sign in using your openfire account</h4>{% else %}<h4 class="woops">{{ error|safe }}</h4>{% endif %}
 		<form action="{{ link('auth/login') }}" method="POST" class="oflogon formcontainer">
 			<input type="text" name="username" placeholder="Email" />
 			<input type="password" name="password" placeholder="Password" />
