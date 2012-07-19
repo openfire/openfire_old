@@ -20,7 +20,7 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
 
         upload = None
         try:
-            upload = self.get_uploads('file')[0]
+            upload = self.get_uploads('filename')[0]
         except:
             logging.critical('Failed to get call "self.get_uploads()"')
 
@@ -30,7 +30,8 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
             asset.pending = False
             asset.blob = upload.key()
             asset.mime = upload.content_type
-            asset.url = self.url_for('serve-asset-filename', action='serve', asset_key=asset.key.urlsafe(), filename=upload.filename)
+            asset.filename = upload.filename
+            asset.url = images.get_serving_url(asset.blob)
             asset.put()
 
         # If there is a target, attach this media to a project or user.

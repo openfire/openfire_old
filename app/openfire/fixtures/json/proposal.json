@@ -93,5 +93,44 @@
         "owners_keys": ["user__ethan", "user__sam"],
         "public": true,
         "viewers_keys": ["user__pug", "user__david"]
+    },
+    {
+        "name": "BlueSeed",
+        "status": "a",
+        "category_key": "category__law",
+        "summary": "This is disruptive, alright.",
+        "pitch": "Buy a cruise ship, park it off SF Bay, screw you INS/ICE.",
+        "tech": "A ship",
+        "keywords": ["law", "politics", "yachting"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan", "user__pug"],
+        "public": true,
+        "viewers_keys": ["user__sam", "user__david"]
+    },
+    {
+        "name": "Carrotmob",
+        "status": "a",
+        "category_key": "category__economy",
+        "summary": "Huge concept, under-resourced.",
+        "pitch": "Reward companies that put your money to improving.",
+        "tech": "Rails",
+        "keywords": ["organizing", "consumer"],
+        "creator_key": "user__pug",
+        "owners_keys": ["user__pug", "user__sam"],
+        "public": true,
+        "viewers_keys": ["user__ethan", "user__david"]
+    },
+    {
+        "name": "Open Source Ecology",
+        "status": "a",
+        "category_key": "category__economy",
+        "summary": "Talk about audacious. Free us!",
+        "pitch": "Working hard, would love more resources",
+        "tech": "Hardware",
+        "keywords": ["diy", "opensource", "hardware"],
+        "creator_key": "user__sam",
+        "owners_keys": ["user__sam", "user__david"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__ethan"]
     }
 ]

@@ -13,7 +13,7 @@ class Landing(WebHandler):
 
     ''' openfire landing page. '''
 
-    projects_per_page = 5
+    projects_per_page = 6
     activity_per_page = 10
 
     def get(self):
@@ -60,7 +60,8 @@ class Landing(WebHandler):
                     # build a list of keys to pull, for avatars, videos, and assets
                     avatars.append(entity.avatar)
                     videos.append(entity.video)
-                    _assets.append(ndb.Key(urlsafe=entity.avatar.id()))
+                    if entity.avatar:
+                        _assets.append(ndb.Key(urlsafe=entity.avatar.id()))
 
                 ## batch pull media
                 asset_keys = [k for k in (avatars + _assets + videos) if isinstance(k, (ndb.Key, ndb.Model))]
@@ -104,7 +105,9 @@ class Landing(WebHandler):
                         # finally, if it's just a blob link with no URL, calculate the serving URL
                         elif project['avatar']['asset'].get('blob'):
                             extension = project['avatar']['asset'].get('mime').split('/')[1]
-                            project['avatar']['location'] = self.url_for('serve-blob-filename', action='serve', asset_key=project['avatar']['asset']['key'].urlsafe(), filename='project-avatar-' + project['model'].get_custom_url() + '.' + extension)
+                            project['avatar']['location'] = self.url_for('serve-blob-filename', action='serve',
+                                    asset_key=project['avatar']['asset']['key'].urlsafe(),
+                                    filename='project-avatar-' + project['model'].get_custom_url() + '.' + extension)
 
                 ## copy projects over to page context
                 context['projects'] = projects.values()

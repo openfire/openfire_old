@@ -26,5 +26,17 @@
     {
         "slug": "urbsly",
         "target_key": "project__urbsly"
+    },
+    {
+        "slug": "ose",
+        "target_key": "project__Open Source Ecology"
+    },
+    {
+        "slug": "blueseed",
+        "target_key": "project__BlueSeed"
+    },
+    {
+        "slug": "carrotmob",
+        "target_key": "project__Carrotmob"
     }
 ]

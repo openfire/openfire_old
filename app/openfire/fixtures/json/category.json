@@ -2,7 +2,7 @@
     {
         "slug": "politics",
         "name": "Politics",
-        "description": "Having to do with politics.",
+        "description": "Our political system is broken. Let's fix it.",
         "keywords": ["policy", "government"]
     },
     {
@@ -13,21 +13,51 @@
         "parent_key": "category__politics"
     },
     {
-        "slug": "money",
-        "name": "Money",
-        "description": "Having to do with money or currency.",
+        "slug": "economy",
+        "name": "Economy",
+        "description": "Our economic system is ready for an overhaul. Better get to work before it surprises us.",
         "keywords": ["currency", "tender", "money", "debt", "economies"]
     },
     {
         "slug": "law",
         "name": "Law",
-        "description": "Having to do with law or policy.",
+        "description": "Dealing with laws in this country and others.",
         "keywords": ["policy", "law", "government"]
     },
     {
         "slug": "business",
         "name": "Business",
-        "description": "Having to do with commercial enterprise.",
+        "description": "Corporations, startups, and everything in between.",
         "keywords": ["corporations", "startups"]
+    },
+    {
+        "slug": "conservation",
+        "name": "Conservation",
+        "description": "Ecological conservation.",
+        "keywords": ["conservation", "green"]
+    },
+    {
+        "slug": "healthcare",
+        "name": "Heathcare",
+        "description": "Our healthcare system is broken. Let's fix it.",
+        "keywords": ["health", "policy"]
+    },
+    {
+        "slug": "resilience",
+        "name": "Resilience",
+        "description": "Reducing dependence on the complex systems we've created while building modern civilization.",
+        "keywords": ["health", "disasters"]
+    },
+    {
+        "slug": "recreation",
+        "name": "Recreation",
+        "description": "Ready for a revolution in how we spend our downtime?",
+        "keywords": ["health", "volunteer"]
+    },
+    {
+        "slug": "knowledge",
+        "name": "Knoeledge",
+        "description": "We have new ways to create and share knowledge. We should use them better.",
+        "keywords": ["knowledge", "copyright"]
     }
 ]
