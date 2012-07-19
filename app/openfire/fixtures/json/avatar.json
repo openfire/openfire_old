@@ -1,18 +1,21 @@
 [
     {
         "parent_key": "project__fat cat map",
+        "blob_file": "../app/openfire/fixtures/img_links/fatcatmap.png",
         "url": "/assets/img/static/projects/cardstock/fatcatmap.png",
         "name": "fatcatmap.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__SeaSteading",
+        "blob_file": "../app/openfire/fixtures/img_links/seasteading.png",
         "url": "/assets/img/static/projects/cardstock/seasteading.png",
         "name": "seasteading.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__urbsly",
+        "blob_file": "../app/openfire/fixtures/img_links/urbsly.png",
         "url": "/assets/img/static/projects/cardstock/urbsly.png",
         "name": "urbsly.png",
         "mime": "image/png"

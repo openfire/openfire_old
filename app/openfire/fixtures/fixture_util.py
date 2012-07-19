@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from google.appengine.api import files, images
 from webapp2_extras import security as wsec
 
 from openfire.models.user import User, EmailAddress, Permissions
@@ -12,6 +13,31 @@ import logging
 '''
 This module is used to create database entities for testing purposes.
 '''
+
+
+def upload_file_to_blobstore(filename, mime_type):
+
+    '''
+    This is a helper method to upload a local file to the blobstore.
+
+    Returns a BlobKey object.
+    '''
+
+    # Upload to blob.
+    blob_name = files.blobstore.create(mime_type=mime_type)
+
+    # Open blob and write the file to it.
+    with files.open(blob_name, 'a') as blob:
+        local_file = open(filename)
+        blob.write(local_file.read())
+
+    # Finalize the blob.
+    files.finalize(blob_name)
+
+    # Get the file's blob key
+    blob_key = files.blobstore.get_blob_key(blob_name)
+    return blob_key
+
 
 def build_indexes(index_list):
 
@@ -193,26 +219,50 @@ def create_project(name='Test Project', status='o', public=True, summary='SUMMAR
             creator=creator_key, owners=owners_keys, viewers=viewers_keys).put()
 
 
-def create_avatar(parent_key=None, url='', name='', mime='', pending=False, version=1, active=True, approved=True):
+def create_avatar(parent_key=None, url='', name='', mime='', pending=False, version=1, active=True,
+            approved=True, blob_file=None, mime_type='image/png'):
 
-    ''' Create an avatar and assign it to a project or user. '''
+    '''
+    Create an avatar and assign it to a project or user.
+
+    If blob_file is set to a local file, it will be uploaded to the blobstore and
+    the serving url will be set.
+    '''
 
     if not parent_key:
         logging.critical('parent_key is required when creating an avatar.')
         return
+
     parent = parent_key.get()
     if not parent:
         logging.critical('Parent could not be found when creating avatar fixture.')
         return
 
-    asset_key = Asset(url=url, name=name, mime=mime, pending=pending, kind='a').put()
+    blob_key = None
+    serving_url = url
+    if blob_file:
+        # Upload the file to the blobstore.
+        blob_key = upload_file_to_blobstore(blob_file, mime_type)
+
+        # Get the serving url for the image.
+        serving_url = images.get_serving_url(blob_key)
+
+        # TODO: Should we remove the http:// portion of the url?
+        #serving_url = serving_url.split('://')[1]
+
+    if blob_key:
+        asset_key = Asset(url=serving_url, name=name, mime=mime, pending=pending, kind='a', blob=blob_key).put()
+    else:
+        asset_key = Asset(url=serving_url, name=name, mime=mime, pending=pending, kind='a').put()
+
     avatar_key = Avatar(key=ndb.Key(Avatar, asset_key.urlsafe(), parent=parent_key),
-            version=version, active=active, url=url, asset=asset_key, approved=approved).put()
+            version=version, active=active, url=serving_url, asset=asset_key, approved=approved).put()
     parent.avatar = avatar_key
     parent.put()
 
 
-def create_image(parent_key=None, url='', name='', mime='', pending=False, approved=True):
+def create_image(parent_key=None, url='', name='', mime='', pending=False,
+            approved=True, blob_file=None, mime_type='image/png'):
 
     ''' Create an image and add it to a project. '''
 
@@ -220,13 +270,29 @@ def create_image(parent_key=None, url='', name='', mime='', pending=False, appro
         logging.critical('Parent is required when creating an image.')
         return
     parent = parent_key.get()
+
     if not parent:
         logging.critical('Parent could not be found when creating an image fixture.')
         return
 
-    asset_key = Asset(url=url, name=name, mime=mime, pending=pending, kind='i').put()
+    blob_key = None
+    serving_url = url
+    if blob_file:
+        # Upload the file to the blobstore.
+        blob_key = upload_file_to_blobstore(blob_file, mime_type)
+
+        # Get the serving url for the image.
+        serving_url = images.get_serving_url(blob_key)
+
+        # TODO: Should we remove the http:// portion of the url?
+        #serving_url = serving_url.split('://')[1]
+
+    if blob_key:
+        asset_key = Asset(url=serving_url, name=name, mime=mime, pending=pending, kind='i', blob=blob_key).put()
+    else:
+        asset_key = Asset(url=serving_url, name=name, mime=mime, pending=pending, kind='i').put()
     image_key = Image(key=ndb.Key(Image, asset_key.urlsafe(), parent=parent_key),
-            url=url, asset=asset_key, approved=approved).put()
+            url=serving_url, asset=asset_key, approved=approved).put()
     parent.images.append(image_key)
     parent.put()
 
