@@ -1,0 +1,20 @@
+[
+    {
+        "parent_key": "project__fat cat map",
+        "url": "/assets/img/static/projects/cardstock/fatcatmap.png",
+        "name": "fatcatmap.png",
+        "mime": "image/png"
+    },
+    {
+        "parent_key": "project__SeaSteading",
+        "url": "/assets/img/static/projects/cardstock/seasteading.png",
+        "name": "seasteading.png",
+        "mime": "image/png"
+    },
+    {
+        "parent_key": "project__urbsly",
+        "url": "/assets/img/static/projects/cardstock/urbsly.png",
+        "name": "urbsly.png",
+        "mime": "image/png"
+    }
+]

@@ -163,9 +163,9 @@ def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amoun
 
 def create_proposal(name='Test Proposal', status='s', public=True,
             summary='SUMMARY', pitch='PITCH', tech='TECH', keywords=['KEYWORDS'],
-            category=ndb.Key('Category', 'test_category_key'),
-            creator=ndb.Key('User', 'test_user_key'),
-            owners=[], viewers=[], goals=[], tiers=[]):
+            category_key=ndb.Key('Category', 'test_category_key'),
+            creator_key=ndb.Key('User', 'test_user_key'),
+            owners_keys=[], viewers_keys=[], goals=[], tiers=[]):
 
     ''' Create a proposal. '''
 
@@ -177,20 +177,20 @@ def create_proposal(name='Test Proposal', status='s', public=True,
         tier_list.append(create_tier(**tier))
     return Proposal(name=name, status=status, public=public,
                     summary=summary, pitch=pitch, tech=tech, keywords=keywords,
-                    category=category, creator=creator, goals=goal_list, tiers=tier_list,
-                    viewers=viewers, owners=owners).put()
+                    category=category_key, creator=creator_key, goals=goal_list, tiers=tier_list,
+                    viewers=viewers_keys, owners=owners_keys).put()
 
 
 def create_project(name='Test Project', status='o', public=True, summary='SUMMARY', pitch='PITCH',
             tech='TECH', keywords=['KEYWORDS'], progress=0, money=0,
-            proposal=ndb.Key('Proposal', 'test_proposal_key'), category=ndb.Key('Category', 'test_category_key'),
-            creator=ndb.Key('User', 'test_user_key'), owners=[], viewers=[]):
+            proposal_key=ndb.Key('Proposal', 'test_proposal_key'), category_key=ndb.Key('Category', 'test_category_key'),
+            creator_key=ndb.Key('User', 'test_user_key'), owners_keys=[], viewers_keys=[]):
 
     ''' Create a project. '''
 
     return Project(name=name, status=status, public=public, summary=summary, pitch=pitch, tech=tech,
-            keywords=keywords, progress=progress, money=money, proposal=proposal, category=category,
-            creator=creator, owners=owners, viewers=viewers).put()
+            keywords=keywords, progress=progress, money=money, proposal=proposal_key, category=category_key,
+            creator=creator_key, owners=owners_keys, viewers=viewers_keys).put()
 
 
 def create_avatar(parent_key=None, url='', name='', mime='', pending=False, version=1, active=True, approved=True):

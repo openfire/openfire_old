@@ -1,0 +1,33 @@
+[
+    {
+        "slug": "politics",
+        "name": "Politics",
+        "description": "Having to do with politics.",
+        "keywords": ["policy", "government"]
+    },
+    {
+        "slug": "transparency",
+        "name": "Transparency",
+        "description": "Having to do with open information",
+        "keywords": ["politics", "policy", "opennes", "freedom"],
+        "parent_key": "category__politics"
+    },
+    {
+        "slug": "money",
+        "name": "Money",
+        "description": "Having to do with money or currency.",
+        "keywords": ["currency", "tender", "money", "debt", "economies"]
+    },
+    {
+        "slug": "law",
+        "name": "Law",
+        "description": "Having to do with law or policy.",
+        "keywords": ["policy", "law", "government"]
+    },
+    {
+        "slug": "business",
+        "name": "Business",
+        "description": "Having to do with commercial enterprise.",
+        "keywords": ["corporations", "startups"]
+    }
+]
