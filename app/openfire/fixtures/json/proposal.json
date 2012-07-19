@@ -1,0 +1,136 @@
+[
+    {
+        "name": "fat cat map",
+        "status": "a",
+        "public": true,
+        "summary": "ever wonder where your local congressman gets his money?",
+        "pitch": "cool fat pitch herr",
+        "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
+        "keywords": ["transparency", "politics", "opendata", "visualization"],
+        "category_key": "category__transparency",
+        "creator_key": "user__sam",
+        "owners_keys": ["user__sam", "user__david"],
+        "viewers_keys": ["user__pug", "user__ethan"],
+        "goals": [
+            {"amount": 1000},
+            {"amount": 10000},
+            {"amount": 50000},
+            {"amount": 100000}
+        ],
+        "tiers": [
+            {
+                "name": "Friend",
+                "amount": 10,
+                "description": "We'll give you an invite to the private beta!",
+                "delivery": "9/1/2012"
+            },
+            {
+                "name": "Supporter",
+                "amount": 35,
+                "description": "Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
+                "delivery": "9/1/2012"
+            },
+            {
+                "name": "Backer",
+                "amount": 50,
+                "description": "Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
+                "delivery": "9/1/2012"
+            },
+            {
+                "name": "Sponsor",
+                "amount": 100,
+                "description": "Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
+                "delivery": "8/1/2012"
+            },
+            {
+                "name": "Investor",
+                "amount": 300,
+                "description": "Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
+                "delivery": "8/1/2012"
+            },
+            {
+                "name": "Inner Circle",
+                "amount": 500,
+                "description": "Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
+                "delivery": "8/1/2012"
+            },
+            {
+                "name": "Transparency Warrior",
+                "amount": 1000,
+                "description": "As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
+                "delivery": "7/5/2012"
+            },
+            {
+                "name": "Fat Cat",
+                "amount": 10000,
+                "description": "Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
+                "delivery": "7/10/2012"
+            }
+        ]
+    },
+    {
+        "name": "SeaSteading",
+        "status": "a",
+        "category_key": "category__law",
+        "summary": "ever take issue with H1B visa policy in the united states! well then help us buy a cruise ship.",
+        "pitch": "cool sea pitch herr",
+        "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
+        "keywords": ["business", "law", "policy"],
+        "creator_key": "user__david",
+        "owners_keys": ["user__david", "user__ethan"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__sam"]
+    },
+    {
+        "name": "urbsly",
+        "status": "a",
+        "category_key": "category__business",
+        "summary": "ever hate on monsanto a bunch? duke on them some more with this thing",
+        "pitch": "cool urbs pitch herr",
+        "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
+        "keywords": ["ecology", "seeds-and-shit", "yup"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan", "user__sam"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__david"]
+    },
+    {
+        "name": "BlueSeed",
+        "status": "a",
+        "category_key": "category__law",
+        "summary": "This is disruptive, alright.",
+        "pitch": "Buy a cruise ship, park it off SF Bay, screw you INS/ICE.",
+        "tech": "A ship",
+        "keywords": ["law", "politics", "yachting"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan", "user__pug"],
+        "public": true,
+        "viewers_keys": ["user__sam", "user__david"]
+    },
+    {
+        "name": "Carrotmob",
+        "status": "a",
+        "category_key": "category__economy",
+        "summary": "Huge concept, under-resourced.",
+        "pitch": "Reward companies that put your money to improving.",
+        "tech": "Rails",
+        "keywords": ["organizing", "consumer"],
+        "creator_key": "user__pug",
+        "owners_keys": ["user__pug", "user__sam"],
+        "public": true,
+        "viewers_keys": ["user__ethan", "user__david"]
+    },
+    {
+        "name": "Open Source Ecology",
+        "status": "a",
+        "category_key": "category__economy",
+        "summary": "Talk about audacious. Free us!",
+        "pitch": "Working hard, would love more resources",
+        "tech": "Hardware",
+        "keywords": ["diy", "opensource", "hardware"],
+        "creator_key": "user__sam",
+        "owners_keys": ["user__sam", "user__david"],
+        "public": true,
+        "viewers_keys": ["user__pug", "user__ethan"]
+    }
+]

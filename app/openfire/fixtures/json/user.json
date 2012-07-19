@@ -1,0 +1,42 @@
+[
+    {
+        "username": "pug",
+        "password": "pugiscool",
+        "firstname": "David",
+        "lastname": "Anderson",
+        "location": "San Francisco, CA",
+        "bio": "hola yo soy pug",
+        "email": "david@openfi.re",
+        "create_permissions": 1
+    },
+    {
+        "username": "sam",
+        "password": "samiscool",
+        "firstname": "Sam",
+        "lastname": "Gammon",
+        "location": "San Francisco, CA",
+        "bio": "fiesta ayayayay",
+        "email": "samuel.gammon@gmail.com",
+        "create_permissions": 1
+    },
+    {
+        "username": "david",
+        "password": "davidiscool",
+        "firstname": "David",
+        "lastname": "Rekow",
+        "location": "San Francisco, CA",
+        "bio": "hi i is david",
+        "email": "davidr@openfi.re",
+        "create_permissions": 1
+    },
+    {
+        "username": "ethan",
+        "password": "ethaniscool",
+        "firstname": "Ethan",
+        "lastname": "Leland",
+        "location": "San Francisco, CA",
+        "bio": "ethan i am",
+        "email": "ethan.leland@gmail.com",
+        "create_permissions": 1
+    }
+]
