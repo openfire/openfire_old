@@ -18,11 +18,17 @@ import hashlib
 
 ## Webapp2 Imports
 import webapp2
+from webapp2_extras import jinja2
+
+## Jinja2 Imports
+import jinja2 as j2
+from jinja2.ext import Extension
 
 ## Google Imports
 from google.appengine.ext import ndb
 
 ## AppTools Imports
+from apptools.api import output
 from apptools.core import BaseHandler
 
 ## Openfire Imports
@@ -53,18 +59,46 @@ class WebHandler(BaseHandler, SessionsMixin):
 
     ## ++ Internal Shortcuts ++ ##
     @webapp2.cached_property
-    def __webHandlerConfig(self):
+    def config(self):
+
+        ''' Cached access to main config for this handler. '''
+
+        return self._webHandlerConfig
+
+    @webapp2.cached_property
+    def _webHandlerConfig(self):
 
         ''' Cached access to this handler's config. '''
 
         return config.config.get('openfire.classes.WebHandler')
 
     @webapp2.cached_property
-    def __integrationConfig(self):
+    def _integrationConfig(self):
 
         ''' Cached access to this handler's integration config. '''
 
-        return self.__webHandlerConfig.get('integrations')
+        return self._webHandlerConfig.get('integrations')
+
+    @webapp2.cached_property
+    def _jinjaConfig(self):
+
+        ''' Cached access to Jinja2 base config. '''
+
+        return config.config.get('webapp2_extras.jinja2')
+
+    @webapp2.cached_property
+    def _outputConfig(self):
+
+        ''' Cached access to base output config. '''
+
+        return config.config.get('apptools.project.output')
+
+    @webapp2.cached_property
+    def _ofOutputConfig(self):
+
+        ''' Cached access to openfire's site-specific output config. '''
+
+        return config.config.get('openfire.output')
 
     @webapp2.cached_property
     def logging(self):
@@ -208,6 +242,92 @@ class WebHandler(BaseHandler, SessionsMixin):
                 self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
+    def jinja2EnvironmentFactory(self, app):
+
+        ''' Prepare a Jinja2 environment suitable for rendering openfire templates. '''
+
+        # get openfire extension config
+        self.logging.info('Preparing Jinja2 OF template execution environment.')
+
+        # use output logging condition for a minute
+        self.logging._setcondition(self._ofOutputConfig.get('extensions').get('config').get('logging'))
+
+        if self._ofOutputConfig.get('extensions', {}).get('config').get('enabled', False) == True:
+
+            # Seen classes
+            installed_bytecaches = []
+            installed_extensions = []
+
+            for name in self._webHandlerConfig.get('extensions').get('load'):
+                if name in self._ofOutputConfig.get('extensions').get('installed'):
+                    if self._ofOutputConfig.get('extensions').get('installed').get(name).get('enabled', False) == True:
+                        extension_path = self._ofOutputConfig.get('extensions').get('installed').get(name).get('path')
+                        try:
+                            extension = webapp2.import_string(extension_path)
+
+                        except ImportError:
+                            self.logging.error('Encountered ImportError when trying to import extension at name "%s" and path "%s"' % (name, extension_path))
+
+                        else:
+                            if issubclass(extension, Extension):
+                                installed_extensions.append((name, extension))
+                            elif issubclass(extension, j2.BytecodeCache):
+                                installed_bytecaches.append((name, extension))
+                    else:
+                        # Extension is disabled
+                        continue
+            else:
+                self.logging.warning('No extensions installed/found in config (at "openfire.output").')
+
+        else:
+            installed_bytecaches = []
+            installed_extensions = []
+
+        # get jinja2 base config
+        j2cfg = self._jinjaConfig
+        templates_compiled_target = j2cfg.get('compiled_path')
+        use_compiled = not config.debug or j2cfg.get('force_compiled', False)
+
+        # resolve loaders
+        if templates_compiled_target is not None and use_compiled:
+            _loader = output.ModuleLoader(templates_compiled_target)
+        else:
+            _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
+
+        # combine extensions and load
+        base_environment_args = j2cfg.get('environment_args')
+        base_extensions_list = base_environment_args.get('extensions')
+        compiled_extension_list = map(lambda x: isinstance(x, basestring) and webapp2.import_string(x) or x, [i for i in base_extensions_list + [e for (n, e) in installed_extensions]])
+
+        self.logging.info('Final extensions list: "%s".' % compiled_extension_list)
+        self.logging.info('Chosen loader: "%s".' % _loader)
+
+        # bind environment args
+        base_environment_args['loader'] = _loader
+
+        if len(installed_extensions) > 0:
+            base_environment_args['extensions'] = compiled_extension_list
+
+        if len(installed_bytecaches) > 0:
+            self.logging.info('Chosen bytecache: "%s".' % installed_bytecaches[0])
+            base_environment_args['bytecode_cache'] = installed_bytecaches[0]
+
+        # hook up filters
+        filters = {
+            'currency': lambda x: self._format_as_currency(x, False),
+            'percentage': lambda x: self._format_as_currency(x, True)
+        }
+
+        # generate environment
+        finalConfig = dict(j2cfg.items()[:])
+        finalConfig.update({'environment_args': base_environment_args, 'globals': self.baseContext, 'filters': filters})
+
+        # replace logging conditional
+        self.logging._setcondition(self._webHandlerConfig.get('logging'))
+
+        environment = jinja2.Jinja2(app, config=finalConfig)
+        return environment
+
     def _bindRuntimeTemplateContext(self, context):
 
         ''' Bind in the session '''
@@ -229,12 +349,12 @@ class WebHandler(BaseHandler, SessionsMixin):
 
             # media utils
             'gravatarify': lambda email, ext, size: ''.join([
-	                ':'.join([self.request.environ.get('wsgi.url_scheme', 'http'), '//']),
-                    '/'.join([self.__integrationConfig.get('gravatar').get('endpoints').get(self.request.environ.get('wsgi.url_scheme', 'http').lower()),
+                    ':'.join([self.request.environ.get('wsgi.url_scheme', 'http'), '//']),
+                    '/'.join([self._integrationConfig.get('gravatar').get('endpoints').get((self.force_https_assets == True and 'https' or self.request.environ.get('wsgi.url_scheme', 'http').lower())),
                         'avatar',
                         hashlib.md5(email).hexdigest()]),
                     '.%s' % ext,
-                    '?s=%s&d=http://placehold.id/%s/ffffff.png' % (size, size)
+                    '?s=%s&d=%s://lyr9.net/img/default-profile.png?s=%s' % (size, (self.force_https_assets == True and 'https' or self.request.environ.get('wsgi.url_scheme', 'http').lower()), size)
                 ]),
 
             # openfire security extensions
