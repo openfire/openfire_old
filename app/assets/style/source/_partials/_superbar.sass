@@ -1,58 +1,74 @@
+@media all and (min-width: 480px)
+  #superbar nav
+    left: 125px
+    ul a
+      color: #ffb246
+
+@media all and (max-width: 768px)
+  #superbar
+    background-color: #ffb246
+    color: #f57220
+    height: 42px
+    font-size: 8.5pt
+    position: fixed
+    nav
+      left: 0%
+      ul li
+        display: list-item
+        a
+          color: #f57220
+    &::after
+      display: block
+      content: ""
+      width: 100%
+      height: 3px
+      position: fixed
+      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b0b0b0), color-stop(60%, transparent), color-stop(100%, transparent))
+      background: -webkit-linear-gradient(top, #b0b0b0, transparent 60%, transparent)
+      background: -moz-linear-gradient(top, #b0b0b0, transparent 60%, transparent)
+      background: -o-linear-gradient(top, #b0b0b0, transparent 60%, transparent)
+      background: -ms-linear-gradient(top, #b0b0b0, transparent 60%, transparent)
+      background: linear-gradient(top, #b0b0b0, transparent 60%, transparent)
+      top: 42px
+
+@media all and (min-width: 768px)
+  #superbar
+    height: 50px
+    background-color: transparent
+
 #superbar
-
-	width: 100%
-	height: 50px
-
-	#tinylogo
-		position: absolute
-		top: 5px
-		left: 10px
-
-	nav
-
-		position: absolute
-		left: 125px
-		right: 0
-
-		.left
-			float: left
-			margin-left: 1%
-
-			li
-				float: left
-
-		.right
-			float: right
-			margin-right: 1%
-
-			li
-				float: right
-
-				&.profiletab
-					padding-top: 5px
-					padding-bottom: 5px
-
-					a
-						display: inline
-						padding-right: 5px
-					img
-						display: inline
-
-		ul
-			li
-				padding: 0 10px
-				margin-left: 1px
-				margin-right: 1px
-
-				a
-					color: #ffb246
-
-					&:hover
-						text-decoration: none !important
-
-				&:hover
-					background: #f57220 !important
-
-					a
-						color: white !important
-						text-decoration: none !important
+  -webkit-transition-property: height,background-color
+  width: 100%
+  #tinylogo
+    position: absolute
+    top: 5px
+    left: 10px
+  nav
+    position: absolute
+    right: 0
+    .left
+      float: left
+      margin-left: 1%
+      li
+        float: left
+    .right li.profiletab
+      padding-top: 5px
+      padding-bottom: 5px
+      a
+        display: inline
+        padding-right: 5px
+      img
+        display: inline
+    ul li
+      padding: 0 10px
+      margin-left: 1px
+      margin-right: 1px
+      a
+        -webkit-transition-property: font-size, color
+        &:hover
+          text-decoration: none !important
+      &:hover
+        background: #f57220 !important
+        a
+          color: #fff !important
+          text-decoration: none !important

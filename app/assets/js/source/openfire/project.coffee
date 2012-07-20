@@ -363,7 +363,7 @@ class ProjectController extends OpenfireController
                             ).fulfill
                                 success: (response) =>
                                     if not @uploader?
-                                        uploader = $.apptools.widgets.uploader.create 'data',
+                                        uploader = $.apptools.widgets.uploader.create 'array',
                                             id: 'body'
                                             endpoints: [response.endpoint]
                                             finish: callback
@@ -705,7 +705,7 @@ class ProjectController extends OpenfireController
                                         ,
                                             duration: 200
 
-                                $.apptools.api.project.put_goal(goal).fulfill
+                                $.apptools.api.project.put_goal(goal.to_message()).fulfill
                                     success: (response) =>
                                         $(pane).animate
                                             opacity: 0
