@@ -20,6 +20,16 @@
   line-height: 0
   height: 0
 
+.clearfix
+  &:before
+    content: ""
+    display: table
+  &:after
+    content: ""
+    display: table
+    clear: both
+  *zoom: 1
+
 .absolute
   position: absolute
 
@@ -40,7 +50,28 @@
 .hidden
   display: hidden
 
+.visuallyhidden
+  border: 0
+  clip: rect(0 0 0 0)
+  height: 1px
+  margin: -1px
+  overflow: hidden
+  padding: 0
+  position: absolute
+  width: 1px
+  &.focusable
+    &:active, &:focus
+      clip: auto
+      height: auto
+      margin: 0
+      overflow: visible
+      position: static
+      width: auto
+
 .invisible
+  visibility: hidden
+
+.secret
   opacity: 0
 
 .block
@@ -158,6 +189,18 @@
   right: 0
   z-index: 990
 
+.ir
+  display: block
+  border: 0
+  text-indent: -999em
+  overflow: hidden
+  background-color: transparent
+  background-repeat: no-repeat
+  text-align: left
+  direction: ltr
+  *line-height: 0
+  br
+    display: none
 
 .polaroid
   padding: 7px 7px 30px

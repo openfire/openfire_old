@@ -17,7 +17,7 @@
             <h1 id="title"><span class='lightorange'>momentum for</span> <span class='darkorange'>positive disruption</span></h1>
         </div>
         <div id="how-it-works-button" class="right">
-            <a href id="a-how-it-works">How it works&nbsp;&nbsp;&gt;</a>
+            <a href="#how-it-works" id="a-how-it-works">How it works&nbsp;&nbsp;&gt;</a>
         </div>
 
     </div><!-- #masthead -->
@@ -28,34 +28,36 @@
 
             <h2 class="editable">Projects</h2>
             <div class='section-wrap'>
-            {% if projects %}
-                {% for project in projects %}
-                    <!-- project card for {{ project.slug }} -->
-                    <div class='project-card' data-project='{{ project.slug }}'>
-                        <a href="{{ link('custom_url', customurl=project.slug) }}">
-                            <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
-                                {% if project.avatar %}
-                                    {% if project.avatar.location %}
-                                    <img src="{{ project.avatar.location }}" title="{{ project.name }} - {{ project.summary }}" />
-                                    {% else %}
-                                        {% if project.avatar.url %}
-                                            <img src="{{ project.avatar.url }}" title="{{ project.name }} - {{ project.summary }}" />
+                <div id="project-cards">
+                {% if projects %}
+                    {% for project in projects %}
+                        <!-- project card for {{ project.slug }} -->
+                        <div class='project-card' data-project='{{ project.slug }}'>
+                            <a href="{{ link('custom_url', customurl=project.slug) }}">
+                                <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
+                                    {% if project.avatar %}
+                                        {% if project.avatar.location %}
+                                        <img src="{{ project.avatar.location }}" title="{{ project.name }} - {{ project.summary }}" />
                                         {% else %}
-                                            <img src="http://placehold.it/140x120" />
+                                            {% if project.avatar.url %}
+                                                <img src="{{ project.avatar.url }}" title="{{ project.name }} - {{ project.summary }}" />
+                                            {% else %}
+                                                <img src="http://placehold.it/140x120" />
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
-                                {% endif %}
+                                </div>
+                            </a>
+                            <div class='project-progress' style='width: {{ util.random.randint(1, 100) }}%'>
                             </div>
-                        </a>
-                        <div class='project-progress' style='width: {{ util.random.randint(1, 100) }}%'>
-                        </div>
-                    </div> <!-- end project card for {{ project.slug }} -->
-                {% endfor %}
-            {% else %}
-                <div class='ohnoes'>
-                    Oh noez, no projects!
+                        </div> <!-- end project card for {{ project.slug }} -->
+                    {% endfor %}
+                {% else %}
+                    <div class='ohnoes'>
+                        Oh noez, no projects!
+                    </div>
+                {% endif %}
                 </div>
-            {% endif %}
             </div>
 
         </section><!-- #projects -->
@@ -64,18 +66,6 @@
 
             <h2>Activity</h2>
             <div class="section-wrap">
-                <!--<ul class='feed'>
-                    <li class='feed-item'>
-                        <span class="datetime">
-                            &nbsp;
-                        </span>
-                    </li>
-                </ul>
-
-                <div class='ohnoes'>
-                    Oh noez, no activity!
-                </div>-->
-
                 <div class='activity-table'>
                     <div class='activity-row dropshadow'>
                         <div class='activity-cell'>
