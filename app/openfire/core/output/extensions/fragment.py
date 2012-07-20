@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from jinja2 import nodes
 from config import config
 from google.appengine.api import memcache
 from openfire.core.output.extensions import OutputExtension
@@ -15,15 +16,20 @@ class FragmentCache(OutputExtension):
 
     def __init__(self, environment):
 
+        ''' Extend the attached environment. '''
+
         super(FragmentCache, self).__init__(environment)
 
         # add the defaults to the environment
         environment.extend(
             fragment_cache_prefix=_extensionConfig.get('config', {}).get('prefix', 'tpl_fragment_cache'),
-            fragment_cache=memcache.Client
+            fragment_cache=memcache.Client()
         )
 
     def parse(self, parser):
+
+        ''' Jinja2 Parse Hook '''
+
         # the first token is the token that started the tag.  In our case
         # we only listen to ``'cache'`` so this will be a name token with
         # `cache` as value.  We get the line number so that we can give
@@ -50,8 +56,10 @@ class FragmentCache(OutputExtension):
                                [], [], body).set_lineno(lineno)
 
     def _cache_support(self, name, timeout, caller):
-        """Helper callback."""
-        key = self.environment.fragment_cache_prefix + name
+
+        ''' Helper callback. '''
+
+        key = '//'.join([self.environment.fragment_cache_prefix, name])
 
         # try to load the block from the cache
         # if there is no fragment in the cache, render it and store
@@ -60,5 +68,8 @@ class FragmentCache(OutputExtension):
         if rv is not None:
             return rv
         rv = caller()
-        self.environment.fragment_cache.add(key, rv, timeout)
+        if timeout is not None:
+            self.environment.fragment_cache.add(key, rv, timeout)
+        else:
+            self.environment.fragment_cache.add(key, rv)
         return rv

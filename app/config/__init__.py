@@ -66,10 +66,12 @@ _config['webapp2_extras.jinja2'] = {
     'compiled_path': 'templates.compiled',  # Compiled templates directory
     'force_compiled': False,  # Force Jinja to use compiled templates, even on the Dev server
 
-    'environment_args': {  # Jinja constructor arguments
-        'optimized': True,   # enable jinja2's builtin optimizer (recommended)
-        'autoescape': True,  # Global Autoescape. BE CAREFUL WITH THIS.
-        'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
+    'environment_args': {  # Jinja2 Environment constructor arguments
+        'optimized': True,     # enable jinja2's builtin optimizer (recommended)
+        'autoescape': True,    # Global Autoescape. BE CAREFUL WITH THIS.
+        'trim_blocks': False,  # trim trailing \n's from blocks (default: False)
+        'auto_reload': True,   # auto reload every template every time (recommended only in dev)
+        'extensions': ['jinja2.ext.autoescape']
     }
 
 }

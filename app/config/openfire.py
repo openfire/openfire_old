@@ -211,18 +211,58 @@ config['openfire.output'] = {
 
     'extensions': {
 
-		'config': {
+        'config': {
+            'enabled': True,
             'debug': False,
-            'logging': False
+            'logging': True
         },
 
-        'installed': [
-            ('FragmentCache', 'openfire.core.output.extensions.fragment.FragmentCache'),
-            ('DynamicContent', 'openfire.core.output.extensions.content.DynamicContent'),
-            ('ThreadedBytecodeCache', 'openfire.core.output.extensions.bytecache.ThreadedBytecodeCache'),
-            ('MemcacheBytecodeCache', 'openfire.core.output.extensions.memcache.MemcachedBytecodeCache')
-        ]
+        'installed': {
 
+            'FragmentCache': {
+                'enabled': True,
+                'path': 'openfire.core.output.extensions.fragment.FragmentCache'
+            },
+
+            'DynamicContent': {
+                'enabled': True,
+                'path': 'openfire.core.output.extensions.content.DynamicContent'
+            },
+
+            'ThreadedBytecodeCache': {
+                'enabled': False,
+                'path': 'openfire.core.output.extensions.bytecache.ThreadedBytecodeCache'
+            },
+
+            'MemcacheBytecodeCache': {
+                'enabled': True,
+                'path': 'openfire.core.output.extensions.memcache.MemcachedBytecodeCache'
+            }
+        }
+
+    }
+
+}
+
+config['openfire.classes.WebHandler'] = {
+
+    'debug': False,
+    'logging': True,
+
+    'integrations': {
+
+        'gravatar': {
+            'enabled': True,
+            'endpoints': {
+                'http': 'www.gravatar.com',
+                'https': 'secure.gravatar.com'
+            }
+        }
+
+    },
+
+    'extensions': {
+        'load': ['FragmentCache']
     }
 
 }
@@ -230,7 +270,7 @@ config['openfire.output'] = {
 config['openfire.sessions'] = {
 
     'ttl': 86400,  # timeout in seconds for stale session records
-    'logging': False,  # enable logging if you want to know what's going on
+    'logging': True,  # enable logging if you want to know what's going on
     'cookieless': True,  # whether to enable cookieless (localstorage-based) sessions
     'salt': 'j09h8v9b&!V!V6vcvkcudv11',  # used for custom meals
 
@@ -265,25 +305,6 @@ config['openfire.sessions'] = {
         'datastore': {
             'ttl': '2400',
             'enabled': True
-        }
-
-    }
-
-}
-
-config['openfire.classes.WebHandler'] = {
-
-    'debug': False,
-    'logging': False,
-
-    'integrations': {
-
-        'gravatar': {
-            'enabled': True,
-            'endpoints': {
-                'http': 'http://www.gravatar.com',
-                'https': 'https://secure.gravatar.com'
-            }
         }
 
     }

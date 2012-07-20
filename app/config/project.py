@@ -58,7 +58,8 @@ config['apptools.project.output'] = {
 
     'headers': {  # Default Headers (only supported headers are shown)
         'Cache-Control': 'no-cache',  # default to not caching dynamic content
-        'X-UA-Compatible': 'IE=edge,chrome=1'  # http://code.google.com/chrome/chromeframe/
+        'X-UA-Compatible': 'IE=edge,chrome=1',  # http://code.google.com/chrome/chromeframe/
+        'Access-Control-Allow-Origin': '*'      # allow crossdomain access from anywhere
     }
 
 }
@@ -105,7 +106,7 @@ config['apptools.project.output.template_loader'] = {
     # Template Loader Config
 
     'force': True,              # Force enable template loader even on Dev server
-    'debug': False,             # Enable dev logging
+    'debug': True,             # Enable dev logging
     'use_memory_cache': False,  # Use handler in-memory cache for template source
     'use_memcache': False,      # Use Memcache API for template source
 
