@@ -363,7 +363,7 @@ class ProjectController extends OpenfireController
                             ).fulfill
                                 success: (response) =>
                                     if not @uploader?
-                                        uploader = $.apptools.widgets.uploader.create 'data',
+                                        uploader = $.apptools.widgets.uploader.create 'array',
                                             id: 'body'
                                             endpoints: [response.endpoint]
                                             finish: callback

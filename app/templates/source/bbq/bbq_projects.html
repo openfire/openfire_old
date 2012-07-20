@@ -54,7 +54,9 @@
         </div>
         <div class="project-info">
             <span class="project-avatars">
-                <img data-key="{{ project.avatar.urlsafe() }}" src="/_assets/blob/serve/{{ project.avatar.id() }}">
+                {% if project.avatar %}
+                <img data-key="{{ project.avatar.urlsafe() }}" src="{{ project.avatar.get().url }}">
+                {% endif %}
             </span>
         </div>
         <div class="project-info">
@@ -76,7 +78,7 @@
             <span class="project-images">
                 {% for image in project.images %}
                     {# FUTURE <img data-key="{{ image.urlsafe() }}" src="{{ link('serve-asset', image.get().asset.urlsafe()) }}"> #}
-                    <img data-key="{{ image.urlsafe() }}" src="/_assets/blob/serve/{{ image.get().asset.urlsafe() }}">
+                    <img data-key="{{ image.urlsafe() }}" src="{{ image.get().url }}">
                 {% else %}
                     NO IMAGES.
                 {% endfor %}

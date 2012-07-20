@@ -99,8 +99,9 @@ class Landing(WebHandler):
                             project['avatar']['location'] = project['avatar'].get('url')
 
                         # fallback to an asset URL next
-                        elif project['avatar']['asset'].get('url'):
-                            project['avatar']['location'] = project['avatar']['asset'].get('url')
+                        elif project['avatar']['asset'] and project['avatar']['asset'].url:
+                            project['avatar']['location'] = project['avatar']['asset'].url
+
 
                         # finally, if it's just a blob link with no URL, calculate the serving URL
                         elif project['avatar']['asset'].get('blob'):
