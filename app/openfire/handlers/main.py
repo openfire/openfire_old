@@ -13,6 +13,7 @@ class Landing(WebHandler):
 
     ''' openfire landing page. '''
 
+    template = 'main/landing.html'
     projects_per_page = 5
     activity_per_page = 10
 
@@ -118,12 +119,7 @@ class Landing(WebHandler):
                 ## set cached page context
                 self.api.memcache.set('landing_page_context', context)
 
-        ## render auth/noauth template (@TODO)
-        if False:
-            self.render('main/landing_noauth.html', **context)
-        else:
-            self.render('main/landing.html', **context)
-        return
+        return self.render('main/landing.html', **context)
 
 
 class VerifyURL(WebHandler):
@@ -159,18 +155,18 @@ class CustomUrlHandler(WebHandler):
             return self.error(404)  # Invalid kind
 
         elif kind == 'Project':
-            handler = self._project_handler_class()
+            handler = self._project_handler_class(self.request, self.response)
             context['key'] = url_object.target.urlsafe()
 
         elif kind == 'User':
-            handler = self._user_handler_class()
+            handler = self._user_handler_class(self.request, self.response)
             context['username'] = url_object.target.id()
 
         if not handler:
             return self.error(500)  # Failed to instantiate handler?
 
         # Initialize the new handler with the current request and response.
-        handler.initialize(self.request, self.response)
+        #handler.initialize(self.request, self.response)  # commented out by sam and moved to handler construction
 
         # Copy over session, user, permissions
         handler.session = self.session

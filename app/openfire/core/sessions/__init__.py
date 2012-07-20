@@ -8,6 +8,10 @@ import base64
 import hashlib
 import webapp2
 
+# SDK Imports
+from google.appengine.ext import ndb
+
+# Extras Imports
 from webapp2_extras import sessions
 from webapp2_extras import securecookie
 
@@ -30,6 +34,7 @@ _ADVANCED_ENCRYPTION_FLAG = 's'
 _ENCRYPTION_PAD_CHARACTER = ':'
 
 
+## CoreSessionAPI - manages, loads and resolves user sessions
 class CoreSessionAPI(CoreAPI):
 
     ''' Manages sessions, backed by NDB and memcache. '''
@@ -181,7 +186,8 @@ class CoreSessionAPI(CoreAPI):
         return self.manager._save_at_sid(sid, session, handler)
 
 
-class SessionsMixin(object):
+## SessionsBridge - brings sessions functionality into an easy mixin
+class SessionsBridge(object):
 
     ''' Bridges the Core Sessions API and WebHandler. '''
 
@@ -270,3 +276,50 @@ class SessionsMixin(object):
             return reduce(lambda x, y: x + y, subj[1:])
         else:
             return ''.join(subj)  # perhaps it's not encrypted?
+
+    def build_session(self):
+
+        ''' Build an initial session object and create an SID, if needed '''
+
+        if hasattr(self, 'session') and self.session is not None and len(self.session) > 0:
+            return self.session  # somehow we already have a session, wtf?
+
+        else:
+            self.session = self.get_session()
+
+            if self.session.get('authenticated', False) == True:
+
+                ## we've authenticated
+                self.authenticated = True
+
+                if self.session.get('ukey'):
+                    try:
+                        self.user, self.permissions = tuple(ndb.get_multi([
+                                ndb.Key(urlsafe=self.session.get('ukey')),
+                                ndb.Key(user.Permissions, 'global', parent=ndb.Key(user.User, self.session['uid']))],
+                                use_cache=True, use_memcache=True, use_datastore=True))
+
+                    except:
+
+                        ## UKEY IS BAD, send them to register again
+                        self.user = None
+
+                    # user not found/bad key
+                    if self.user is None:
+
+                        # if they have a continue url, use it
+                        if self.session.get('continue_url'):
+                            registration_url = self.url_for('auth/register', go=self.session.get('continue_url'))
+
+                        # otherwise bring them back here afterwards
+                        else:
+                            registration_url = self.url_for('auth/register', go=self.request.path_qs)
+
+                        return self.redirect(registration_url)
+
+                    # user found!
+                    else:
+                        pass
+
+        # for now @(TODO): START BACK HERE ON AUTH
+        return self.session

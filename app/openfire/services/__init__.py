@@ -7,16 +7,16 @@ from apptools.util import debug
 # sdk imports
 from google.appengine.ext import ndb
 
-# core imports
-from openfire.core.content import ContentMixin
-from openfire.core.sessions import SessionsMixin
-
 # user/permissions
 from openfire.models.user import User
 from openfire.models.user import Permissions
 
+## core bridge imports
+from openfire.core.content import ContentBridge
+from openfire.core.sessions import SessionsBridge
 
-class RemoteService(BaseService, SessionsMixin, ContentMixin):
+
+class RemoteService(BaseService, SessionsBridge, ContentBridge):
 
     ''' Abstract parent for all openfire services. '''
 

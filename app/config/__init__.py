@@ -97,7 +97,7 @@ _config['apptools.system'] = {
     },
 
     'include': [  # Extended configuration files to include
-		('layer9', 'config.layer9'),  # layer9 hosting configuration
+        ('layer9', 'config.layer9'),  # layer9 hosting configuration
         ('project', 'config.project'),  # Project config
         ('openfire', 'config.openfire'),  # Openfire config
         ('services', 'config.services'),  # Global + site services (RPC/API) config
