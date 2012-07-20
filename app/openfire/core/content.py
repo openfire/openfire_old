@@ -130,11 +130,12 @@ class ContentBridge(object):
     __content_bridge = None
     __content_prerender = None
 
-    def __init__(self, app, handler=None, service=None, environment=None):
+    def __init__(self, app=None, handler=None, service=None, environment=None):
 
         ''' Initialize the content bridge. '''
 
-        self._initialize_dynamic_content(app, handler, service, environment)
+        if app is not None:
+            self._initialize_dynamic_content(app, handler, service, environment)
 
     def _initialize_dynamic_content(self, app, handler=None, service=None, environment=None):
 

@@ -24,8 +24,6 @@ class RemoteService(BaseService, SessionsBridge, ContentBridge):
 
         ''' Initialize hook. '''
 
-        ## @TODO: Make these log messages not suck via apptools.debug.Logger._setcondition, etc
-
         ## extract the session & csrf headers
         self.session = self.get_session(make=False)
 
