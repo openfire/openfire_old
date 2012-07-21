@@ -577,7 +577,8 @@ class ProjectController extends OpenfireController
                             @project.attach('goals', _goal)
                             return _goal
 
-                        goals.push(_at(goal)) for goal in response.goals
+                        if response.goals
+                            goals.push(_at(goal)) for goal in response.goals
 
                         return if callback? then callback.call(@, goals) else goals
 
@@ -870,7 +871,8 @@ class ProjectController extends OpenfireController
                             @project.attach('tiers', _tier)
                             return _tier
 
-                        tiers.push(_at(tier)) for tier in response.tiers
+                        if response.tiers
+                            tiers.push(_at(tier)) for tier in response.tiers
 
                         return if callback? then callback.call(@, tiers) else tiers
 
