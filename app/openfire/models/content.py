@@ -17,6 +17,12 @@ class ContentArea(AppModel):
 
     ''' Represents a content area that can be edited for a certain datapoint. '''
 
+    # Storage Settings
+    _use_cache = True
+    _use_memcache = True
+    _use_datastore = True
+
+    # Messages/Pipelines
     _message_class = messages.ContentArea
     _pipeline_class = pipelines.ContentAreaPipeline
 
@@ -32,6 +38,12 @@ class ContentSnippet(AppModel):
 
     ''' Represents a versioned content value of a content area. '''
 
+    # Storage Settings
+    _use_cache = True
+    _use_memcache = True
+    _use_datastore = True
+
+    # Messages/Pipelines
     _message_class = messages.ContentSnippet
     _pipeline_class = pipelines.ContentSnippetPipeline
 
@@ -45,6 +57,12 @@ class ContentSummary(AppModel):
 
     ''' Represents a summary of content in a content area. '''
 
+    # Storage Settings
+    _use_cache = True
+    _use_memcache = True
+    _use_datastore = True
+
+    # Messages/Pipelines
     _message_class = messages.ContentSummary
     _pipeline_class = pipelines.ContentSummaryPipeline
 

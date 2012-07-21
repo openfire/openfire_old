@@ -1,0 +1,237 @@
+// display/positioning
+.left,
+.floatleft
+  float: left
+
+.right,
+.floatright
+  float: right
+
+.clear,
+.clearer
+  clear: both
+
+.noclear
+  clear: none
+
+.clearer
+  display: block
+  font-size: 0
+  line-height: 0
+  height: 0
+
+.clearfix
+  &:before
+    content: ""
+    display: table
+  &:after
+    content: ""
+    display: table
+    clear: both
+  *zoom: 1
+
+.absolute
+  position: absolute
+
+.relative
+  position: relative
+
+.fixed
+  position: fixed
+
+.center,
+.centered,
+.aligncenter
+  display: block
+  margin:
+    left: auto
+    right: auto
+
+.hidden
+  display: hidden
+
+.visuallyhidden
+  border: 0
+  clip: rect(0 0 0 0)
+  height: 1px
+  margin: -1px
+  overflow: hidden
+  padding: 0
+  position: absolute
+  width: 1px
+  &.focusable
+    &:active, &:focus
+      clip: auto
+      height: auto
+      margin: 0
+      overflow: visible
+      position: static
+      width: auto
+
+.invisible
+  visibility: hidden
+
+.secret
+  opacity: 0
+
+.block
+  display: block
+
+.inline
+  display: inline
+
+.in-block
+  display: inline-block
+
+.in-table
+  display: inline-table
+  vertical-align: middle
+
+.table
+  display: table
+
+.none
+  display: none
+
+
+// text align/styles
+.text-left
+  text-align: left
+
+.text-right
+  text-align: right
+
+.text-center
+  text-align: center
+
+.small
+  font-size: 0.9em
+
+.smaller
+  font-size: 0.8em
+
+.smallest
+  font-size: 0.7em
+
+.big
+  font-size: 1.2em
+
+.bigger
+  font-size: 1.3em
+
+.biggest
+  font-size: 1.4em
+
+.silent
+  display: none
+
+.quiet,
+.shh
+  color: #999
+  font-style: italic
+  a
+    color: #999
+    font-style: italic
+
+.loud
+  color: #000
+  a
+    color: #000
+
+.highlight
+  background: #ff0
+  a
+    background: #ff0
+
+.nowrap
+  white-space: nowrap
+
+// lists
+.naked
+  list-style: none
+  -webkit-padding-start: 0
+  li
+    list-style: none
+
+// notification/status
+.yay
+  background-color: #99e368
+  border-color: #68a83d
+  color: #68a83d
+
+.notify
+  background-color: #8fbdf2
+  border-color: #256bba
+  color: #256bba
+
+.warn
+  background-color: #f7ee65
+  border-color: #f5be18
+  color: #e4ad07
+
+.error
+  background-color: #ff9e9e
+  border-color: #b31717
+  color: #b31717
+
+// effects
+.rounded
+  border-radius: 7px
+
+.dropshadow
+  box-shadow: 2px 2px 3px rgba(0,0,0, 0.5)
+
+.overlay
+  position: fixed
+  bottom: 0
+  top: 0
+  left: 0
+  right: 0
+  z-index: 990
+
+.ir
+  display: block
+  border: 0
+  text-indent: -999em
+  overflow: hidden
+  background-color: transparent
+  background-repeat: no-repeat
+  text-align: left
+  direction: ltr
+  *line-height: 0
+  br
+    display: none
+
+.polaroid
+  padding: 7px 7px 30px
+  background-color: white
+
+  a,
+  img
+    border: none
+    padding: 0
+    margin: 0
+
+  &::after
+    display: block
+    content: attr(data-title)
+    height: 16px
+    margin: 0
+    padding: 0
+    font:
+      family: 'Karla'
+      size: 16px
+      weight: 700
+    text:
+      align: center
+      transform: uppercase
+    line-height: 16px
+    vertical-align: middle
+    color: #666
+
+    &.notitle
+      padding: 7px
+
+      &::after
+        display: none
+        content: none

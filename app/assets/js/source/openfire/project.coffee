@@ -363,7 +363,7 @@ class ProjectController extends OpenfireController
                             ).fulfill
                                 success: (response) =>
                                     if not @uploader?
-                                        uploader = $.apptools.widgets.uploader.create 'data',
+                                        uploader = $.apptools.widgets.uploader.create 'array',
                                             id: 'body'
                                             endpoints: [response.endpoint]
                                             finish: callback
@@ -676,19 +676,16 @@ class ProjectController extends OpenfireController
                         populate = (gfield) =>
 
                             editor = $.apptools.widgets.editor.create(gfield)
-                            $.apptools.widgets.editor.enable(editor)
-                            _el = Util.get((_id = editor._state.element_id))
-                            _idx = _id.split('-').pop()
 
-                            document.getElementById('goal-save-'+_idx).addEventListener('click', (e) =>
+                            _idx = editor._state.element_id.split('-').pop()
+                            goal = @project.get_attached('goals', _idx)
+                            _key = goal.key
+
+                            editor.save = (e) =>
 
                                 if e? and e.preventDefault
                                     e.preventDefault()
                                     e.stopPropagation()
-                                    clicked = e.target
-                                    _idx = clicked?.getAttribute('id').split('-').pop()
-                                    goal = @project.get_attached('goals', _idx)
-                                    _key = goal.key
 
                                 goal.target = @project_key
                                 goal.amount = parseInt(document.getElementById('goal-amount-'+_idx).innerHTML)
@@ -696,27 +693,61 @@ class ProjectController extends OpenfireController
 
                                 return false if not goal.amount? or not goal.description?
 
-                                $.apptools.api.project.put_goal(goal).fulfill
-                                    success: (response) =>
-                                        _el.style.backgroundColor = '#bada55'
-                                        clicked?.classList.add('success')
+                                pane = document.getElementById(editor._state.pane_id)
+                                $(pane).animate
+                                    opacity: 0
+                                ,
+                                    duration: 200
+                                    complete: () =>
+                                        pane.innerHTML = '<span class="loading spinner momentron">&#xf0045;</span>'
+                                        $(pane).animate
+                                            opacity: 1
+                                        ,
+                                            duration: 200
 
-                                        setTimeout(() =>
-                                            $(_el).animate
-                                                'background-color': 'transparent'
-                                            ,
-                                                duration: 300
-                                                complete: () =>
-                                                    editor.hide()
-                                        , 200)
+                                $.apptools.api.project.put_goal(goal.to_message()).fulfill
+                                    success: (response) =>
+                                        $(pane).animate
+                                            opacity: 0
+                                        ,
+                                            duration: 200
+                                            complete: () =>
+                                                pane.innerHTML = '<span class="momentron">&#xf0053;</span>'
+                                                pane.style.color = '#bada55'
+                                                $(pane).animate
+                                                    opacity: 1
+                                                ,
+                                                    duration: 200
+                                                    complete: () =>
+                                                        setTimeout(() =>
+                                                            return editor.hide()
+                                                        , 400)
 
                                         return @project.attach('goals', goal.from_message(response))
 
                                     failure: (error) =>
-                                        _el.style.backgroundColor = 'red'
-                                        clicked.classList.add('failure')
-                                        alert 'goal put() failure'
-                            , false)
+                                        $(pane).animate
+                                            opacity: 0
+                                        ,
+                                            duration: 200
+                                            complete: () =>
+                                                pane.innerHTML = '<span class="momentron">&#xf0054;</span>'
+                                                pane.style.color = '#f00'
+                                                $(pane).animate
+                                                    opacity: 1
+                                                ,
+                                                    duration: 200
+                                                    complete: () =>
+                                                        setTimeout(() =>
+                                                            return editor.hide()
+                                                        , 800)
+
+
+                            $.apptools.widgets.editor.enable(editor)
+                            _el = Util.get((_id = editor._state.element_id))
+                            _idx = _id.split('-').pop()
+
+                            document.getElementById('goal-save-'+_idx).addEventListener('click', editor.save, false)
 
                             (close_x = document.getElementById(base_id + '-modal-close')).removeEventListener('mousedown')
                             close_x.addEventListener('click', () =>

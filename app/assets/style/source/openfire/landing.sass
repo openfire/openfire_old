@@ -1,127 +1,104 @@
 @import "../main"
 
 .ohnoes
-    width: 200px
-    height: 50px
-    text-align: center
-    background: #E07979
-    border: 2px solid #DB4B4B
-    border-radius: 5px
-    position: relative
-    margin: 50px
-    margin-left: auto
-    margin-right: auto
-    line-height: 50px
+  width: 200px
+  height: 50px
+  text-align: center
+  background: #e07979
+  border: 2px solid #db4b4b
+  border-radius: 5px
+  position: relative
+  margin: 50px
+  margin-left: auto
+  margin-right: auto
+  line-height: 50px
 
 #main
-
-    #content
-        section
-            margin: 0px 2.5% 300px
-            width: 45%
-            background: #eee
-            min-width: 100px
-            float: left
-
-            h2
-                font:
-                    family: 'Karla', sans-serif
-                    size: 44px
-                    weight: 700
-                color: #bbb
-                background-color: white
-                text-transform: uppercase
-                line-height: 50px
-                vertical-align: middle
-                height: 50px
-                width: 100%
-                margin: 0
-                padding: 10px 0
-
-    #masthead
-        #how-it-works-button
-            height: 120px
-            width: 300px
-            position: absolute
-            right: 5%
-            top: 75px
-            border-radius: 12px
-            +background(linear-gradient(top center, #f79331, #f57220))
-            text-align: right
-
-            &:hover
-                cursor: pointer
-                +background(linear-gradient(top center, #ffd468, #ffb246))
-
-            &:active
-                margin-top: 2px
-                margin-right: 2px
-
-            a,
-            a:link,
-            a:visited,
-            a:active
-                cursor: pointer
-                display: block
-                line-height: 120px
-                vertical-align: middle
-                margin-right: 20px
-                width: 280px
-                font:
-                    family: 'Karla', sans-serif
-                    size: 25px
-                    weight: 700
-                color: #eee
-                text-decoration: none
-                text-transform: uppercase
-
-                &:hover
-                    color: white
-
+  #content
+    section
+      background: #fff
+      min-width: 100px
+      float: left
+      h2
+        font-family: "Karla",sans-serif
+        font-size: 44px
+        font-weight: 700
+        color: #bbb
+        background-color: #fff
+        text-transform: uppercase
+        line-height: 50px
+        vertical-align: middle
+        height: 50px
+        width: 100%
+        margin: 0
+        padding: 10px 0
+  #masthead
+    #how-it-works-button
+      -webkit-transition-property: height, width, left
+      position: absolute
+      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220))
+      background: -webkit-linear-gradient(top center, #f79331, #f57220)
+      background: -moz-linear-gradient(top center, #f79331, #f57220)
+      background: -o-linear-gradient(top center, #f79331, #f57220)
+      background: -ms-linear-gradient(top center, #f79331, #f57220)
+      background: linear-gradient(top center, #f79331, #f57220)
+      text-align: right
+      &:hover
+        background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffd468), color-stop(100%, #ffb246))
+        background: -webkit-linear-gradient(top center, #ffd468, #ffb246)
+        background: -moz-linear-gradient(top center, #ffd468, #ffb246)
+        background: -o-linear-gradient(top center, #ffd468, #ffb246)
+        background: -ms-linear-gradient(top center, #ffd468, #ffb246)
+        background: linear-gradient(top center, #ffd468, #ffb246)
+        cursor: pointer
+        a
+          color: white
+          &:active
+            margin-right: 6px
+      a
+        display: block
+        font-family: "Karla",sans-serif
+        font-weight: 700
+        color: #eee
+        text-decoration: none
+        text-transform: uppercase
 
 .activity-table
-    height: 500px
-    width: 90%
-    margin-left: 30px
-    margin-top: 20px
+  font-family: "Karla",sans-serif
+  font-weight: 700
+  font-size: 8pt
+  width: 90%
+  margin-bottom: 30px
 
-    div.activity-row
-        height: 200px
-        text-align: center
-        background: #FFFFFF
-        border-radius: 5px
-        margin-top: 10px
+  .activity-row
+    .activity-cell
+      text-align: center
+      background: #fff
+      border-radius: 5px
+      margin: 10px 0 0 10px
+      display: inline-table
+      padding: 5px
 
-        div.activity-cell
-            display: inline-table
-            width: 250px
-            height: 170px
-            border: 1px solid black
-            padding: 5px
-            margin: 10px
+      label
+        text-transform: uppercase
 
-            label
-                text-decoration: underline
+      .graph
+        border: 1px solid #000
 
-
-
-#spark-graph rect
+#spark-graph
+  rect
     stroke: blue
     fill: SteelBlue
-
-#spark-graph text
+  text
     font: 10px sans-serif
 
-#activity-metrics
-    div
-        display: inline-block
-        margin-top: 8px
-
-        .project-count
-            font-size: 2em
-            color: #FF8800
-
-        .total-raised
-            font-size: 3em
-            color: green
-            margin-top: 15px
+#activity-metrics div
+  display: inline-block
+  margin-top: 8px
+  .project-count
+    font-size: 2em
+    color: #ff8800
+  .total-raised
+    font-size: 3em
+    color: green
+    margin-top: 15px

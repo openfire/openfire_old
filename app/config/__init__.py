@@ -66,10 +66,12 @@ _config['webapp2_extras.jinja2'] = {
     'compiled_path': 'templates.compiled',  # Compiled templates directory
     'force_compiled': False,  # Force Jinja to use compiled templates, even on the Dev server
 
-    'environment_args': {  # Jinja constructor arguments
-        'optimized': True,   # enable jinja2's builtin optimizer (recommended)
-        'autoescape': True,  # Global Autoescape. BE CAREFUL WITH THIS.
-        'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
+    'environment_args': {  # Jinja2 Environment constructor arguments
+        'optimized': True,     # enable jinja2's builtin optimizer (recommended)
+        'autoescape': True,    # Global Autoescape. BE CAREFUL WITH THIS.
+        'trim_blocks': False,  # trim trailing \n's from blocks (default: False)
+        'auto_reload': True,   # auto reload every template every time (recommended only in dev)
+        'extensions': ['jinja2.ext.autoescape']
     }
 
 }
@@ -95,11 +97,13 @@ _config['apptools.system'] = {
     },
 
     'include': [  # Extended configuration files to include
-		('layer9', 'config.layer9'),  # layer9 hosting configuration
+        ('layer9', 'config.layer9'),  # layer9 hosting configuration
         ('project', 'config.project'),  # Project config
         ('openfire', 'config.openfire'),  # Openfire config
         ('services', 'config.services'),  # Global + site services (RPC/API) config
-        ('assets', 'config.assets')       # Asset manangement layer config
+        ('assets', 'config.assets'),       # Asset manangement layer config
+        ('middleware', 'config.middleware'),  # Service middleware config
+        ('extensions', 'config.extensions')  # Output extension config
     ]
 
 }

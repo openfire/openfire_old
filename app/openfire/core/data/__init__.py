@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from google.appengine.ext import ndb
 from openfire.core import CoreAPI
+from google.appengine.ext import ndb
 
 
 class CoreDataAPI(CoreAPI):

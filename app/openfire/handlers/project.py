@@ -13,6 +13,8 @@ class ProjectLanding(WebHandler):
 
     ''' openfire project landing page. '''
 
+    template = 'projects/project_landing.html'
+
     def get(self):
 
         ''' Render project_landing.html. '''
@@ -24,6 +26,8 @@ class ProjectLanding(WebHandler):
 class ProjectHome(WebHandler):
 
     ''' openfire page. '''
+
+    template = 'projects/project_home.html'
 
     def get(self, key):
 

@@ -4,23 +4,25 @@
 from apptools import BaseService
 from apptools.util import debug
 
+# sdk imports
 from google.appengine.ext import ndb
-from openfire.core.sessions import SessionsMixin
 
 # user/permissions
 from openfire.models.user import User
 from openfire.models.user import Permissions
 
+## core bridge imports
+from openfire.core.content import ContentBridge
+from openfire.core.sessions import SessionsBridge
 
-class RemoteService(BaseService, SessionsMixin):
+
+class RemoteService(BaseService, SessionsBridge, ContentBridge):
 
     ''' Abstract parent for all openfire services. '''
 
     def initialize(self):
 
         ''' Initialize hook. '''
-
-        ## @TODO: Make these log messages not suck via apptools.debug.Logger._setcondition, etc
 
         ## extract the session & csrf headers
         self.session = self.get_session(make=False)

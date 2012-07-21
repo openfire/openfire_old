@@ -1,11 +1,158 @@
-/* =============================================================================
- * Media Queries
- * ==========================================================================
+@media all and (max-width: 480px)
+  p
+    margin: 8px 0
+    padding: 3px 0
+  #main
+    #masthead
+      height: 200px
+      #oflogo
+        max-width: 92%
+        height: auto
+        left: 4%
+        bottom: 55px
+      #title
+        text-align: right
+        font: 21pt "Satisfy",cursive
+        line-height: 18pt
+        opacity: 0
+        bottom: 4%
+        right: 4%
+
+      #how-it-works-button
+        height: 50px
+        width: 95%
+        //min-width: 201px
+        //max-width: 250px
+        bottom: 5%
+        left: 2.5%
+        border-radius: 5px
+
+        a
+          margin: 13px 3px 0 0
+          font-size: 24px
+
+    #content section
+      width: 100%
+      height: auto
+      margin: 0
+      .project-card
+        width: 100px
+        img
+          width: 100px
+          height: 88px
+        .project-icon::after
+          height: 15px
+          line-height: 15px
+          font-size: 15px
+      .activity-table
+        height: auto
+        margin: 15px 0 0 15px
+        .activity-row
+          height: 100
+          .activity-cell
+            width: 100
+            height: 90
+
+  #footer-container
+    display: none
+
+@media all and (min-width: 480px)
+  #main
+    #masthead
+      border-radius: none
+      height: 270px
+      #oflogo
+        max-width: 92%
+        height: auto
+        left: 4%
+        bottom: 37%
+
+      #title
+        opacity: 1
+        font: 21pt "Satisfy",cursive
+        line-height: 18pt
+        width: 44%
+        height: auto
+        min-width: 200px
+        max-width: 240px
+        text-align: right
+        bottom: 4%
+        right: 52%
+
+      #how-it-works-button
+        border-top: none
+        height: 80px
+        width: 44%
+        min-width: 200px
+        left: 52%
+        bottom: 4%
+        border-radius: 9px
+        a
+          margin: 26px 3px 0 0
+          font-size: 23px
+
+        &::before
+          display: none
+          content: none
+
+    #content section
+      width: 100%
+      height: auto
+      .project-card
+        width: 140px
+        img
+          width: 140px
+          height: 120px
+        .project-icon::after
+          height: 18px
+          line-height: 18px
+          font-size: 18px
+      .activity-table
+        height: auto
+        margin-bottom: 30px
+        .activity-row
+          height: 100
+          .activity-cell
+            width: 100
+            height: 90
+
+            .graph
+              width: 252px
+              height: 140px
+
+@media all and (max-width: 768px)
+  p
+    margin: 12px 0
+  #main section
+    width: 100%
+    .section-wrap
+      overflow: hidden
+      padding-bottom: 10px
+      #project-cards
+        width: 1000px
+
+@media all and (min-width: 768px)
+  #main
+    #masthead
+      #oflogo
+        left: 4%
+      #title
+        font: 28pt "Satisfy", cursive
+      #how-it-works-button
+        border-radius: 9px
+    #content section
+      width: 45%
+      margin: 0px 2.5% 300px
+
+@media all and (min-width: 1140px)
+  #main #masthead
+    #oflogo
+      bottom: 25%
+      left: 5%
+    #title
+      font: 32pt "Satisfy", cursive
 
 @media only screen and (min-width: 480px)
-  /* ====================
-   *  INTERMEDIATE: Menu
-   * ====================
   nav
     a
       margin: 0 1.7%
@@ -17,27 +164,15 @@
         margin-right: 0
     ul li
       display: inline
-  /* ========================
-   *  INTERMEDIATE: IE Fixes
-   * ========================
-  .oldie nav a
+  .oldie a
     margin: 0 0.7%
 
 @media only screen and (min-width: 768px)
-  /* ====================
-   *  WIDE: CSS3 Effects
-   * ====================
-  /* ============
-   *  WIDE: Menu
-   * ============
   #title
     float: left
   nav
     float: left
     margin-left: 1%
-  /* ============
-   *  WIDE: Main
-   * ============
   #main
     article
       float: left
@@ -47,9 +182,6 @@
       width: 28%
 
 @media only screen and (min-width: 1140px)
-  /* ===============
-   *  Maximal Width
-   * ===============
   .wrapper
     width: 100%
     margin: 0 auto

@@ -18,36 +18,108 @@ import hashlib
 
 ## Webapp2 Imports
 import webapp2
+from webapp2_extras import jinja2
+
+## Jinja2 Imports
+from jinja2.ext import Extension
+from jinja2.bccache import BytecodeCache
 
 ## Google Imports
 from google.appengine.ext import ndb
 
 ## AppTools Imports
+from apptools.api import output
 from apptools.core import BaseHandler
 
 ## Openfire Imports
 from openfire.models.user import User
 from openfire.models.user import Permissions
-from openfire.core.sessions import SessionsMixin
+
+## Core Bridge Imports
+from openfire.core.content import ContentBridge
+from openfire.core.sessions import SessionsBridge
 
 
-class WebHandler(BaseHandler, SessionsMixin):
+## WebHandler - parent class for all site request handler classes
+class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
 
     ''' Handler for desktop web requests. '''
 
+    # Resource/Template Preloading
+    preload = []
+    template = None
+
+    # Session Properties
+    session = None
+    sessions = True
+    force_session = True
+
+    # Security Properties
     user = None
     scope = None
-    session = None
     permissions = None
-    force_session = True
     authenticated = False
     auth_provider = False
 
+    # Channel Properties
     channel_id = None
     channel_token = None
     channel_timeout = 120
 
     ## ++ Internal Shortcuts ++ ##
+    @webapp2.cached_property
+    def config(self):
+
+        ''' Cached access to main config for this handler. '''
+
+        return self._webHandlerConfig
+
+    @webapp2.cached_property
+    def jinja2(self):
+
+        ''' Cached access to Jinja2. '''
+
+        ## Patch in dynamic content support, if available
+        if hasattr(self, 'dynamicEnvironmentFactory'):
+            return self._output_api.get_jinja(self.app, self.dynamicEnvironmentFactory)
+        else:
+            return self._output_api.get_jinja(self.app, self.jinja2EnvironmentFactory)
+
+    @webapp2.cached_property
+    def _webHandlerConfig(self):
+
+        ''' Cached access to this handler's config. '''
+
+        return config.config.get('openfire.classes.WebHandler')
+
+    @webapp2.cached_property
+    def _integrationConfig(self):
+
+        ''' Cached access to this handler's integration config. '''
+
+        return self._webHandlerConfig.get('integrations')
+
+    @webapp2.cached_property
+    def _jinjaConfig(self):
+
+        ''' Cached access to Jinja2 base config. '''
+
+        return config.config.get('webapp2_extras.jinja2')
+
+    @webapp2.cached_property
+    def _outputConfig(self):
+
+        ''' Cached access to base output config. '''
+
+        return config.config.get('apptools.project.output')
+
+    @webapp2.cached_property
+    def _ofOutputConfig(self):
+
+        ''' Cached access to openfire's site-specific output config. '''
+
+        return config.config.get('openfire.output')
+
     @webapp2.cached_property
     def logging(self):
 
@@ -55,112 +127,94 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         return super(WebHandler, self).logging.extend('WebHandler', self.__class__.__name__)._setcondition(self.config.get('logging', False))
 
+    @webapp2.cached_property
+    def template_environment(self):
+
+        ''' Return a new environment, because if we're already here it's not cached. '''
+
+        return self.jinja2
+
     ## ++ Internal Methods ++ ##
+    def __init__(self, request=None, response=None):
+
+        ''' Init this request handler. '''
+
+        # Pass up to webapp2 first
+        self.initialize(request, response)
+
+        # Initialize dynamic content API
+        self._initialize_dynamic_content(self.app)
+
+        # Preload second
+        self.preload()
+
+    def preload(self):
+
+        ''' Preloaded data and template support. '''
+
+        # Preload keys
+        if hasattr(self, 'preload'):
+            pass
+
+        # Preload/prerender template
+        if hasattr(self, 'template') and getattr(self, 'template') not in frozenset(['', None, False]):
+            self.preload_template(self.template)
+        return
+
     def dispatch(self):
 
         ''' Retrieve session + dispatch '''
 
-        # Resolve user session
-        self.session = self.build_session()
+        if self.sessions:
+            # Resolve user session
+            self.session = self.build_session()
+
+        # kick off preloader
+        self.preload()
 
         try:
 
-            # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
-            if self.session.get('redirect') is not None:
-                redirect_url = self.session.get('redirect')
-                del self.session['redirect']
-                response = self.redirect(redirect_url)
+            if self.sessions:
+                # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
+                if self.session.get('redirect') is not None:
+                    redirect_url = self.session.get('redirect')
+                    del self.session['redirect']
+                    response = self.redirect(redirect_url)
+                    return response
 
-            else:
-                # Find super
-                _super = super(WebHandler, self)
+            # Find super
+            _super = super(WebHandler, self)
 
-                # Dispatch method
-                response = _super.dispatch()
+            # Dispatch method
+            response = _super.dispatch()
 
         finally:
-            self.save_session()
+
+            if self.sessions:
+                # Always save the session.
+                self.save_session()
 
         return response
 
-    def _format_as_currency(self, number, isPercent):
+    def _format_as_currency(self, number, isPercent=False):
 
-        #truncates the 'number' variable to the 100's place
-        base = int(number)
-        remain = number - base
+        ''' Format a number as a currency or percentage. '''
 
-        decStep = remain * 100
+        # create result array
+        formatted_number = [i for i in reversed(list(str(number)))]
 
-        decimal = int(decStep)
-        decimal = float(decimal)
-        decimal = decimal / 100
+        # format with commas
+        map(lambda x: formatted_number.insert(x, ','), [
+                i for i in reversed([
+                        b for (b, i) in enumerate(formatted_number[:])
+                        if ((b % 3) == 0)])
+            if (i != 0)])
 
-        money = base + decimal
-        money = str(money)
-
-        #conditional that adds an additonal '0' to the number if the decimal
-        # only goes to  the 10's place
-        zeroChk = remain * 10
-        if zeroChk == int(zeroChk):
-            money = money + "0"
-
-        #conditional that will put in a dollar sign '$' if requested by making
-        # isPercent equal to zero, and insert a '%' if isPercent equals 1
-        if isPercent == 0:
-            #money = str(money)
-            money = "$" + money
-
-        elif isPercent == 1:
-            #money = str(money)
-            money = money + "%"
-        return money
-
-    def build_session2(self):
-
-        ''' Build an initial session object and create an SID, if needed '''
-
-        if hasattr(self, 'session') and self.session is not None and len(self.session) > 0:
-            return self.session  # somehow we already have a session, wtf?
-
-        else:
-            self.session = self.get_session()
-
-            if self.session.get('authenticated', False):
-
-                ## we've authenticated
-                self.authenticated = True
-
-                if self.session.get('ukey'):
-                    try:
-                        self.user, self.permissions = tuple(ndb.get_multi([
-                                ndb.Key(urlsafe=self.session.get('ukey')),
-                                ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))],
-                                use_cache=True, use_memcache=True, use_datastore=True))
-
-                    except:
-
-                        ## UKEY IS BAD, send them to register again
-                        self.user = None
-
-                    # user not found/bad key
-                    if self.user is None:
-
-                        # if they have a continue url, use it
-                        if self.session.get('continue_url'):
-                            registration_url = self.url_for('auth/register', go=self.session.get('continue_url'))
-
-                        # otherwise bring them back here afterwards
-                        else:
-                            registration_url = self.url_for('auth/register', go=self.request.path_qs)
-
-                        return self.redirect(registration_url)
-
-                    # user found!
-                    else:
-                        pass
-
-        # for now @(TODO): START BACK HERE ON AUTH
-        return self.session
+        # build, format as currency/percentage, return
+        return ''.join([char for char in filter(lambda x: x is not None,
+                ['$' if not isPercent else None,
+                 ''.join([i for i in reversed(formatted_number)]),
+                 '%' if isPercent else None])])
 
     def build_session(self):
 
@@ -200,74 +254,70 @@ class WebHandler(BaseHandler, SessionsMixin):
                 self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
-    def handle_exception2(self, exception, debug):
+    def render(self, *args, **kwargs):
 
-        ''' Handle an unhandled exception '''
+        ''' If supported, pass off to render_dynamic, which rolls-in support for editable content blocks. '''
 
-        self.logging.critical('Unhandled exception encountered.')
-        self.logging.critical(str(exception))
-
-        if not config.debug:
-            self.response.write('Woops! Error.<br />')
+        if hasattr(self, 'render_dynamic'):
+            return self.render_dynamic(*args, **kwargs)
         else:
-            self.response.write('<b>Unhandled exception encountered:</b><br />')
-            self.response.write(str(exception))
-            self.response.write('<h2>quick, get the developers</h2>')
-            raise exception
-
-        return self.error(500)
+            return super(WebHandler, self).render(*args, **kwargs)
 
     def _bindRuntimeTemplateContext(self, context):
 
         ''' Bind in the session '''
 
-        if 'user' not in context:
-            context['user'] = {}
-        context['user']['session'] = self.session
+        context.update({
 
-        # install meta config
-        context['_meta'] = config.config.get('openfire.meta')
-        context['_opengraph'] = context['_meta'].get('opengraph', {})
-        context['_location'] = context['_opengraph'].get('location', {})
+            # head meta config
+            '_meta': config.config.get('openfire.meta'),
+            '_opengraph': config.config.get('openfire.meta').get('opengraph'),
+            '_location': config.config.get('openfire.meta').get('opengraph').get('location'),
 
-        # install encryption shim
-        context['encrypt'] = lambda x: self.encrypt(x)
-        context['decrypt'] = lambda x: self.decrypt(x)
+            # encryption/decryption utilities
+            'encrypt': lambda x: self.encrypt(x),
+            'decrypt': lambda x: self.decrypt(x),
 
-        # install currency + percentage formatters
-        context['currency'] = lambda x: self._format_as_currency(x, False)
-        context['percentage'] = lambda x: self._format_as_currency(x, True)
+            # formatter shortcuts (also installed as filters)
+            'currency': lambda x: self._format_as_currency(x, False),
+            'percentage': lambda x: self._format_as_currency(x, True),
 
-        # converts an email address into a gravatar img src url
-        context['gravatarify'] = lambda x, y, z: ''.join(['http://www.gravatar.com/avatar/', hashlib.md5(x).hexdigest(), '.%s?s=%s&d=http://placehold.it/%s/ffffff.png' % (y, z, z)])
+            # media utils
+            'gravatarify': lambda email, ext, size: ''.join([
+                    ':'.join([self.request.environ.get('wsgi.url_scheme', 'http'), '//']),
+                    '/'.join([self._integrationConfig.get('gravatar').get('endpoints').get((self.force_https_assets == True and 'https' or self.request.environ.get('wsgi.url_scheme', 'http').lower())),
+                        'avatar',
+                        hashlib.md5(email).hexdigest()]),
+                    '.%s' % ext,
+                    '?s=%s&d=%s://lyr9.net/img/default-profile.png?s=%s' % (size, (self.force_https_assets == True and 'https' or self.request.environ.get('wsgi.url_scheme', 'http').lower()), size)
+                ]),
 
-        # retrieves current user model + permissions
-        context['security'] = {
-            'permissions': self.permissions,
-            'current_user': self.user,
-            'session': self.session
-        }
-
-        # setup transport config
-        context['transport'] = {
-            
-            ## services config
-            'services': {
-                'secure': False,
-                'endpoint': self.request.environ.get('HTTP_HOST'),
-                'consumer': 'ofapp',
-                'scope': 'readonly'
+            # openfire security extensions
+            'security': {
+                'session': self.session,
+                'permissions': self.permissions,
+                'current_user': self.user
             },
 
-            ## push config
-            'realtime': {
-                'enabled': False,
-                'channel': self.channel_token,
-                'timeout': self.channel_timeout
+            # openfire transport extensions
+            'transport': {
+
+                # services config
+                'services': {
+                    'secure': False,
+                    'endpoint': self.request.environ.get('HTTP_HOST'),
+                    'consumer': 'ofapp',
+                    'scope': 'readonly'
+                },
+
+                # realtime/push config
+                'realtime': {
+                    'enabled': False,
+                    'channel': self.channel_token,
+                    'timeout': self.channel_timeout
+                }
             }
-
-        }
-
+        })
         return super(WebHandler, self)._bindRuntimeTemplateContext(context)
 
     ## ++ HTTP Methods ++ ##
@@ -283,9 +333,9 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         ''' Return available methods '''
 
-        return
+        return self.response.write(','.join([i for i in frozenset(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']) if hasattr(self, i.lower())]))
 
 
-class MobileHandler(BaseHandler):
+class MobileHandler(WebHandler):
 
     ''' Handler for mobile web requests. '''

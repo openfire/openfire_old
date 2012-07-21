@@ -1,192 +1,172 @@
 @import "compass/utilities/sprites/sprite-img"
 @import "compass/css3/images"
 @import _core/config
-@import _core/fonts.sass
+@import _core/fonts
 @import _core/h5bp
 @import _core/initializr
 
+// media queries / base classes
+@import _core/mediaqueries
+@import _core/print
+@import _core/base
+
+*
+  -webkit-transition-duration: 0.5s
+  -webkit-transition-property: none
+
 body
-    font: 80% Verdana, sans-serif
+  font: 80% Verdana, sans-serif
 
 h1
-    font: 48pt 'Satisfy', cursive
+  font: 48pt "Satisfy", cursive
 
 p
-    margin: 15px 0
-    padding: 5px 0
-
-.naked
-    list-style: none
-    -webkit-padding-start: 0
-    li
-        list-style: none
+  margin: 15px 0
+  padding: 5px 0
 
 .lightorange
-    color: #ffb246
+  color: #ffb246
 
 .darkorange
-    color: #f57220
+  color: #f57220
 
 #header-container
-    top: 0
-    left: 0
-    right: 0
-    position: absolute
-    z-index: 800
+  top: 0
+  left: 0
+  right: 0
+  position: absolute
+  z-index: 800
 
 #main
-    position: absolute
-    top: 0
-    left: 0
-    bottom: 0
-    right: 0
-    z-index: 500
-
-    #content
-
-        &::before
-            display: block
-            content: ''
-            height: 5px
-            margin-top: -5px
-            +background(linear-gradient(bottom, #cfcfcf, #ddd))
-
-    #masthead
-        background: #ddd
-        height: 270px
-        position: relative
-
-        #oflogo
-            position: absolute
-            bottom: 25%
-            left: 5%
-
-        #title
-            position: absolute
-            bottom: 0
-            left: 13%
-            font: 32pt "Satisfy", cursive
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  z-index: 500
+  #content::before
+    display: block
+    content: ""
+    height: 5px
+    margin-top: -5px
+    background: -webkit-gradient(linear, 50% 100%, 50% 0%, color-stop(0%, #cfcfcf), color-stop(100%, #dddddd))
+    background: -webkit-linear-gradient(bottom, #cfcfcf, #dddddd)
+    background: -moz-linear-gradient(bottom, #cfcfcf, #dddddd)
+    background: -o-linear-gradient(bottom, #cfcfcf, #dddddd)
+    background: -ms-linear-gradient(bottom, #cfcfcf, #dddddd)
+    background: linear-gradient(bottom, #cfcfcf, #dddddd)
+  #masthead
+    background: #ddd
+    position: relative
+    -webkit-transition-property: height
+    #oflogo
+      position: absolute
+      -webkit-transition-property: top
+    #title
+      position: absolute
+      -webkit-transition-property: opacity, right
 
 
 #footer-container
-    position: fixed
-    bottom: 0
-    left: 0
-    right: 0
-    z-index: 1000
-    background: #bbb
-    padding: 10px
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  z-index: 1000
+  background: #bbb
+  padding: 10px
+  footer
+    padding: 0 !important
 
-    footer
-        padding: 0 !important
-
-.left
-    float: left
-
-.right
-    float: right
-
-
-// MediaQueries/Print/Helpers
-@import _core/helpers
-@import _core/mediaqueries
-@import _core/print
 
 @import _partials/widgets
-// openfire! :)
 @import _partials/superbar
 
 .section-wrap
-    width: 100%
+  background: #eee
+  width: 100%
 
 .project-card
-    width: 140px
-    border-radius: 5px
-    background-color: white
-    padding: 10px
-    margin: 20px 0px 20px 20px
-    float: left
-    box-shadow: 2px 2px 2px #cdcdcd
-
-    &:hover
-        box-shadow: 2px 2px 2px #bfbfbf
-        .project-icon
-            &::after
-                background-color: #eee
-                color: #666
-
-        .project-progress
-            +background(linear-gradient(top center, #ffb246, #f57220))
-            opacity: 0.75
-
-    a
-        text-decoration: none
-
-    .project-icon
-        &::after
-            display: block
-            content: attr(data-name)
-            height: 20px
-            line-height: 20px
-            padding-right: 4px
-            text-align: right
-            vertical-align: middle
-            background-color: #f4f4f4
-            color: #999
-            font:
-                family: 'Karla', sans-serif
-                size: 16px
-                weight: 400
-                style: italic
-            text-transform: uppercase
-            overflow: hidden
-            text-decoration: none
-
-        &:hover
-            cursor: pointer
-            &::after
-                text-decoration: underline
-
+  border-radius: 5px
+  background-color: #fff
+  padding: 10px
+  margin: 10px 0 0 10px
+  display: inline-table
+  box-shadow: 2px 2px 2px #cdcdcd
+  &:hover
+    box-shadow: 2px 2px 2px #bfbfbf
+    .project-icon::after
+      background-color: #eee
+      color: #666666
     .project-progress
-        width: 120px
-        height: 10px
-        margin-top: 10px
-        border: none !important
-        border-top-left-radius: 5px
-        border-bottom-left-radius: 5px
-        background-color: #f57220
-        background-size: 9px 10px
-        opacity: 0.5
+      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffb246), color-stop(100%, #f57220))
+      background: -webkit-linear-gradient(top center, #ffb246, #f57220)
+      background: -moz-linear-gradient(top center, #ffb246, #f57220)
+      background: -o-linear-gradient(top center, #ffb246, #f57220)
+      background: -ms-linear-gradient(top center, #ffb246, #f57220)
+      background: linear-gradient(top center, #ffb246, #f57220)
+      opacity: 0.75
+  a
+    text-decoration: none
+  .project-icon
+    &::after
+      display: block
+      content: attr(data-name)
+      padding-right: 4px
+      text-align: right
+      vertical-align: middle
+      background-color: #f4f4f4
+      color: #999
+      font-family: "Karla",sans-serif
+      font-weight: 400
+      font-style: italic
+      text-transform: uppercase
+      overflow: hidden
+      text-decoration: none
+    &:hover
+      cursor: pointer
+      &::after
+        text-decoration: underline
+  .project-progress
+    width: 120px
+    height: 10px
+    margin-top: 10px
+    border: none !important
+    border-top-left-radius: 5px
+    border-bottom-left-radius: 5px
+    background-color: #f57220
+    background-size: 9px 10px
+    opacity: 0.5
+    &:hover
+      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffb246), color-stop(100%, #f57220))
+      background: -webkit-linear-gradient(top center, #ffb246, #f57220)
+      background: -moz-linear-gradient(top center, #ffb246, #f57220)
+      background: -o-linear-gradient(top center, #ffb246, #f57220)
+      background: -ms-linear-gradient(top center, #ffb246, #f57220)
+      background: linear-gradient(top center, #ffb246, #f57220)
+      opacity: 1
+      cursor: pointer
 
-        &:hover
-            +background(linear-gradient(top center, #ffb246, #f57220))
-            opacity: 1
-            cursor: pointer
-
-section.newsfeed
-    ul.feed
-        list-style-type: none
-        width: 100%
-        margin: 0
-        padding: 3% 0 0
-
-        li.feed-item
-            background-color: white
-            min-height: 60px
-            width: 94%
-            margin: 0px auto !important
-            border-bottom: 1px solid #eee
-
-            &:last
-                border-bottom: none !important
-
-            .datetime
-                align: right
-                display: block
-                position: relative
-                bottom: 0
-                width: 50px
-                height: 50px
-                background-color: orange
+section.newsfeed ul.feed
+  list-style-type: none
+  width: 100%
+  margin: 0
+  padding: 3% 0 0
+  li.feed-item
+    background-color: #fff
+    min-height: 60px
+    width: 94%
+    margin: 0px auto !important
+    border-bottom: 1px solid #eeeeee
+    &:last
+      border-bottom: none !important
+    .datetime
+      align: right
+      display: block
+      position: relative
+      bottom: 0
+      width: 50px
+      height: 50px
+      background-color: orange
 
 @import _partials/social.sass
+
