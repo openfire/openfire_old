@@ -18,17 +18,11 @@ import hashlib
 
 ## Webapp2 Imports
 import webapp2
-from webapp2_extras import jinja2
-
-## Jinja2 Imports
-from jinja2.ext import Extension
-from jinja2.bccache import BytecodeCache
 
 ## Google Imports
 from google.appengine.ext import ndb
 
 ## AppTools Imports
-from apptools.api import output
 from apptools.core import BaseHandler
 
 ## Openfire Imports
@@ -169,9 +163,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
             # Resolve user session
             self.session = self.build_session()
 
-        # kick off preloader
-        self.preload()
-
         try:
 
             if self.sessions:
@@ -187,6 +178,10 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
 
             # Dispatch method
             response = _super.dispatch()
+            if isinstance(response, basestring):
+                self.response.write(response)
+            elif isinstance(response, webapp2.Response):
+                self.response = response
 
         finally:
 
@@ -194,7 +189,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
                 # Always save the session.
                 self.save_session()
 
-        return response
+        return self.response
 
     def _format_as_currency(self, number, isPercent=False):
 
