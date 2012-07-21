@@ -34,6 +34,7 @@
         padding: 10px 0
   #masthead
     #how-it-works-button
+      -webkit-transition-property: height, width, left
       position: absolute
       background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220))
       background: -webkit-linear-gradient(top center, #f79331, #f57220)
@@ -67,18 +68,22 @@
   font-weight: 700
   font-size: 8pt
   width: 90%
-  div.activity-row
-    text-align: center
-    background: #fff
-    border-radius: 5px
-    margin-top: 10px
-    div.activity-cell
+  margin-bottom: 30px
+
+  .activity-row
+    .activity-cell
+      text-align: center
+      background: #fff
+      border-radius: 5px
+      margin: 10px 0 0 10px
       display: inline-table
-      border: 1px solid #000
       padding: 5px
-      margin: 10px
+
       label
         text-transform: uppercase
+
+      .graph
+        border: 1px solid #000
 
 #spark-graph
   rect

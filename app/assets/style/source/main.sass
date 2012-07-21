@@ -41,7 +41,6 @@ p
   position: absolute
   top: 0
   left: 0
-  bottom: 0
   right: 0
   z-index: 500
   #content::before
@@ -58,13 +57,14 @@ p
   #masthead
     background: #ddd
     position: relative
-    -webkit-transition-property: height, width
+    -webkit-transition-property: height
     #oflogo
       position: absolute
       -webkit-transition-property: top
     #title
       position: absolute
-      -webkit-transition-property: height, opacity, width
+      -webkit-transition-property: opacity, right
+
 
 #footer-container
   position: fixed

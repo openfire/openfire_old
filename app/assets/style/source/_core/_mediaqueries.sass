@@ -6,19 +6,25 @@
     #masthead
       height: 200px
       #oflogo
-        max-width: 98%
+        max-width: 92%
         height: auto
-        left: 1%
+        left: 4%
         bottom: 55px
       #title
-        display: none
+        text-align: right
+        font: 21pt "Satisfy",cursive
+        line-height: 18pt
+        opacity: 0
+        bottom: 4%
+        right: 4%
+
       #how-it-works-button
         height: 50px
         width: 95%
         //min-width: 201px
         //max-width: 250px
         bottom: 5%
-        right: 2.5%
+        left: 2.5%
         border-radius: 5px
 
         a
@@ -46,6 +52,7 @@
           .activity-cell
             width: 100
             height: 90
+
   #footer-container
     display: none
 
@@ -55,29 +62,34 @@
       border-radius: none
       height: 270px
       #oflogo
-        max-width: 98%
+        max-width: 92%
         height: auto
-        left: 1%
-        top: 8%
-        bottom: none
+        left: 4%
+        bottom: 37%
 
       #title
+        opacity: 1
         font: 21pt "Satisfy",cursive
         line-height: 18pt
         width: 44%
+        height: auto
+        min-width: 200px
+        max-width: 240px
         text-align: right
         bottom: 4%
-        left: 2%
+        right: 52%
+
       #how-it-works-button
         border-top: none
         height: 80px
         width: 44%
-        right: 4%
+        min-width: 200px
+        left: 52%
         bottom: 4%
         border-radius: 9px
         a
-          margin: 25px 3px 0 0
-          font-size: 24px
+          margin: 26px 3px 0 0
+          font-size: 23px
 
         &::before
           display: none
@@ -96,13 +108,17 @@
           line-height: 18px
           font-size: 18px
       .activity-table
-        height: 500px
+        height: auto
         margin-bottom: 30px
         .activity-row
           height: 100
           .activity-cell
             width: 100
             height: 90
+
+            .graph
+              width: 252px
+              height: 140px
 
 @media all and (max-width: 768px)
   p
@@ -119,9 +135,7 @@
   #main
     #masthead
       #oflogo
-        top: auto
-        bottom: 25%
-        left: 5%
+        left: 4%
       #title
         font: 28pt "Satisfy", cursive
       #how-it-works-button
