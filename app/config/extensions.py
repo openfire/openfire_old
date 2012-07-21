@@ -16,6 +16,7 @@ config['openfire.output.extension.DynamicContent'] = {
     'logging': True,
 
     'config': {
+        'default_namespace': '::'.join(['of', 'tpl', 'dynamic', 'system'])
     }
 
 }

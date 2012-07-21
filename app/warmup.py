@@ -21,10 +21,8 @@ try:
     import logging
     import webapp2
     import slimmer
-    import protorpc
     import pipeline
     import mapreduce
-    import webapp2_extras
     import wsgiref.handlers
 except:
     pass

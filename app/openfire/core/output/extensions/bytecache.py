@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-import webapp
+import webapp2
 from config import config
 from jinja2 import MemcachedBytecodeCache as BytecodeCache
 
+## Global Cache
+_template_bytecode = {}
 
 ## ThreadedBytecodeCache - caches and loads compiled template bytecode with thread memory
 class ThreadedBytecodeCache(BytecodeCache):

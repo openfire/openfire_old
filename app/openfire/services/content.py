@@ -6,9 +6,6 @@ from apptools.services import RequestError
 from openfire.services import RemoteService
 
 ## Models, Messages + Pipelines
-from openfire.core.content import ContentMixin
-
-
 from openfire.models import content as models
 from openfire.messages import content as messages
 from openfire.pipelines import content as pipelines
@@ -20,7 +17,7 @@ class ContentServiceException(RequestError):
 
 
 ## ContentService
-class ContentService(RemoteService, ContentMixin):
+class ContentService(RemoteService):
 
     ''' Server-side backend for content management features. '''
 

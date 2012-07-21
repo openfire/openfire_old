@@ -262,7 +262,7 @@ config['openfire.classes.WebHandler'] = {
     },
 
     'extensions': {
-        'load': ['FragmentCache']
+        'load': ['FragmentCache', 'DynamicContent', 'MemcacheBytecodeCache']
     }
 
 }

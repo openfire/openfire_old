@@ -21,8 +21,8 @@ import webapp2
 from webapp2_extras import jinja2
 
 ## Jinja2 Imports
-import jinja2 as j2
 from jinja2.ext import Extension
+from jinja2.bccache import BytecodeCache
 
 ## Google Imports
 from google.appengine.ext import ndb
@@ -34,15 +34,24 @@ from apptools.core import BaseHandler
 ## Openfire Imports
 from openfire.models.user import User
 from openfire.models.user import Permissions
-from openfire.core.sessions import SessionsMixin
+
+## Core Bridge Imports
+from openfire.core.content import ContentBridge
+from openfire.core.sessions import SessionsBridge
 
 
-class WebHandler(BaseHandler, SessionsMixin):
+## WebHandler - parent class for all site request handler classes
+class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
 
     ''' Handler for desktop web requests. '''
 
+    # Resource/Template Preloading
+    preload = []
+    template = None
+
     # Session Properties
     session = None
+    sessions = True
     force_session = True
 
     # Security Properties
@@ -64,6 +73,17 @@ class WebHandler(BaseHandler, SessionsMixin):
         ''' Cached access to main config for this handler. '''
 
         return self._webHandlerConfig
+
+    @webapp2.cached_property
+    def jinja2(self):
+
+        ''' Cached access to Jinja2. '''
+
+        ## Patch in dynamic content support, if available
+        if hasattr(self, 'dynamicEnvironmentFactory'):
+            return self._output_api.get_jinja(self.app, self.dynamicEnvironmentFactory)
+        else:
+            return self._output_api.get_jinja(self.app, self.jinja2EnvironmentFactory)
 
     @webapp2.cached_property
     def _webHandlerConfig(self):
@@ -107,33 +127,72 @@ class WebHandler(BaseHandler, SessionsMixin):
 
         return super(WebHandler, self).logging.extend('WebHandler', self.__class__.__name__)._setcondition(self.config.get('logging', False))
 
+    @webapp2.cached_property
+    def template_environment(self):
+
+        ''' Return a new environment, because if we're already here it's not cached. '''
+
+        return self.jinja2
+
     ## ++ Internal Methods ++ ##
+    def __init__(self, request=None, response=None):
+
+        ''' Init this request handler. '''
+
+        # Pass up to webapp2 first
+        self.initialize(request, response)
+
+        # Initialize dynamic content API
+        self._initialize_dynamic_content(self.app)
+
+        # Preload second
+        self.preload()
+
+    def preload(self):
+
+        ''' Preloaded data and template support. '''
+
+        # Preload keys
+        if hasattr(self, 'preload'):
+            pass
+
+        # Preload/prerender template
+        if hasattr(self, 'template') and getattr(self, 'template') not in frozenset(['', None, False]):
+            self.preload_template(self.template)
+        return
+
     def dispatch(self):
 
         ''' Retrieve session + dispatch '''
 
-        # Resolve user session
-        self.session = self.build_session()
+        if self.sessions:
+            # Resolve user session
+            self.session = self.build_session()
+
+        # kick off preloader
+        self.preload()
 
         try:
 
-            # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
-            if self.session.get('redirect') is not None:
-                redirect_url = self.session.get('redirect')
-                del self.session['redirect']
-                response = self.redirect(redirect_url)
+            if self.sessions:
+                # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
+                if self.session.get('redirect') is not None:
+                    redirect_url = self.session.get('redirect')
+                    del self.session['redirect']
+                    response = self.redirect(redirect_url)
+                    return response
 
-            else:
-                # Find super
-                _super = super(WebHandler, self)
+            # Find super
+            _super = super(WebHandler, self)
 
-                # Dispatch method
-                response = _super.dispatch()
+            # Dispatch method
+            response = _super.dispatch()
 
         finally:
 
-            # Always save the session.
-            self.save_session()
+            if self.sessions:
+                # Always save the session.
+                self.save_session()
 
         return response
 
@@ -156,53 +215,6 @@ class WebHandler(BaseHandler, SessionsMixin):
                 ['$' if not isPercent else None,
                  ''.join([i for i in reversed(formatted_number)]),
                  '%' if isPercent else None])])
-
-    def build_session2(self):
-
-        ''' Build an initial session object and create an SID, if needed '''
-
-        if hasattr(self, 'session') and self.session is not None and len(self.session) > 0:
-            return self.session  # somehow we already have a session, wtf?
-
-        else:
-            self.session = self.get_session()
-
-            if self.session.get('authenticated', False) == True:
-
-                ## we've authenticated
-                self.authenticated = True
-
-                if self.session.get('ukey'):
-                    try:
-                        self.user, self.permissions = tuple(ndb.get_multi([
-                                ndb.Key(urlsafe=self.session.get('ukey')),
-                                ndb.Key(Permissions, 'global', parent=ndb.Key(User, self.session['uid']))],
-                                use_cache=True, use_memcache=True, use_datastore=True))
-
-                    except:
-
-                        ## UKEY IS BAD, send them to register again
-                        self.user = None
-
-                    # user not found/bad key
-                    if self.user is None:
-
-                        # if they have a continue url, use it
-                        if self.session.get('continue_url'):
-                            registration_url = self.url_for('auth/register', go=self.session.get('continue_url'))
-
-                        # otherwise bring them back here afterwards
-                        else:
-                            registration_url = self.url_for('auth/register', go=self.request.path_qs)
-
-                        return self.redirect(registration_url)
-
-                    # user found!
-                    else:
-                        pass
-
-        # for now @(TODO): START BACK HERE ON AUTH
-        return self.session
 
     def build_session(self):
 
@@ -242,91 +254,14 @@ class WebHandler(BaseHandler, SessionsMixin):
                 self.user, self.permissions = tuple(ndb.get_multi([self.user, self.permissions]))
         return self.session
 
-    def jinja2EnvironmentFactory(self, app):
+    def render(self, *args, **kwargs):
 
-        ''' Prepare a Jinja2 environment suitable for rendering openfire templates. '''
+        ''' If supported, pass off to render_dynamic, which rolls-in support for editable content blocks. '''
 
-        # get openfire extension config
-        self.logging.info('Preparing Jinja2 OF template execution environment.')
-
-        # use output logging condition for a minute
-        self.logging._setcondition(self._ofOutputConfig.get('extensions').get('config').get('logging'))
-
-        if self._ofOutputConfig.get('extensions', {}).get('config').get('enabled', False) == True:
-
-            # Seen classes
-            installed_bytecaches = []
-            installed_extensions = []
-
-            for name in self._webHandlerConfig.get('extensions').get('load'):
-                if name in self._ofOutputConfig.get('extensions').get('installed'):
-                    if self._ofOutputConfig.get('extensions').get('installed').get(name).get('enabled', False) == True:
-                        extension_path = self._ofOutputConfig.get('extensions').get('installed').get(name).get('path')
-                        try:
-                            extension = webapp2.import_string(extension_path)
-
-                        except ImportError:
-                            self.logging.error('Encountered ImportError when trying to import extension at name "%s" and path "%s"' % (name, extension_path))
-
-                        else:
-                            if issubclass(extension, Extension):
-                                installed_extensions.append((name, extension))
-                            elif issubclass(extension, j2.BytecodeCache):
-                                installed_bytecaches.append((name, extension))
-                    else:
-                        # Extension is disabled
-                        continue
-            else:
-                self.logging.warning('No extensions installed/found in config (at "openfire.output").')
-
+        if hasattr(self, 'render_dynamic'):
+            return self.render_dynamic(*args, **kwargs)
         else:
-            installed_bytecaches = []
-            installed_extensions = []
-
-        # get jinja2 base config
-        j2cfg = self._jinjaConfig
-        templates_compiled_target = j2cfg.get('compiled_path')
-        use_compiled = not config.debug or j2cfg.get('force_compiled', False)
-
-        # resolve loaders
-        if templates_compiled_target is not None and use_compiled:
-            _loader = output.ModuleLoader(templates_compiled_target)
-        else:
-            _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
-
-        # combine extensions and load
-        base_environment_args = j2cfg.get('environment_args')
-        base_extensions_list = base_environment_args.get('extensions')
-        compiled_extension_list = map(lambda x: isinstance(x, basestring) and webapp2.import_string(x) or x, [i for i in base_extensions_list + [e for (n, e) in installed_extensions]])
-
-        self.logging.info('Final extensions list: "%s".' % compiled_extension_list)
-        self.logging.info('Chosen loader: "%s".' % _loader)
-
-        # bind environment args
-        base_environment_args['loader'] = _loader
-
-        if len(installed_extensions) > 0:
-            base_environment_args['extensions'] = compiled_extension_list
-
-        if len(installed_bytecaches) > 0:
-            self.logging.info('Chosen bytecache: "%s".' % installed_bytecaches[0])
-            base_environment_args['bytecode_cache'] = installed_bytecaches[0]
-
-        # hook up filters
-        filters = {
-            'currency': lambda x: self._format_as_currency(x, False),
-            'percentage': lambda x: self._format_as_currency(x, True)
-        }
-
-        # generate environment
-        finalConfig = dict(j2cfg.items()[:])
-        finalConfig.update({'environment_args': base_environment_args, 'globals': self.baseContext, 'filters': filters})
-
-        # replace logging conditional
-        self.logging._setcondition(self._webHandlerConfig.get('logging'))
-
-        environment = jinja2.Jinja2(app, config=finalConfig)
-        return environment
+            return super(WebHandler, self).render(*args, **kwargs)
 
     def _bindRuntimeTemplateContext(self, context):
 
@@ -401,6 +336,6 @@ class WebHandler(BaseHandler, SessionsMixin):
         return self.response.write(','.join([i for i in frozenset(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']) if hasattr(self, i.lower())]))
 
 
-class MobileHandler(BaseHandler):
+class MobileHandler(WebHandler):
 
     ''' Handler for mobile web requests. '''
