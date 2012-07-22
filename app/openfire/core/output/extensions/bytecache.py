@@ -6,6 +6,7 @@ from jinja2 import MemcachedBytecodeCache as BytecodeCache
 ## Global Cache
 _template_bytecode = {}
 
+
 ## ThreadedBytecodeCache - caches and loads compiled template bytecode with thread memory
 class ThreadedBytecodeCache(BytecodeCache):
 

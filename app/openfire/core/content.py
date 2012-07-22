@@ -5,8 +5,10 @@ import config
 import webapp2
 
 ## Jinja2 Imports
+from jinja2 import Template
 from jinja2.ext import Extension
 from jinja2.bccache import BytecodeCache
+from jinja2.exceptions import TemplateNotFound
 
 ## Core Imports
 from openfire.core import CoreAPI
@@ -81,6 +83,34 @@ class CoreContentAPI(CoreAPI):
     def _walk_jinja2_ast(self):
         pass
 
+    def _inner_ast_hook(self):
+        pass
+
+    def _load_template(self, environment, name):
+
+        ''' Load a template from source/compiled packages and preprocess. '''
+
+        loader = environment.loader
+        try:
+            source, template, uptodate = loader.get_source(environment, name)
+        except TemplateNotFound:
+            raise
+        else:
+            #parsed_ast = environment.parse(environment.preprocess(source))
+            bcc = environment.bytecode_cache
+            if bcc is not None:
+                bucket = bcc.get_bucket(environment, name, template, source)
+                code = bucket.code
+
+            if code is None:
+                code = environment.compile(source, name, template)
+
+            if bcc is not None and bucket.code is None:
+                bucket.code = code
+                bcc.set_bucket(bucket)
+
+            return environment.template_class.from_code(environment, code, environment.globals, uptodate)
+
     ## == High-level Methods == ##
     def preload_content(self, areas):
 
@@ -98,7 +128,17 @@ class CoreContentAPI(CoreAPI):
 
         ''' Prerender the currently selected template. '''
 
-        return environment.get_or_select_template(path_or_template)
+        # If it's a string path...
+        if isinstance(path_or_template, basestring):
+
+            # If we have it in the threadcache...
+            if path_or_template in self.templates:
+                template_object = self.templates[path_or_template]
+            else:
+                self.templates[path_or_template] = self._load_template(environment, path_or_template)
+                template_object = self.templates[path_or_template]
+
+        return template_object
 
     def render(self, template, context):
 
@@ -111,7 +151,9 @@ class CoreContentAPI(CoreAPI):
 
 
 ## Globals
-_output_extensions = None
+_output_loader = None
+_output_extensions = {}
+_output_bytecacher = None
 _output_api_instance = CoreContentAPI()
 
 
@@ -186,62 +228,14 @@ class ContentBridge(object):
         self.__content_prerender = self.__content_bridge.prerender(self._environment, template)
         return self.__content_prerender
 
-    def render_dynamic(self, path=None, context={}, elements={}, content_type='text/html', headers={}, dependencies=[], **kwargs):
-
-        ''' Render shim for advanced dynamic content rendering. '''
-
-        # Provide render options to template
-        _render_opts = {
-            'path': path,
-            'self': self,
-            'context': context,
-            'elements': elements,
-            'content_type': content_type,
-            'headers': headers,
-            'dependencies': dependencies,
-            'kwargs': kwargs
-        }
-
-        context['__render_opts'] = _render_opts
-
-        # Layer on user context
-        if isinstance(self.context, dict) and len(self.context) > 0:
-            self.context.update(context)
-        else:
-            self.context = context
-
-        # Build response headers
-        response_headers = {}
-        for key, value in self.baseHeaders.items():
-            response_headers[key] = value
-
-        # Consider kwargs
-        if len(kwargs) > 0:
-            self.context.update(kwargs)
-
-        # Bind runtime-level template context
-        self.context = self._bindRuntimeTemplateContext(self.context)
-
-        # Bind elements
-        if len(elements) > 0:
-            map(self._setcontext, elements)
-
-        # If we have a pre-render, use it, otherwise load and render
-        if self.__content_prerender is not None:
-            rendered = self.__content_bridge.render(self.__content_prerender, self.context)
-
-        else:
-            # Get/select the template using our environment
-            rendered = self.__content_bridge.prerender(self._environment, path).render(self.context)
-
-        # Render the template
-        return self.response.write(rendered)
-
     def dynamicEnvironmentFactory(self, app):
 
         ''' Prepare a Jinja2 environment suitable for rendering openfire templates. '''
 
+        global _output_loader
         global _output_extensions
+        global _output_bytecacher
+
         if self.__environment is not None:
             return self.__environment
 
@@ -256,44 +250,47 @@ class ContentBridge(object):
             # get jinja2 base config
             j2cfg = self._jinjaConfig
             base_environment_args = j2cfg.get('environment_args')
+            base_extensions_list = base_environment_args.get('extensions')
 
             if self._ofOutputConfig.get('extensions', {}).get('config').get('enabled', False) == True:
 
-                if isinstance(_output_extensions, tuple) and (len(_output_extensions) == len(self._webHandlerConfig.get('extensions').get('load'))):
-                    installed_extensions, installed_bytecaches = _output_extensions
-                    compiled_extension_list = installed_extensions
+                if isinstance(_output_extensions, dict) and (len(_output_extensions) == len(base_extensions_list)):
+                    compiled_extension_list = _output_extensions.values()
 
                 else:
                     # Seen classes
                     installed_bytecaches = []
                     installed_extensions = []
 
-                    if len(self._webHandlerConfig.get('extensions').get('load')) > 0:
-                        for name in self._webHandlerConfig.get('extensions').get('load'):
+                    if (len(self._webHandlerConfig.get('extensions').get('load')) + len(base_extensions_list)) > 0:
+                        for name in self._webHandlerConfig.get('extensions').get('load') + base_extensions_list:
                             if name in self._ofOutputConfig.get('extensions').get('installed'):
                                 if self._ofOutputConfig.get('extensions').get('installed').get(name).get('enabled', False) == True:
                                     extension_path = self._ofOutputConfig.get('extensions').get('installed').get(name).get('path')
-                                    try:
-                                        extension = webapp2.import_string(extension_path)
-
-                                    except ImportError:
-                                        self.logging.error('Encountered ImportError when trying to import extension at name "%s" and path "%s"' % (name, extension_path))
-
-                                    else:
-                                        if issubclass(extension, Extension):
-                                            installed_extensions.append((name, extension))
-                                        elif issubclass(extension, BytecodeCache):
-                                            installed_bytecaches.append((name, extension))
                                 else:
-                                    # Extension is disabled
                                     continue
+                            else:
+                                extension_path = name
+
+                            try:
+                                extension = webapp2.import_string(extension_path)
+
+                            except ImportError:
+                                self.logging.error('Encountered ImportError when trying to import extension at name "%s" and path "%s"' % (name, extension_path))
+
+                            else:
+                                if issubclass(extension, Extension):
+                                    installed_extensions.append((name, extension))
+                                    _output_extensions[name] = extension
+                                elif issubclass(extension, BytecodeCache):
+                                    installed_bytecaches.append((name, extension))
 
                         # combine extensions and load
-                        base_extensions_list = base_environment_args.get('extensions')
-                        compiled_extension_list = map(lambda x: isinstance(x, basestring) and webapp2.import_string(x) or x, [i for i in base_extensions_list] + [e for (n, e) in installed_extensions])
-
-                        # Set global
-                        _output_extensions = compiled_extension_list, installed_bytecaches
+                        compiled_extension_list = []
+                        map(lambda x: compiled_extension_list.append(x),
+                            filter(lambda x: x not in compiled_extension_list,
+                                map(lambda x: isinstance(x, basestring) and webapp2.import_string(x) or x,
+                                    [e for (n, e) in installed_extensions])))
 
                     else:
                         self.logging.warning('No extensions installed/found in config (at "openfire.output").')
@@ -306,24 +303,31 @@ class ContentBridge(object):
             templates_compiled_target = j2cfg.get('compiled_path')
             use_compiled = not config.debug or j2cfg.get('force_compiled', False)
 
-            # resolve loaders
-            if templates_compiled_target is not None and use_compiled:
-                _loader = output.ModuleLoader(templates_compiled_target)
+            # resolve loader/s
+            if _output_loader is not None:
+                _loader = _output_loader
             else:
-                _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
+                if templates_compiled_target is not None and use_compiled:
+                    _loader = output.ModuleLoader(templates_compiled_target)
+                else:
+                    _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
+                _output_loader = _loader
 
             self.logging.info('Final extensions list: "%s".' % compiled_extension_list)
             self.logging.info('Chosen loader: "%s".' % _loader)
 
+            # resolve bytecacher/s
+            if _output_bytecacher is not None:
+                _bytecacher = _output_bytecacher
+            else:
+                if len(installed_bytecaches) > 0:
+                    _output_bytecacher = installed_bytecaches[0][1]()
+                    _bytecacher = _output_bytecacher
+
             # bind environment args
             base_environment_args['loader'] = _loader
-
-            if len(installed_extensions) > 0:
-                base_environment_args['extensions'] = compiled_extension_list
-
-            if len(installed_bytecaches) > 0:
-                self.logging.info('Chosen bytecache: "%s".' % installed_bytecaches[0][0])
-                base_environment_args['bytecode_cache'] = installed_bytecaches[0][1]()
+            base_environment_args['extensions'] = compiled_extension_list
+            base_environment_args['bytecode_cache'] = _bytecacher
 
             # hook up filters
             filters = {
@@ -347,4 +351,60 @@ class ContentBridge(object):
             # replace logging conditional
             self.logging._setcondition(self._webHandlerConfig.get('logging'))
             self.__environment = environment
+
             return self.__environment
+
+    def render_dynamic(self, path=None, context={}, elements={}, content_type='text/html', headers={}, dependencies=[], flush=True, **kwargs):
+
+            ''' Render shim for advanced dynamic content rendering. '''
+
+            # Provide render options to template
+            _render_opts = {
+                'path': path,
+                'self': self,
+                'context': context,
+                'elements': elements,
+                'content_type': content_type,
+                'headers': headers,
+                'dependencies': dependencies,
+                'kwargs': kwargs
+            }
+
+            context['__render_opts'] = _render_opts
+
+            # Layer on user context
+            if isinstance(self.context, dict) and len(self.context) > 0:
+                self.context.update(context)
+            else:
+                self.context = context
+
+            # Build response headers
+            response_headers = {}
+            for key, value in self.baseHeaders.items():
+                response_headers[key] = value
+
+            # Consider kwargs
+            if len(kwargs) > 0:
+                self.context.update(kwargs)
+
+            # Bind runtime-level template context
+            self.context = self._bindRuntimeTemplateContext(self.context)
+
+            # Bind elements
+            if len(elements) > 0:
+                map(self._setcontext, elements)
+
+            # If we have a pre-render, use it, otherwise load and render
+            if self.__content_prerender is not None:
+                rendered = self.__content_bridge.render(self.__content_prerender, self.context)
+
+            else:
+                # Get/select the template using our environment
+                rendered = self.__content_bridge.prerender(self._environment, path).render(self.context)
+
+            if flush:
+                # Output rendered template
+                return self.response.write(rendered)
+            else:
+                # Return rendered template
+                return rendered
