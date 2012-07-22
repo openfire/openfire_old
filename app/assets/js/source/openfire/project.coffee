@@ -7,36 +7,41 @@ class ProjectVideo extends Asset
 
 class ProjectAvatar extends Asset
 
+
 # project object classes
 
-class Goal
-    constructor: () ->
-        @from_message = (message) =>
-            # should eventually live on Model?
-            return Util.extend(true, @, message)
-
-        @to_message = () =>
-            message = {}
-            message[prop] = val for own prop, val of @
-            return message
-
-class Tier
-    constructor: () ->
-        @from_message = (message) =>
-            # should eventually live on Model?
-            return Util.extend(true, @, message)
-
-        @to_message = () =>
-            message = {}
-            message[prop] = val for own prop, val of @
-            return message
-
-
-
-# base project object
-class Project # extends Model
+class Goal extends Model
 
     model:
+        key: String()
+        target: String()
+        contribution_type: String()
+        amount: Number()
+        description: String()
+        backer_count: Number()
+        progress: Number()
+        met: Boolean()
+
+
+class Tier extends Model
+
+    model:
+        key: String()
+        target: String()
+        name: String()
+        contribution_type: String()
+        amount: Number()
+        description: String()
+        delivery: String()
+        backer_count: Number()
+        backer_limit: Number()
+
+
+# base project class
+class Project extends Model
+
+    model:
+        key: String()
         name: String()
         status: String()
         category: String()
@@ -51,106 +56,110 @@ class Project # extends Model
 
     constructor: (key) ->
 
-        @key = key
-        @assets =
-            store:[]
-            index: {}
+        super(key)
 
-        @goals =
-            store:[]
-            index: {}
+        @stashes = {}
+        @internal =
 
-        @tiers =
-            store:[]
-            index: {}
+            new_stash: () =>
+                return store: [], index: {}
 
-        @attach = (kind, obj) =>
+            clean_stashes: Util.debounce(() =>
 
-            if obj? and kind?
+                @log('Renewing stash indexes...')
 
-                if @[kind]?
-                    key = obj.key
+                renew = (sn, s) =>
+                    store = s.store
+                    index = s.index
+                    new_store = []
+                    new_index = {}
 
-                    if @[kind].index[key]?
-                        idx = @[kind].index[key]
+                    (new_index[k] = new_store.push(store[i]) - 1) for k, i of index
 
-                        old_store = @[kind].store
-                        new_store = old_store.slice(0, idx)
-                        (_ns = old_store.slice(idx+1)).unshift(obj)
+                    @stashes[sn] =
+                        store: new_store
+                        index: new_index
 
-                        new_store.push(item) for item in _ns
+                renew(stashname, stash) for stashname, stash of @stashes
+                @log('Index update complete.')
 
-                        @[kind].store = new_store
+            , 1000)
 
-                        return obj
 
-                    else @[kind].index[key] = @[kind].store.push(obj) - 1
+        @attach = (obj, callback) =>
 
-                else throw 'Invalid project store specified for attach()ment'
+            if obj? and obj.key?
 
-            else throw 'Too few arguments passed to attach(): function(store_name, object_to_store){}'
+                stash_name = obj.constructor.name.toLowerCase()
+                key = obj.key
 
-        @from_message = (message, strict=false) =>
+                @stashes[stash_name] ?= @internal.new_stash()
 
-            ## updates model with RPC responses
-            # should eventually live on Model API
-            # can't be simple extend - must compare against 'model' property on prototype to type-validate
-            # if strict isnt false, validate just discards non-model properties and returns modelsafed object
-            try
-                if @::validate(message, @::model, false)
-                    @[prop] = val for own prop, val of message
+                if @stashes[stash_name].index[key]
 
-            catch error
-                console.log 'Validation error: ', error.toString()
+                    idx = @stashes[stash_name].index[key]
 
-                if not strict
-                    try
-                        modsafe = @::validate(message, @::model, true)
-                        @[p] = v for own p, v of modsafe
+                    old_store = @stashes[stash_name].store
+                    new_store = old_store.slice(0, idx)
+                    (_ns = old_store.slice(idx+1)).unshift(obj)
 
-                    catch err
-                        console.log 'Model-safing RPC message failed: ', err.toString()
+                    new_store.push(item) for item in _ns
 
-            finally
-                return @
+                    @stashes[stash_name].store = new_store
 
-        @to_message = () =>
+                else @stashes[stash_name].index[key] = @stashes[stash_name].store.push(obj) - 1
 
-            ## converts model to RPC-ready object
-            # needs some thought - improvements?
-            message = {}
-            message[prop] = val for own prop, val of @
+                $.apptools.events.trigger 'PROJECT_ASSET_ATTACHED', obj, @
+                @internal.clean_stashes()
 
-            return message
+                return if callback? then callback?(obj) else obj
+
+            else if obj?
+                throw 'No key found on '+obj.constructor.name+' object.'
+
+            else
+                throw 'Too few arguments passed to attach(): function(object, callback=null){}'
+
+        @get_attached = (stash_name, key_or_index, index_only=false) =>
+
+            if stash_name? and key_or_index?
+
+                stash_name = stash_name.toLowerCase()
+
+                if not @stashes[stash_name]?
+                    return false
+                else
+                    if (i = parseInt(key_or_index, 10)) > 0 or i < 0 or i is 0    # if key parse doesn't return NaN, assume it's an index
+                        index = i
+
+                    else if (_i = @stashes[stash_name].index[key_or_index])?
+                        index = _i
+
+                    else return false
+
+                    return if index_only then index else @stashes[stash_name].store[index]
+
+            else 
+                # eventually, calling this with no arguments should sync assets with server. for now you get error.
+                throw 'Too few arguments passed to get_attached(): function(model, key_or_index, index_only=false)'
+
 
         @get = (callback) =>
 
+            @log('Pulling most updated project version from server...')
             $.apptools.api.project.get(key: @key).fulfill
-
                 success: (response) =>
+                    @log('Project successfully synced.')
                     return if callback? then callback?(@from_message(response)) else @from_message(response)
 
                 failure: (error) =>
+                    @log('Error syncing project: '+error)
                     alert 'project get() failure'
-
-        @get_attached = (kind, key, index_only=false) =>
-
-            if key? and @[kind]?
-
-                if (_i = parseInt(key, 10)) > 0 or _i < 0 or _i is 0  # rule out NaN responses from parseInt
-                    return @[kind].store[_i] or false
-
-                if (idx = @[kind].index[key])?
-                    return if index_only then idx else @[kind].store[idx]
-                else
-                    return false
-
-            else throw 'Too few arguments passed to get_attached(): function(store_name, index){}'
 
 
 
 # base proposal object
-class Proposal # extends Model
+class Proposal extends Model
 
     model: null
 
@@ -165,8 +174,10 @@ class ProjectController extends OpenfireController
     @events = [
         'PROJECT_CONTROLLER_READY',
         'PROJECT_CONTROLLER_INIT',
-        'PROJECT_MEDIA_ADDED',
+        'PROJECT_ASSET_ATTACHED',
         'PROJECT_AVATAR_ADDED',
+        'PROJECT_IMAGE_ADDED',
+        'PROJECT_VIDEO_ADDED',
         'PROJECT_BACKED',
         'PROJECT_EDITED',
         'PROJECT_FOLLOWED',
@@ -175,6 +186,8 @@ class ProjectController extends OpenfireController
         'PROJECT_UPDATED',
     ]
 
+    method_proxies: ['attach', 'get_attached', 'from_message', 'to_message']
+
     constructor: (openfire) ->
 
         @_state = Util.extend(true, {}, window._cp)
@@ -182,7 +195,76 @@ class ProjectController extends OpenfireController
         @project = new Project(@_state.ke)
         @project_key = @project.key
 
-        @add_media = (file_or_url, kind) =>
+        @log = (message) => return @constructor::log(@constructor.name, message)
+
+        @internal =
+
+            prep_dropped_modal_html: (name, ext) =>
+
+                old = document.getElementById('project-image-drop-choice-modal-dialog')
+                if old?
+                    old.parentNode.removeChild(old)
+
+                _old = document.getElementById('project-image-drop-choice')
+                if _old?
+                    _old.parentNode.removeChild(_old)
+
+                # takes filename, returns [premodal_element, trigger_element]
+
+                preview = Util.create_element_string('img',
+                    id: 'project-image-drop-preview'
+                    style: 'max-width: 140px;'
+                    class: 'dropshadow'
+                )
+
+                filename_edit = Util.create_element_string('span',
+                    id: 'project-image-drop-filename'
+                    class: 'modal-editable alone'
+                    'data-ext': '.'+ext
+                    contenteditable: true
+                , name)
+
+                greeting = Util.create_element_string('span',
+                    style: 'font-weight: 700; font-size: 14px;'
+                , 'Would you like to attach' + filename_edit + 'to your project?')
+
+                attach_avatar = Util.create_element_string('button',
+                    id: 'project-image-drop-avatar'
+                    class: 'rounded modal-button'
+                    value: 'avatar'
+                , 'yes!<br>(as an avatar)')
+
+                attach_image = Util.create_element_string('button',
+                    id: 'project-image-drop-image'
+                    class: 'rounded modal-button'
+                    value: 'image'
+                , 'yes!<br>(as an image)')
+
+                oops = Util.create_element_string('button',
+                    id: 'project-image-drop-no'
+                    class: 'rounded modal-button'
+                    value: 'oops'
+                , 'oops!<br>(no thanks)')
+
+                buttons = [attach_avatar, attach_image, oops].join('')
+                content = ['',preview,'','',greeting,'','',buttons].join('<br>')
+
+                pre_modal = Util.create_element_string('div',
+                    id: 'project-image-drop-choice'
+                    style: 'width: 100%;margin: 0 auto;opacity: 0;text-align: center;background-color: #eee;font-size: 9pt;'
+                    class: 'pre-modal'
+                    'data-title': 'Hey! You dropped your photo!'
+                , content)
+
+                trigger = Util.create_element_string('a',
+                    id: 'a-project-image-drop-choice'
+                    href: '#project-image-drop-choice'
+                    style: 'display: none;'
+                )
+
+                return [pre_modal, trigger]
+
+        @add_media = (file_or_url) =>
 
             ## attach a media item to a project
             if @_state.o
@@ -201,67 +283,29 @@ class ProjectController extends OpenfireController
                     # it's a file!
                     file = file_or_url
                     filetype = file.type
-                    console.log('Received dropped ', filetype)
+                    filesize = file.size
+                    file_ext = (fn = file.name.split('.')).pop()
 
-                    reader = new FileReader()
-                    reader.file = file
-                    reader.onloadend = (e) =>
-                        e.preventDefault()
-                        e.stopPropagation()
-                        Util.get('project-image-drop-preview').setAttribute('src', e.target.result)
+                    @log('Received dropped file: '+filetype, file)
 
-                    choice = $.apptools.widgets.modal.create (() =>
-                        docfrag = Util.create_doc_frag (() =>
-                            return Util.create_element_string('div',
-                                id: 'project-image-drop-choice'
-                                style: 'width: 100%;margin: 0 auto;opacity: 0;text-align: center;background-color: #eee;font-size: 9pt;'
-                                class: 'pre-modal'
-                                "data-title": 'Hey, you dropped your photo!'
-                            ).split('*').join([
-                                '',
-                                Util.create_element_string('img',
-                                    id: 'project-image-drop-preview'
-                                    style: 'max-width: 140px;'
-                                    class: 'dropshadow'
-                                ),
-                                '','', '<span style="font-size: 14px; font-weight: bolder;">My, that looks nice.</span>', '','','',
-                                'Would you like to attach "'+file.name+'" to your project?',
-                                 '','',
-                                [
-                                    Util.create_element_string('button',
-                                        id: 'project-image-drop-avatar'
-                                        class: 'rounded'
-                                        value: 'avatar'
-                                    ).split('*').join('yes!<br>(as an avatar)')
-                                ,
-                                    Util.create_element_string('button',
-                                        id: 'project-image-drop-image'
-                                        class: 'rounded'
-                                        value: 'image'
-                                    ).split('*').join('yes!<br>(as an image)')
-                                ,
-                                    Util.create_element_string('button',
-                                        id: 'project-image-drop-no'
-                                        class: 'rounded'
-                                        value: 'no'
-                                    ).split('*').join('oops!<br>(no thanks)')
-                                ].join('')
-                            ].join('<br>'))
-                        )()
+                    # prep modal
+                    modal_parts = @internal.prep_dropped_modal_html(fn.join('.'), file_ext)
+
+                    choice_modal = $.apptools.widgets.modal.create (() =>
+                        # pre-modal
+                        docfrag = Util.create_doc_frag(modal_parts[0])
                         document.body.appendChild(docfrag)
                         return document.getElementById('project-image-drop-choice')
                     )(), (() =>
-                        docfrag = Util.create_doc_frag (() =>
-                            return Util.create_element_string 'a',
-                                id: 'a-project-image-drop-choice'
-                                href: '#project-image-drop-choice'
-                                style: 'display: none;'
-                        )()
+                        # trigger (not used here but required for create())
+                        docfrag = Util.create_doc_frag(modal_parts[1])
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-project-image-drop-choice')
                     )(), (m) =>
+                        # create() callback
                         return m.open()
                     ,
+                        # config for modal
                         initial:
                             width: '0px'
                             height: '0px'
@@ -270,7 +314,7 @@ class ProjectController extends OpenfireController
 
                         ratio:
                             x: 0.3
-                            y: 0.5
+                            y: 0.7
 
                         calc: () ->
                             css = {}
@@ -287,10 +331,20 @@ class ProjectController extends OpenfireController
 
                             return css
 
+                    # construct reader for img preview
+                    reader = new FileReader()
+                    reader.file = file
+                    reader.onloadend = (e) =>
+                        e.preventDefault()
+                        e.stopPropagation()
+                        return Util.get('project-image-drop-preview').setAttribute('src', e.target.result)
+
                     if /^image\/(png|jpeg|gif)$/gi.test(filetype)
 
+                        # kick off preview
                         reader.readAsDataURL(file)
 
+                        # upload as image
                         Util.get('project-image-drop-image').addEventListener('click', (e) =>
 
                             if e.preventDefault
@@ -298,26 +352,27 @@ class ProjectController extends OpenfireController
                                 e.stopPropagation()
 
                             (btn = e.target).innerHTML = 'Great!<br>Uploading...'
+                            fn_el = document.getElementById('project-image-drop-filename')
+                            filename = fn_el.innerText
 
                             callback = (res) =>
-                                console.log('attach_image() callback reached!')
-                                console.log('callback response: ', res)
+                                # post-upload callback
+                                @log('Image upload successful! Attaching image to project...')
+                                @attach new ProjectImage(res[0]), () =>
+                                    $.apptools.events.trigger 'PROJECT_IMAGE_ADDED', @                                               
+                                    btn.style.backgroundColor = '#bada55'
+                                    btn.innerHTML = 'Awesome!<br>Good to go.'
 
-                                @project.attach(new ProjectImage(res))
-                                $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
-
-                                btn.style.backgroundColor = '#bada55'
-                                btn.innerHTML = 'Awesome!<br>Good to go.'
-
-                                return @
+                                    return @project
 
                             $.apptools.api.media.attach_image(
                                 target: @project_key
-                                size: file.size
-                                name: file.name
+                                size: filesize
+                                name: filename
                             ).fulfill
                                 success: (response) =>
                                     if not @uploader?
+                                        # create uploader if one hasn't been made
                                         uploader = $.apptools.widgets.uploader.create 'array',
                                             id: 'body'
                                             endpoints: [response.endpoint]
@@ -326,18 +381,24 @@ class ProjectController extends OpenfireController
                                         @uploader = uploader
 
                                     else
-                                        uploader = @uploader.add_endpoint(response.endpoint)
+                                        # update current uploader
+                                        uploader = @uploader.set_endpoint(response.endpoint)
                                         uploader = uploader.add_callback(callback)
 
                                     uploader.upload(file)
 
                                 failure: (error) =>
+                                    # apologize and try again
                                     btn.style.backgroundColor = '#ee9099'
-                                    btn.innerHTML = 'Bummer!<br> :('
-                                    alert 'uploaded attach_image() failure'
+                                    btn.innerHTML = 'Sorry!<br>:('
+                                    timer = setTimeout(() =>
+                                        btn.style.backgroundColor = 'transparent'
+                                        btn.innerHTML = 'Try again?<br>:)'
+                                    , 600)
 
                         , false)
 
+                        # upload as avatar
                         Util.get('project-image-drop-avatar').addEventListener('click', (e) =>
 
                             if e.preventDefault
@@ -345,21 +406,22 @@ class ProjectController extends OpenfireController
                                 e.stopPropagation()
 
                             (btn = e.target).innerHTML = 'Great!<br>Uploading...'
+                            fn_el = document.getElementById('project-image-drop-filename')
+                            filename = fn_el.innerText
 
                             callback = (res) =>
-                                console.log('attach_image() callback reached!')
-                                console.log('callback response: ', res)
-
-                                @project.attach(new ProjectAvatar(res))
-                                $.apptools.events.trigger 'PROJECT_AVATAR_ADDED', @
-
-                                btn.style.backgroundColor = '#bada55'
-                                btn.innerHTML = 'Awesome!<br>Good to go.'
+                                @log('Avatar upload successful! Attaching avatar to project...')
+                                @attach new ProjectAvatar(res[0]), () =>
+                                    $.apptools.events.trigger 'PROJECT_AVATAR_ADDED', @
+                                    btn.style.backgroundColor = '#bada55'
+                                    btn.innerHTML = 'Awesome!<br>Good to go.'
+                                
+                                    return @project
 
                             $.apptools.api.media.attach_avatar(
                                 target: @project_key
-                                size: file.size
-                                name: file.name
+                                size: filesize
+                                name: filename
                             ).fulfill
                                 success: (response) =>
                                     if not @uploader?
@@ -371,18 +433,22 @@ class ProjectController extends OpenfireController
                                         @uploader = uploader
 
                                     else
-                                        uploader = @uploader.add_endpoint(response.endpoint)
+                                        uploader = @uploader.set_endpoint(response.endpoint)
                                         uploader = uploader.add_callback(callback)
 
                                     uploader.upload(file)
 
                                 failure: (error) =>
                                     btn.style.backgroundColor = '#ee9099'
-                                    btn.innerHTML = 'Bummer!<br> :('
-                                    alert 'uploaded attach_avatar() failure'
+                                    btn.innerHTML = 'Sorry!<br>:('
+                                    timer = setTimeout(() =>
+                                        btn.style.backgroundColor = 'transparent'
+                                        btn.innerHTML = 'Try again?<br>:)'
+                                    , 600)
 
                         , false)
 
+                        # no thx
                         Util.get('project-image-drop-no').addEventListener('click', (e) =>
 
                             if e.preventDefault
@@ -397,56 +463,64 @@ class ProjectController extends OpenfireController
 
                     else throw new MediaError(@constructor.name, 'Tried to upload unsupported filetype. Images must be .jpg, .png, or .gif.')
 
-                else
-                    # assume it's a URL
+                else if file_or_url.length and file_or_url.charAt
+                    # it's a URL - for now we support video
                     url = file_or_url
-                    console.log('received url to attach: ', url)
+                    @log('Received video URL: '+url)
 
-                    if kind is 'image'
+                    $.apptools.api.media.attach_video(
+                        reference: url
+                        target: @project_key
+                    ).fulfill
+                        success: (response) =>
+                            @attach(new Video(response))
+                            $.apptools.events.trigger 'PROJECT_VIDEO_ADDED', @
 
-                        $.apptools.api.media.attach_image(
+                        failure: (error) =>
+                            alert 'attach_video() failure'
 
-                            intake: 'url'
-                            target: @project_key
-
-                        ).fulfill
-
-                            success: (response) =>
-
-                                @project.attach(new Image(response.media_key, response.serve_url))
-                                $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
-
-                            failure: (error) =>
-                                alert 'url-linked attach_image() failure'
-
-                    else if kind is 'video'
-
-                        $.apptools.api.media.attach_video(
-
-                            reference: url
-                            target: @project_key
-
-                        ).fulfill
-
-                            success: (response) =>
-
-                                @project.attach(new Video(response.media_key, response.serve_url))
-                                $.apptools.events.trigger 'PROJECT_MEDIA_ADDED', @
-
-                            failure: (error) =>
-                                alert 'attach_video() failure'
-
-                    else throw new MediaError(@constructor.name, 'Unrecognized media kind linked.')
+                else throw new MediaError(@constructor.name, 'Unrecognized media kind linked.')
 
             else throw new UserPermissionsError(@constructor.name, 'Current user is not a project owner.')
 
 
+        @edit = () =>
+
+            ## edit an existing project
+            # content api?
+            @log('editing functionality currently stubbed.')
+            alert('You tried to edit a project! We\'re working on it :)')
+
+        @update = () =>
+
+            ## post an update to a project
+            @log('updating functionality currently stubbed.')
+            alert('You tried to update a project! We\'re working on it :)')
+
+            ###
+            if @_state.o
+                $.apptools.api.project.post(target: @project_key).fulfill
+                    success: () =>
+                        # no response i think?
+                        alert 'update() success'
+
+                    failure: (error) =>
+                        alert 'update() failure'
+
+            else throw new UserPermissionsError(@constructor.name, 'Current user is not a project owner.')
+            ###
+
         @back = () =>
 
             ## back a project
-            $.apptools.api.project.back(target: @project_key).fulfill
-
+            # to do - figure out how to get the user, create UI for backing
+            $.apptools.api.project.back(
+                project: @project_key
+                user: null
+                contribution: null
+            ).fulfill
                 success: (response) =>
+                    @log('backing functionality currently stubbed.')
                     $('#back-text').animate opacity: 0,
                         duration: 250
                         complete: () =>
@@ -461,21 +535,13 @@ class ProjectController extends OpenfireController
                 failure: (error) =>
                     alert 'back() failure'
 
-
-        @edit = () =>
-
-            ## edit an existing project
-            # content api?
-
-        @edit_tier = () => return @tiers.edit.apply(@, arguments)
-        @edit_goal = () => return @tiers.edit.apply(@, arguments)
-
-            ## edit a project tier
-
-
         @follow = () =>
 
             ## follow a project
+            @log('following functionality currently stubbed.')
+            alert('You tried to follow a project! We\'re working on it :)')
+
+            ###
             $.apptools.api.project.follow(target: @project_key).fulfill
 
                 success: (response) =>
@@ -484,13 +550,23 @@ class ProjectController extends OpenfireController
 
                 failure: (error) =>
                     alert 'follow() failure'
+            ###
 
 
-        @get = (refresh, callback) =>
+        @share = (sm_service) =>
+
+            ## share a project via social media
+            # what do?
+
+            @log('sharing functionality currently stubbed.')
+            alert('You tried to share a project! We\'re working on it :)')
+
+
+        @get = (refresh, callback) =>  
 
             ## get the associated project
-            # for server pull, refresh=true
-            if not refresh?
+            
+            if not refresh?         # refresh=true syncs with server
                 refresh = false
 
             else if typeof refresh isnt 'boolean'
@@ -500,7 +576,7 @@ class ProjectController extends OpenfireController
             if typeof callback isnt 'function'
                 callback = null
 
-            return if refresh then @project.get(callback) else if callback? then callback.call?(@, @project) else @project
+            return if refresh then @project.get(callback) else if callback? then callback.call(@, @project) else @project
 
         @get_backers = () =>
 
@@ -540,23 +616,25 @@ class ProjectController extends OpenfireController
                 failure: (error) =>
                     alert 'get_updates() failure'
 
+        @edit_goal = () => return @tiers.edit.apply(@, arguments)
+        @edit_tier = () => return @tiers.edit.apply(@, arguments)
+
         @goals =
 
-            get: (goal_key, callback) =>
+            get: (goal_key, callback, sync=false) =>
+                
                 ## get goal by key
-
-                if goal_key is false
-                    # just return local version
-                    goal_key = callback
-                    idx = @project.goals_by_key[goal_key]
-                    return if idx then @project.goals[idx] else null
+                if not sync
+                    return @get_attached('goal', goal_key)
 
                 else
                     # get from the server
-                    $.apptools.api.project.get_goal({key: goal_key}).fulfill
-
+                    $.apptools.api.project.get_goal(
+                        key: goal_key
+                        project: @project_key
+                    ).fulfill
                         success: (response) =>
-                            goal = @project.attach('goal', new Goal().from_message(response.goal))
+                            goal = @attach(new Goal().from_message(response.goal))
 
                             return if callback? then callback.call(@, goal) else goal
 
@@ -564,26 +642,20 @@ class ProjectController extends OpenfireController
                             alert 'goals.get() failure'
 
 
-            list: (callback) =>
+            list: (callback, sync=false) =>
 
                 ## list goals by project key
-                $.apptools.api.project.list_goals({project: @project_key}).fulfill
+                $.apptools.api.project.list_goals(project: @project_key).fulfill
 
                     success: (response) =>
                         goals = []
-                        _at = (_g) =>
-                            _goal = new Goal()
-                            _goal = _goal.from_message(_g)
-                            @project.attach('goals', _goal)
-                            return _goal
-
-                        goals.push(_at(goal)) for goal in response.goals
+                        goals.push(@attach(new Goal().from_message(goal))) for goal in response.goals
 
                         return if callback? then callback.call(@, goals) else goals
 
                     failure: (error) =>
                         alert 'goals.list() failure'
-                        console.log('Error listing goals: ' + error)
+                        @log('Error listing goals: ' + error)
 
             put: (goal, callback) =>
 
@@ -621,6 +693,14 @@ class ProjectController extends OpenfireController
                     _key = null
 
                     $.apptools.widgets.modal.create (() =>
+                        old = document.getElementById(base_id+'-modal-dialog')
+                        if old?
+                            old.parentNode.removeChild(old)
+
+                        _old = document.getElementById(base_id)
+                        if _old?
+                            _old.parentNode.removeChild(_old)
+
                         document.body.appendChild(Util.create_doc_frag(Util.create_element_string('div'
                             id: base_id
                             class: 'pre-modal'
@@ -629,8 +709,7 @@ class ProjectController extends OpenfireController
                         , ((goal_div='') =>
                             (goal_div += Util.create_element_string('div'
                                 id: 'goal-editing-'+ (() =>
-                                    go = @project.attach('goals', g)
-                                    _idx = @project.get_attached('goals', go.key, true)
+                                    _idx = @get_attached('goal', g.key, true)
                                     return _idx
                                 )()
                                 class: 'mini-editable goal'
@@ -678,7 +757,7 @@ class ProjectController extends OpenfireController
                             editor = $.apptools.widgets.editor.create(gfield)
 
                             _idx = editor._state.element_id.split('-').pop()
-                            goal = @project.get_attached('goals', _idx)
+                            goal = @get_attached('goal', _idx)
                             _key = goal.key
 
                             editor.save = (e) =>
@@ -723,7 +802,7 @@ class ProjectController extends OpenfireController
                                                             return editor.hide()
                                                         , 400)
 
-                                        return @project.attach('goals', goal.from_message(response))
+                                        return @attach(goal.from_message(response))
 
                                     failure: (error) =>
                                         $(pane).animate
@@ -749,12 +828,6 @@ class ProjectController extends OpenfireController
 
                             document.getElementById('goal-save-'+_idx).addEventListener('click', editor.save, false)
 
-                            (close_x = document.getElementById(base_id + '-modal-close')).removeEventListener('mousedown')
-                            close_x.addEventListener('click', () =>
-                                return m.close((_m) =>
-                                    return $.apptools.widgets.modal.destroy(_m))
-                            , false)
-
 
                             document.getElementById('goal-get-'+_idx).addEventListener('click', (e) =>
 
@@ -763,13 +836,13 @@ class ProjectController extends OpenfireController
                                     e.stopPropagation()
                                     clicked = e.target
                                     _idx = clicked?.getAttribute('id').split('-').pop()
-                                    goal = @project.get_attached('goals', _idx)
+                                    goal = @get_attached('goal', _idx)
                                     _key = goal.key
 
                                 return @goals.get _key, (gol) =>
                                     document.getElementById('goal-amount-'+_idx).innerHTML = gol.amount
                                     document.getElementById('goal-description-'+_idx).innerHTML = gol.description
-                                    @project.attach('goals', gol)
+                                    @attach(gol)
                             , false)
 
                             document.getElementById('goal-delete-'+_idx).addEventListener('click', (e) =>
@@ -779,10 +852,15 @@ class ProjectController extends OpenfireController
                                     e.stopPropagation()
                                     clicked = e.target
                                     _idx = clicked?.getAttribute('id').split('-').pop()
-                                    goal = @project.get_attached('goals', _idx)
+                                    goal = @get_attached('goal', _idx)
                                     _key = goal.key
 
                                 return @goals.delete(_key)
+                            , false)
+
+                            (close_x = document.getElementById(base_id + '-modal-close')).removeEventListener('mousedown')
+                            close_x.addEventListener('click', 
+                                () => return m.close()
                             , false)
 
                             return editor
@@ -819,50 +897,6 @@ class ProjectController extends OpenfireController
 
                     return @
 
-                ### end current edit functionality - below code is future-planned, thanks to bugs :(
-
-                # extract goal & key from params
-                if goal_or_key.key.key
-                    # we got a goal
-                    goal = goal_or_key
-                    goal_key = goal.key
-                    goals = [goal]
-
-                else if goal_or_key.key and goal_or_key.constructor.name is 'Key'
-
-                    goal_key = goal_or_key
-                    goal = @goals.get(goal_key)
-                    goals = [goal]
-
-
-                goal_editor.steps = []
-                goal_editor._state.current = 0
-                goal_editor.step = (incr, callback) ->
-                    if not incr?
-                        incr = 1
-
-                    current_idx = @_state.current
-                    current_step = @steps[current_idx]
-                    next_step = @steps[current_idx + incr]
-
-                    $(current_step).animate opacity: 0
-                        duration: 250
-                        complete: () =>
-                            $(next_step).animate opacity: 1
-                                duration: 200
-                                complete: () =>
-                                    @_state.current += incr
-                                    return if callback? then callback?(next_step) else @
-
-                ###
-
-
-        @share = (sm_service) =>
-
-            ## share a project via social media
-            # what do?
-
-            alert 'Testing social sharing!'
 
         @tiers =
 
@@ -880,7 +914,7 @@ class ProjectController extends OpenfireController
                     $.apptools.api.project.get_tier({key: tier_key}).fulfill
 
                         success: (response) =>
-                            tier = @project.attach('tier', new Tier().from_message(response.tier))
+                            tier = @attach(new Tier().from_message(response.tier))
 
                             return if callback? then callback.call(@, tier) else tier
 
@@ -898,7 +932,7 @@ class ProjectController extends OpenfireController
                         _at = (_t) =>
                             _tier = new Tier()
                             _tier = _tier.from_message(_t)
-                            @project.attach('tiers', _tier)
+                            @attach(_tier)
                             return _tier
 
                         tiers.push(_at(tier)) for tier in response.tiers
@@ -907,7 +941,7 @@ class ProjectController extends OpenfireController
 
                     failure: (error) =>
                         alert 'tiers.list() failure'
-                        console.log('Error listing tiers: ' + error)
+                        @log('Error listing tiers: ' + error)
 
             put: (tier, callback) =>
 
@@ -945,6 +979,14 @@ class ProjectController extends OpenfireController
                     _key = null
 
                     $.apptools.widgets.modal.create (() =>
+                        old = document.getElementById(base_id+'-modal-dialog')
+                        if old?
+                            old.parentNode.removeChild(old)
+
+                        _old = document.getElementById(base_id)
+                        if _old?
+                            _old.parentNode.removeChild(_old)
+
                         document.body.appendChild(Util.create_doc_frag(Util.create_element_string('div'
                             id: base_id
                             class: 'pre-modal'
@@ -953,8 +995,7 @@ class ProjectController extends OpenfireController
                         , ((tier_div='') =>
                             (tier_div += Util.create_element_string('div'
                                 id: 'tier-editing-'+ (() =>
-                                    ti = @project.attach('tiers', t)
-                                    _idx = @project.get_attached('tiers', ti.key, true)
+                                    _idx = @get_attached('tier', t.key, true)
                                     return _idx
                                 )()
                                 class: 'mini-editable tier'
@@ -1011,7 +1052,7 @@ class ProjectController extends OpenfireController
                                     e.stopPropagation()
                                     clicked = e.target
                                     _idx = clicked?.getAttribute('id').split('-').pop()
-                                    tier = @project.get_attached('tiers', _idx)
+                                    tier = @get_attached('tier', _idx)
                                     _key = tier.key
 
                                 tier.target = @project_key
@@ -1034,7 +1075,7 @@ class ProjectController extends OpenfireController
                                                     editor.hide()
                                         , 200)
 
-                                        return @project.attach('tiers', new tier.from_message(response))
+                                        return @attach(new Tier().from_message(response))
 
                                     failure: (error) =>
                                         _el.style.backgroundColor = 'red'
@@ -1049,13 +1090,13 @@ class ProjectController extends OpenfireController
                                     e.stopPropagation()
                                     clicked = e.target
                                     _idx = clicked?.getAttribute('id').split('-').pop()
-                                    tier = @project.get_attached('tiers', _idx)
+                                    tier = @get_attached('tier', _idx)
                                     _key = tier.key
 
                                 return @tiers.get _key, (teer) =>
                                     document.getElementById('tier-amount-'+_idx).innerHTML = teer.amount
                                     document.getElementById('tier-description-'+_idx).innerHTML = teer.description
-                                    @project.attach('tiers', teer)
+                                    @attach(teer)
                             , false)
 
                             document.getElementById('tier-delete-'+_idx).addEventListener('click', (e) =>
@@ -1065,10 +1106,15 @@ class ProjectController extends OpenfireController
                                     e.stopPropagation()
                                     clicked = e.target
                                     _idx = clicked?.getAttribute('id').split('-').pop()
-                                    tier = @project.get_attached('tiers', _idx)
+                                    tier = @get_attached('tier', _idx)
                                     _key = tier.key
 
                                 return @tiers.delete(_key)
+                            , false)
+
+                            (close_x = document.getElementById(base_id + '-modal-close')).removeEventListener('mousedown')
+                            close_x.addEventListener('click',
+                                () => return m.close()
                             , false)
 
                             return editor
@@ -1105,25 +1151,17 @@ class ProjectController extends OpenfireController
 
                     return @
 
-        @update = () =>
-
-            ## post an update to a project
-            if @_state.o
-                $.apptools.api.project.post(target: @project_key).fulfill
-
-                    success: () =>
-                        # no response i think?
-                        alert 'update() success'
-
-                    failure: (error) =>
-                        alert 'update() failure'
-
-            else throw new UserPermissionsError(@constructor.name, 'Current user is not a project owner.')
-
 
         @_init = () =>
 
             if window._cp
+
+                # setup project method proxies
+                ((m) => 
+                    @[m] = () => return @project[m].apply(@project, arguments)
+                )(method) for method in @constructor::method_proxies
+
+                # event listeners
                 document.getElementById('follow').addEventListener('click', @follow, false)
                 document.getElementById('share').addEventListener('click', @share, false)
                 document.getElementById('back').addEventListener('click', @back, false)
@@ -1154,6 +1192,7 @@ class ProjectController extends OpenfireController
                         return @add_media(ev)
                     ), false)
 
+            window.__pr = new Project('my-test-project-key')
             return @get()
 
 
@@ -1173,7 +1212,7 @@ if @__openfire_preinit?
     @__openfire_preinit.abstract_base_objects.push(Asset)
     @__openfire_preinit.abstract_base_objects.push(ProjectImage)
     @__openfire_preinit.abstract_base_objects.push(ProjectVideo)
-    @__openfire_preinit.abstract_base_objects.push(ProjectVideo)
+    @__openfire_preinit.abstract_base_objects.push(ProjectAvatar)
     @__openfire_preinit.abstract_base_classes.push(Project)
     @__openfire_preinit.abstract_base_classes.push(Proposal)
     @__openfire_preinit.abstract_base_controllers.push(ProjectController)

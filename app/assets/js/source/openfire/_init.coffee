@@ -103,7 +103,7 @@ class Openfire
                         window.apptools?.events?.register(event) for event in obj.events
 
                     # instantiate and bind to window, if obj isn't private
-                    if obj.export? isnt 'private' then (obj = new obj(@)) and window[o] = obj else obj = new obj()
+                    if not (exp = obj.export)? or exp isnt 'private' then (obj = new obj(@)) and window[o] = obj else obj = new obj()
 
                     # lastly init, if it needs it
                     obj._init?()
@@ -115,21 +115,21 @@ class Openfire
                     @sys.state.classes[(cl=cls.constructor.name)] = cls
                     if cls.events?
                         window.apptools?.events?.register(event) for event in cls.events
-                    if cls.export? isnt 'private' then (cls = new cls(@)) and window[cl] = cls else cls = new cls()
+                    if not (exp = cls.export)? or exp isnt 'private' then (cls = new cls(@)) and window[cl] = cls else cls = new cls()
                     cls._init?()
 
                     return cls
 
                 # installs an openfire controller
                 controller: (ctrlr) =>
+                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.constructor.name
+
                     @sys.state.controllers[ctrlr.mount] = ctrlr
                     if ctrlr.events?
                         window.apptools?.events?.register(event) for event in ctrlr.events
-                    if ctrlr.mount?
-                        mount_point = ctrlr.mount
-                    if ctrlr.export? isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[ctrlr.constructor.name] = ctrlr else ctrlr = new ctrlr(window)
+                    if not (exp = ctrlr.export)? or exp isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[ctrlr.constructor.name] = ctrlr else ctrlr = new ctrlr(window)
+                    
                     @[mount_point] = ctrlr
-
                     ctrlr._init?()
 
                     return ctrlr
