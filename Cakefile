@@ -279,8 +279,15 @@ task 'run', 'run apptools\' local dev server', (options) ->
 
 task 'deploy', 'compile all assets and templates and deploy to appengine', (options) ->
 
+	out.shout "deploy", "Beginning deploy routine...", true
+
+	invoke_order = []
+	add_to_invoke = (op, message) =>
+		out.say "deploy", "Preparing to "+message+'...'
+		invoke_order.push(op)
+
 	appcfg_done = (code) =>
-		out.shout 'deploy', 'Deploy finished with code '+code+'.'
+		out.shout 'deploy', 'Deploy finished! :)'
 
 	appcfg_data = (data) =>
 		out.whisper data
@@ -288,13 +295,12 @@ task 'deploy', 'compile all assets and templates and deploy to appengine', (opti
 	appcfg_err = (data) =>
 		out.whisper data
 
-	invoke_order = []
-	invoke_order.push('compile:sass')
-	invoke_order.push('minify:sass')
-	invoke_order.push('compile:coffee')
-	invoke_order.push('minify:coffee')
-	invoke_order.push('clean:templates')
-	invoke_order.push('compile:templates')
+	add_to_invoke('cake compile:sass', 'compile SASS assets')
+	add_to_invoke('cake minify:sass', 'minify SASS assets')
+	add_to_invoke('cake compile:coffee', 'compile CoffeeScript assets')
+	add_to_invoke('cake minify:coffee', 'minify CoffeeScript assets')
+	add_to_invoke('cake clean:templates', 'clean compiled Jinja2 templates')
+	add_to_invoke('cake compile:templates', 'compile Jinja2 templates')
 
 	if options.version?
 		if options.appid?
@@ -307,15 +313,15 @@ task 'deploy', 'compile all assets and templates and deploy to appengine', (opti
 		else
 			cmd = 'update app --oauth2'
 
-	deploy_cmd = fixpath('tools', 'bin', 'appcfg')+' '+cmd
+	out.say "deploy", "Preparing AppEngine deploy routine..."
+	cmd = fixpath('tools', 'bin', 'appcfg')+' '+cmd
 
 	cmdstring = ''
 	for invoke in invoke_order
-		cmdstring += invoke + ' '
+		cmdstring += invoke + ' && '
 
-	out.shout "deploy", "Beginning deploy routine..."
-	out.exec 'start "Preparing deployment..." /I /WAIT cake '+cmdstring
-	out.exec 'start "Deploying..." /I /WAIT ' + deploy_cmd, appcfg_done, appcfg_data, appcfg_err
+	out.say "deploy", "Invoking..."
+	out.exec 'start "Deploying..." /I /WAIT cmd /k "prompt deploy: && cls ' + cmdstring + 'sleep 3 && ' + cmd + ' && pause && exit"', appcfg_done, appcfg_data, appcfg_err
 
 
 task 'serve', 'deploy app to appengine', (options) ->
