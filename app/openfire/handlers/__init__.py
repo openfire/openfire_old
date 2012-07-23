@@ -21,6 +21,7 @@ import webapp2
 
 ## Google Imports
 from google.appengine.ext import ndb
+from google.appengine.ext.ndb import context
 
 ## AppTools Imports
 from apptools.core import BaseHandler
@@ -155,6 +156,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
             self.preload_template(self.template)
         return
 
+    @ndb.toplevel
     def dispatch(self):
 
         ''' Retrieve session + dispatch '''

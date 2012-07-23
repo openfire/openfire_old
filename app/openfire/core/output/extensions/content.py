@@ -6,6 +6,7 @@ from apptools.util import debug
 from openfire.core.content import ContentBridge
 from openfire.core.output.extensions import OutputExtension
 
+## Globals
 _extensionConfig = config.get('openfire.output.extension.DynamicContent')
 
 
@@ -36,21 +37,23 @@ class DynamicContent(OutputExtension):
 
         super(DynamicContent, self).__init__(environment)
 
-        if self.__config.get('config').get('enabled', False) == True:
+        if self.__config.get('enabled', False) == True:
 
-            self.logging.info('DynamicContent output extension enabled and loaded properly. Attaching to template enviornment.')
+            self.__logging.info('DynamicContent output extension enabled and loaded properly. Attaching to template enviornment.')
 
             # make our content bridge
             bridge = ContentBridge(app=environment.wsgi_current_application, handler=environment.wsgi_current_handler, environment=self)
 
-            self.logging.info('==Default Namespace: "%s"' % self.__config.get('config').get('default_namespace', '__EMPTY__'))
-            self.logging.info('==Content Bridge: "%s"' % bridge)
+            self.__logging.info('==Default Namespace: "%s"' % self.__config.get('config').get('default_namespace', '__EMPTY__'))
+            self.__logging.info('==Content Bridge: "%s"' % bridge)
 
             # add the defaults to the environment
             environment.extend(
                 default_dynamic_namespace=self.__config.get('config').get('default_namespace', None),
                 dynamic_content_bridge=bridge
             )
+
+            self.environment = environment
 
     def parse(self, parser):
 
@@ -78,19 +81,17 @@ class DynamicContent(OutputExtension):
         body = parser.parse_statements(['name:endcontent', 'name:endsnippet', 'name:endsummary', 'name:end'], drop_needle=True)
 
         # now return the `CallBlock` node that calls the appropriate extension
-        # method from the attached enfironment
+        # method from the attached environment
 
-        return nodes.CallBlock(self.call_method('_callback', args), [], [], body).set_lineno(lineno)
+        return nodes.CallBlock(self.call_method('_fulfill_dynamic_content_block', args), [], [], body).set_lineno(lineno)
 
-    def _callback(self, keyname, namespace, caller):
+    def _fulfill_dynamic_content_block(self, keyname, namespace, caller, blocktype='area'):
 
-        ''' Helper callback. '''
+        ''' Resolve a dynamic content block through the Core Content API, otherwise fallback to the block default via caller(). '''
 
         # resolve namespace
         if namespace is None:
-            if hasattr(self.environment, 'default_dynamic_namespace'):
-                namespace = self.environment.default_dynamic_namespace
-            else:
-                namespace = '__system__'
+            namespace = self.environment.default_dynamic_namespace
 
-        return caller()
+        # pass off to the content API
+        return self.environment.dynamic_content_bridge.fulfill_content(keyname, namespace, caller, blocktype)

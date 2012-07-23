@@ -11,8 +11,8 @@ from google.appengine.ext import ndb
 
 
 ## QueryOptions objects
-_keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False)
-_avatars_q = ndb.QueryOptions(limit=1, projection=('r', 'a'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False)
+_keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+_avatars_q = ndb.QueryOptions(limit=1, projection=('r', 'a'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
 
 
 ## ProjectLanding - page for a listing of projects (`browse`)
@@ -36,7 +36,7 @@ class ProjectHome(WebHandler):
     ''' openfire page. '''
 
     should_log = True     # activate handler-specific logging
-    should_cache = True   # activate fullpage caching
+    should_cache = False   # activate fullpage caching
     cache_timeout = 1200  # memcache fullpage caching timeout
     template = 'projects/project_home.html'
 
@@ -53,9 +53,13 @@ class ProjectHome(WebHandler):
 
         # calculate keys to pull
         pr = ndb.Key(urlsafe=key)
+        self.preload_namespace(pr)
 
         if self.should_cache:
-            mck = '::'.join(['of', 'pagecontent', 'project_home', pr.urlsafe()])
+            if self.user:
+                mck = '::'.join(['of', 'pagecontent', 'project_home', self.user.key.urlsafe(), pr.urlsafe()])
+            else:
+                mck = '::'.join(['of', 'pagecontent', 'project_home', '_public_', pr.urlsafe()])
             self.logging.info('Looking in Memcache for project page context at key "%s"...' % mck)
             page_content = self.api.memcache.get(mck)
 

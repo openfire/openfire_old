@@ -12,6 +12,21 @@ from openfire.pipelines.model import content as pipelines
 
 ######## ======== XMS Content Models ======== ########
 
+# ContentNamespace - groups runtime sections of dynamic content, if not assigned a datastore key as a namespace
+class ContentNamespace(AppModel):
+
+    ''' Represents a group of ContentAreas namespaced by something other than a datastore key (otherwise they are put under that and just correlated here). '''
+
+    # Storage Settings
+    _use_cache = True
+    _use_memcache = True
+    _use_datastore = True
+
+    name = ndb.StringProperty('n', required=True, indexed=True)
+    target = ndb.KeyProperty('t', required=False, indexed=True, default=None)
+    areas = ndb.KeyProperty('a', repeated=True, indexed=True)
+
+
 # ContentArea - marks an editable dynamic area on a given page for a given data point
 class ContentArea(AppModel):
 
@@ -30,6 +45,8 @@ class ContentArea(AppModel):
     section = ndb.StringProperty('s', choices=['prf', 'prj', 'sys'])  # profile, project or system
     html = ndb.BlobProperty('ht', compressed=False)
     text = ndb.TextProperty('tx', compressed=False)
+    local = ndb.BooleanProperty('lc', default=False)
+    latest = ndb.KeyProperty('l', default=None)
     versions = ndb.KeyProperty('v', repeated=True)
 
 
@@ -50,6 +67,7 @@ class ContentSnippet(AppModel):
     area = ndb.KeyProperty('a')
     html = ndb.BlobProperty('h', compressed=False)
     text = ndb.TextProperty('t', compressed=True)
+    summary = ndb.KeyProperty('s')
 
 
 ## ContentSummary - a shortened summary value for a content area's content
