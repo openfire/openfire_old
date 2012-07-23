@@ -474,16 +474,46 @@
 
 
 
-#project-image-drop-avatar,
-#project-image-drop-image,
-#project-image-drop-no
-
+.modal-button
     width: 30%
     margin: 5px
     font-family: Karla
     font-size: 11pt
     text-transform: uppercase
     color: #404044
+
+.modal-editable
+    text-transform: uppercase
+    position: relative
+    margin: 10px auto
+    padding: 5px
+    text-align: center
+    font:
+        family: 'Karla', sans-serif
+        size: 15pt
+        weight: 700
+    color: #aaa
+    background-color: #fcfcfc
+    border: 1px solid #aaa
+    border-radius: 3px
+
+    &.alone
+        width: 45%
+        display: block
+
+    &:focus
+        color: #494949
+        border-color: #494949
+
+        &::before
+            color: #aaa
+
+    &::before
+        text-transform: lowercase
+        content: attr(data-ext)
+        color: #bcbcbc
+        position: absolute
+        right: 0
 
 
 #project-goal-editor,

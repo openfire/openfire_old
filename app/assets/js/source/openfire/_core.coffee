@@ -17,7 +17,7 @@ class OpenfireObject extends CoreObject
 
 
 # openfire controller: base controller class for frontend services
-class OpenfireController
+class OpenfireController extends Model
 
 
 # openfire exception: base error for openfire-level errors
@@ -31,6 +31,7 @@ class OpenfireException extends Error
 class MediaError extends OpenfireException
 class UserPermissionsError extends OpenfireException
 class ProjectEditError extends OpenfireException
+class ModelValidateError extends OpenfireException
 
 Util = new window.Util()
 
