@@ -130,7 +130,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
         return self.jinja2
 
     ## ++ Internal Methods ++ ##
-    def __init__(self, request=None, response=None):
+    def __init__(self, request=None, response=None, preload=True):
 
         ''' Init this request handler. '''
 
@@ -141,7 +141,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
         self._initialize_dynamic_content(self.app)
 
         # Preload second
-        self.preload()
+        if preload:
+            self.preload()
 
     def preload(self):
 

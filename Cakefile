@@ -100,8 +100,14 @@ out =
 		op.on 'exit', (code) =>
 			callback?() if code is 0
 
-	exec: (command, callback) ->
-		return exec command, (error, stdout, stderr) =>
+	exec: (command, callback, stdout, stderr) ->
+
+		options =
+			stdio: 'inherit'
+			encoding: 'utf8'
+
+		return exec command, options, (error, stdout, stderr) =>
+
 			if error is null
 				callback?(stdout)
 			else
@@ -116,6 +122,8 @@ option 'c', '--config [STR]', 'path to project feature/skeleton config (defaults
 option 's', '--skeleton [STR]', 'different skeleton branch to install (defaults to \'py27-base\')'
 option 'cm', '--compass', 'enable compass support, if it\'s set to off by default'
 option 'cs', '--coffee', 'enable coffeescript support, if it\'s set to off by default'
+option 'app', '--appid [STR]', 'specify the appid you want to deploy to, when running cake `deploy` or cake `serve`'
+option 'vid', '--version [STR]', 'specify the version you want to deploy to, when running cake `deploy` or cake `serve`'
 
 
 task 'echo', 'i am rubber and you are glue...', (options) =>
@@ -269,7 +277,48 @@ task 'run', 'run apptools\' local dev server', (options) ->
 		out.spawn 'compass', 'compass', ['watch'], compass_done, compass_data, compass_err
 
 
-task 'serve', 'deploy fatcatmap to appengine', (options) ->
+task 'deploy', 'compile all assets and templates and deploy to appengine', (options) ->
+
+	appcfg_done = (code) =>
+		out.shout 'deploy', 'Deploy finished with code '+code+'.'
+
+	appcfg_data = (data) =>
+		out.whisper data
+
+	appcfg_err = (data) =>
+		out.whisper data
+
+	invoke_order = []
+	invoke_order.push('compile:sass')
+	invoke_order.push('minify:sass')
+	invoke_order.push('compile:coffee')
+	invoke_order.push('minify:coffee')
+	invoke_order.push('clean:templates')
+	invoke_order.push('compile:templates')
+
+	if options.version?
+		if options.appid?
+			cmd = 'update app -A ' + options.appid + ' -V ' + options.version + ' --oauth2'
+		else
+			cmd = 'update app ' + '-V ' + options.version + ' --oauth2'
+	else
+		if options.appid?
+			cmd = 'update app ' + '-A ' + options.appid + ' --oauth2'
+		else
+			cmd = 'update app --oauth2'
+
+	deploy_cmd = fixpath('tools', 'bin', 'appcfg')+' '+cmd
+
+	cmdstring = ''
+	for invoke in invoke_order
+		cmdstring += invoke + ' '
+
+	out.shout "deploy", "Beginning deploy routine..."
+	out.exec 'start "Preparing deployment..." /I /WAIT cake '+cmdstring
+	out.exec 'start "Deploying..." /I /WAIT ' + deploy_cmd, appcfg_done, appcfg_data, appcfg_err
+
+
+task 'serve', 'deploy app to appengine', (options) ->
 
 	appcfg_done = (code) =>
 		out.shout 'serve', 'Appcfg exited with code '+code+'.'

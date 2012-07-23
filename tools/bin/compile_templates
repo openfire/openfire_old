@@ -163,13 +163,23 @@ def main():
 
     log('Installing output extensions...')
 
+    import webapp2
+    from openfire.handlers.main import Landing
     from openfire.core.output.extensions import content
     from openfire.core.output.extensions import fragment
 
     log('Compiling templates in root "%s".' % sourcepath)
     log('Compiled template output target "%s".' % targetpath)
 
-    compile_dir(Environment(extensions=[autoescape, with_, do, loopcontrols, content.DynamicContent, fragment.FragmentCache]), sourcepath, targetpath, base_dir=module, as_module=True)
+    request = webapp2.Request.blank('/')
+    handler = Landing(request, webapp2.Response(), preload=False)
+
+    environment = Environment(extensions=[autoescape, with_, do, loopcontrols])
+    environment.extend(wsgi_current_application=object(), wsgi_current_handler=handler)
+    environment.add_extension(content.DynamicContent)
+    environment.add_extension(fragment.FragmentCache)
+
+    compile_dir(environment, sourcepath, targetpath, base_dir=module, as_module=True)
 
 
     log('Success! Template compile routine complete.')

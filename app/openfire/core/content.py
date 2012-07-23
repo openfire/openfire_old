@@ -507,7 +507,7 @@ class CoreContentAPI(CoreAPI):
                     else:
                         template = self._pre_ast_hook(template.run(environment))
 
-                    return self._compiled_ast_hook(loader.prepare_template(environment, name, self.templates[name], environment.globals))
+                    return self._compiled_ast_hook(loader.prepare_template(environment, name, template, environment.globals))
 
                 # for source-based templates
                 else:
@@ -790,8 +790,8 @@ class ContentBridge(object):
                     _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
                 _output_loader = _loader
 
-            #if True:
-            #    _loader = output.ModuleLoader(templates_compiled_target)
+            if True:
+                _loader = output.ModuleLoader(templates_compiled_target)
 
             self.logging.info('Final extensions list: "%s".' % compiled_extension_list)
             self.logging.info('Chosen loader: "%s".' % _loader)
