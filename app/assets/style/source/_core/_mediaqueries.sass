@@ -46,7 +46,6 @@
           font-size: 15px
       .activity-table
         height: auto
-        margin: 15px 0 0 15px
         .activity-row
           height: 100
           .activity-cell
@@ -98,6 +97,10 @@
     #content section
       width: 100%
       height: auto
+
+      &:last
+        margin-bottom: 20px
+
       .project-card
         width: 140px
         img
@@ -109,7 +112,6 @@
           font-size: 18px
       .activity-table
         height: auto
-        margin-bottom: 30px
         .activity-row
           height: 100
           .activity-cell
@@ -142,7 +144,10 @@
         border-radius: 9px
     #content section
       width: 45%
-      margin: 0px 2.5% 300px
+      margin: 0px 2.5% 60px
+      .section-wrap
+        margin-left: auto
+        margin-right: auto
 
 @media all and (min-width: 1140px)
   #main #masthead
