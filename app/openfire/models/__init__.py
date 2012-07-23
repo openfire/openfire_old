@@ -132,14 +132,22 @@ class MessageConverterMixin(ModelMixin):
         else:
             response.key = None
 
+        def _convert_prop(v):
+
+            if isinstance(v, ndb.Key):
+                return v.urlsafe()
+            elif hasattr(v, 'isoformat'):
+                return v.isoformat()
+            else:
+                if isinstance(v, (tuple, list)):
+                    values = []
+                    for i in v:
+                        values.append(_convert_prop(v))
+                    return values
+
         for k, v in self.to_dict(include=include, exclude=exclude).items():
             if hasattr(response, k):
-                if isinstance(v, ndb.Key):
-                    setattr(response, k, v.urlsafe())
-                elif hasattr(v, 'isoformat'):
-                    setattr(response, k, v.isoformat())
-                else:
-                    setattr(response, k, v)
+                setattr(response, k, _convert_prop(v))
 
         return response
 

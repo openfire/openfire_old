@@ -100,8 +100,14 @@ out =
 		op.on 'exit', (code) =>
 			callback?() if code is 0
 
-	exec: (command, callback) ->
-		return exec command, (error, stdout, stderr) =>
+	exec: (command, callback, stdout, stderr) ->
+
+		options =
+			stdio: 'inherit'
+			encoding: 'utf8'
+
+		return exec command, options, (error, stdout, stderr) =>
+
 			if error is null
 				callback?(stdout)
 			else
@@ -116,6 +122,8 @@ option 'c', '--config [STR]', 'path to project feature/skeleton config (defaults
 option 's', '--skeleton [STR]', 'different skeleton branch to install (defaults to \'py27-base\')'
 option 'cm', '--compass', 'enable compass support, if it\'s set to off by default'
 option 'cs', '--coffee', 'enable coffeescript support, if it\'s set to off by default'
+option 'app', '--appid [STR]', 'specify the appid you want to deploy to, when running cake `deploy` or cake `serve`'
+option 'vid', '--version [STR]', 'specify the version you want to deploy to, when running cake `deploy` or cake `serve`'
 
 
 task 'echo', 'i am rubber and you are glue...', (options) =>
@@ -269,7 +277,54 @@ task 'run', 'run apptools\' local dev server', (options) ->
 		out.spawn 'compass', 'compass', ['watch'], compass_done, compass_data, compass_err
 
 
-task 'serve', 'deploy fatcatmap to appengine', (options) ->
+task 'deploy', 'compile all assets and templates and deploy to appengine', (options) ->
+
+	out.shout "deploy", "Beginning deploy routine...", true
+
+	invoke_order = []
+	add_to_invoke = (op, message) =>
+		out.say "deploy", "Preparing to "+message+'...'
+		invoke_order.push(op)
+
+	appcfg_done = (code) =>
+		out.shout 'deploy', 'Deploy finished! :)'
+
+	appcfg_data = (data) =>
+		out.whisper data
+
+	appcfg_err = (data) =>
+		out.whisper data
+
+	add_to_invoke('cake compile:sass', 'compile SASS assets')
+	add_to_invoke('cake minify:sass', 'minify SASS assets')
+	add_to_invoke('cake compile:coffee', 'compile CoffeeScript assets')
+	add_to_invoke('cake minify:coffee', 'minify CoffeeScript assets')
+	add_to_invoke('cake clean:templates', 'clean compiled Jinja2 templates')
+	add_to_invoke('cake compile:templates', 'compile Jinja2 templates')
+
+	if options.version?
+		if options.appid?
+			cmd = 'update app -A ' + options.appid + ' -V ' + options.version + ' --oauth2'
+		else
+			cmd = 'update app ' + '-V ' + options.version + ' --oauth2'
+	else
+		if options.appid?
+			cmd = 'update app ' + '-A ' + options.appid + ' --oauth2'
+		else
+			cmd = 'update app --oauth2'
+
+	out.say "deploy", "Preparing AppEngine deploy routine..."
+	cmd = fixpath('tools', 'bin', 'appcfg')+' '+cmd
+
+	cmdstring = ''
+	for invoke in invoke_order
+		cmdstring += invoke + ' && '
+
+	out.say "deploy", "Invoking..."
+	out.exec 'start "Deploying..." /I /WAIT cmd /k "prompt deploy: && cls ' + cmdstring + 'sleep 3 && ' + cmd + ' && pause && exit"', appcfg_done, appcfg_data, appcfg_err
+
+
+task 'serve', 'deploy app to appengine', (options) ->
 
 	appcfg_done = (code) =>
 		out.shout 'serve', 'Appcfg exited with code '+code+'.'

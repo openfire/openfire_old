@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 
+## == Imports == ##
+
 ## Base Imports
+import time
 import config
 import webapp2
+import hashlib
 
 ## Jinja2 Imports
+from jinja2 import nodes
 from jinja2 import Template
+from jinja2 import Environment
 from jinja2.ext import Extension
 from jinja2.bccache import BytecodeCache
 from jinja2.exceptions import TemplateNotFound
 
 ## Core Imports
 from openfire.core import CoreAPI
-
-## Extras Imports
-from webapp2_extras import jinja2
 
 ## AppTools Imports
 from apptools.api import output
@@ -23,6 +26,7 @@ from apptools.api import output
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import context
 from google.appengine.ext.ndb import tasklet
+from google.appengine.ext.ndb import synctasklet
 
 ## SDK Imports
 from google.appengine.api import memcache
@@ -32,97 +36,552 @@ from google.appengine.ext import blobstore
 from openfire.models import content as models
 
 
+## == Globals == ##
+
+## Cached Objects
+_output_loader = None
+_output_extensions = {}
+_output_bytecacher = None
+
+## Global Defaults
+_SYSTEM_NAMESPACE = "__system__"
+_blocktypes = frozenset(['area', 'snippet', 'summary'])
+_dynamic_inheritance_nodes = (nodes.Extends, nodes.FromImport, nodes.Import, nodes.Include)
+
+## Global Query Options
+_keys_only_opt = ndb.QueryOptions(keys_only=True, limit=3, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+_projection_opt = ndb.QueryOptions(keys_only=False, limit=3, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+
+
 ## CoreContentAPI - manages the retrieval and update of dynamically editable site content
 class CoreContentAPI(CoreAPI):
 
-    ''' Core API for managing dynamic content. '''
+    ''' Core API for fulfilling, rendering and managing dynamic content-related requests. '''
+
+
+    ## == API State == ##
 
     # Content Models
-    areas = []
-    futures = []
-    snippets = []
-    summaries = []
+    seen = set([])        # seen keys
+    areas = {}       # content areas
+    futures = {}     # data futures
+    snippets = {}    # content snippets
+    summaries = {}   # content summaries
+    namespaces = {}  # content namespaces
 
     # Structure Cache
-    keygroups = []
-    heuristics = []
+    templates = {}   # templates cache
+    keygroups = {}   # keygroups active
+    heuristics = {}  # keygroup heuristics
 
-    # Class References
-    app = None
-    handler = None
-    service = None
-    templates = {}
-    environment = None
 
     ## == Low-level Methods == ##
-    @tasklet
-    def _batch_fulfill(self, batch):
-        pass
+    def _filter_key(self, k):
+
+        ''' Filter a key in a batch key list. '''
+
+        if isinstance(k, basestring):
+            try:
+                k = ndb.Key(urlsafe=k)
+            except:
+                raise
+        elif isinstance(k, ndb.Model):
+            return k.key
+        return k
+
+    def _filter_model(self, m):
+
+        ''' Filter a model in a batch model list. '''
+
+        if not isinstance(m, ndb.Model):
+            return False
+        return True
+
+    def _fulfill(self, key):
+
+        ''' Fulfill a model, given a key, either from local cache or the datastore. '''
+
+        key = self._filter_key(key)
+        if key in self.seen:
+            cached_model = {
+                models.ContentNamespace: self.namespaces,
+                models.ContentArea: self.areas,
+                models.ContentSnippet: self.snippets,
+                models.ContentSummary: self.summaries
+            }.get(key.kind()).get(key)
+
+            # perhaps it's already here?
+            if cached_model is not None:
+
+                # yay
+                return cached_model
+
+            # perhaps we're still waiting?
+            elif key in futures:
+
+                # block :(
+                return self.futures.get(key).get_result()
+
+            else:
+                # wtf why was it seen then
+                return key.get()
+        else:
+            # just get it
+            return key.get()
 
     @tasklet
-    def _run_query(self, query, options):
-        pass
+    def _batch_fulfill(self, batch, query=None, **kwargs):
+
+        ''' Synchronously retrieve a batch of keys. '''
+
+        # if it's a future, we're probably coming from a now-finished query
+        if isinstance(batch, ndb.Future):
+            batch = batch.get_result()
+
+        # if it's not a list make it a list (obvs cuz this is _batch_ fulfill)
+        if not isinstance(batch, list):
+            batch = [batch]
+
+        # filter out so we only get keys
+        keys = map(self._filter_key, batch)
+
+        # check for the hashed keygroup
+        keygroup_s = tuple([s for s in keys])
+        heuristic = self.heuristics.get(keygroup_s)
+        if heuristic is not None:
+            return [m for b, m in self.keygroups.get(heuristic)]
+
+        return ndb.get_multi(keys, **kwargs)
 
     @tasklet
-    def _consider_result(self, result):
-        pass
+    def _batch_fulfill_async(self, batch, query=None, resultset_callback=None, item_callback=None, **kwargs):
+
+        ''' Asynchronously retrieve a batch of keys. '''
+
+        # if it's a future, we're probably coming from a now-finished query
+        if isinstance(batch, ndb.Future):
+            batch = batch.get_result()
+
+        # if it's not a list make it a list (obvs cuz this is _batch_ fulfill async)
+        if not isinstance(batch, list):
+            batch = [batch]
+
+        # build fetch!
+        keys = map(self._filter_key, batch)
+
+        # check for the hashed keygroup
+        keygroup_s = tuple([s for s in keys])
+        heuristic = self.heuristics.get(keygroup_s)
+        if heuristic is not None:
+            if resultset_callback:
+                resultset_callback([m for b, m in self.keygroups.get(heuristic)], query=query)
+            elif item_callback:
+                map(lambda x: item_callback(x, query=query), [m for b, m in self.keygroups.get(heuristic)])
+        else:
+
+            # build operations
+            op = ndb.get_multi_async(batch, **kwargs)
+
+            # if we want results in batch
+            if resultset_callback and not item_callback:
+
+                # build a dependent multifuture that waits on all to finish
+                multifuture = ndb.MultiFuture()
+
+                # add each operation as a dependent
+                for f in op:
+                    multifuture.add_dependent(f)
+
+                # close dependents
+                multifuture.complete()
+
+                # add callback to catch results in batch
+                if query:
+                    multifuture.add_callback(resultset_callback, multifuture, query=query)
+                else:
+                    multifuture.add_callback(resultset_callback, multifuture)
+
+            # if we want results one by one
+            elif item_callback and not resultset_callback:
+
+                # add the item callback to each future
+                for f in op:
+                    f.add_callback(item_callback, f, query=query)
+
+            # parallel yield!
+            yield tuple(op)
+
+    @tasklet
+    def _run_query(self, query, count=False, **kwargs):
+
+        ''' Synchronously run a query. '''
+
+        # if we should count first, count
+        if not isinstance(count, int) and count == True:
+            count = query.count()
+
+        # pull via count or via kwargs
+        if isinstance(count, int):
+            return query.fetch(count, **kwargs)
+        return query.fetch(**kwargs)
+
+    @tasklet
+    def _run_query_async(self, query, count=False, future=None, resultset_callback=None, item_callback=None, eventual_callback=None, **kwargs):
+
+        ''' Asynchronously run a query. '''
+
+        # if we just counted
+        if future:
+
+            # we have a limit
+            count = future.get_result()
+
+            # there are no results
+            if count == 0:
+                yield resultset_callback([], query=query)
+
+        # if we should count first, kick off a count and call self with the result
+        if not isinstance(count, int) and count == True:
+            future = query.count_async(**kwargs)
+            future.add_callback(self._run_query_async, query, False, future, resultset_callback, item_callback, **kwargs)
+            yield future
+
+        else:
+
+            # if we want to go over things in batch
+            if resultset_callback and not item_callback:
+                if isinstance(count, int):
+                    future = query.fetch_async(count, **kwargs)
+                else:
+                    future = query.fetch_async(**kwargs)
+                if eventual_callback:
+                    future.add_callback(resultset_callback, future, query=query, resultset_callback=eventual_callback)
+                else:
+                    future.add_callback(resultset_callback, future, query=query)
+
+            # if we want to go over things one at a time
+            elif item_callback and not resultset_callback:
+                if isinstance(count, int):
+                    future = query.map_async(item_callback, limit=count, **kwargs)
+                else:
+                    future = query.map_async(item_callback, **kwargs)
+
+            yield future
+
+    @tasklet
+    def _batch_store_callback(self, result, query=None):
+
+        ''' Callback for asynchronously retrieved results. '''
+
+        # landing from a query
+        if isinstance(result, ndb.Future):
+            result = result.get_result()
+
+        # should really be a list
+        if not isinstance(result, list):
+            result = [result]
+
+        _batch = []
+        timestamp = int(time.time())
+        for i in filter(self._filter_model, result):
+
+            if i.key not in self.seen:
+                self.seen.append(i.key)
+            _batch.append((i.key, i))
+
+            if isinstance(i, models.ContentNamespace):
+                self.namespaces.get(i.key, {}).update({'model': i, 'timestamp': timestamp})
+
+            elif isinstance(i, models.ContentArea):
+                self.areas.get(i.key, {}).update({'model': i, 'timestamp': timestamp})
+
+            elif isinstance(i, models.ContentSnippet):
+                self.snippets.get(i.key, {}).update({'model': i, 'timestamp': timestamp})
+
+            elif isinstance(i, models.ContentSummary):
+                self.summaries.get(i.key, {}).update({'model': i, 'timestamp': timestamp})
+
+        # generate the keygroup's signature and use it to look for an existing heuristics hint
+        keygroup_s = tuple([b for b, i in _batch])
+        keygroup_i = self.heuristics.get(keygroup_s, False)
+
+        # trim the old one
+        if keygroup_i:
+            self.keygroups.remove(keygroup_i)
+
+        # add the new keygroup and map it
+        self.keygroups.append(_batch)
+        self.heuristics[keygroup_s] = self.keygroups.index(_batch)
+
+    def _build_keysonly_query(self, kind, parent=None, **kwargs):
+
+        ''' Build a keys-only ndb.Query object with the _keys_only options object. '''
+
+        return kind.query(ancestor=parent, default_options=_keys_only.merge(ndb.QueryOptions(**kwargs)))
+
+    def _build_projection_query(self, kind, properties, parent=None, **kwargs):
+
+        ''' Build a projection ndb.Query object with the default _projection_opt options object. '''
+
+        return kind.query(ancestor=parent, default_options=_projection_opt.merge(ndb.QueryOptions(projection=properties, **kwargs)))
+
+    def _build_keygroup(self, keyname, namespace, snippet=False, summary=False):
+
+        ''' Build a group of keys, always containing a ContentNamespace and ContentArea, optionally with a Snippet and Summary. '''
+
+        keygroup = []
+
+        # calculate namespace key
+        namespace_key = self._build_namespace_key(namespace)
+        keygroup.append(namespace)
+
+        # calculate area key
+        area_key = self._build_area_key(keyname, namespace)
+        keygroup.append(area_key)
+
+        # if a snippet key is requested
+        if snippet:
+
+            # you can pass a version into snippet manually, or True
+            if isinstance(snippet, int):
+                snippet_key = self._build_snippet_key(keyname, namespace, area_key, snippet)
+            else:
+                snippet_key = self._build_snippet_key(keyname, namespace, area_key)
+            keygroup.append(snippet_key)
+
+            # if a summary is requested
+            if summary:
+
+                # you can pass a version into summary manually, or True
+                if isinstance(summary, int):
+                    summary_key = self._build_summary_key(keyname, namespace, snippet_key, summary)
+                else:
+                    summary_key = self._build_summary_key(keyname, namespace, snippet_key)
+                keygroup.append(snippet_key)
+
+        return keygroup
+
+    def _build_namespace_key(self, namespace):
+
+        ''' Build a key for a ContentNamespace '''
+
+        # if it's not the system namespace, it's key-worthy
+        if namespace != _SYSTEM_NAMESPACE:
+            if not isinstance(namespace, ndb.Key):
+                try:
+                    namespace = ndb.Key(urlsafe=namespace)
+                except Exception, e:
+                    namespace = ndb.Key(models.ContentNamespace, hashlib.sha256(str(namespace)).hexdigest())
+        else:
+            namespace = ndb.Key(models.ContentNamespace, _SYSTEM_NAMESPACE)
+
+        return namespace
+
+    def _build_area_key(self, keyname, namespace):
+
+        ''' Build a key for a ContentArea '''
+
+        if not isinstance(namespace, ndb.Key):
+            namespace = self._build_namespace_key(namespace)
+        if (not isinstance(keyname, basestring)) or (not isinstance(namespace, ndb.Key)):
+            raise ValueError("Must pass in a string keyname and ContentNamespace-compatible Key or string namespace.")
+        else:
+            return ndb.Key(models.ContentArea, hashlib.sha256(str(keyname)).hexdigest(), parent=namespace)
+
+    def _build_snippet_key(self, keyname=None, namespace=None, area=None, version=1):
+
+        ''' Build a key for a ContentSnippet '''
+
+        if area is not None:
+            return ndb.Key(models.ContentSnippet, str(version), parent=area)
+        else:
+            return ndb.Key(models.ContentSnippet, str(version), parent=self._build_area_key(keyname, namespace))
+
+    def _build_summary_key(self, keyname, namespace, snippet=None, version=1):
+
+        ''' Build a key for a ContentSummary '''
+
+        if snippet is not None:
+            return ndb.Key(models.ContentSummary, str(version), parent=snippet)
+        else:
+            return ndb.Key(models.ContentSummary, str(version), parent=self._build_snippet_key(keyname, namespace))
+
+    def _find_callblocks(self, node):
+
+        ''' Find callblocks in a node. '''
+
+        ## @TODO: Implement AST walking.
+        raise NotImplemented
+
+    def _walk_jinja2_ast(self, ast):
+
+        ''' Discover the power, of the haterade '''
+
+        ## @TODO: Implement AST walking.
+        raise NotImplemented
+
+    def _pre_ast_hook(self, template_ast):
+
+        ''' Pre-hook that is called right after the template AST is ready '''
+
+        ## @TODO: Preload content with a pleasant walk down the AST.
+        return template_ast
+
+    def _compiled_ast_hook(self, code):
+
+        ''' Post-hook that is called after the AST is compiled into a <code> object '''
+
+        ## @TODO: Pick up the hints generated by pre_ast_hook.
+        return code
+
 
     ## == Mid-level Methods == ##
-    def _build_keygroup(self):
-        pass
+    def _fulfill_content_area(self, keyname, namespace, caller):
 
-    def _build_area_key(self):
-        pass
+        ''' Return a contentarea's content, or the caller's default, at render time. '''
 
-    def _build_snippet_key(self):
-        pass
+        area = self._fulfill(self._build_area_key(keyname, namespace))
+        if area is None:
+            return caller()
 
-    def _build_summary_key(self):
-        pass
+        if area.local:
+            return (area.html, area.text)
 
-    def _walk_jinja2_ast(self):
-        pass
+        else:
+            snippet = self._fulfill(area.latest)
+            if snippet is None:
+                return caller()
+            return (snippet.html, snippet.text)
 
-    def _inner_ast_hook(self):
-        pass
+    def _fulfill_content_snippet(self, keyname, namespace, caller):
 
-    def _load_template(self, environment, name):
+        ''' Return a contentsnippet's content, or the caller's default, at render time. '''
+
+        area = self._fulfill(self._build_area_key(keyname, namespace))
+        if area is None:
+            return caller()
+
+        snippet = self._fulfill(area.latest)
+        if snippet is None:
+            return caller()
+        return (snippet.html, snippet.text)
+
+    def _fulfill_content_summary(self, keyname, namespace, caller):
+
+        ''' Return a contentsummary's content, or the caller's default, at render time. '''
+
+        area = self._fulfill(self._build_area_key(keyname, namespace))
+        if area is None:
+            return caller()
+
+        snippet = self._fulfill(area.latest)
+        if snippet is None:
+            return caller()
+
+        if snippet.summary is None:
+            return caller()
+
+        summary = self._fulfill(snippet.summary)
+        if summary is None:
+            return caller()
+        return (summary.html, summary.text)
+
+    def _load_template(self, environment, name, direct=False):
 
         ''' Load a template from source/compiled packages and preprocess. '''
 
-        loader = environment.loader
-        try:
-            source, template, uptodate = loader.get_source(environment, name)
-        except TemplateNotFound:
-            raise
+        ## check the internal API bytecode cache first
+        if name not in self.templates:
+
+            # get loader + bytecacher
+            loader = environment.loader
+            bytecache = environment.bytecode_cache
+
+            try:
+                # for modules: load directly (it's way faster)
+                if not loader.has_source_access:
+                    template = loader.load(environment, name, prepare=False)
+                    self.templates[name] = template
+                    if direct:
+                        return template.run(environment)
+                    else:
+                        template = self._pre_ast_hook(template.run(environment))
+
+                    return self._compiled_ast_hook(loader.prepare_template(environment, name, template, environment.globals))
+
+                # for source-based templates
+                else:
+                    # load template source
+                    source, template, uptodate = loader.get_source(environment, name)
+
+                    # parse abstract syntax tree
+                    if not direct:
+                        parsed_ast = self._pre_ast_hook(environment.parse(environment.preprocess(source)))
+                    else:
+                        return environment.parse(environment.preprocess(source))
+
+                    # check the bytecode cache for compiled source for this template
+                    code = None
+                    if bytecache is not None:
+                        bucket = bytecache.get_bucket(environment, name, template, source)
+                        if bucket.code is not None:
+                            code = bucket.code
+
+                    # if we couldn't get it anywhere else, compile source to bytecode
+                    if code is None:
+                        code = environment.compile(parsed_ast, name, template)
+
+                        if bytecache is not None:
+                            bucket.code = code
+                            bytecache.set_bucket(bucket)
+
+                    # we now have bytecode
+                    self.templates[name] = code
+
+                    if direct:
+                        return code
+                    else:
+                        return self._compiled_ast_hook(environment.template_class.from_code(environment, code, environment.globals, uptodate))
+
+            except TemplateNotFound:
+                raise
+
+        # return from API cache
         else:
-            #parsed_ast = environment.parse(environment.preprocess(source))
-            bcc = environment.bytecode_cache
-            if bcc is not None:
-                bucket = bcc.get_bucket(environment, name, template, source)
-                code = bucket.code
+            return self._compiled_ast_hook(environment.template_class.from_code(environment, self.templates.get(name), environment.globals, True))
 
-            if code is None:
-                code = environment.compile(source, name, template)
-
-            if bcc is not None and bucket.code is None:
-                bucket.code = code
-                bcc.set_bucket(bucket)
-
-            return environment.template_class.from_code(environment, code, environment.globals, uptodate)
 
     ## == High-level Methods == ##
-    def preload_content(self, areas):
+    @ndb.toplevel
+    def preload_namespace(self, namespace, snippet=True, summary=False):
+
+        ''' Preload an entire namespace of content '''
+
+        if not isinstance(namespace, ndb.Key):
+            namespace = self._build_namespace_key(namespace)
+
+        yield self._run_query_async(self._build_projection_query(kind=models.ContentArea, parent=namespace, properties=['l', 'lc']), count=True,
+            resultset_callback=self._batch_fulfill_async, eventual_callback=self.preload_content)
+
+    @tasklet
+    def preload_content(self, areas, snippet=True, summary=False, query=None):
 
         ''' Preload a set of content areas asynchronously '''
 
-        pass
+        if isinstance(areas, ndb.MultiFuture):
+            areas = areas.get_result()
+            if len(areas) == 0:
+                raise ndb.Return([])
 
-    def encounter_content_area(self):
+        if not isinstance(areas, list):
+            areas = [areas]
 
-        ''' Encounter a content area during render. '''
+        snippet_queries = []
+        for area in areas:
+            snippet_queries.append(self._build_projection_query(kind=models.ContentSnippet, parent=area, resultset_callback=self.batch_fulfill_async, eventual_callback=self._batch_store_callback))
 
-        pass
+        self._batch_store_callback(areas)
+        yield tuple([self._run_query_async(q) for q in snippet_queries])
 
     def prerender(self, environment, path_or_template):
 
@@ -130,30 +589,36 @@ class CoreContentAPI(CoreAPI):
 
         # If it's a string path...
         if isinstance(path_or_template, basestring):
-
-            # If we have it in the threadcache...
-            if path_or_template in self.templates:
-                template_object = self.templates[path_or_template]
-            else:
-                self.templates[path_or_template] = self._load_template(environment, path_or_template)
-                template_object = self.templates[path_or_template]
+            template_object = self._load_template(environment, path_or_template)
+        else:
+            template_object = path_or_template
 
         return template_object
 
     def render(self, template, context):
 
         ''' Render a template, given context '''
-
         if template is None:
             raise ValueError('Must pass in a template object or path to template source or an iterable of those.')
         else:
             return template.render(**context)
 
+    def fulfill(self, keyname, namespace, caller, blocktype):
 
-## Globals
-_output_loader = None
-_output_extensions = {}
-_output_bytecacher = None
+        ''' Utilize the blocktype-specific method according to the template render routine and dispatch to fulfill. '''
+
+        if blocktype not in _blocktypes:
+            raise ValueError('Invalid dynamic content block type. Must be one of "%s".' % _blocktypes)
+        return {
+
+            'area': self._fulfill_content_area,
+            'snippet': self._fulfill_content_snippet,
+            'summary': self._fulfill_content_summary
+
+        }.get(blocktype)(keyname, namespace, caller)
+
+
+## Globals (phase II)
 _output_api_instance = CoreContentAPI()
 
 
@@ -179,6 +644,15 @@ class ContentBridge(object):
         if app is not None:
             self._initialize_dynamic_content(app, handler, service, environment)
 
+    @webapp2.cached_property
+    def _environment(self):
+
+        ''' Cached access to the current template environment. '''
+
+        if self.__environment is None:
+            self.__environment = self.dynamicEnvironmentFactory(self.__app)
+        return self.__environment
+
     def _initialize_dynamic_content(self, app, handler=None, service=None, environment=None):
 
         ''' Initialize the content bridge from an already-instantiated Handler or Service. '''
@@ -195,15 +669,6 @@ class ContentBridge(object):
             self.__environment = environment
         self.__acquire_content_bridge()
         return
-
-    @webapp2.cached_property
-    def _environment(self):
-
-        ''' Cached access to the current template environment. '''
-
-        if self.__environment is None:
-            self.__environment = self.dynamicEnvironmentFactory(self.__app)
-        return self.__environment
 
     def __acquire_content_bridge(self):
 
@@ -227,6 +692,12 @@ class ContentBridge(object):
             self.__acquire_content_bridge()
         self.__content_prerender = self.__content_bridge.prerender(self._environment, template)
         return self.__content_prerender
+
+    def preload_namespace(self, namespace, snippet=True, summary=False):
+
+        ''' Preload a namespace-full of content '''
+
+        self.__content_bridge.preload_namespace(namespace, snippet, summary)
 
     def dynamicEnvironmentFactory(self, app):
 
@@ -301,17 +772,26 @@ class ContentBridge(object):
                 compiled_extension_list = []
 
             templates_compiled_target = j2cfg.get('compiled_path')
-            use_compiled = not config.debug or j2cfg.get('force_compiled', False)
+            if config.debug:
+                if j2cfg.get('force_compiled', False) is True:
+                    use_compiled = True
+                else:
+                    use_compiled = False
+            else:
+                use_compiled = True
 
             # resolve loader/s
             if _output_loader is not None:
                 _loader = _output_loader
             else:
-                if templates_compiled_target is not None and use_compiled:
+                if (templates_compiled_target is not None) and (use_compiled is True):
                     _loader = output.ModuleLoader(templates_compiled_target)
                 else:
                     _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
                 _output_loader = _loader
+
+            if True:
+                _loader = output.ModuleLoader(templates_compiled_target)
 
             self.logging.info('Final extensions list: "%s".' % compiled_extension_list)
             self.logging.info('Chosen loader: "%s".' % _loader)
@@ -326,7 +806,6 @@ class ContentBridge(object):
 
             # bind environment args
             base_environment_args['loader'] = _loader
-            base_environment_args['extensions'] = compiled_extension_list
             base_environment_args['bytecode_cache'] = _bytecacher
 
             # hook up filters
@@ -337,8 +816,14 @@ class ContentBridge(object):
 
             # generate environment
             finalConfig = dict(j2cfg.items()[:])
-            finalConfig.update({'environment_args': base_environment_args, 'globals': self.baseContext, 'filters': filters})
-            environment = jinja2.Jinja2(app, config=finalConfig).environment
+            environment_args = finalConfig.get('environment_args', {})
+            environment_args.update(base_environment_args)
+
+            environment = Environment(**environment_args)
+
+            # update globals and filters
+            environment.globals.update(self.baseContext)
+            environment.filters.update(filters)
 
             # patch in app, handler, ext and api
             environment.extend(**{
@@ -347,6 +832,9 @@ class ContentBridge(object):
                 'jinja2_current_loader': _loader,
                 'jinja2_current_bytecache': base_environment_args.get('bytecode_cache')
             })
+
+            for extension in compiled_extension_list:
+                environment.add_extension(extension)
 
             # replace logging conditional
             self.logging._setcondition(self._webHandlerConfig.get('logging'))
@@ -408,3 +896,9 @@ class ContentBridge(object):
             else:
                 # Return rendered template
                 return rendered
+
+    def fulfill_content(self, keyname, namespace, caller, blocktype):
+
+        ''' Callback from template render to fulfill a dynamic content block. '''
+
+        return self.__content_bridge.fulfill(keyname, namespace, caller, blocktype)
