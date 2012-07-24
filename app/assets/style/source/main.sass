@@ -83,9 +83,16 @@ p
 
 .section-wrap
   background: #eee
-  width: 100%
+  width: auto
+  padding-bottom: 5px
 
 .project-card
+  img,
+  div
+    -webkit-transition-property: width, height
+    
+  -webkit-transition-property: width, height, margin
+
   border-radius: 5px
   background-color: #fff
   padding: 10px

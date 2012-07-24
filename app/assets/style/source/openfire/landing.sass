@@ -16,6 +16,7 @@
 #main
   #content
     section
+      -webkit-transition-property: width, margin
       background: #fff
       min-width: 100px
       float: left
@@ -67,8 +68,7 @@
   font-family: "Karla",sans-serif
   font-weight: 700
   font-size: 8pt
-  width: 90%
-  margin-bottom: 30px
+  width: auto
 
   .activity-row
     .activity-cell
@@ -78,12 +78,14 @@
       margin: 10px 0 0 10px
       display: inline-table
       padding: 5px
+      max-width: 262px
 
       label
         text-transform: uppercase
 
       .graph
         border: 1px solid #000
+        max-width: 250px
 
 #spark-graph
   rect
