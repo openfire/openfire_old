@@ -119,14 +119,14 @@ class ActivityGraph
             .text(String)
             .attr("x", (d) -> x d)
             .attr("y", 0)
-            .attr "text-anchor", "middle"
+            .attr("text-anchor", "middle")
 
         g.selectAll(".yLabel").data(y.ticks(4)).enter().append("svg:text")
             .attr("class", "yLabel")
             .text(String)
             .attr("x", 0)
             .attr("text-anchor", "right")
-            .attr "dy", 4
+            .attr("dy", 4)
             .attr("y", (d) -> -1 * y(d))
 
         g.selectAll(".xTicks").data(x.ticks(5)).enter().append("svg:line")
@@ -134,14 +134,14 @@ class ActivityGraph
             .attr("x1", (d) -> x d)
             .attr("y1", -1 * y(0))
             .attr("x2", (d) -> x d)
-            .attr "y2", -1 * y(-0.3)
+            .attr("y2", -1 * y(-0.3))
 
         g.selectAll(".yTicks").data(y.ticks(4)).enter().append("svg:line")
             .attr("class", "yTicks")
             .attr("y1", (d) -> -1 * y(d))
             .attr("x1", x(-0.3))
             .attr("y2", (d) -> -1 * y(d))
-            .attr "x2", x(0)
+            .attr("x2", x(0))
 
 
 window.ActivityGraph = ActivityGraph

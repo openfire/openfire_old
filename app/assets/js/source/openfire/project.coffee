@@ -139,7 +139,7 @@ class Project extends Model
 
                     return if index_only then index else @stashes[stash_name].store[index]
 
-            else 
+            else
                 # eventually, calling this with no arguments should sync assets with server. for now you get error.
                 throw 'Too few arguments passed to get_attached(): function(model, key_or_index, index_only=false)'
 
@@ -359,7 +359,7 @@ class ProjectController extends OpenfireController
                                 # post-upload callback
                                 @log('Image upload successful! Attaching image to project...')
                                 @attach new ProjectImage(res[0]), () =>
-                                    $.apptools.events.trigger 'PROJECT_IMAGE_ADDED', @                                               
+                                    $.apptools.events.trigger 'PROJECT_IMAGE_ADDED', @
                                     btn.style.backgroundColor = '#bada55'
                                     btn.innerHTML = 'Awesome!<br>Good to go.'
 
@@ -415,7 +415,7 @@ class ProjectController extends OpenfireController
                                     $.apptools.events.trigger 'PROJECT_AVATAR_ADDED', @
                                     btn.style.backgroundColor = '#bada55'
                                     btn.innerHTML = 'Awesome!<br>Good to go.'
-                                
+
                                     return @project
 
                             $.apptools.api.media.attach_avatar(
@@ -562,10 +562,10 @@ class ProjectController extends OpenfireController
             alert('You tried to share a project! We\'re working on it :)')
 
 
-        @get = (refresh, callback) =>  
+        @get = (refresh, callback) =>
 
             ## get the associated project
-            
+
             if not refresh?         # refresh=true syncs with server
                 refresh = false
 
@@ -622,7 +622,7 @@ class ProjectController extends OpenfireController
         @goals =
 
             get: (goal_key, callback, sync=false) =>
-                
+
                 ## get goal by key
                 if not sync
                     return @get_attached('goal', goal_key)
@@ -859,7 +859,7 @@ class ProjectController extends OpenfireController
                             , false)
 
                             (close_x = document.getElementById(base_id + '-modal-close')).removeEventListener('mousedown')
-                            close_x.addEventListener('click', 
+                            close_x.addEventListener('click',
                                 () => return m.close()
                             , false)
 
@@ -935,7 +935,8 @@ class ProjectController extends OpenfireController
                             @attach(_tier)
                             return _tier
 
-                        tiers.push(_at(tier)) for tier in response.tiers
+                        if response.tiers
+                            tiers.push(_at(tier)) for tier in response.tiers
 
                         return if callback? then callback.call(@, tiers) else tiers
 
@@ -1157,7 +1158,7 @@ class ProjectController extends OpenfireController
             if window._cp
 
                 # setup project method proxies
-                ((m) => 
+                ((m) =>
                     @[m] = () => return @project[m].apply(@project, arguments)
                 )(method) for method in @constructor::method_proxies
 

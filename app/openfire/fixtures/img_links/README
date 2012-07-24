@@ -1,0 +1,10 @@
+This directory and the symbolic links to image files it contains are required
+to run the fixtures and have the images load properly. In google appengine,
+python modules do not have access to any of the files declared as static in the
+app.yaml. Thus these symbolic links are referenced in the fixture files and the
+images can be loaded.
+
+See this stackoverflow answer for more information:
+http://stackoverflow.com/questions/2630205/read-a-file-on-app-engine-with-python
+
+-Ethan

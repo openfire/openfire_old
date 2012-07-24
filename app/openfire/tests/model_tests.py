@@ -9,6 +9,8 @@ import unittest
 from google.appengine.ext import testbed
 import webapp2
 
+from openfire.tests.file_testbed import TestbedWithFiles
+
 from openfire.models.project import Category
 import test_db_loader as db_loader
 
@@ -25,10 +27,12 @@ class FixturesTestCase(unittest.TestCase):
     #fixtures = ['fixtures.json']
 
     def setUp(self):
-        self.testbed = testbed.Testbed()
+        self.testbed = TestbedWithFiles()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_blobstore_stub()
+        self.testbed.init_images_stub()
 
     def tearDown(self):
         self.testbed.deactivate()

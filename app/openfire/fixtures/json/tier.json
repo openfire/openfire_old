@@ -1,0 +1,93 @@
+[
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Friend",
+        "amount": 10,
+        "description": "We'll give you an invite to the private beta!",
+        "delivery": "9/1/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Supporter",
+        "amount": 35,
+        "description": "Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
+        "delivery": "9/1/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Backer",
+        "amount": 50,
+        "description": "Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
+        "delivery": "9/1/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Sponsor",
+        "amount": 100,
+        "description": "Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
+        "delivery": "9/1/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Investor",
+        "amount": 300,
+        "description": "Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
+        "delivery": "9/1/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Inner Circle",
+        "amount": 500,
+        "description": "Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
+        "delivery": "9/1/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Transparency Warrior",
+        "amount": 1000,
+        "description": "As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
+        "delivery": "7/15/2012"
+    },
+    {
+        "parent_key": "project__fat cat map",
+        "name": "Fat Cat",
+        "amount": 10000,
+        "description": "Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
+        "delivery": "7/10/2012"
+    },
+    {
+        "parent_key": "project__SeaSteading",
+        "name": "Mate",
+        "amount": 10000,
+        "description": "We'll have you on board!",
+        "delivery": "10/1/2012"
+    },
+    {
+        "parent_key": "project__urbsly",
+        "name": "Green Thumb",
+        "amount": 10,
+        "description": "You get a thumbs up!",
+        "delivery": "10/1/2012"
+    },
+    {
+        "parent_key": "project__BlueSeed",
+        "name": "Foot in the Door",
+        "amount": 10000,
+        "description": "One week of cube space rental.",
+        "delivery": "10/1/2012"
+    },
+    {
+        "parent_key": "project__Carrotmob",
+        "name": "Carrot",
+        "amount": 100,
+        "description": "One free item at the next carrot mob.",
+        "delivery": "10/1/2012"
+    },
+    {
+        "parent_key": "project__Open Source Ecology",
+        "name": "User",
+        "amount": 10,
+        "description": "Early access to our online database.",
+        "delivery": "10/1/2012"
+    }
+]

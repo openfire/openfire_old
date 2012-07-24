@@ -27,10 +27,11 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
         asset_key = ndb.Key(urlsafe=asset_key)
         asset = asset_key.get()
         if asset:
-            asset.pending = False
             asset.blob = upload.key()
+            asset.url = images.get_serving_url(asset.blob)
+            asset.name = upload.filename
             asset.mime = upload.content_type
-            asset.url = self.url_for('serve-asset-filename', action='serve', asset_key=asset.key.urlsafe(), filename=upload.filename)
+            asset.pending = False
             asset.put()
 
         # If there is a target, attach this media to a project or user.
@@ -38,21 +39,28 @@ class BlobstoreUploaded(blobstore_handlers.BlobstoreUploadHandler, RequestHandle
             target = ndb.Key(urlsafe=target_key).get()
             if target:
                 # TODO: Populate a few more fields of Image and Avatar here, like size and name. -Ethan
-                if asset.kind == 'i' and hasattr(target, 'images'):
-                    image = Image(asset=asset_key, parent=target.key)
+                if asset.kind == 'i':
+                    image = Image(asset=asset_key, parent=target.key, url=asset.url)
                     image.put()
-                    target.images.append(image.key)
-                    target.put()
-                elif asset.kind == 'a' and hasattr(target, 'avatar'):
+                    if hasattr(target, 'images'):
+                        target.images.append(image.key)
+                        target.put()
+                    else:
+                        logging.critical('BlobstoreUploaded: Target passed to image has no attribute avatar.')
+                elif asset.kind == 'a':
                     # TODO: Set all other avatars as inactive?
-                    avatar = Avatar(id=asset_key.urlsafe(), asset=asset_key, active=True, parent=target.key)
+                    avatar = Avatar(id=asset_key.urlsafe(), asset=asset_key, url=asset.url,
+                            active=True, parent=target.key)
                     avatar.put()
-                    target.avatar = avatar.key
-                    target.put()
+                    if hasattr(target, 'avatar'):
+                        target.avatar = avatar.key
+                        target.put()
+                    else:
+                        logging.critical('BlobstoreUploaded:Target passed to avatar has no attribute avatar.')
                 else:
                     # We do not currently support any kind other than image.
                     # Eventually we will support 's', 't', 'v' (style, script, video)
-                    pass
+                    logging.critical('Asset with key "%s" passed to handler BlobstoreUploaded.' % asset.kind)
 
         return self.redirect('/_assets/get/%s' % asset_key.urlsafe())
 
