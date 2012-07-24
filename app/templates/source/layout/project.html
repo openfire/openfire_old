@@ -113,6 +113,24 @@
                     <div id='backer_summary'>
                         backerz
                     </div> <!-- end #backer_summary -->
+
+                    {% block freeform %}
+                        <div {{ {
+
+                            'id': 'project_freeform',
+                            'data-keyname': 'project_freeform' if security.current_user.key in project.owners else none,
+                            'data-namespace': encrypt(project.key.urlsafe()) if security.current_user.key in project.owners else none,
+                            'class': 'dynamic mini-editable' if security.current_user.key in project.owners else 'dynamic'
+
+                        }|xmlattr }}>
+
+                            {% content 'project_freeform', project.key.urlsafe() %}
+                                <b>Default content! I am overridden when you edit!</b>
+                            {% endcontent %}
+
+                        </div>
+                    {% endblock freeform %}
+
                 </section> <!-- end #backers -->
 
                 <div id='owners' >

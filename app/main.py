@@ -27,6 +27,13 @@ def warmup(environ=None, start_response=None):
     return w.Warmup(environ, start_response)
 
 
+def backend(environ=None, start_response=None):
+
+    ''' Backend warmup '''
+
+    return w.Warmup(environ, start_response)
+
+
 def pipelines(environ=None, start_response=None):
 
     ''' GAE Pipelines '''

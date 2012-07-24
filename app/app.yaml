@@ -1,5 +1,5 @@
 application: open-fire-staging
-version: auth
+version: develop
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -52,6 +52,9 @@ inbound_services:
 #- xmpp_subscribe
 #- channel_presence
 
+#### ===== Includes
+includes:
+- mapreduce/include.yaml
 
 #### ===== Force precompilation
 derived_file_type:
@@ -176,6 +179,14 @@ handlers:
   login: admin
   auth_fail_action: unauthorized
 
+# Embedded Admin Panel
+- url: /_dev/console.*
+  script: google.appengine.ext.admin.application
+  login: admin
+
+- url: /_dev/console/.*
+  script: google.appengine.ext.admin.application
+  login: admin
 
 ###### Asset Handlers
 

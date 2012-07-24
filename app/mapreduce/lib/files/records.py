@@ -321,10 +321,7 @@ class RecordsReader(object):
     """Skip reader to the block boundary."""
     pad_length = BLOCK_SIZE - self.__reader.tell() % BLOCK_SIZE
     if pad_length and pad_length != BLOCK_SIZE:
-      data = self.__reader.read(pad_length)
-      if len(data) != pad_length:
-        raise EOFError('Read %d bytes instead of %d' %
-                       (len(data), pad_length))
+      self.__reader.read(pad_length)
 
   def read(self):
     """Reads record from current position in reader."""

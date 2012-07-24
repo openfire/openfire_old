@@ -41,9 +41,7 @@ class ContentArea(AppModel):
     _message_class = messages.ContentArea
     _pipeline_class = pipelines.ContentAreaPipeline
 
-    target = ndb.KeyProperty('t')
-    section = ndb.StringProperty('s', choices=['prf', 'prj', 'sys'])  # profile, project or system
-    html = ndb.BlobProperty('ht', compressed=False)
+    html = ndb.TextProperty('ht', compressed=False)
     text = ndb.TextProperty('tx', compressed=False)
     local = ndb.BooleanProperty('lc', default=False)
     latest = ndb.KeyProperty('l', default=None)
@@ -65,7 +63,7 @@ class ContentSnippet(AppModel):
     _pipeline_class = pipelines.ContentSnippetPipeline
 
     area = ndb.KeyProperty('a')
-    html = ndb.BlobProperty('h', compressed=False)
+    html = ndb.TextProperty('h', compressed=True)
     text = ndb.TextProperty('t', compressed=True)
     summary = ndb.KeyProperty('s')
 

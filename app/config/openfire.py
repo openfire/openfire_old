@@ -214,7 +214,7 @@ config['openfire.output'] = {
         'config': {
             'enabled': True,
             'debug': False,
-            'logging': False
+            'logging': True
         },
 
         'installed': {

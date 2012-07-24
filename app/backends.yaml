@@ -21,7 +21,7 @@ backends:
 ## command backend - for util/dev and command stuff
 - name: command
   class: B8
-  instances: 1
+  instances: 4
   options: dynamic, public
 
 ## transport backend - in charge of incoming/outgoing comms

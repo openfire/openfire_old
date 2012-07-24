@@ -1,4 +1,26 @@
 # -*- coding: utf-8 -*-
+
+"""
+
+    Here is an example of dynamic content in Jinja2:
+
+        <div {{ {
+
+            'id': 'project_freeform_test',
+            'data-keyname': 'project_freeform' if security.current_user.key in project.owners else none,
+            'data-namespace': encrypt(project.key.urlsafe()) if security.current_user.key in project.owners else none,
+            'class': 'dynamic mini-editable' if security.current_user.key in project.owners else 'dynamic'
+
+        }|xmlattr }}>
+
+            {% content 'project_freeform_test', project.key.urlsafe() %}
+                <b>Default content! I am overridden when you edit!</b>
+            {% endcontent %}
+
+        </div>
+
+"""
+
 import webapp2
 from jinja2 import nodes
 from config import config
@@ -94,4 +116,9 @@ class DynamicContent(OutputExtension):
             namespace = self.environment.default_dynamic_namespace
 
         # pass off to the content API
-        return self.environment.dynamic_content_bridge.fulfill_content(keyname, namespace, caller, blocktype)
+        result = self.environment.dynamic_content_bridge.fulfill_content(keyname, namespace, caller, blocktype)
+        if isinstance(result, tuple):
+            html, text = result
+            return html
+        else:
+            return result

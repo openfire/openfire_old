@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import os
 from google.appengine.ext import ndb
 from google.appengine.api import files, images
@@ -24,24 +25,54 @@ def upload_file_to_blobstore(filename, mime_type):
     Returns a BlobKey object.
     '''
 
+    logging.info('UPLOADING FILE to blobstore. At filename "%s".' % filename)
+    print 'Uploading file to blobstore. At filename "%s".' % filename
+
     # Upload to blob.
     blob_name = files.blobstore.create(mime_type=mime_type)
+
+    print 'Blob name: "%s".' % blob_name
 
     # Open blob and write the file to it.
     if os.name == 'nt':
         mode = 'rb'
+        file_data = b""
     else:
         mode = 'r'
+        file_data = ""
 
+    with open(filename, mode) as local_file:
+        logging.info('Local file: "%s".' % local_file)
+        print 'Local file: "%s".' % local_file
+        file_data = local_file.read()
+
+    logging.info('Found file data with length "%s".' % len(file_data))
+    print 'Found file data with length "%s".' % len(file_data)
+
+    logging.info('Opening blob...')
+    print 'Opening blob...'
     with files.open(blob_name, 'a') as blob:
-        local_file = open(filename, mode)
-        blob.write(local_file.read())
+
+        logging.info('Blob file: "%s".' % blob)
+        print 'Blob file: "%s".' % blob
+
+        blob.write(file_data)
+
+    logging.info('Done writing...')
+    print 'Done writing...'
 
     # Finalize the blob.
     files.finalize(blob_name)
 
+    logging.info('Finalized.')
+    print 'Finalized.'
+
     # Get the file's blob key
     blob_key = files.blobstore.get_blob_key(blob_name)
+
+    logging.info('Uploaded blob key: "%s".' % blob_key)
+    print 'Uploaded blob key: "%s".' % blob_key
+
     return blob_key
 
 

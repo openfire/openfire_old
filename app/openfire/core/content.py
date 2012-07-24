@@ -369,7 +369,7 @@ class CoreContentAPI(CoreAPI):
         if namespace != _SYSTEM_NAMESPACE:
             if not isinstance(namespace, ndb.Key):
                 try:
-                    namespace = ndb.Key(urlsafe=namespace)
+                    namespace = ndb.Key(models.ContentNamespace, ndb.Key(urlsafe=namespace).urlsafe())
                 except Exception, e:
                     namespace = ndb.Key(models.ContentNamespace, hashlib.sha256(str(namespace)).hexdigest())
         else:
@@ -910,3 +910,20 @@ class ContentBridge(object):
         ''' Callback from template render to fulfill a dynamic content block. '''
 
         return self.__content_bridge.fulfill(keyname, namespace, caller, blocktype)
+
+    def get_dynamic_namespace(self, namespace):
+
+        ''' Retrieve or create a ContentNamespace record '''
+
+        if namespace != _SYSTEM_NAMESPACE:
+            try:
+                target = ndb.Key(urlsafe=namespace)
+            except:
+                target = None
+
+        namespace_key = self.__content_bridge._build_namespace_key(namespace)
+        namespace_obj = namespace_key.get()
+        if namespace_obj is None:
+            return models.ContentNamespace(key=namespace_key, name=namespace, target=target).put()
+        else:
+            return namespace_obj.key
