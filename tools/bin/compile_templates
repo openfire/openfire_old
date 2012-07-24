@@ -134,7 +134,10 @@ def main():
     app = base + '/app'
     lib = app + '/lib'
     dist = lib + '/dist'
-    gae = base + '/var/parts/google_appengine'
+    if os.name == 'nt':
+        gae = base + '/var/parts/google_appengine'
+    else:
+        gae = '/usr/local/google_appengine'
     gaelib = gae + '/lib'
     module = base + '/app/templates'
     sourcepath = base + '/app/templates/source'

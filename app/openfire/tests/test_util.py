@@ -1,4 +1,4 @@
-from openfire.core.sessions import SessionsMixin
+from openfire.core.sessions import SessionsBridge
 
 '''
 This module has utility functions used for the test suite.
@@ -6,9 +6,9 @@ This module has utility functions used for the test suite.
 
 def encrypt(key):
     # TODO: Do this a better way?
-    return SessionsMixin().encrypt(key)
+    return SessionsBridge().encrypt(key)
 
 def decrypt(key):
     # TODO: Do this a better way?
-    return SessionsMixin().decrypt(key)
+    return SessionsBridge().decrypt(key)
 
