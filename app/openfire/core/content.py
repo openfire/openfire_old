@@ -11,7 +11,7 @@ import hashlib
 ## Jinja2 Imports
 from jinja2 import nodes
 from jinja2 import Template
-from jinja2 import Environment
+from jinja2 import environment
 from jinja2.ext import Extension
 from jinja2.bccache import BytecodeCache
 from jinja2.exceptions import TemplateNotFound
@@ -486,7 +486,7 @@ class CoreContentAPI(CoreAPI):
             return caller()
         return (summary.html, summary.text)
 
-    def _load_template(self, environment, name, direct=False):
+    def _load_template(self, _environment, name, direct=False):
 
         ''' Load a template from source/compiled packages and preprocess. '''
 
@@ -494,42 +494,42 @@ class CoreContentAPI(CoreAPI):
         if name not in self.templates:
 
             # get loader + bytecacher
-            loader = environment.loader
-            bytecache = environment.bytecode_cache
+            loader = _environment.loader
+            bytecache = _environment.bytecode_cache
 
             try:
                 # for modules: load directly (it's way faster)
                 if not loader.has_source_access:
-                    template = loader.load(environment, name, prepare=False)
-                    self.templates[name] = template
+                    template = self._pre_ast_hook(loader.load(_environment, name, prepare=False))
                     if direct:
-                        return template.run(environment)
-                    else:
-                        template = self._pre_ast_hook(template.run(environment))
+                        return template
 
-                    return self._compiled_ast_hook(loader.prepare_template(environment, name, template, environment.globals))
+                    template = loader.prepare_template(_environment, name, template.run(_environment), _environment.globals)
+                    self.templates[name] = template
+
+                    return self._compiled_ast_hook(self.templates.get(name))
 
                 # for source-based templates
                 else:
                     # load template source
-                    source, template, uptodate = loader.get_source(environment, name)
+                    source, template, uptodate = loader.get_source(_environment, name)
 
                     # parse abstract syntax tree
                     if not direct:
-                        parsed_ast = self._pre_ast_hook(environment.parse(environment.preprocess(source)))
+                        parsed_ast = self._pre_ast_hook(_environment.parse(_environment.preprocess(source)))
                     else:
-                        return environment.parse(environment.preprocess(source))
+                        return _environment.parse(_environment.preprocess(source))
 
                     # check the bytecode cache for compiled source for this template
                     code = None
                     if bytecache is not None:
-                        bucket = bytecache.get_bucket(environment, name, template, source)
+                        bucket = bytecache.get_bucket(_environment, name, template, source)
                         if bucket.code is not None:
                             code = bucket.code
 
                     # if we couldn't get it anywhere else, compile source to bytecode
                     if code is None:
-                        code = environment.compile(parsed_ast, name, template)
+                        code = _environment.compile(parsed_ast, name, template)
 
                         if bytecache is not None:
                             bucket.code = code
@@ -541,14 +541,19 @@ class CoreContentAPI(CoreAPI):
                     if direct:
                         return code
                     else:
-                        return self._compiled_ast_hook(environment.template_class.from_code(environment, code, environment.globals, uptodate))
+                        return self._compiled_ast_hook(_environment.template_class.from_code(_environment, code, _environment.globals, uptodate))
 
             except TemplateNotFound:
                 raise
 
         # return from API cache
         else:
-            return self._compiled_ast_hook(environment.template_class.from_code(environment, self.templates.get(name), environment.globals, True))
+            tpl = self.templates.get(name)
+            if isinstance(tpl, dict):
+                return self._compiled_ast_hook(_environment.template_class.from_module_dict(_environment, tpl, _environment.globals))
+            if isinstance(tpl, environment.Template):
+                return tpl
+            return self._compiled_ast_hook(_environment.template_class.from_code(_environment, tpl, _environment.globals, True))
 
 
     ## == High-level Methods == ##
@@ -578,10 +583,13 @@ class CoreContentAPI(CoreAPI):
 
         snippet_queries = []
         for area in areas:
-            snippet_queries.append(self._build_projection_query(kind=models.ContentSnippet, parent=area, resultset_callback=self.batch_fulfill_async, eventual_callback=self._batch_store_callback))
+            snippet_queries.append(self._build_keysonly_query(kind=models.ContentSnippet, parent=area, resultset_callback=self.batch_fulfill_async, eventual_callback=self._batch_store_callback))
 
-        self._batch_store_callback(areas)
-        yield tuple([self._run_query_async(q) for q in snippet_queries])
+        query_futures = [self._run_query_async(q) for q in snippet_queries]
+
+        ## Parrallel yield, then return!
+        yield tuple(query_futures + [self._batch_store_callback(areas)])
+        raise ndb.Return(None)
 
     def prerender(self, environment, path_or_template):
 
@@ -790,8 +798,8 @@ class ContentBridge(object):
                     _loader = output.CoreOutputLoader(j2cfg.get('template_path'))
                 _output_loader = _loader
 
-            if True:
-                _loader = output.ModuleLoader(templates_compiled_target)
+            #if True:
+            #    _loader = output.ModuleLoader(templates_compiled_target)
 
             self.logging.info('Final extensions list: "%s".' % compiled_extension_list)
             self.logging.info('Chosen loader: "%s".' % _loader)
@@ -819,14 +827,14 @@ class ContentBridge(object):
             environment_args = finalConfig.get('environment_args', {})
             environment_args.update(base_environment_args)
 
-            environment = Environment(**environment_args)
+            env = environment.Environment(**environment_args)
 
             # update globals and filters
-            environment.globals.update(self.baseContext)
-            environment.filters.update(filters)
+            env.globals.update(self.baseContext)
+            env.filters.update(filters)
 
             # patch in app, handler, ext and api
-            environment.extend(**{
+            env.extend(**{
                 'wsgi_current_application': app,
                 'wsgi_current_handler': self,
                 'jinja2_current_loader': _loader,
@@ -834,11 +842,11 @@ class ContentBridge(object):
             })
 
             for extension in compiled_extension_list:
-                environment.add_extension(extension)
+                env.add_extension(extension)
 
             # replace logging conditional
             self.logging._setcondition(self._webHandlerConfig.get('logging'))
-            self.__environment = environment
+            self.__environment = env
 
             return self.__environment
 
