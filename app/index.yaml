@@ -25,6 +25,12 @@ indexes:
   - name: r
   - name: a
 
+- kind: ContentArea
+  ancestor: yes
+  properties:
+  - name: l
+  - name: lc
+
 - kind: _AE_Pipeline_Record
   properties:
   - name: class_path
