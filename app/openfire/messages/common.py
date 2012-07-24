@@ -67,6 +67,8 @@ class Goal(messages.Message):
     backer_count = messages.IntegerField(6)
     progress = messages.IntegerField(7)
     met = messages.BooleanField(8)
+    created = messages.StringField(9)
+    modified = messages.StringField(10)
 
 
 class Goals(messages.Message):

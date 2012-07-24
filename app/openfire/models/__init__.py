@@ -4,6 +4,7 @@
 # Base Imports
 import config
 import webapp2
+import datetime
 
 # AppTools Imports
 from apptools.util import debug
@@ -121,7 +122,7 @@ class MessageConverterMixin(ModelMixin):
 
     _message_class = None
 
-    def to_message(self, include=None, exclude=None):
+    def to_message(self, include=None, exclude=None, strict=False):
 
         ''' Convert an entity instance into a message instance. '''
 
@@ -136,7 +137,7 @@ class MessageConverterMixin(ModelMixin):
 
             if isinstance(v, ndb.Key):
                 return v.urlsafe()
-            elif hasattr(v, 'isoformat'):
+            if isinstance(v, (datetime.datetime, datetime.date, datetime.time)):
                 return v.isoformat()
             else:
                 if isinstance(v, (tuple, list)):
@@ -144,6 +145,11 @@ class MessageConverterMixin(ModelMixin):
                     for i in v:
                         values.append(_convert_prop(v))
                     return values
+                if isinstance(v, (int, basestring, float, bool)):
+                    return v
+                if v == None:
+                    if strict:
+                        return v
 
         for k, v in self.to_dict(include=include, exclude=exclude).items():
             if hasattr(response, k):
