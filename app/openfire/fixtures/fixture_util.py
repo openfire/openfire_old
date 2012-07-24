@@ -1,3 +1,4 @@
+import os
 from google.appengine.ext import ndb
 from google.appengine.api import files, images
 from webapp2_extras import security as wsec
@@ -27,8 +28,13 @@ def upload_file_to_blobstore(filename, mime_type):
     blob_name = files.blobstore.create(mime_type=mime_type)
 
     # Open blob and write the file to it.
+    if os.name == 'nt':
+        mode = 'rb'
+    else:
+        mode = 'r'
+
     with files.open(blob_name, 'a') as blob:
-        local_file = open(filename)
+        local_file = open(filename, mode)
         blob.write(local_file.read())
 
     # Finalize the blob.
