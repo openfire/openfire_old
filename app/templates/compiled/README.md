@@ -1,1 +1,0 @@
-Remember to compile your templates before you push! This is simply a placeholder to make sure this folder stays in Git.

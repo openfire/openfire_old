@@ -21,6 +21,8 @@ class Goal extends Model
         backer_count: Number()
         progress: Number()
         met: Boolean()
+        created: String()
+        modified: String()
 
 
 class Tier extends Model
@@ -131,6 +133,10 @@ class Project extends Model
                 else
                     if (i = parseInt(key_or_index, 10)) > 0 or i < 0 or i is 0    # if key parse doesn't return NaN, assume it's an index
                         index = i
+
+                    else if key_or_index is true
+                        # returns list
+                        return @stashes[stash_name].store
 
                     else if (_i = @stashes[stash_name].index[key_or_index])?
                         index = _i
@@ -621,11 +627,19 @@ class ProjectController extends OpenfireController
 
         @goals =
 
-            get: (goal_key, callback, sync=false) =>
+            get: (goal_key, callback, sync) =>
 
                 ## get goal by key
+
+                if not sync?
+                    if callback? and typeof callback is 'boolean'
+                        sync = callback
+                        callback = null
+                    else sync = false
+                
                 if not sync
-                    return @get_attached('goal', goal_key)
+                    goal = @get_attached('goal', goal_key)
+                    return if callback? then callback.call(@, goals) else goal
 
                 else
                     # get from the server
@@ -642,20 +656,33 @@ class ProjectController extends OpenfireController
                             alert 'goals.get() failure'
 
 
-            list: (callback, sync=false) =>
+            list: (callback, sync) =>
 
                 ## list goals by project key
-                $.apptools.api.project.list_goals(project: @project_key).fulfill
 
-                    success: (response) =>
-                        goals = []
-                        goals.push(@attach(new Goal().from_message(goal))) for goal in response.goals
+                if not sync?
+                    if callback? and typeof callback is 'boolean'
+                        sync = callback
+                        callback = null
+                    else sync = false
 
-                        return if callback? then callback.call(@, goals) else goals
+                if not sync
+                    goals = @get_attached('goal', true)
+                    return if callback? then callback.call(@, goals) else goals
 
-                    failure: (error) =>
-                        alert 'goals.list() failure'
-                        @log('Error listing goals: ' + error)
+                else
+                    # get from the server
+                    $.apptools.api.project.list_goals(project: @project_key).fulfill
+
+                        success: (response) =>
+                            goals = []
+                            goals.push(@attach(new Goal().from_message(goal))) for goal in response.goals
+
+                            return if callback? then callback.call(@, goals) else goals
+
+                        failure: (error) =>
+                            alert 'goals.list() failure'
+                            @log('Error listing goals: ' + error)
 
             put: (goal, callback) =>
 
@@ -974,12 +1001,12 @@ class ProjectController extends OpenfireController
                 base_id = 'project-tier-editor'
                 base_el = null
 
-                return @tiers.list (tiers) =>
+                return @tiers.list((tiers) =>
                     _pk = @project_key
                     _idx = null
                     _key = null
 
-                    $.apptools.widgets.modal.create (() =>
+                    $.apptools.widgets.modal.create((() =>
                         old = document.getElementById(base_id+'-modal-dialog')
                         if old?
                             old.parentNode.removeChild(old)
@@ -1149,8 +1176,9 @@ class ProjectController extends OpenfireController
                             css.right = @initial.right
 
                             return css
+                    )
 
-                    return @
+                , true)
 
 
         @_init = () =>
