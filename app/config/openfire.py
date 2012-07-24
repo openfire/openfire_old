@@ -214,7 +214,7 @@ config['openfire.output'] = {
         'config': {
             'enabled': True,
             'debug': False,
-            'logging': True
+            'logging': False
         },
 
         'installed': {
@@ -270,7 +270,7 @@ config['openfire.classes.WebHandler'] = {
 config['openfire.sessions'] = {
 
     'ttl': 86400,  # timeout in seconds for stale session records
-    'logging': True,  # enable logging if you want to know what's going on
+    'logging': False,  # enable logging if you want to know what's going on
     'cookieless': True,  # whether to enable cookieless (localstorage-based) sessions
     'salt': 'j09h8v9b&!V!V6vcvkcudv11',  # used for custom meals
 

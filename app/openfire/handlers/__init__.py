@@ -41,7 +41,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
     ''' Handler for desktop web requests. '''
 
     # Resource/Template Preloading
-    preload = []
     template = None
 
     # Session Properties
@@ -60,6 +59,10 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
     channel_id = None
     channel_token = None
     channel_timeout = 120
+
+    # Runtime Config
+    should_cache = False
+    should_preload = False
 
     ## ++ Internal Shortcuts ++ ##
     @webapp2.cached_property
@@ -148,14 +151,11 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
 
         ''' Preloaded data and template support. '''
 
-        # Preload keys
-        if hasattr(self, 'preload'):
-            pass
-
-        # Preload/prerender template
-        if hasattr(self, 'template') and getattr(self, 'template') not in frozenset(['', None, False]):
-            self.preload_template(self.template)
-        return
+        if self.should_preload:
+            # Preload/prerender template
+            if hasattr(self, 'template') and getattr(self, 'template') not in frozenset(['', None, False]):
+                self.preload_template(self.template)
+            return
 
     @ndb.toplevel
     def dispatch(self):

@@ -13,7 +13,7 @@ config['openfire.output.extension.DynamicContent'] = {
 
     'debug': True,
     'enabled': True,
-    'logging': True,
+    'logging': False,
 
     'config': {
         'default_namespace': '::'.join(['of', 'tpl', 'dynamic', 'system'])
@@ -26,7 +26,7 @@ config['openfire.output.extension.FragmentCache'] = {
 
     'debug': True,
     'enabled': True,
-    'logging': True,
+    'logging': False,
 
     'config': {
         'timeout': 1200,  # default timeout of 5 minutes
@@ -40,7 +40,7 @@ config['openfire.output.extension.ThreadedBytecodeCache'] = {
 
     'debug': True,
     'enabled': True,
-    'logging': True,
+    'logging': False,
 
     'config': {
         'timeout': 1200,  # default timeout of 5 minutes
@@ -54,7 +54,7 @@ config['openfire.output.extension.MemcachedBytecodeCache'] = {
 
     'debug': True,
     'enabled': True,
-    'logging': True,
+    'logging': False,
 
     'config': {
         'timeout': 1200,

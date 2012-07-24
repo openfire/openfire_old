@@ -137,13 +137,25 @@ class MessageConverterMixin(ModelMixin):
 
             if isinstance(v, ndb.Key):
                 return v.urlsafe()
-            if isinstance(v, (datetime.datetime, datetime.date, datetime.time)):
+
+            elif isinstance(v, (datetime.datetime, datetime.date, datetime.time)):
                 return v.isoformat()
+
+            # TODO: Activate this code and write a test for it.
+            elif isinstance(v, ndb.Model):
+                if hasattr(v, '_message_class'):
+                    return v.to_message()
+                else:
+                    model_dict = {}
+                    for k, v in v.to_dict().items():
+                        model_dict[k] = _convert_prop(v)
+                    return model_dict
+
             else:
                 if isinstance(v, (tuple, list)):
                     values = []
                     for i in v:
-                        values.append(_convert_prop(v))
+                        values.append(_convert_prop(i))
                     return values
                 if isinstance(v, (int, basestring, float, bool)):
                     return v
