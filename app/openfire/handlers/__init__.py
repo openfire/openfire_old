@@ -35,8 +35,32 @@ from openfire.core.content import ContentBridge
 from openfire.core.sessions import SessionsBridge
 
 
+class NamespaceBridge(object):
+
+    ''' Used to put all our datastore data into a namespace. '''
+
+    @webapp2.cached_property
+    def _namespace_config(self):
+
+        ''' Cached access to multitenancy config for this handler. '''
+
+        return config.config.get('openfire.multitenancy', {})
+
+    def prepare_namespace(self, request):
+
+        ''' Set the namespace for this request. '''
+
+        if self._namespace_config.get('enabled', False):
+            current_version = request.environ.get('CURRENT_VERSION_ID')
+            # If the current version is not set, this is probably a test, so don't set a namespace.
+            if current_version:
+                namespace = current_version.split('-')[0]
+                self.logging.info('Setting dev datastore namespace to "%s".' % namespace)
+                self.api.multitenancy.set_namespace(self._namespace_config.get('namespace', namespace))
+
+
 ## WebHandler - parent class for all site request handler classes
-class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
+class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
     ''' Handler for desktop web requests. '''
 
@@ -133,19 +157,32 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge):
         return self.jinja2
 
     ## ++ Internal Methods ++ ##
-    def __init__(self, request=None, response=None, preload=True):
+    def __init__(self, request=None, response=None, preload=False):
 
         ''' Init this request handler. '''
 
-        # Pass up to webapp2 first
-        self.initialize(request, response)
+        self.should_preload = preload
+
+        if request and response:
+            # Pass up to webapp2 first
+            self.initialize(request, response)
+
+    def initialize(self, request, response):
+
+        ''' Initialize this request handler. '''
+
+        super(WebHandler, self).initialize(request, response)
+
+        # Set up the namespace.
+        self.prepare_namespace(request)
 
         # Initialize dynamic content API
         self._initialize_dynamic_content(self.app)
 
         # Preload second
-        if preload:
+        if self.should_preload:
             self.preload()
+
 
     def preload(self):
 

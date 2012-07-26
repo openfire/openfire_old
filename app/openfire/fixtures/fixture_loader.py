@@ -27,7 +27,7 @@ FIXTURE_FILES = [
     ('project', util.create_project, 'name'),
     ('goal', util.create_goal, 'parent_key'),
     ('tier', util.create_tier, 'name'),
-    #('avatar', util.create_avatar, 'name'),
+    ('avatar', util.create_avatar, 'name'),
     ('video', util.create_video, 'name'),
     ('custom_url', util.create_custom_url, 'slug'),
 ]
@@ -74,8 +74,8 @@ def load_fixtures():
     loaded_data = {}
     for name, create_func, unique_slug in FIXTURE_FILES:
         filename = os.path.join(os.path.dirname(__file__), 'json', name + '.json')
-        fixture = open(filename)
-        fixture_data = json.loads(fixture.read())
+        with open(filename) as fixture:
+            fixture_data = json.loads(fixture.read())
 
         loaded_data[name] = {}
         for i in range(len(fixture_data)):

@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from apptools import BaseHandler
 
 from openfire.models import system
+from openfire.handlers import NamespaceBridge
 
 from openfire.fixtures import fixture_loader
 
@@ -34,7 +35,7 @@ class TestPassthrough(blobstore_handlers.BlobstoreUploadHandler):
         return self.response.write('<pre>' + str(self.request) + '</pre>')
 
 
-class DevModels(BaseHandler):
+class DevModels(BaseHandler, NamespaceBridge):
 
     ''' Quickly insert some dev models for testing. This is NOT meant to be a full, permanent fixture. '''
 
@@ -43,6 +44,8 @@ class DevModels(BaseHandler):
     def get(self):
 
         ''' Load the fixtures if they have not already been loaded. '''
+
+        self.prepare_namespace(self.request)
 
         run = True
         flag = system.SystemProperty.get('fixture', 'openfire.dev.BaseDataFixture')

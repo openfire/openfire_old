@@ -207,6 +207,11 @@ config['openfire.security'] = {
 
 }
 
+config['openfire.multitenancy'] = {
+    'enabled': True,
+    'namespace': 'develop'
+}
+
 config['openfire.output'] = {
 
     'extensions': {
