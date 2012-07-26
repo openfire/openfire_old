@@ -33,6 +33,7 @@ class FixturesTestCase(unittest.TestCase):
         self.testbed.init_memcache_stub()
         self.testbed.init_blobstore_stub()
         self.testbed.init_images_stub()
+        self.testbed.init_urlfetch_stub()
 
     def tearDown(self):
         self.testbed.deactivate()

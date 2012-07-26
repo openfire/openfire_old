@@ -112,7 +112,6 @@ class AdvancedEncryptTestCase(unittest.TestCase):
         # Try to import AES
         self.assertTrue(AES, 'Could not load PyCrypt AES support. All advanced encryption tests will fail.')
 
-    @unittest.expectedFailure
     def test_advanced_encryption(self):
 
         # prepare cleartext
@@ -124,7 +123,6 @@ class AdvancedEncryptTestCase(unittest.TestCase):
 
         self.assertEqual(advanced_cleartext, decrypted_text, 'Advanced encryption failed to properly encrypt or decrypt, because the resulting cleartext does not match.')
 
-    @unittest.expectedFailure
     def test_advanced_key_encryption(self):
 
         # prepare key

@@ -1,42 +1,42 @@
 [
     {
         "parent_key": "project__fat cat map",
-        "blob_file": "../app/openfire/fixtures/img_links/fatcatmap.png",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/fatcatmap.png",
         "url": "/assets/img/static/projects/cardstock/fatcatmap.png",
         "name": "fatcatmap.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__SeaSteading",
-        "blob_file": "../app/openfire/fixtures/img_links/seasteading.png",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/seasteading.png",
         "url": "/assets/img/static/projects/cardstock/seasteading.png",
         "name": "seasteading.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__urbsly",
-        "blob_file": "../app/openfire/fixtures/img_links/urbsly.png",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/urbsly.png",
         "url": "/assets/img/static/projects/cardstock/urbsly.png",
         "name": "urbsly.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__BlueSeed",
-        "blob_file": "../app/openfire/fixtures/img_links/blueseed.png",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/blueseed.png",
         "url": "/assets/img/static/projects/cardstock/blueseed.png",
         "name": "blueseed.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__Carrotmob",
-        "blob_file": "../app/openfire/fixtures/img_links/carrotmob.png",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/carrotmob.png",
         "url": "/assets/img/static/projects/cardstock/carrotmob.png",
         "name": "carrotmob.png",
         "mime": "image/png"
     },
     {
         "parent_key": "project__Open Source Ecology",
-        "blob_file": "../app/openfire/fixtures/img_links/ose.png",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/ose.png",
         "url": "/assets/img/static/projects/cardstock/ose.png",
         "name": "ose.png",
         "mime": "image/png"

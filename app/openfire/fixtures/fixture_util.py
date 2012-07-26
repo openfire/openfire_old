@@ -1,7 +1,7 @@
 from __future__ import with_statement
 import os
 from google.appengine.ext import ndb
-from google.appengine.api import files, images
+from google.appengine.api import files, images, urlfetch
 from webapp2_extras import security as wsec
 
 from openfire.models.user import User, EmailAddress, Permissions
@@ -17,10 +17,36 @@ This module is used to create database entities for testing purposes.
 '''
 
 
-def upload_file_to_blobstore(filename, mime_type):
+def fetch_url_to_blobstore(url):
 
     '''
     This is a helper method to upload a local file to the blobstore.
+    Returns a BlobKey object.
+    '''
+
+    logging.info('DOWNLOADING URL FILE to blobstore. At url "%s".' % url)
+
+    # Fetch the url.
+    result = urlfetch.fetch(url)
+    if result.status_code != 200:
+        return None
+
+    # Create the blob.
+    blob_name = files.blobstore.create(mime_type=result.headers['content-type'])
+    with files.open(blob_name, 'a') as blob:
+        blob.write(result.content)
+    files.finalize(blob_name)
+
+    # Return the blob key.
+    return files.blobstore.get_blob_key(blob_name)
+
+
+def upload_local_file_to_blobstore(filename, mime_type):
+
+    '''
+    This is a helper method to upload a local file to the blobstore.
+    It is not currently in use since we are having trouble loading local files
+    in google app engine.
 
     Returns a BlobKey object.
     '''
@@ -279,10 +305,10 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
     serving_url = url
     if blob_file:
         # Upload the file to the blobstore.
-        blob_key = upload_file_to_blobstore(blob_file, mime_type)
+        blob_key = fetch_url_to_blobstore(blob_file)
 
         # Get the serving url for the image.
-        serving_url = images.get_serving_url(blob_key)
+        serving_url = images.get_serving_url(blob_key, secure_url=True)
 
         # TODO: Should we remove the http:// portion of the url?
         #serving_url = serving_url.split('://')[1]
@@ -316,10 +342,10 @@ def create_image(parent_key=None, url='', name='', mime='', pending=False,
     serving_url = url
     if blob_file:
         # Upload the file to the blobstore.
-        blob_key = upload_file_to_blobstore(blob_file, mime_type)
+        blob_key = fetch_url_to_blobstore(blob_file)
 
         # Get the serving url for the image.
-        serving_url = images.get_serving_url(blob_key)
+        serving_url = images.get_serving_url(blob_key, secure_url=True)
 
         # TODO: Should we remove the http:// portion of the url?
         #serving_url = serving_url.split('://')[1]
