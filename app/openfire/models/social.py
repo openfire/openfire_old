@@ -30,4 +30,5 @@ class Follow(AppModel):
     _pipeline_class = pipelines.FollowPipeline
 
     user = ndb.KeyProperty('u', indexed=True, required=True)
-    subscription = ndb.KeyProperty('s', indexed=True, required=True)
+    subject = ndb.KeyProperty('sj', indexed=True, required=True)
+    subscription = ndb.KeyProperty('sb', indexed=True, required=True)

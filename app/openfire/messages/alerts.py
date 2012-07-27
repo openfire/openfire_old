@@ -2,7 +2,14 @@ from protorpc import messages
 
 
 #### ++++ Object Messages ++++ ####
-class ProspectiveQuery(messages.Message):
+class Namespace(messages.Message):
+
+	''' A registered prospective query. '''
+
+	pass
+
+
+class Query(messages.Message):
 
 	''' A registered prospective query. '''
 
