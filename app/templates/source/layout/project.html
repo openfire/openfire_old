@@ -7,53 +7,28 @@
 {% block main %}
 
     <!-- Main Masthead -->
-    <div id='masthead'>
-    </div><!-- #masthead -->
+    <div id='masthead'></div>
+    <!-- #masthead -->
 
     <div id='content'>
         <div id="fb-root"></div>
         <div id='project'>
 
-            <div id='welcomebox'>
-				{% if security.current_user.key in project.owners %}
+            {% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
                     <button id='promote-goals' value="goals">edit goals</button>
                     <button id='promote-tiers' value="tiers">edit tiers</button>
                 </div>
-                {% endif %}
-                {% block media %}
-                    {% if video %}
-                        {% if video.provider == 'vimeo' %}
-                        <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                            {% if video.ext_id %}
-                                <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                            {% else %}
-                                <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                            {% endif %}
-                        </div>
-                        {% else %}
-                            {% if video.provider == 'youtube' %}
-                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            {% else %}
-                                <img src="http://placehold.it/640x360/222222&text=video" />
-                            {% endif %}
-                        {% endif %}
-                    {% else %}
-                        <img src="http://placehold.it/640x360/222222&text=video" />
-                    {% endif %}
-                {% endblock media %}
-            </div>
+            {% endif %}
 
-            <div id='sidebar' class='pre-sticky'>
+            <div id='sidebar'> <!--  class='pre-sticky' -->
                 <header>
-                    <div id='sidetitle' class='fancy title'><h1>{{ project.name }}</h1></div>
                     <div id='sidebuttons' class='buttons'>
                         <button id='follow' class='momentron{%- if project.current_user_following -%} following{%- endif -%}'>&#xf007f;</button>
                         <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
+                    <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ project.name }}</h1></div>
                 </header> <!-- end header -->
 
                 <hr class="hr-inset most">
@@ -70,11 +45,10 @@
 
                         <div id='project_goals' data-section-title="goals">
                             {% if project.goals %}
-                            <div id="project-goals-accordion" class='pre-accordion' data-options='{"axis":"vertical"}'>
-                                {% set current_goal = false %}
+                            <div id="project-goals-accordion" class='css-accordion widget'>
                                 {% for goal in goals %}
-                                    <a href="#{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached"{% else %}{% if current_goal == false %} class="current"{% endif %}{% endif %}>{{ currency(goal.amount) }}</a>
-                                    <div id="{{ encrypt(goal.key.urlsafe()) }}"{% if goal.amount < project.money %} class="reached none"{% else %}{% if current_goal == false %}{% set current_goal = true %} class="current none"{% else %} class="none"{% endif %}{% endif %}>
+                                    <a id="a-{{ encrypt(goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(goal.key.urlsafe()) }}" class="target-link{% if goal.amount < project.money %} reached{% endif %}">{{ currency(goal.amount) }}</a>
+                                    <div id="{{ encrypt(goal.key.urlsafe()) }}" class="fold">
                                         <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
                                     </div>
                                 {% endfor %}
@@ -86,11 +60,10 @@
 
                         <div id='project_tiers'  data-section-title="tiers">
                             {% if project.tiers %}
-                            <div id="project-tiers-accordion" class='pre-accordion' data-options='{"axis":"vertical"}'>
-                                {% set current_tier = false %}
+                            <div id="project-tiers-accordion" class='css-accordion widget'>
                                 {% for tier in tiers %}
-                                    <a href="#{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %} class="current"{% endif %}>{{ tier.name }} - {{ currency(tier.amount) }}</a>
-                                    <div id="{{ encrypt(tier.key.urlsafe()) }}"{% if current_tier == false %}{% set current_tier = true %} class="current none"{% else %} class="none"{% endif %}>
+                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}"class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                    <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
                                         <p>{{ tier.description|safe }}</p>
                                     </div>
                                 {% endfor %}
@@ -156,11 +129,37 @@
                 </div> <!-- end #owners -->
             </div> <!-- end #sidebar -->
 
+            <div id='welcomebox'>
+                {% block media %}
+                    {% if video %}
+                        {% if video.provider == 'vimeo' %}
+                        <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
+                            {% if video.ext_id %}
+                                <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% else %}
+                                <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                            {% if video.provider == 'youtube' %}
+                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
+                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            {% else %}
+                                <img src="http://placehold.it/640x360/222222&text=video" />
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <img src="http://placehold.it/640x360/222222&text=video" />
+                    {% endif %}
+                {% endblock media %}
+            </div>
+
             <article id='deets'>
 
                 <!-- project title -->
                 <div id='projecttitle'>
-                    <h1 class="mini-editable" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
+                    <h1 data-href="#project" class="target-link" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
                     <div id='deetactions'>
                         <div class='buttongroup' data-action="Share This">
                             <button id='fbshare' class='zocial facebook sharebutton icon'></button>
@@ -171,59 +170,43 @@
                 </div> <!-- end #projecttitle -->
 
                 <!-- project info tabset -->
-                <div id='project-tabset' class='pre-tabs relative tabset' data-options='{"div_string":"section","width":"640px"}'>
-                    <a href='#details-tab' class='tab-rounded'>project details</a>
-                    <a href='#members-tab' class='tab-rounded'>project members</a>
-                    <a href='#openfire-tab' class='tab-rounded'>social reach</a>
+                <div id='project-tabset' class='pre-tabs relative tabset'>
+                    <a href='#details-tab' class='tab-rounded'>project<br>details</a>
+                    <a href='#members-tab' class='tab-rounded'>project<br>members</a>
+                    <a href='#openfire-tab' class='tab-rounded'>social<br>reach</a>
 
                     <!-- details-tab -->
-                    <section id='details-tab' class='prsection absolute tab' style="opacity: 0">
-                        <h2>Project Details</h2>
-                        {% block description %}
-                            <h3>Summary</h3>
-                            <p>{{ project.summary }}</p>
-                            <h3>Pitch</h3>
-                            <p>{{ project.pitch }}</p>
-                            <h3>Specifics</h3>
-                            <ul class='naked'>
-                                <li>Category: {{ project.category }}</li>
-                                <li>Technology: {{ project.tech }}</li>
-                                <li>Keywords: {{ project.keywords }}</li>
-                            </ul>
-                        {% endblock %}
-                    </section><!-- end #details-tab -->
+                    <div id='details-tab' class="tab" style="opacity: 0">
+                        <section class='prsection'>
+                            {% block description %}
+                                <h3>Summary</h3>
+                                <p>{{ project.summary }}</p>
+                                <h3>Pitch</h3>
+                                <p>{{ project.pitch }}</p>
+                                <h3>Specifics</h3>
+                                <ul class='naked'>
+                                    <li>Category: {{ project.category }}</li>
+                                    <li>Technology: {{ project.tech }}</li>
+                                    <li>Keywords: {{ project.keywords }}</li>
+                                </ul>
+                            {% endblock %}
+                        </section>
+                    </div><!-- end #details-tab -->
 
                     <!-- members-tab-->
-                    <section id='members-tab' class='prsection absolute tab' style="opacity: 0">
-                        <h2>Project Members</h2>
-                        <p>This project has team members and an owner.</p>
-                        <p>It was made possible by {{ project.backers }} generous backers, who have donated {{ currency(project.money) }} to date, placing this project {{ project.progress }}% of the way to its next support goal!</p>
-                    </section><!-- end #members-tab-->
+                    <div id="members-tab" class="tab" style="opacity: 0">
+                        <section class='prsection'>
+                            <p>This project has team members and an owner.</p>
+                            <p>It was made possible by {{ project.backers }} generous backers, who have donated {{ currency(project.money) }} to date, placing this project {{ project.progress }}% of the way to its next support goal!</p>
+                        </section>
+                    </div><!-- end #members-tab-->
 
                     <!-- team -->
-                    <section id='openfire-tab' class='prsection absolute tab' style="opacity: 0">
-                        <h2>Social Reach</h2>
-                        <p>TEAM</p>
-                    </section><!-- end #team -->
-
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
+                    <div id="openfire-tab" class="tab" style="opacity: 0">
+                        <section class='prsection'>
+                            <p>TEAM</p>
+                        </section>
+                    </div><!-- end #team -->
 
             </article><!-- end #project -->
         </div><!-- end #content -->

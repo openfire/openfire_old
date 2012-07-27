@@ -1,17 +1,25 @@
 @media all and (min-width: 480px)
-  #superbar nav
-    left: 125px
-    ul a
-      color: #ffb246
+  #superbar 
+    nav
+      left: 125px
+      ul a
+        color: #ffb246
 
 @media all and (max-width: 768px)
   #superbar
-    background-color: #ffb246
+    #tinylogo
+      left: 2%
+      padding: 2px
+      max-width: 10%
+
+    background-color: #555
     color: #f57220
     height: 42px
     position: fixed
     nav
-      left: 0%
+      left: 0
+      .left
+        display: none
       ul li
         display: list-item
         a
@@ -22,6 +30,10 @@
 
 @media all and (min-width: 768px)
   #superbar
+    #tinylogo
+      top: 5px
+      left: 10px
+
     background-color: transparent
     box-shadow: none
 
@@ -36,10 +48,10 @@
 
   #tinylogo
     position: absolute
-    top: 5px
-    left: 10px
+
   nav
     position: absolute
+    top: 0
     right: 0
     .left
       float: left
