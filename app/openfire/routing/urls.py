@@ -70,6 +70,16 @@ rules = [
         ## === Internal URLs === ##
         HandlerPrefixRoute('internal.', [
             PathPrefixRoute('/_internal', [
+
+                HandlerPrefixRoute('matcher.', [
+                    PathPrefixRoute('/matcher', [
+
+                        Route('/match', name='internal/matcher-match', handler='Match'),
+                        Route('/notify', name='internal/matcher-notify', handler='Notify')
+
+                    ])
+                ]),
+
                 Route('/tick/cache', name='internal/cache-flush', handler='NoOp'),
                 Route('/tick/garbage', name='internal/garbage-collector', handler='NoOp')
             ])
