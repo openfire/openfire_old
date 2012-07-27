@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Unit tests for openfire</title>
+
+    <!-- Jasmine Core Library. -->
+    <link rel="stylesheet" type="text/css" href="/assets/style/static/compiled/jasmine.css">
+    <script type="text/javascript" src="/assets/js/static/core/jasmine.js"></script>
+    <script type="text/javascript" src="/assets/js/static/core/jasmine-html.js"></script>
+
+
+    <!-- Core Scripts -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{ asset.script('jquery', 'core') }}"><\/script>')</script>
+    <script src="{{ asset.script('modernizr', 'core') }}"></script>
+    <script src="{{ asset.script('underscore', 'core') }}"></script>
+    <script src="{{ asset.script('d3', 'core') }}"></script>
+    <script src="/assets/js/static/core/jquery/easing.min.js"></script>
+
+    <!-- Our openfire code to be tested. -->
+    <script src="{{ asset.script('admin', 'apptools') }}"></script>
+    <script src="{{ asset.script('admin', 'openfire') }}"></script>
+
+    <!-- Our openfire test files. -->
+    <script type="text/javascript" src="/assets/js/static/tests/tests.js"></script>
+
+    <!-- The jasmine test runner. -->
+    <script type="text/javascript">
+        (function() {
+            var jasmineEnv = jasmine.getEnv();
+            jasmineEnv.updateInterval = 1000;
+
+            var trivialReporter = new jasmine.TrivialReporter();
+
+            jasmineEnv.addReporter(trivialReporter);
+
+            jasmineEnv.specFilter = function(spec) {
+                return trivialReporter.specFilter(spec);
+            };
+
+            var currentWindowOnload = window.onload;
+
+            window.onload = function() {
+                if (currentWindowOnload) {
+                    currentWindowOnload();
+                }
+                execJasmine();
+            };
+
+            function execJasmine() {
+                jasmineEnv.execute();
+            }
+        })();
+    </script>
+
+</head>
+<body>
+</body>
+</html>

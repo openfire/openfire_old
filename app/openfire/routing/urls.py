@@ -21,6 +21,7 @@ rules = [
 
         ## Temporary dev URLS
         Route('/_dev/data', name='default/data', handler='dev.DevModels'),
+        Route('/_dev/jasmine', name='unittests', handler='dev.JasmineTests'),
 
         ## === About URLs === ##
         HandlerPrefixRoute('about.', [

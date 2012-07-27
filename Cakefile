@@ -750,6 +750,11 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
+	out.shout 'coffee', 'Compiling openfire unit tests...'
+	out.spawn 'coffee', node_bin, [ coffee_bin,
+									'--join', fixpath(js_prefix, 'static', 'tests', 'tests.js'),
+									'--compile', fixpath(js_prefix, 'source', 'tests', 'tests.coffee')]
+
 	out.say 'coffee', 'Done :)'
 
 

@@ -58,3 +58,14 @@ class DevModels(BaseHandler, NamespaceBridge):
         fixture_loader.load_fixtures()
 
         return self.redirect_to('landing')
+
+
+class JasmineTests(BaseHandler, NamespaceBridge):
+
+    ''' Return the page that will run all of our jasmine unit tests. '''
+
+    def get(self):
+
+        ''' Just return the jasmine test page. '''
+
+        return self.render('test/jasmine_tests.html')
