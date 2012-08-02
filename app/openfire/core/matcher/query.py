@@ -84,7 +84,7 @@ class Query(object):
 
 		''' Build a Query object from an NDB Query. '''
 
-		pass
+		raise NotImplementedError
 
 	@classmethod
 	def from_string(cls, querystring, **kwargs):
