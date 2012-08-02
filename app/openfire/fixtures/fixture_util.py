@@ -154,7 +154,6 @@ def create_user(username='fakie', password='fakieiscool', firstname='Fakie', las
                                _securityConfig.get('config', {}).get('wsec', {}).get('hash', 'sha256'),
                                _securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('salt', '__salt__'),
                                _securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('pepper', '__pepper__'))
-    import pdb; pdb.set_trace();
     user_key = User(key=ndb.Key('User', email), username=username, firstname=firstname, lastname=lastname,
             location=location, bio=bio, password=pwd).put()
     if email:
