@@ -41,6 +41,22 @@ class SecurityConfigProvider(object):
                 return p
         return None
 
+    def build_authenticated_session(self, email, nickname, ukey, uid):
+
+        ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
+
+        self.authenticated = True
+        self.session['authenticated'] = True
+        self.session['email'] = email
+        self.session['uid'] = email
+        if isinstance(ukey, ndb.Key):
+            self.session['ukey'] = ukey.urlsafe()
+        else:
+            self.session['ukey'] = ukey
+        self.session['nickname'] = nickname
+
+        return self.session
+
 
 class Login(WebHandler, SecurityConfigProvider):
 
@@ -79,7 +95,7 @@ class Login(WebHandler, SecurityConfigProvider):
         ''' Redirect the user to Google-based login. '''
 
         if 'staging' in self.request.environ.get('HTTP_HOST'):
-            return self.do_auth_redirect(*[                
+            return self.do_auth_redirect(*[
                 self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
             ])
 
@@ -185,8 +201,14 @@ class Login(WebHandler, SecurityConfigProvider):
         ## pick up the form
         if 'username' in self.request.params and 'password' in self.request.params:
 
+            import pdb; pdb.set_trace()
+
             try:
-                hashed_password = wsec.hash_password(self.request.params.get('password'), 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal')
+                hashed_password = wsec.hash_password( self.request.params.get('password'),  # plaintext pswd
+                                                      self._securityConfig.get('config', {}).get('wsec', {}).get('hash', 'sha256'),  # hash algorithm
+                                                      self._securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('salt', '__salt__'),  # salt
+                                                      self._securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('pepper', '__pepper__'))  # n' peppa
+
                 user_key = ndb.Key(user_models.User, self.request.params.get('username'))
             except NotImplementedError:
                 context['error'] = 'Woops! Something went wrong. Please try again.'
@@ -356,23 +378,6 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             continue_url = self.url_for('landing')
 
         return self.redirect(continue_url)
-
-    ### === Session Functions === ###
-    def build_authenticated_session(self, email, nickname, ukey, uid):
-
-        ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
-
-        self.authenticated = True
-        self.session['authenticated'] = True
-        self.session['email'] = email
-        self.session['uid'] = email
-        if isinstance(ukey, ndb.Key):
-            self.session['ukey'] = ukey.urlsafe()
-        else:
-            self.session['ukey'] = ukey
-        self.session['nickname'] = nickname
-
-        return self.session
 
     ### === Callback Functions === ###
     def callback_facebook(self):
