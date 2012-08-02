@@ -220,7 +220,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'develop'
+    'namespace': 'auth'
 }
 
 config['openfire.output'] = {

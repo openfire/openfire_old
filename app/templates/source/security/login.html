@@ -2,37 +2,60 @@
 
 {% block content %}
 
-{% block loginsplash %}
-<div id='splash' class="rounded-big center-all">
+	{% block loginsplash %}
+	<div id='splash' class="rounded-big center-all">
 
-	<div id="login_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}" data-csrf="{{ encrypt(security.session.get('sid', '__DEV__')) }}">
-		{% include "snippets/login_box.html" with context %}
-	</div><!-- end #login_wrapper -->
+		<div id="login_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}" data-csrf="{{ encrypt(security.session.get('sid', '__DEV__')) }}">
+			{% include "snippets/login_box.html" with context %}
+		</div><!-- end #login_wrapper -->
 
-</div><!-- end #splash -->
-{% endblock %}
+	</div><!-- end #splash -->
+	{% endblock %}
 
-{% block secbadges %}
-<div id="security_badges" data-ssl-enabled="" data-trustseal-enabled="">
+	{% block secbadges %}
+	<div id="security_badges" data-ssl-enabled="" data-trustseal-enabled="">
 
-	<div class='badgecontainer'>
-		<div id='ssl_status' class='{%- if security.https -%}secured{%- else %}notsecured{%- endif -%}'>
-			{% if security.https %}
-				<div class='bigtext momentron'>&#xf0008;</div><div class='karlabig'>HTTPS</div>
-			{% else %}
-				<div class='bigtext momentron'>&#xf0009;</div><div class='karlabig'>HTTP</div>
-			{% endif %}
+		<div class='badgecontainer'>
+			<div id='ssl_status' class='{%- if security.https -%}secured{%- else %}notsecured{%- endif -%}'>
+				{% if security.https %}
+					<div class='bigtext momentron'>&#xf0008;</div><div class='karlabig'>HTTPS</div>
+				{% else %}
+					<div class='bigtext momentron'>&#xf0009;</div><div class='karlabig'>HTTP</div>
+				{% endif %}
+			</div>
+			<div id='trustseal' class='symantec trusted'>
+				{% if util.config.debug %}
+					<img src="http://placehold.it/130x88/BBBBBB&text=Trust%20Seal" alt="Trust seal not available in development." />
+				{% else %}
+					<script type="text/javascript" src="https://seal.verisign.com/getseal?host_name={{ util.request.env.get('HTTP_HOST') }}&amp;size=L&amp;use_flash=YES&amp;use_transparent=YES&amp;lang=en" async></script>
+				{% endif %}
+			</div>
 		</div>
-		<div id='trustseal' class='symantec trusted'>
-			{% if util.config.debug %}
-				<img src="http://placehold.it/130x88/BBBBBB&text=Trust%20Seal" alt="Trust seal not available in development." />
-			{% else %}
-				<script type="text/javascript" src="https://seal.verisign.com/getseal?host_name={{ util.request.env.get('HTTP_HOST') }}&amp;size=L&amp;use_flash=YES&amp;use_transparent=YES&amp;lang=en" async></script>
-			{% endif %}
-		</div>
+
 	</div>
-
-</div>
-{% endblock %}
+	{% endblock %}
 
 {% endblock %}
+
+{% block postsouth %}
+	<script>
+		_.ready(function () {
+			// # openfire logon # //
+			var i, l, button,
+				buttons = document.getElementsByClassName("authprovider");
+			for (i = 0, l = buttons.length; i < l; i++) {
+				button = buttons[i];
+				button.addEventListener("click", function (e) {
+					var provider = e.target,
+						disabled = provider.getAttribute('disabled'),
+						location = provider.getAttribute('data-action');
+
+					e.preventDefault();
+					e.stopPropagation();
+
+					if (disabled !== 'disabled') { window.location.href = location; }
+				}, false);
+			};
+		});
+	</script>
+{% endblock postsouth %}

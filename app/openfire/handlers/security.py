@@ -96,7 +96,10 @@ class Login(WebHandler, SecurityConfigProvider):
 
         if 'staging' in self.request.environ.get('HTTP_HOST'):
             return self.do_auth_redirect(*[
-                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+                self.api.users.create_login_url(
+                    # google auth callback (no federated identity endpoint)
+                    self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+                )
             ])
 
         return self.do_auth_redirect(*[
@@ -200,8 +203,6 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ## pick up the form
         if 'username' in self.request.params and 'password' in self.request.params:
-
-            import pdb; pdb.set_trace()
 
             try:
                 hashed_password = wsec.hash_password( self.request.params.get('password'),  # plaintext pswd
