@@ -220,7 +220,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'auth'
+    'namespace': 'federated_auth'
 }
 
 config['openfire.output'] = {

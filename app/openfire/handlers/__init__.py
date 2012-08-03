@@ -71,6 +71,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
     session = None
     sessions = True
     force_session = True
+    apply_redirect = True
 
     # Security Properties
     user = None
@@ -205,7 +206,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
         try:
 
-            if self.sessions:
+            if self.sessions and self.apply_redirect:
                 # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
                 if self.session.get('redirect') is not None:
                     redirect_url = self.session.get('redirect')
@@ -251,7 +252,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
                  ''.join([i for i in reversed(formatted_number)]),
                  '%' if isPercent else None])])
 
-    def build_session(self):
+    def build_session2(self):
 
         ''' Build an initial session object and create an SID '''
 

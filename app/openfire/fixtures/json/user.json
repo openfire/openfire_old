@@ -16,7 +16,7 @@
         "lastname": "Gammon",
         "location": "San Francisco, CA",
         "bio": "fiesta ayayayay",
-        "email": "samuel.gammon@gmail.com",
+        "email": ["samuel.gammon@gmail.com", "sam@openfi.re", "sam@momentum.io"],
         "create_permissions": 1
     },
     {
@@ -26,7 +26,7 @@
         "lastname": "Rekow",
         "location": "San Francisco, CA",
         "bio": "hi i is david",
-        "email": "davidr@openfi.re",
+        "email": ["davidr@openfi.re", "xdavidrekowx@gmail.com", "david@momentum.io"],
         "create_permissions": 1
     },
     {
@@ -36,7 +36,7 @@
         "lastname": "Leland",
         "location": "San Francisco, CA",
         "bio": "ethan i am",
-        "email": "ethan.leland@gmail.com",
+        "email": ["ethan.leland@gmail.com", "ethan@openfi.re"],
         "create_permissions": 1
     }
 ]
