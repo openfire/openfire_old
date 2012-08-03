@@ -63,12 +63,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'backbone': {'min': True, 'version': '0.9.1'},    # Backbone.JS - site MVC core
-                'amplify': {'min': True, 'version': '1.1.0'},     # AmplifyJS - for request, local storage + pubsub management
                 'modernizr': {'min': False, 'version': '2.0.6'},  # Modernizr - browser polyfill + compatibility testing
-                'lawnchair': {'min': False, 'version': '0.6.3'},  # Lawnchair: Client-side persistent storage
-                'jquery': {'min': True, 'version': '1.7.1'},      # jQuery: Write Less, Do More!
-                'underscore': {'min': True, 'version': '1.3.1'},  # Underscore: JavaScript's utility belt
+                'jquery': {'min': True, 'version': '1.7.2'},      # jQuery: Write Less, Do More!
                 'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},   # D3 - Visualizations
             }
 
@@ -83,8 +79,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'base': {'min': True, 'version': 1.1},  # RPC, events, dev, storage, user, etc (see $.apptools)
-                'admin': {'name': 'base.admin', 'min': True, 'version': 1.1}  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'base': {'min': True, 'version': 1.2},  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'admin': {'name': 'base.admin', 'min': True, 'version': 1.2}  # RPC, events, dev, storage, user, etc (see $.apptools)
             }
 
         },
