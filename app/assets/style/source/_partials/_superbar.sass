@@ -18,7 +18,7 @@
           color: #f57220
 
     box-shadow: 0px 2px 2px -1px rgba(0,0,0,0.5)
-    
+
 
 @media all and (min-width: 768px)
   #superbar
@@ -51,7 +51,11 @@
       padding-bottom: 5px
       a
         display: inline
-        padding-right: 5px
+        padding-right: 15px
+        padding-left: 15px
+        padding-bottom: 18px
+        &:hover
+          background: white !important
       img
         display: inline
     ul li
@@ -61,8 +65,5 @@
         -webkit-transition-property: color
         &:hover
           text-decoration: none !important
-      &:hover
-        background: #f57220 !important
-        a
-          color: #fff !important
-          text-decoration: none !important
+
+@import _partials/loginbox.sass

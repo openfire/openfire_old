@@ -25,13 +25,31 @@
 	<ul class='right'>
 
 		{% if security.current_user %}  {# if the user is logged in... @TODO #}
-			<li class='profiletab'>
-				<a href="/me" title='Profile'>{{ random_greeting(security.current_user, security.session) }}</a>
-				<img src="{{ gravatarify(security.session.get('email'), 'jpg', '32') }}" width='32' height='32' alt='you!' />
+			<li class='profiletab widget'>
+
+				<div id='me'>
+					<a href='#' data-href="#profile_dropdown" id='profile_trigger' class='target-link' title='Profile'>{{ random_greeting(security.current_user, security.session) }}
+					{% if security.current_user.has_avatar() %}
+						<img src="{{ security.current_user.get_avatar_url('jpg', '32') }}" width='32' height='32' alt='you!' /></a>
+					{% else %}
+						<img src="{{ gravatarify(security.current_user.email[0].id(), 'jpg', '32') }}" width='32' height='32' alt='you!' /></a>
+					{% endif %}
+				</div>
+
+				<div id='profile_dropdown' class='xhidden'>
+					sup here's a profile dropdown
+				</div>
 			</li>
 		{% else %}
-			<li><a id='signup_trigger' href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>
-			<li><a id='login_trigger' href="{{ link('auth/login') }}" title="Log In">Log In</a></li>
+			<li>
+				<div id='topbox_topfold'>
+					<a id='loginsignup_trigger' href="{{ link('auth/login') }}" title="Log In">Log In</a> &amp; <a id='signup_trigger' href="{{ link('auth/register') }}">Sign Up</a>
+				</div>
+
+				<div id='loginsignup_dropdown' class='xhidden'>
+					loginsignup
+				</div>
+			</li>
 		{% endif %}
 
 	</ul>

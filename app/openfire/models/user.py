@@ -34,9 +34,38 @@ class User(AppModel):
     images = ndb.KeyProperty('im', repeated=True)
 
     def get_custom_url(self):
+
+        ''' Return this user's profile custom URL. '''
+
         if self.customurl:
             return self.customurl.id()
         return None
+
+    def get_avatar_url(self, extension='jpg', size='32'):
+
+        ''' Return this user's avatar URL, or false if we don't have it but *do* have an email (yay gravatar) or FBID. '''
+
+        if self.avatar is not None:
+            avatar, asset = tuple(ndb.get_multi([self.avatar, ndb.Key(urlsafe=self.avatar.id()).get()]))
+            if avatar.url is not None:
+                return avatar.url
+            elif asset.cdn is not None:
+                ## extension is ignored for CDN urls
+                return '='.join([asset.cdn, 's' + size])
+            elif asset.url is not None:
+                return asset.url
+            elif asset.blob is not None:
+                if extension:
+                    return self.url_for('serve-asset-filename', asset_key=str(asset.blob), filename='.'.join(['profile', extension]), s=size)
+                else:
+                    return self.url_for('serve-asset', asset_key=str(asset.blob))
+        return False
+
+    def has_avatar(self):
+
+        ''' Check and see if an avatar is attached. '''
+
+        return (self.avatar is not None)
 
 
 ## EmailAddress - links an email address to a user, for the purpose of signin/notifications/contact
