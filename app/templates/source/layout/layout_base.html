@@ -28,16 +28,20 @@
 			<li class='profiletab widget'>
 
 				<div id='me'>
-					<a href='#' data-href="#profile_dropdown" id='profile_trigger' class='target-link' title='Profile'>{{ random_greeting(security.current_user, security.session) }}
-					{% if security.current_user.has_avatar() %}
-						<img src="{{ security.current_user.get_avatar_url('jpg', '32') }}" width='32' height='32' alt='you!' /></a>
-					{% else %}
-						<img src="{{ gravatarify(security.current_user.email[0].id(), 'jpg', '32') }}" width='32' height='32' alt='you!' /></a>
-					{% endif %}
+					<a href='#' id='profile_trigger' class='target-link autoclose' data-href="#profile_dropdown" title='Profile'>{{ random_greeting(security.current_user, security.session) }}
+						<img {{ {
+							'src': security.current_user.has_avatar() and security.current_user.get_avatar_url('jpg', '32') or gravatarify(security.current_user.email[0].id(), 'jpg', '32'),
+							'width': '32',
+							'height': '32',
+							'alt': 'you!',
+							'onclick': "javascript:window.location.href='%s';" % link('user/me')
+						}|xmlattr }} /></a>
 				</div>
 
 				<div id='profile_dropdown' class='xhidden'>
-					sup here's a profile dropdown
+					<a href='{{ link("user/me") }}' title='You!'>Profile</a>
+					<a href='{{ link("user/account", username=security.current_user.username) }}' title="Settings">Settings</a>
+					<a href='{{ link("auth/logout") }}' title='Log Out'>Log Out</a>
 				</div>
 			</li>
 		{% else %}

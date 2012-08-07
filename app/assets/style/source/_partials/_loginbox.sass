@@ -1,20 +1,58 @@
 
 #me
-	text-align: right
-	height: 45px
-	line-height: 43px
-	max-width: 450px
-	max-height: 210px
+    text-align: right
+    height: 45px
+    line-height: 43px
+    max-width: 450px
+    max-height: 210px
+
+    -webkit-transition-property: background-color
+
+    a
+        background-color: transparent !important
+        &:hover
+            background-color: white !important
+        &.active
+            background-color: white !important
+
 
 #profile_dropdown
-	background: white
-	min-width: 200px
-	min-height: 45px
-	padding: 10px
-	visibility: hidden
-	position: relative
-	top: -3px
-	-webkit-transition-property: visibility
+    background: white
+    min-width: 200px
+    min-height: 45px
+    padding: 10px
+    position: relative
+    top: -3px
+    opacity: 0.0 !important
+    -webkit-transition-property: opacity
 
-	&.active
-		visibility: visible !important
+    &.active
+        opacity: 1.0 !important
+
+    a
+        position: relative
+        top: 15px
+        border-radius: 5px
+        color: white !important
+        background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220))
+        background: -webkit-linear-gradient(top center, #f79331, #f57220)
+        background: -moz-linear-gradient(top center, #f79331, #f57220)
+        background: -o-linear-gradient(top center, #f79331, #f57220)
+        background: -ms-linear-gradient(top center, #f79331, #f57220)
+        background: linear-gradient(top center, #f79331, #f57220)
+        &:hover
+            background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffd468), color-stop(100%, #ffb246)) !important
+            background: -webkit-linear-gradient(top center, #ffd468, #ffb246) !important
+            background: -moz-linear-gradient(top center, #ffd468, #ffb246) !important
+            background: -o-linear-gradient(top center, #ffd468, #ffb246) !important
+            background: -ms-linear-gradient(top center, #ffd468, #ffb246) !important
+            background: linear-gradient(top center, #ffd468, #ffb246) !important
+            cursor: pointer
+        &:active
+            background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffb246), color-stop(100%, #ffd468)) !important
+            background: -webkit-linear-gradient(top center, #ffb246, #ffd468) !important
+            background: -moz-linear-gradient(top center, #ffb246, #ffd468) !important
+            background: -o-linear-gradient(top center, #ffb246, #ffd468) !important
+            background: -ms-linear-gradient(top center, #ffb246, #ffd468) !important
+            background: linear-gradient(top center, #ffb246, #ffd468) !important
+            cursor: pointer
