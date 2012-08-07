@@ -317,9 +317,4 @@ class SessionsBridge(object):
 
                         return self.redirect(registration_url)
 
-                    # user found!
-                    else:
-                        pass
-
-        # for now @(TODO): START BACK HERE ON AUTH
         return self.session

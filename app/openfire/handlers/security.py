@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import base64
 import webapp2
 import logging
 import hashlib
@@ -41,6 +42,27 @@ class SecurityConfigProvider(object):
                 return p
         return None
 
+    def build_authenticated_session(self, email, nickname, ukey, uid):
+
+        ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
+
+        self.authenticated = True
+        self.session['authenticated'] = True
+        if isinstance(email, ndb.Key):
+            self.session['email'] = email.id()
+        elif isinstance(email, list):
+            self.session['email'] = email[0].id()
+        else:
+            self.session['email'] = email
+        self.session['uid'] = self.session['email']
+        if isinstance(ukey, ndb.Key):
+            self.session['ukey'] = ukey.urlsafe()
+        else:
+            self.session['ukey'] = ukey
+        self.session['nickname'] = nickname
+
+        return self.session
+
 
 class Login(WebHandler, SecurityConfigProvider):
 
@@ -57,11 +79,16 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ''' Redirect the user to Facebook-based login. '''
 
+        if cfg.debug or 'staging' in self.request.environ.get('HTTP_HOST'):
+            appid = '257586781019220'
+        else:
+            appid = self._metaConfig.get('opengraph', {}).get('facebook', {}).get('app_id', '__EMPTY_APP_ID__')
+
         return self.do_auth_redirect(
             "https://www.facebook.com/dialog/oauth?client_id=%(appid)s&redirect_uri=%(callback)s&scope=%(scope)s&state=%(state)s" % {
 
                 # appID and sessionID
-                'appid': self._metaConfig.get('opengraph', {}).get('facebook', {}).get('app_id', False),
+                'appid': appid,
                 'state': self.encrypt(self.session.get('sid')),
 
                 # scopes and callback
@@ -79,8 +106,11 @@ class Login(WebHandler, SecurityConfigProvider):
         ''' Redirect the user to Google-based login. '''
 
         if 'staging' in self.request.environ.get('HTTP_HOST'):
-            return self.do_auth_redirect(*[                
-                self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+            return self.do_auth_redirect(*[
+                self.api.users.create_login_url(
+                    # google auth callback (no federated identity endpoint)
+                    self.url_for('auth/action-provider', action='callback', provider='googleplus', csrf=hashlib.sha256(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+                )
             ])
 
         return self.do_auth_redirect(*[
@@ -136,6 +166,7 @@ class Login(WebHandler, SecurityConfigProvider):
             return {
 
                 # run code for whatever provider we're doing
+                'google': self.via_google,
                 'facebook': self.via_facebook,
                 'googleplus': self.via_google,
                 'twitter': self.via_twitter
@@ -186,8 +217,13 @@ class Login(WebHandler, SecurityConfigProvider):
         if 'username' in self.request.params and 'password' in self.request.params:
 
             try:
-                hashed_password = wsec.hash_password(self.request.params.get('password'), 'sha256', wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE), 'openfire-internal')
+                hashed_password = wsec.hash_password( self.request.params.get('password'),  # plaintext pswd
+                                                      self._securityConfig.get('config', {}).get('wsec', {}).get('hash', 'sha256'),  # hash algorithm
+                                                      self._securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('salt', '__salt__'),  # salt
+                                                      self._securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('pepper', '__pepper__'))  # n' peppa
+
                 user_key = ndb.Key(user_models.User, self.request.params.get('username'))
+                email_key = user_models.EmailAddress.query().filter(user_models.EmailAddress.address == self.request.params.get('username')).get(keys_only=True, produce_cursors=False)
             except NotImplementedError:
                 context['error'] = 'Woops! Something went wrong. Please try again.'
                 return self.render('security/login.html', **context)
@@ -196,6 +232,12 @@ class Login(WebHandler, SecurityConfigProvider):
 
                 # resolve user by username
                 user = user_key.get()
+
+                if user is None:
+                    # try resolving as email
+                    email = email_key.get()
+                    if email is not None:
+                        user = email.key.parent().get()
 
                 # user found?
                 if user is not None:
@@ -253,7 +295,7 @@ class Logout(WebHandler, SecurityConfigProvider):
 
         try:
             self.session = {}
-            logout_url = self.api.users.create_logout_url(self.request.environ.get('HTTP_REFERRER', '/'))
+            logout_url = self.api.users.create_logout_url(self.request.environ.get('HTTP_REFERRER', '/login'))
             if logout_url is not None:
                 return self.redirect(logout_url)
 
@@ -266,53 +308,14 @@ class Register(WebHandler, SecurityConfigProvider):
 
     ''' Default signup handler - return 404 by default. '''
 
+    # shut off registration redirect
+    apply_redirect = False
+
     def get(self):
 
         ''' Dev signup handler. Will need to be rewritten with an actual registration form. '''
 
-        # if they aren't logged in, redirect
-        u = self.api.users.get_current_user()
-        if u is None:
-            return self.redirect_to('auth/login')
-
-        # make sure user doesn't already exist
-        pu = user_models.User.get_by_id(u.email())
-        if pu is None:
-            if cfg.debug:
-                # only autoregister on the devserver
-                self.response.write('Autoregistering...<br />')
-
-                username, domain = tuple(u.email().split('@'))
-
-                # make user
-                user = user_models.User(id=u.email(), user=u, username=u.nickname(), firstname='John', lastname='Doe', bio='You are cool')
-                ukey = user.put()
-
-                # make customurl
-                curl = assets.CustomURL(id=username, slug=username, target=ukey)
-                curl.put()
-
-                user.customurl = curl.key
-
-                # make email
-                em = user_models.EmailAddress(id=u.email(), parent=ukey, user=ukey, address=u.email(), label='d', notify=True, jabber=True, gravatar=True)
-                em.put()
-                user.email = [em.key]
-
-                # make permissions
-                pm = user_models.Permissions(id='global', parent=ukey, user=ukey, moderator=True, admin=True, developer=True)
-                pm.put()
-                user.permissions = [pm.key]
-
-                user.put()
-
-                self.response.write('<b>Done. Redirecting.</b>')
-
-                # TODO: Redirect back to the url they came from, if provided.
-
-                return self.redirect_to('landing')
-        else:
-            return self.redirect_to('landing')
+        pass
 
 
 class Provider(WebHandler, SecurityConfigProvider):
@@ -329,6 +332,8 @@ class Provider(WebHandler, SecurityConfigProvider):
 class FederatedAction(WebHandler, SecurityConfigProvider):
 
     ''' Description/policy page for a login provider. '''
+
+    apply_redirect = False
 
     ### === Redirect Methods === ###
     def redirect_failure(self, error_message=None, error_code=None):
@@ -356,23 +361,6 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             continue_url = self.url_for('landing')
 
         return self.redirect(continue_url)
-
-    ### === Session Functions === ###
-    def build_authenticated_session(self, email, nickname, ukey, uid):
-
-        ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
-
-        self.authenticated = True
-        self.session['authenticated'] = True
-        self.session['email'] = email
-        self.session['uid'] = email
-        if isinstance(ukey, ndb.Key):
-            self.session['ukey'] = ukey.urlsafe()
-        else:
-            self.session['ukey'] = ukey
-        self.session['nickname'] = nickname
-
-        return self.session
 
     ### === Callback Functions === ###
     def callback_facebook(self):
@@ -407,15 +395,22 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             # no errors
             else:
 
+                if cfg.debug or 'staging' in self.request.environ.get('HTTP_HOST'):
+                    client = '257586781019220'
+                    secret = '679a4b95e7213409d61397bb989b826a'
+                else:
+                    client = self._resolveProvider('facebook').get('key')
+                    secret = self._resolveProvider('facebook').get('secret')
+
                 token_endpoint = "https://graph.facebook.com/oauth/access_token?client_id=%(client)s&redirect_uri=%(redirect)s&client_secret=%(secret)s&code=%(code)s" % {
 
-                    'client': self._resolveProvider('facebook').get('key'),
+                    'client': client,
                     'redirect': ''.join([
                             self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
                             self.request.environ.get('HTTP_HOST', 'localhost:8080'),
                             self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=csrf)
                     ]),
-                    'secret': self._resolveProvider('facebook').get('secret'),
+                    'secret': secret,
                     'code': code
 
                 }
@@ -450,22 +445,46 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         user_struct = json.loads(user_info.content)
 
                         # Copy over user struct stuff
-                        email = user_struct['email']
-                        nickname = user_struct['name']
+                        id = self.session['fb_id'] = user_struct['id']
+                        email = self.session['fb_email'] = user_struct['email']
+                        nickname = self.session['fullname'] = user_struct['name']
+
                         ukey = ndb.Key(user_models.User, email)
+                        fb_id = user_models.FacebookAccount.query().filter(user_models.FacebookAccount.ext_id == id).get(keys_only=True, produce_cursors=False)
+
+                        if fb_id is not None:
+                            ukey, fb_acct = tuple(ndb.get_multi([ukey, fb_id]))
+                        else:
+                            user = ukey.get()
+                            if user is None:
+                                ukey = None
+                            else:
+                                ukey = user.key
+
+                        if ukey is None and fb_acct is not None:
+                            fb_user = fb_acct.key.parent().get()
+                            ukey = fb_user.key
 
                         # Log it
                         logging.info('FB: Loggin in user with email "%s" and nickname "%s" and derived ukey "%s".' % (email, nickname, ukey))
 
-                        # log them in
-                        self.build_authenticated_session(
-                            email=email,
-                            nickname=nickname,
-                            ukey=ukey.urlsafe(),
-                            uid=ukey.id()
-                        )
-
-                        return self.redirect_success()
+                        if ukey is not None:
+                            # log them in
+                            self.build_authenticated_session(
+                                email=email,
+                                nickname=user_struct['name'],
+                                ukey=ukey.urlsafe(),
+                                uid=ukey.id()
+                            )
+                            return self.redirect_success()
+                        else:
+                            self.build_authenticated_session(
+                                email=email,
+                                nickname=user_struct['name'],
+                                ukey=None,
+                                uid=user_struct['id']
+                            )
+                            return self.redirect_to('auth/register', exi=base64.b64encode(user_struct['id']), state=hashlib.sha512(user_struct['id']).hexdigest())
 
                 else:
                     logging.critical('FB: ERROR! Failed to get persistent auth token.')
@@ -476,9 +495,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         else:
             logging.critical('WARNING! POSSIBLE SECURITY BREACH.')
             logging.critical('State variable did not match in callback.')
-            return self.redirect("/login")
-
-        return self.response.write('<pre>' + str(self.request) + '</pre>')
+        return self.redirect("/login")
 
     def callback_google(self):
 
@@ -489,15 +506,34 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         # federated/openid
         if u is not None:
 
-            self.build_authenticated_session(
-                email=u.email(),
-                nickname=u.nickname(),
-                ukey=ndb.Key(user_models.User, u.email()),
-                uid=u.email()
-            )
+            ## resolve user
+            user_key = ndb.Key(user_models.User, u.email())
+            email_key = user_models.EmailAddress.query().filter(user_models.EmailAddress.address == u.email()).get(keys_only=True, produce_cursors=False)
 
-            return self.redirect_success()
+            if email_key is not None:
+                user, email = tuple(ndb.get_multi([user_key, email_key]))
+                if user is None and email is not None:
+                    self.user = user = email.key.parent().get()
 
+            else:
+                self.user = user = user_key.get()
+
+            if user is not None:
+                self.build_authenticated_session(
+                    email=user.email,
+                    nickname=user.firstname + ' ' + user.lastname,
+                    ukey=user.key,
+                    uid=u.user_id()
+                )
+                return self.redirect_success()
+            else:
+                self.build_authenticated_session(
+                    email=u.email,
+                    nickname=u.nickname(),
+                    ukey=ndb.Key(user_models.User, u.email()),
+                    uid=u.user_id()
+                )
+                return self.redirect_to('auth/register', exi=base64.b64encode(u.user_id()), p='gp', state=hashlib.sha512(u.user_id()).hexdigest())
         else:
 
             try:
@@ -505,12 +541,33 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                 u = self.api.oauth.get_current_user()
                 assert u is not None
 
-                self.build_authenticated_session(
-                    email=u.email(),
-                    nickname=u.nickname(),
-                    ukey=ndb.Key(user_models.User, u.email()),
-                    uid=u.email()
-                )
+                user_key = ndb.Key(user_models.User, u.email())
+                email_key = user_models.EmailAddress.query().filter(user_models.EmailAddress.address == u.email()).get(keys_only=True, produce_cursors=False)
+
+                if email_key is not None:
+                    user, email = tuple(ndb.get_multi([user_key, email_key]))
+                    if user is None and email is not None:
+                        self.user = user = email.key.parent().get()
+
+                else:
+                    self.user = user = user_key.get()
+
+                if user is not None:
+                    self.build_authenticated_session(
+                        email=user.email,
+                        nickname=user.firstname + ' ' + user.lastname,
+                        ukey=user.key,
+                        uid=u.user_id()
+                    )
+                    return self.redirect_success()
+                else:
+                    self.build_authenticated_session(
+                        email=u.email(),
+                        nickname=u.email(),
+                        ukey=None,
+                        uid=u.user_id()
+                    )
+                    return self.redirect_to('auth/register', exi=base64.b64encode(u.user_id()), p='foa', state=hashlib.sha512(u.user_id()).hexdigest())
 
             ## everything failed
             except AssertionError:
@@ -531,12 +588,19 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         ''' Return a test message. '''
 
+        if 'register' in self.session:
+            del self.session['register']
+
+        if 'returnto' in self.session:
+            del self.session['returnto']
+
         if action == 'callback':
             if provider is not None:
                 return {
+                    'google': self.callback_google,
                     'googleplus': self.callback_google,
                     'facebook': self.callback_facebook,
-                    'twitter': self.callback_twitter
+                    #'twitter': self.callback_twitter
                 }.get(provider, lambda: self.error(404))()
 
         return self.response.write('<b>action:</b> ' + action)

@@ -89,6 +89,17 @@ config['openfire.security'] = {
         'pad16': True,
         'bad_logon_limit': 5,
 
+        'wsec': {
+            'hash': 'sha512',
+        },
+
+        'random': {
+            'blocks': {
+                'salt': """B#SE3!I@'zI*}U&O~dB?%~Q1zC9yhuP\D\t%i%58U'ol,|2l*+u|b,;\Gm=s?\V6B*'C[DGq"@"Oa;lOk#Uj}GZ~DYG$W;},E"cu/`((jn`70F43O\m>^j~mqAIKW~cbdIQg.>h0aVK*RU5a{n<Hlm{)1vGLG1}1V4HNXmCR-h>ah(`Q~}1xiHTTTDm8Gm`a3PNU!b&J<R[/V'#0z"]S8Of`Z:fR3{hdwm6-+@46Oowy}3vB@4&>D.@jOs3\JLJp""",
+                'pepper': """;^-lmpd24h8ac5JxGq;+ph?&i]Ov;YvZ5kk~'>7tt!oFaBU{'lSVE+"*?:#i^y\b.]Sq3>j;XA{eF)tsVg!+Q4>LEA+[]N_sGwa?=g3jd3q4I)'t0G=$6s1t1VmS;B["}C'$e()Q84&_FMM#gQ!De.f1ci+C'j>/MUlv>aJZ81H%z&#5=Mq5x0y$6N.}~:n{py%B]j,,~r?sgG|}fra<KlI\S{ZT_Gmdbw:,JK|+8x9@p'_|3p&*>@GQ*DiS\mcT"""
+            }
+        },
+
         'extensions': {
 
             ## enable/disable openid and openid providers completely
@@ -209,7 +220,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'develop'
+    'namespace': 'federated_auth'
 }
 
 config['openfire.output'] = {

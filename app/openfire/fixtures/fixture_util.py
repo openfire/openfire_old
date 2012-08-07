@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import os
+import config
 from google.appengine.ext import ndb
 from google.appengine.api import files, images, urlfetch
 from webapp2_extras import security as wsec
@@ -148,12 +149,26 @@ def create_user(username='fakie', password='fakieiscool', firstname='Fakie', las
     The email field is optional, and if provided an email object will be added as well.
     '''
 
-    pwd = wsec.hash_password(password, 'sha256',
-            wsec.generate_random_string(length=32, pool=wsec.ASCII_PRINTABLE),
-            'openfire-internal')
+    _securityConfig = config.config.get('openfire.security')
+    pwd = wsec.hash_password(  password,
+                               _securityConfig.get('config', {}).get('wsec', {}).get('hash', 'sha256'),
+                               _securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('salt', '__salt__'),
+                               _securityConfig.get('config', {}).get('random', {}).get('blocks', {}).get('pepper', '__pepper__'))
+
+    if isinstance(email, list):
+        emails = email[:]
+        email = email[0]
+    else:
+        emails = False
+
     user_key = User(key=ndb.Key('User', email), username=username, firstname=firstname, lastname=lastname,
             location=location, bio=bio, password=pwd).put()
-    if email:
+
+    if emails:
+        for email in emails:
+            create_email_address(address=email, parent_key=user_key, user_key=user_key)
+
+    elif email and not emails:
         create_email_address(address=email, parent_key=user_key, user_key=user_key)
 
     if create_permissions:

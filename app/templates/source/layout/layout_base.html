@@ -2,13 +2,13 @@
 {% from "macros/eggs.html" import random_greeting %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
+    <link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
 {% endblock stylesheets %}
 
 {% block header %}
 {% block tinylogo %}
 <div id='tinylogo'>
-	<a title="openfire home" href='{{ link("landing") }}'><img src='{{ asset.image("branding/oflogo", "of_small_transparent.png") }}' /></a>
+    <a title="openfire home" href='{{ link("landing") }}'><img src='{{ asset.image("branding/oflogo", "of_small_transparent.png") }}' /></a>
 </div>
 {% endblock tinylogo %}
 
@@ -25,13 +25,35 @@
 	<ul class='right'>
 
 		{% if security.current_user %}  {# if the user is logged in... @TODO #}
-			<li class='profiletab'>
-				<a href="/me" title='Profile'>{{ random_greeting(security.current_user, security.session) }}</a>
-				<img src="{{ gravatarify(security.session.get('email'), 'jpg', '32') }}" width='32' height='32' alt='you!' />
+			<li class='profiletab widget'>
+
+				<div id='me'>
+					<a href='#' id='profile_trigger' class='target-link autoclose' data-href="#profile_dropdown" title='Profile'>{{ random_greeting(security.current_user, security.session) }}
+						<img {{ {
+							'src': security.current_user.has_avatar() and security.current_user.get_avatar_url('jpg', '32') or gravatarify(security.current_user.email[0].id(), 'jpg', '32'),
+							'width': '32',
+							'height': '32',
+							'alt': 'you!',
+							'onclick': "javascript:window.location.href='%s';" % link('user/me')
+						}|xmlattr }} /></a>
+				</div>
+
+				<div id='profile_dropdown' class='xhidden'>
+					<a href='{{ link("user/me") }}' title='You!'>Profile</a>
+					<a href='{{ link("user/account", username=security.current_user.username) }}' title="Settings">Settings</a>
+					<a href='{{ link("auth/logout") }}' title='Log Out'>Log Out</a>
+				</div>
 			</li>
 		{% else %}
-			<li><a id='signup_trigger' href="{{ link('auth/logout') }}" title="Sign Up">Sign Up</a></li>
-			<li><a id='login_trigger' href="{{ link('auth/login') }}" title="Log In">Log In</a></li>
+			<li>
+				<div id='topbox_topfold'>
+					<a id='loginsignup_trigger' href="{{ link('auth/login') }}" title="Log In">Log In</a> &amp; <a id='signup_trigger' href="{{ link('auth/register') }}">Sign Up</a>
+				</div>
+
+				<div id='loginsignup_dropdown' class='xhidden'>
+					loginsignup
+				</div>
+			</li>
 		{% endif %}
 
 	</ul>
@@ -44,16 +66,18 @@
 
 {% block footer %}
     <div id='footer-content'>
-    {% block footerleft  %}
-		<div class='left'>
-	        BETA - work in progress
-	    </div>
-    {% endblock footerleft %}
+        {% block footerleft  %}
+            <div id='system-info'>
+                BETA - work in progress
+            </div>
+        {% endblock footerleft %}
 
-    {% block footerright %}
-		<div class='right'>
-	        copyright (c) 2012, openfire
-	    </div>
-    {% endblock footerright %}
+        {% block footerright %}
+            <div id="copyright">
+                &copy; 2012, openfire
+            </div>
+        {% endblock footerright %}
     </div>
+
+
 {% endblock footer %}

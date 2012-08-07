@@ -48,7 +48,7 @@
     right: auto
 
 .hidden
-  display: hidden
+  display: none !important
 
 .visuallyhidden
   border: 0
@@ -69,7 +69,7 @@
       width: auto
 
 .invisible
-  visibility: hidden
+  visibility: hidden !important
 
 .secret
   opacity: 0
@@ -202,6 +202,10 @@
   br
     display: none
 
+// css3 widgets
+.target-link
+  cursor: pointer
+
 .polaroid
   padding: 7px 7px 30px
   background-color: white
@@ -219,7 +223,7 @@
     margin: 0
     padding: 0
     font:
-      family: 'Karla'
+      family: "Karla"
       size: 16px
       weight: 700
     text:
@@ -235,3 +239,32 @@
       &::after
         display: none
         content: none
+
+.css-accordion
+  position: relative
+
+  a
+    display: block
+    margin: 0
+    padding: 2px
+    width: 100%
+
+  .fold
+    margin: 0
+    -webkit-transition-duration: 0.4s
+    -webkit-transition-property: height, opacity, visibility
+    height: 0px
+    opacity: 0
+    visibility: hidden
+
+    p
+      display: none !important
+
+    &:target,
+    &.active
+      height: 50px
+      opacity: 1
+      visibility: visible
+
+      p
+        display: block !important

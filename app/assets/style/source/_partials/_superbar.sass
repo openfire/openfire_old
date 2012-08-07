@@ -1,28 +1,41 @@
 @media all and (min-width: 480px)
-  #superbar nav
-    left: 125px
-    ul a
-      color: #ffb246
+  #superbar
+    nav
+      left: 125px
+      ul a
+        color: #ffb246
 
 @media all and (max-width: 768px)
   #superbar
-    background-color: #ffb246
+    #tinylogo
+      left: 2%
+      padding: 2px
+      max-width: 10%
+
+    background-color: #555
     color: #f57220
     height: 42px
     position: fixed
     nav
-      left: 0%
+      left: 0
+      .left
+        display: none
       ul li
         display: list-item
         a
           color: #f57220
 
     box-shadow: 0px 2px 2px -1px rgba(0,0,0,0.5)
-    
+
 
 @media all and (min-width: 768px)
   #superbar
-    background-color: transparent
+    #tinylogo
+      top: 5px
+      left: 10px
+
+    background: #DDD
+    height: 50px
     box-shadow: none
 
     nav
@@ -36,10 +49,10 @@
 
   #tinylogo
     position: absolute
-    top: 5px
-    left: 10px
+
   nav
     position: absolute
+    top: 0
     right: 0
     .left
       float: left
@@ -51,7 +64,13 @@
       padding-bottom: 5px
       a
         display: inline
-        padding-right: 5px
+        padding-right: 15px
+        padding-left: 15px
+        padding-bottom: 18px
+        &:hover
+          background: white
+        &.active
+          background: white
       img
         display: inline
     ul li
@@ -61,8 +80,5 @@
         -webkit-transition-property: color
         &:hover
           text-decoration: none !important
-      &:hover
-        background: #f57220 !important
-        a
-          color: #fff !important
-          text-decoration: none !important
+
+@import _partials/loginbox.sass

@@ -122,7 +122,7 @@ class Openfire
 
                 # installs an openfire controller
                 controller: (ctrlr) =>
-                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.constructor.name
+                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.constructor.name.toLowerCase()
 
                     @sys.state.controllers[ctrlr.mount] = ctrlr
                     if ctrlr.events?
@@ -170,5 +170,5 @@ if $?
 # otherwise, we got this on lock.
 else
 
-    window.$ = (id) -> if window.Util? then window.Util.get(id) else document.getElementById(id)
+    window.$ = (id) -> if window.Util? then window._.get(id) else document.getElementById(id)
     window.$.openfire = window.openfire

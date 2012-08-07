@@ -193,19 +193,19 @@ handlers:
 # Images (Static)
 - url: /assets/img/static
   static_dir: assets/img/static
-  expiration: "364d"
+  expiration: "1m"
 
 # Style (Static)
 - url: /assets/style/static
   static_dir: assets/style/static
   mime_type: text/css
-  expiration: "364d"
+  expiration: "1m"
 
 # Scripts (Static)
 - url: /assets/js/static
   static_dir: assets/js/static
   mime_type: text/javascript
-  expiration: "364d"
+  expiration: "1m"
 
 # Generic (Static)
 - url: /assets/ext/static

@@ -1,38 +1,34 @@
 <div class="loginbox" data-csrf="" data-providers="">
 
-	<script>
-		(function (w)
-		{
-			w._initExtAuth = function (p, m)
-			{
-				var selector = [p, 'federated', 'logon', 'trigger'].join('-'),
-					provider = document.getElementById(selector),
-					disabled = provider.getAttribute('disabled'),
-					location = provider.getAttribute('data-action');
-					if (disabled !== 'disabled') { w.location.href = location; }
-			};
-		})(window);
-	</script>
-
 	<!-- left column: 3rd part logon -->
 	<div class="federated">
 		<div class="{%- if not security_config.authentication.federation.enabled -%}disabled{%- else -%}thirdparty{%- endif -%}">
 		{% if not federated_error %}<h4>Sign in with an existing account</h4>{% else %}<h4 class="woops">{{ federated_error|safe }}</h4>{% endif %}
 		{% for provider in security_config.authentication.federation.providers %}
 			{% if provider.enabled %}
-				{%- if not security_config.authentication.federation.enabled -%}{%- set disabled = "disabled" -%}{%- else -%}{%- set disabled = "thirdparty" -%}{%- endif -%}
-				<button {{
-					{
-						'id': '%s-federated-logon-trigger' % provider.name,
-						'class': ' '.join([disabled, 'zocial', provider.name, 'logon', 'button']),
-						'data-provider-name': provider.name,
-						'data-provider-label': provider.label,
-						'data-provider-mode': provider.mode,
-						'disabled': none if not disabled else 'disabled',
-						'data-action': link('auth/login-with', provider=provider.name),
-						'onclick': ("javascript:window._initExtAuth('%(name)s', '%(mode)s');" % provider)|safe
-					}|xmlattr
-				}}>Login with {{ provider.label }}</button>
+				{%- if not security_config.authentication.federation.enabled -%}
+					<button {{
+						{
+							'id': '%s-federated-logon-trigger' % provider.name,
+							'class': ' '.join(['disabled', 'zocial', provider.name, 'logon', 'button']),
+							'data-provider-name': provider.name,
+							'data-provider-label': provider.label,
+							'data-provider-mode': provider.mode,
+							'disabled': 'disabled'
+						}|xmlattr
+					}}>Login with {{ provider.label }}</button>
+				{%- else -%}
+					<button {{
+						{
+							'id': '%s-federated-logon-trigger' % provider.name,
+							'class': ' '.join(['thirdparty', 'zocial', provider.name, 'authprovider', 'logon', 'button']),
+							'data-provider-name': provider.name,
+							'data-provider-label': provider.label,
+							'data-provider-mode': provider.mode,
+							'data-action': link('auth/login-with', provider=provider.name)
+						}|xmlattr
+					}}>Login with {{ provider.label }}</button>
+				{%- endif -%}
 			{% endif %}
 		{% endfor %}
 		</div>
