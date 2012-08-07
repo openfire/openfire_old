@@ -8,24 +8,25 @@
 
 <!-- Header -->
 <div id="header-container">
-	<header id='superbar' class="clearfix" role="banner">
-		{% block header %}
-			{% include "snippets/superbar.html" %}
-		{% endblock %}
-	</header>
+    <header id='superbar' class="clearfix" role="banner">
+        {% block header %}
+            {% include "snippets/superbar.html" %}
+        {% endblock %}
+    </header>
 </div>
 
 <!-- Main Content -->
 <div id="main-container">
-	<div id="main" class="wrapper clearfix" role="main">
-		{% block main %}
+    <div id="main" class="wrapper clearfix" role="main">
+        {% block main %}
         <h3>main</h3>
-		{% endblock main %}
-	</div> <!-- #main -->
+        {% endblock main %}
+    </div> <!-- #main -->
 </div> <!-- #main-container -->
 
 <!-- Footer -->
 <div id="footer-container">
+    <div id="footer-toggle" data-href="#footer-container" class="target-link"></div>
     <footer class="wrapper" role="banner">
         {% block footer %}
         <h3>footer</h3>

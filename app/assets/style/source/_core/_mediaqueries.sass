@@ -1,10 +1,12 @@
+
 @media all and (max-width: 480px)
   p
     margin: 8px 0
     padding: 3px 0
   #main
     #masthead
-      height: 200px
+      height: 225px
+
       #oflogo
         max-width: 92%
         height: auto
@@ -18,11 +20,10 @@
         bottom: 4%
         right: 4%
 
+      // landing
       #how-it-works-button
         height: 50px
         width: 95%
-        //min-width: 201px
-        //max-width: 250px
         bottom: 5%
         left: 2.5%
         border-radius: 5px
@@ -31,40 +32,149 @@
           margin: 13px 3px 0 0
           font-size: 24px
 
-    #content section
-      width: 100%
-      height: auto
-      margin: 0
-      .project-card
-        width: 100px
-        img
-          width: 100px
-          height: 88px
-        .project-icon::after
-          height: 15px
-          line-height: 15px
-          font-size: 15px
-      .activity-table
+    #content
+      // landing
+      section
+        width: 100%
         height: auto
-        .activity-row
-          height: 100
-          .activity-cell
-            width: 100
-            height: 90
+        margin: 0
+        .project-card
+          width: 100px
+          img
+            width: 100px
+            height: 88px
+          .project-icon::after
+            height: 15px
+            line-height: 15px
+            font-size: 15px
+        .activity-table
+          height: auto
+          .activity-row
+            height: 100
+            .activity-cell
+              width: 100
+              height: 90
 
-  #footer-container
-    display: none
+      #project
+        top: -200px
+
+        &.active
+          top: 0px
+
+        #promote
+          margin: 0 auto
+          button
+            font-size: 8pt
+            padding: 0 3px
+            margin: 3px 3px 3px 0
+            border-radius: 3px
+            background-color: #eee
+            border: none
+            clear: both
+
+          &::before
+            margin-top: -11px
+            margin-left: 5px
+
+        #welcomebox
+          position: relative
+          width: 100%
+          left: 0
+          padding-top: 20px
+          background-color: #ddd
+
+          #mainvideo
+            //display: none
+            min-height: 200px
+
+        #sidebar
+          //display: none
+          div,
+          section
+            display: none
+
+          #quickinfo,
+          #global_progress,
+          #global_progress div,
+          header,
+          header div
+            display: block !important
+
+            div,
+            section
+              display: block !important
+
+          section
+            margin: 0
+
+
+          #sidebuttons
+            right: 5px
+            top: 5px
+            width: auto
+            text-align: right
+
+          #owners
+            display: none !important
+          hr
+            display: none !important
+
+          #quickinfo
+            display: none
+            #progress
+              width: 100%
+              left: 0
+              margin-top: 10px
+              &::before,
+              &::after
+                display: none
+
+        #deets
+          .prsection
+            p
+              font-size: 9pt
+
+            h3
+              font-size: 15pt
+
+          #projecttitle
+            margin-top: 0
+            h1,
+            a h1
+              font-size: 24pt
+              line-height: 37pt
+
+            #deetactions
+              .buttongroup
+                .zocial
+                  &::before
+                    font: 110%/1.45 zocial
+
+                  &.icon
+                    max-width: 2em
+                    max-height: 1.792em
+
+                    &::before
+                      width: 1.667em
+                      height: 1.667em
+
+          #project-tabset
+            &.tabset
+              .tab-rounded,
+              .tab-link
+                font-size: 14px
+                line-height: 16px
 
 @media all and (min-width: 480px)
   #main
     #masthead
       border-radius: none
-      height: 270px
+      height: 300px
       #oflogo
         max-width: 92%
         height: auto
         left: 4%
-        bottom: 37%
+        bottom: 30%
 
       #title
         opacity: 1
@@ -94,60 +204,233 @@
           display: none
           content: none
 
-    #content section
-      width: 100%
-      height: auto
+    #content 
 
-      &:last
-        margin-bottom: 20px
-
-      .project-card
-        width: 140px
-        img
-          width: 140px
-          height: 120px
-        .project-icon::after
-          height: 18px
-          line-height: 18px
-          font-size: 18px
-      .activity-table
+      section
+        width: 100%
         height: auto
-        .activity-row
-          height: 100
-          .activity-cell
-            width: 100
-            height: 90
 
-            .graph
-              width: 252px
-              height: 140px
+        &:last
+          margin-bottom: 20px
+
+        .project-card
+          width: 140px
+          img
+            width: 140px
+            height: 120px
+          .project-icon::after
+            height: 18px
+            line-height: 18px
+            font-size: 18px
+        .activity-table
+          height: auto
+          .activity-row
+            height: 100
+            .activity-cell
+              width: 100
+              height: 90
+
+              .graph
+                width: 252px
+                height: 140px
+
+      #project
+        #promote
+          &::before
+            margin-top: -11px
+            margin-left: 5px
+
+        #welcomebox
+          #mainvideo
+            min-height: 300px
+
+        #sidebar
+          #owners,
+          #sidetitle,
+          hr
+            display: block
+
+          #sidebuttons
+            right: 20px
+            top: 25px
+            width: 70px
+            text-align: center
+
+        #deets
+          margin-bottom: 100px
+
+          .prsection
+            p
+              font-size: 10pt
+
+            h3
+              font-size: 14pt
+
+          #projecttitle
+
+            h1,
+            a h1
+              font-size: 32pt
+              line-height: 44pt
+
+          #project-tabset
+            &.tabset
+              .tab-rounded,
+              .tab-link
+                font-size: 16px
+                line-height: 18px
+            
 
 @media all and (max-width: 768px)
   p
     margin: 12px 0
-  #main section
-    width: 100%
-    .section-wrap
-      overflow: hidden
-      padding-bottom: 10px
-      #project-cards
-        width: 1000px
+  #main
+    &.wrapper
+      width: 100%
+      margin: 0
+
+        
+    #content 
+      section
+        width: 100%
+        .section-wrap
+          overflow: hidden
+          padding-bottom: 10px
+          #project-cards
+            width: 1000px
+
+      #project
+        overflow: hidden
+        margin: 0 auto
+        width: 100%
+        top: -200px
+        &.active
+          top: 0px
+
+        #promote
+          display: none
+          position: relative
+          width: 100%
+          top: 0
+          height: auto
+
+        #welcomebox
+          position: relative
+          width: 100%
+          left: 0
+          padding-top: 20px
+          background-color: #ddd
+
+          #mainvideo
+            width: 90%
+            margin: 0 auto
+            height: auto
+            background-color: blue
+
+            iframe
+              display: none
+
+        #sidebar
+          z-index: 9999
+          position: fixed !important
+          bottom: 0px
+          left: 0px
+          right: 0px
+          top: 88%
+          border-top-left-radius: 7px
+          border-top-right-radius: 7px
+          padding-top: 10px
+          width: 100%
+          min-height: 56px
+          &.active
+            top: 40%
+            overflow-y: auto
+          #quickinfo
+            #progress
+              width: 100%
+              left: 0
+              &::before,
+              &::after
+                display: none
+            #project_goals,
+            #project_tiers
+              &::before
+                display: none
+
+        #deets
+          width: 100%
+          margin: 0 auto
+          height: auto
+          background-color: #999
+
+          #project-tabset
+            margin-bottom: 0px
+            &.tabset
+              .tab-rounded,
+              .tab-link
+                margin: 0 auto
+                font-weight: 700
+                padding: 10px
+
+              .tab
+                position: relative
+                bottom: 0px
+
+  #footer-container
+    display: none
 
 @media all and (min-width: 768px)
   #main
-    #masthead
-      #oflogo
-        left: 4%
-      #title
-        font: 28pt "Satisfy", cursive
-      #how-it-works-button
-        border-radius: 9px
-    #content section
-      width: 45%
-      margin: 0px 2.5% 60px
-      .section-wrap
-        margin-left: auto
-        margin-right: auto
+    &.wrapper
+      width: 100%
+      margin: 50px auto
+      #masthead
+        #oflogo
+          left: 4%
+        #title
+          font: 28pt "Satisfy", cursive
+        #how-it-works-button
+          border-radius: 9px
+    #content 
+      section
+        width: 45%
+        margin: 0px 2.5% 60px
+        .section-wrap
+          margin-left: auto
+          margin-right: auto
+          #project-cards
+            width: auto
+      #project
+        width: 95%
+        margin: 0 2.5%
+        #promote
+          margin: 20px auto
+        #sidebar
+          display: block
+          float: right
+          width: 300px
+          section
+            width: 95%
+            margin: 2.5%
+          #quickinfo
+            #progress
+              width: 320px
+              left: -17px
+              &::before,
+              &::after
+                display: block
+        #welcomebox
+          #mainvideo
+            background-color: blue
+            height: 307px
+            max-width: 460px
+
+            iframe
+              display: none
+        #deets
+          min-width: 460px
+
+
 
 @media all and (min-width: 1140px)
   #main #masthead
@@ -160,7 +443,6 @@
 @media only screen and (min-width: 480px)
   nav
     a
-      margin: 0 1.7%
       margin-bottom: 0
     li
       &:first-child a

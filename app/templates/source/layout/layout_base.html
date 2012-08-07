@@ -2,13 +2,13 @@
 {% from "macros/eggs.html" import random_greeting %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
+    <link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
 {% endblock stylesheets %}
 
 {% block header %}
 {% block tinylogo %}
 <div id='tinylogo'>
-	<a title="openfire home" href='{{ link("landing") }}'><img src='{{ asset.image("branding/oflogo", "of_small_transparent.png") }}' /></a>
+    <a title="openfire home" href='{{ link("landing") }}'><img src='{{ asset.image("branding/oflogo", "of_small_transparent.png") }}' /></a>
 </div>
 {% endblock tinylogo %}
 
@@ -62,16 +62,18 @@
 
 {% block footer %}
     <div id='footer-content'>
-    {% block footerleft  %}
-		<div class='left'>
-	        BETA - work in progress
-	    </div>
-    {% endblock footerleft %}
+        {% block footerleft  %}
+            <div id='system-info'>
+                BETA - work in progress
+            </div>
+        {% endblock footerleft %}
 
-    {% block footerright %}
-		<div class='right'>
-	        copyright (c) 2012, openfire
-	    </div>
-    {% endblock footerright %}
+        {% block footerright %}
+            <div id="copyright">
+                &copy; 2012, openfire
+            </div>
+        {% endblock footerright %}
     </div>
+
+
 {% endblock footer %}
