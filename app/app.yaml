@@ -1,4 +1,4 @@
-application: open-fire-staging
+application: open-fire
 version: develop
 runtime: python27
 api_version: 1

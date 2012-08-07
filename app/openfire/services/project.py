@@ -1,3 +1,4 @@
+import webapp2
 from apptools.services.builtin import Echo
 from google.appengine.ext import ndb
 from protorpc import message_types, remote
@@ -6,11 +7,24 @@ from openfire.messages import project as project_messages
 from openfire.messages import common as common_messages
 from openfire.messages import media as media_messages
 from openfire.models.project import Project, Tier, Goal
+from openfire.core.matcher import CoreMatcherAPI
 
 
 class ProjectService(RemoteService):
 
     ''' Project service api. '''
+
+    __matcher_api = None
+
+    @webapp2.cached_property
+    def matcher(self):
+
+        ''' Cached access to a constructed CoreMatcherAPI. '''
+
+        if self.__matcher_api is None:
+            self.__matcher_api = CoreMatcherAPI()
+
+        return self.__matcher_api
 
     @remote.method(message_types.VoidMessage, project_messages.Projects)
     def list(self, request):
