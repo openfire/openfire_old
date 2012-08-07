@@ -17,6 +17,9 @@
 body
   font: 80% Verdana, sans-serif
 
+math
+  display: none
+
 h1, h2, h3
   -webkit-margin-before: 0
   -webkit-margin-after: 0
@@ -64,7 +67,7 @@ p
     position: relative
     -webkit-transition-property: height
     &:empty
-      height: 42px
+      height: 0px
     #oflogo
       position: absolute
       -webkit-transition-property: top
@@ -77,15 +80,93 @@ p
 
 
 #footer-container
+  -webkit-transition-property: top
   position: fixed
   bottom: 0
   left: 0
   right: 0
+  top: 95%
   z-index: 1000
   background: #bbb
-  padding: 10px
+
+  #footer-toggle
+    width: 100%
+    padding: 3px
+    margin: 0
+    cursor: pointer
+    background-color: #aaa
+    text-align: center
+
+    &::before
+      display: block
+      content: "expand"
+      color: #ddd
+      text-transform: uppercase
+      font:
+        family: "Karla", sans-serif
+        size: 10px
+        weight: 700
+      vertical-align: middle
+      margin: 0 auto
+
+    &:hover
+      background-color: #888
+      &::before
+        color: white
+
+  &.active
+    top: 52%
+    #footer-toggle
+      &::before
+        content: "hide"
+
   footer
-    padding: 0 !important
+    color: white
+    &.wrapper
+      width: 99%
+      margin: 0 auto
+
+      #footer-content
+        #system-info,
+        #footer-links,
+        #copyright
+          position: fixed
+          bottom: 5px
+          font:
+            family: "Karla", sans-serif
+            size: 13px
+            weight: 400
+        
+        #system-info
+          left: 5px
+
+        #footer-links
+          left: 25%
+          right: 25%
+          color: #555
+          text-align: center
+          a
+            display: inline-block
+            margin: 0 2px
+            padding: 5px
+            text:
+              decoration: none
+              transform: uppercase
+            font:
+              size: 12px
+              weight: 700
+            color: #555
+            border-radius: 3px
+            background-color: transparent
+
+            &:hover
+              background-color: #777
+              color: #eee
+
+        #copyright
+          right: 5px
+
+      #footer-content
 
 
 @import _partials/widgets

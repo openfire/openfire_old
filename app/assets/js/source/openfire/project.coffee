@@ -64,7 +64,7 @@ class Project extends Model
             new_stash: () =>
                 return store: [], index: {}
 
-            clean_stashes: Util.debounce(() =>
+            clean_stashes: _.debounce(() =>
 
                 @log('Renewing stash indexes...')
 
@@ -194,7 +194,7 @@ class ProjectController extends OpenfireController
 
     constructor: (openfire) ->
 
-        @_state = Util.extend(true, {}, window._cp)
+        @_state = _.extend(true, {}, window._cp)
 
         @project = new Project(@_state.ke)
         @project_key = @project.key
@@ -221,13 +221,13 @@ class ProjectController extends OpenfireController
 
                 index = if goal.key? then @get_attached('goal', goal.key, true) else 'new'
 
-                amount = Util.create_element_string('h3',
+                amount = _.create_element_string('h3',
                     id: 'goal-amount-' + index
                     class: 'goal-field amount'
                     contenteditable: true
                 , goal.amount)
 
-                description = Util.create_element_string('p',
+                description = _.create_element_string('p',
                     id: 'goal-description-' + index
                     class: 'rounded goal-field description'
                     contenteditable: true
@@ -235,19 +235,19 @@ class ProjectController extends OpenfireController
 
                 if index isnt 'new'
 
-                    save_goal = Util.create_element_string('button',
+                    save_goal = _.create_element_string('button',
                         'data-index': index
                         'data-action': 'save'
                         class: 'goal-button save'
                     , 'save goal')
 
-                    reset_goal = Util.create_element_string('button',
+                    reset_goal = _.create_element_string('button',
                         'data-index': index
                         'data-action': 'reset'
                         class: 'goal-button reset'
                     , 'reset goal')
 
-                    delete_goal = Util.create_element_string('button',
+                    delete_goal = _.create_element_string('button',
                         'data-index': index
                         'data-action': 'delete'
                         class: 'goal-button delete'
@@ -256,7 +256,7 @@ class ProjectController extends OpenfireController
                     buttons = [save_goal, reset_goal, delete_goal].join('&nbsp;')
 
                 else
-                    add_goal = Util.create_element_string('button',
+                    add_goal = _.create_element_string('button',
                         'data-index': index
                         'data-action': 'add'
                         class: 'goal-button add'
@@ -266,7 +266,7 @@ class ProjectController extends OpenfireController
 
                 content = [amount, description, buttons].join('')
 
-                goal_wrapper = Util.create_element_string('div',
+                goal_wrapper = _.create_element_string('div',
                     id: 'goal-editing-' + index
                     class: 'goal'
                 , content)
@@ -284,36 +284,36 @@ class ProjectController extends OpenfireController
                     'a-project-image-drop-choice-modal-dialog'
                 ])
 
-                preview = Util.create_element_string('img',
+                preview = _.create_element_string('img',
                     id: 'project-image-drop-preview'
                     style: 'max-width: 140px;'
                     class: 'dropshadow'
                 )
 
-                filename_edit = Util.create_element_string('span',
+                filename_edit = _.create_element_string('span',
                     id: 'project-image-drop-filename'
                     class: 'modal-editable alone'
                     'data-ext': '.'+ext
                     contenteditable: true
                 , name)
 
-                greeting = Util.create_element_string('span',
+                greeting = _.create_element_string('span',
                     style: 'font-weight: 700; font-size: 14px;'
                 , 'Would you like to attach' + filename_edit + 'to your project?')
 
-                attach_avatar = Util.create_element_string('button',
+                attach_avatar = _.create_element_string('button',
                     id: 'project-image-drop-avatar'
                     class: 'rounded modal-button'
                     value: 'avatar'
                 , 'yes!<br>(as an avatar)')
 
-                attach_image = Util.create_element_string('button',
+                attach_image = _.create_element_string('button',
                     id: 'project-image-drop-image'
                     class: 'rounded modal-button'
                     value: 'image'
                 , 'yes!<br>(as an image)')
 
-                oops = Util.create_element_string('button',
+                oops = _.create_element_string('button',
                     id: 'project-image-drop-no'
                     class: 'rounded modal-button'
                     value: 'oops'
@@ -322,14 +322,14 @@ class ProjectController extends OpenfireController
                 buttons = [attach_avatar, attach_image, oops].join('')
                 content = ['',preview,'','',greeting,'','',buttons].join('<br>')
 
-                pre_modal = Util.create_element_string('div',
+                pre_modal = _.create_element_string('div',
                     id: 'project-image-drop-choice'
                     style: 'width: 100%;margin: 0 auto;opacity: 0;text-align: center;background-color: #eee;font-size: 9pt;'
                     class: 'pre-modal'
                     'data-title': 'Hey! You dropped your photo!'
                 , content)
 
-                trigger = Util.create_element_string('a',
+                trigger = _.create_element_string('a',
                     id: 'a-project-image-drop-choice'
                     href: '#project-image-drop-choice'
                     style: 'display: none;'
@@ -356,14 +356,14 @@ class ProjectController extends OpenfireController
                 _goals.push(@internal.process_goal(blank_goal))
                 _goals.push(@internal.process_goal(g)) for g in goals
 
-                pre_modal = Util.create_element_string('div',
+                pre_modal = _.create_element_string('div',
                     id: 'project-goal-editor'
                     class: 'pre-modal'
                     style: 'opacity: 0'
                     'data-title': 'editing project goals...'
                 ,_goals.join(''))
 
-                trigger = Util.create_element_string('a',
+                trigger = _.create_element_string('a',
                     id: 'a-project-goal-editor'
                     style: 'display: none;'
                 )
@@ -399,12 +399,12 @@ class ProjectController extends OpenfireController
 
                     choice_modal = $.apptools.widgets.modal.create (() =>
                         # pre-modal
-                        docfrag = Util.create_doc_frag(modal_parts[0])
+                        docfrag = _.create_doc_frag(modal_parts[0])
                         document.body.appendChild(docfrag)
                         return document.getElementById('project-image-drop-choice')
                     )(), (() =>
                         # trigger (not used here but required for create())
-                        docfrag = Util.create_doc_frag(modal_parts[1])
+                        docfrag = _.create_doc_frag(modal_parts[1])
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-project-image-drop-choice')
                     )(), (m) =>
@@ -443,7 +443,7 @@ class ProjectController extends OpenfireController
                     reader.onloadend = (e) =>
                         e.preventDefault()
                         e.stopPropagation()
-                        return Util.get('project-image-drop-preview').setAttribute('src', e.target.result)
+                        return _.get('project-image-drop-preview').setAttribute('src', e.target.result)
 
                     if /^image\/(png|jpeg|gif)$/gi.test(filetype)
 
@@ -451,7 +451,7 @@ class ProjectController extends OpenfireController
                         reader.readAsDataURL(file)
 
                         # upload as image
-                        Util.get('project-image-drop-image').addEventListener('click', (e) =>
+                        _.get('project-image-drop-image').addEventListener('click', (e) =>
 
                             if e.preventDefault
                                 e.preventDefault()
@@ -505,7 +505,7 @@ class ProjectController extends OpenfireController
                         , false)
 
                         # upload as avatar
-                        Util.get('project-image-drop-avatar').addEventListener('click', (e) =>
+                        _.get('project-image-drop-avatar').addEventListener('click', (e) =>
 
                             if e.preventDefault
                                 e.preventDefault()
@@ -555,7 +555,7 @@ class ProjectController extends OpenfireController
                         , false)
 
                         # no thx
-                        Util.get('project-image-drop-no').addEventListener('click', (e) =>
+                        _.get('project-image-drop-no').addEventListener('click', (e) =>
 
                             if e.preventDefault
                                 e.preventDefault()
@@ -812,7 +812,7 @@ class ProjectController extends OpenfireController
             edit: (e) =>
 
                 if (trigger = e.target)?
-                    trigger.classList.add('init') if (sync = not Util.has_class(trigger, 'init'))
+                    trigger.classList.add('init') if (sync = not _.has_class(trigger, 'init'))
 
                 else if typeof e is 'boolean'
                     sync = e
@@ -827,11 +827,11 @@ class ProjectController extends OpenfireController
                     modal_parts = @internal.prep_goals_modal_html(goals)
 
                     return $.apptools.widgets.modal.create (() =>
-                        docfrag = Util.create_doc_frag(modal_parts[0])
+                        docfrag = _.create_doc_frag(modal_parts[0])
                         document.body.appendChild(docfrag)
                         return document.getElementById('project-goal-editor')
                     )(), (() =>
-                        docfrag = Util.create_doc_frag(modal_parts[1])
+                        docfrag = _.create_doc_frag(modal_parts[1])
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-project-goal-editor')
                     )(), ((m) =>
@@ -866,7 +866,7 @@ class ProjectController extends OpenfireController
                                         amt_el = document.getElementById('a-'+k)
                                         desc_el = document.getElementById(k)
                                         amt_edit_el.innerHTML = _goal.amount
-                                        amt_el.innerHTML = Util.currency(_goal.amount)
+                                        amt_el.innerHTML = _.currency(_goal.amount)
                                         desc_edit_el.innerHTML = _goal.description
                                         desc_el.innerHTML = '<p>'+_goal.description+'</p>'
 
@@ -890,7 +890,7 @@ class ProjectController extends OpenfireController
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _save, false)
 
-                        ), false) for save_button in Util.get('save', editor)
+                        ), false) for save_button in _.get('save', editor)
 
                         delete_button.addEventListener('click', (_delete = (e) =>
                             @log('Goal delete() click handler triggered. Confirming goal delete...')
@@ -944,7 +944,7 @@ class ProjectController extends OpenfireController
                                 btn.innerHTML = 'Delete goal'
                                 return btn.addEventListener('click', _delete, false)
 
-                        ), false) for delete_button in Util.get('delete', editor)
+                        ), false) for delete_button in _.get('delete', editor)
 
                         reset_button.addEventListener('click', (_reset = (e) =>
                             @log('Goal reset() click handler triggered. Confirming goal reset...')
@@ -996,7 +996,7 @@ class ProjectController extends OpenfireController
                                 btn.innerHTML = 'Reset goal'
                                 return btn.addEventListener('click', _reset, false)
 
-                        ), false) for reset_button in Util.get('reset', editor)
+                        ), false) for reset_button in _.get('reset', editor)
 
                         add_button.addEventListener('click', (_add = (e) =>
                             @log('Goal add() click handler triggered. Saving...')
@@ -1026,7 +1026,7 @@ class ProjectController extends OpenfireController
                                         k = _goal.key
                                         index = @get_attached('goal', k, true)
 
-                                        df = Util.create_doc_frag(@internal.process_goal(_goal))
+                                        df = _.create_doc_frag(@internal.process_goal(_goal))
                                         new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
 
                                         amt_edit_el.innerHTML = 0
@@ -1037,9 +1037,9 @@ class ProjectController extends OpenfireController
 
                                         added = document.getElementById('goal-editing-'+index)
 
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in Util.get('save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in Util.get('reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in Util.get('delete', added)
+                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('save', added)
+                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('reset', added)
+                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('delete', added)
 
                                         btn.style.backgroundColor = '#bada55'
                                         btn.innerHTML = 'Goal added!'
@@ -1054,7 +1054,7 @@ class ProjectController extends OpenfireController
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _add, false)
 
-                        ), false) for add_button in Util.get('add', editor)
+                        ), false) for add_button in _.get('add', editor)
 
                         set_focus = (g_f) =>
                             g_f.addEventListener('click', (_focus = (e) =>
@@ -1065,7 +1065,7 @@ class ProjectController extends OpenfireController
                                 return field.focus()
                             ), false)
 
-                        set_focus(goal_field) for goal_field in Util.get('goal-field', editor)
+                        set_focus(goal_field) for goal_field in _.get('goal-field', editor)
 
                         return m.open()
 
@@ -1189,13 +1189,13 @@ class ProjectController extends OpenfireController
                         if _old?
                             _old.parentNode.removeChild(_old)
 
-                        document.body.appendChild(Util.create_doc_frag(Util.create_element_string('div'
+                        document.body.appendChild(_.create_doc_frag(_.create_element_string('div'
                             id: base_id
                             class: 'pre-modal'
                             style: 'opacity: 0;'
                             'data-title': 'editing project tiers...'
                         , ((tier_div='') =>
-                            (tier_div += Util.create_element_string('div'
+                            (tier_div += _.create_element_string('div'
                                 id: 'tier-editing-'+ (() =>
                                     _idx = @get_attached('tier', t.key, true)
                                     return _idx
@@ -1203,25 +1203,25 @@ class ProjectController extends OpenfireController
                                 class: 'mini-editable tier'
 
                             , ((parts='') =>
-                                parts += Util.create_element_string('h3',
+                                parts += _.create_element_string('h3',
                                     class: 'tier-field amount'
                                     id: 'tier-amount-' + _idx
                                     contenteditable: true
                                 , t.amount)
-                                parts += Util.create_element_string('p',
+                                parts += _.create_element_string('p',
                                     class: 'rounded tier-field description'
                                     id: 'tier-description-' + _idx
                                     contenteditable: true
                                 , (if t.description? then t.description else '<span class="shh">default description</span>'))
-                                parts += Util.create_element_string('button',
+                                parts += _.create_element_string('button',
                                     id: 'tier-save-' + _idx,
                                     class: 'tier-button save'
                                 ,'save tier')
-                                parts += Util.create_element_string('button',
+                                parts += _.create_element_string('button',
                                     id: 'tier-get-' + _idx,
                                     class: 'tier-button get'
                                 ,'refresh tier')
-                                parts += Util.create_element_string('button',
+                                parts += _.create_element_string('button',
                                     id: 'tier-delete-' + _idx,
                                     class: 'tier-button delete'
                                 ,'delete tier')
@@ -1232,7 +1232,7 @@ class ProjectController extends OpenfireController
                         )())))
                         return document.getElementById(base_id)
                     )(), (() =>
-                        document.body.appendChild(Util.create_doc_frag(Util.create_element_string('a'
+                        document.body.appendChild(_.create_doc_frag(_.create_element_string('a'
                             id: 'a-'+base_id
                             href: '#'+base_id
                             style: 'display: none'
@@ -1244,7 +1244,7 @@ class ProjectController extends OpenfireController
 
                             editor = $.apptools.widgets.editor.create(tfield)
                             $.apptools.widgets.editor.enable(editor)
-                            _el = Util.get((_id = editor._state.element_id))
+                            _el = _.get((_id = editor._state.element_id))
                             _idx = _id.split('-').pop()
 
                             document.getElementById('tier-save-'+_idx).addEventListener('click', (e) =>
@@ -1321,7 +1321,7 @@ class ProjectController extends OpenfireController
 
                             return editor
 
-                        editors.push(populate(tier_field)) for tier_field in fields if (fields = Util.get('tier', document.getElementById(base_id+'-modal-content')))?
+                        editors.push(populate(tier_field)) for tier_field in fields if (fields = _.get('tier', document.getElementById(base_id+'-modal-content')))?
 
                         return m.open()
 
@@ -1368,26 +1368,6 @@ class ProjectController extends OpenfireController
                 document.getElementById('follow').addEventListener('click', @follow, false)
                 document.getElementById('share').addEventListener('click', @share, false)
                 document.getElementById('back').addEventListener('click', @back, false)
-
-                accordions = Util.to_array(document.getElementsByClassName('css-accordion'))
-
-                link.addEventListener('click', (e) =>
-                    e.preventDefault()
-                    e.stopPropagation()
-
-                    trigger = e.target
-                    target_id = trigger.getAttribute('data-href')
-                    target = document.getElementById(target_id.slice(1))
-
-                    is_curr = target.classList.contains('active')
-
-                    if Util.has_class(target.parentNode, 'widget')
-                        widget = target.parentNode
-                        other.classList.remove('active') for other in others if (others = Util.filter(widget.getElementsByTagName(target.tagName), (o) => return o.parentNode is widget and o isnt target))?
-
-                    return if not is_curr then target.classList.add('active') else target.classList.remove('active')
-
-                , false) for link in target_links if (target_links = Util.get('target-link'))?
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)

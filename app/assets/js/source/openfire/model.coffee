@@ -46,7 +46,7 @@ class Asset
 
     constructor: (hash) ->
 
-        if hash? and Util.is_object hash
+        if hash? and _.is_object hash
             @[prop] = val for prop, val of hash
 
         return @

@@ -4,7 +4,9 @@
     margin: 8px 0
     padding: 3px 0
   #main
-    &.wrapper
+    #masthead
+      height: 225px
+
       #oflogo
         max-width: 92%
         height: auto
@@ -29,9 +31,6 @@
         a
           margin: 13px 3px 0 0
           font-size: 24px
-
-      // project
-
 
     #content
       // landing
@@ -170,12 +169,12 @@
   #main
     #masthead
       border-radius: none
-      height: 270px
+      height: 300px
       #oflogo
         max-width: 92%
         height: auto
         left: 4%
-        bottom: 37%
+        bottom: 30%
 
       #title
         opacity: 1
@@ -289,8 +288,7 @@
     &.wrapper
       width: 100%
       margin: 0
-      #masthead
-        height: 200px
+
         
     #content 
       section
@@ -344,7 +342,6 @@
           padding-top: 10px
           width: 100%
           min-height: 56px
-          box-shadow: 0px -2px 2px 1px rgba(127,127,127,0.2)
           &.active
             top: 40%
             overflow-y: auto
@@ -386,7 +383,7 @@
   #main
     &.wrapper
       width: 100%
-      margin: 0
+      margin: 50px auto
       #masthead
         #oflogo
           left: 4%
@@ -446,7 +443,6 @@
 @media only screen and (min-width: 480px)
   nav
     a
-      margin: 0 1.7%
       margin-bottom: 0
     li
       &:first-child a
