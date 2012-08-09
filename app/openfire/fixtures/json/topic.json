@@ -1,0 +1,52 @@
+[
+    {
+        "slug": "politics",
+        "name": "Politics",
+        "description": "Our political system is broken. Let's fix it."
+    },
+    {
+        "slug": "transparency",
+        "name": "Transparency",
+        "description": "Having to do with open information"
+    },
+    {
+        "slug": "economy",
+        "name": "Economy",
+        "description": "Our economic system is ready for an overhaul. Better get to work before it surprises us."
+    },
+    {
+        "slug": "law",
+        "name": "Law",
+        "description": "Dealing with laws in this country and others."
+    },
+    {
+        "slug": "business",
+        "name": "Business",
+        "description": "Corporations, startups, and everything in between."
+    },
+    {
+        "slug": "conservation",
+        "name": "Conservation",
+        "description": "Ecological conservation."
+    },
+    {
+        "slug": "healthcare",
+        "name": "Heathcare",
+        "description": "Our healthcare system is broken. Let's fix it."
+    },
+    {
+        "slug": "resilience",
+        "name": "Resilience",
+        "description": "Reducing dependence on the complex systems we've created while building modern civilization."
+    },
+    {
+        "slug": "recreation",
+        "name": "Recreation",
+        "description": "Ready for a revolution in how we spend our downtime?"
+    },
+    {
+        "slug": "knowledge",
+        "name": "Knoeledge",
+        "description": "We have new ways to create and share knowledge. We should use them better."
+    }
+]

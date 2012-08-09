@@ -6,11 +6,29 @@ from openfire.models import AppModel
 from google.appengine.ext.ndb import polymodel
 
 # Model Attachments
+from openfire.messages import common
 from openfire.messages import user as messages
 from openfire.pipelines.model import user as pipelines
 
 
 ######## ======== Top-Level User Models ======== ########
+
+## Topics that users can follow and display interest in.
+class Topic(AppModel):
+
+    ''' A topic for users to display interest in and follow. '''
+
+    _message_class = common.Topic
+    _pipeline_class = pipelines.TopicPipeline
+
+    # Name and description
+    slug = ndb.StringProperty('s', indexed=True, required=True)
+    name = ndb.StringProperty('n', indexed=True, required=True)
+    description = ndb.StringProperty('d', indexed=False, required=True)
+
+    # Count
+    user_count = ndb.IntegerProperty('uc', indexed=True, default=0)
+
 
 ## User - top-level entity for user accounts
 class User(AppModel):
@@ -25,7 +43,8 @@ class User(AppModel):
     password = ndb.StringProperty('p', indexed=True, default=None)
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
-    bio = ndb.TextProperty('b', indexed=False)
+    bio = ndb.StringProperty('b', indexed=True)
+    topics = ndb.KeyProperty('ts', indexed=True, repeated=True)
     location = ndb.StringProperty('loc', indexed=True)
     customurl = ndb.KeyProperty('url', indexed=True, default=None)
     permissions = ndb.KeyProperty('prms', indexed=True, repeated=True)

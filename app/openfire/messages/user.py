@@ -17,13 +17,20 @@ class EmailAddress(messages.Message):
 
 class Profile(messages.Message):
 
-    ''' Contains all profile fields for users. Can be request or response. '''
+    '''
+    Contains all profile fields for users.
+
+    Can be request or response, but username, email, firstname,
+    and lastname cannot be set from this message.
+    '''
 
     username = messages.StringField(1)
     email = messages.StringField(2)
     firstname = messages.StringField(3)
     lastname = messages.StringField(4)
     bio = messages.StringField(5)
+    location = messages.StringField(6)
+    topics = messages.StringField(7, repeated=True)
 
 
 class ProfileRequest(messages.Message):

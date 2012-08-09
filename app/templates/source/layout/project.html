@@ -62,7 +62,7 @@
                             {% if project.tiers %}
                             <div id="project-tiers-accordion" class='css-accordion widget'>
                                 {% for tier in tiers %}
-                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}"class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
                                     <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
                                         <p>{{ tier.description|safe }}</p>
                                     </div>

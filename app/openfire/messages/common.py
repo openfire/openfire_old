@@ -27,6 +27,32 @@ class Categories(messages.Message):
     categories = messages.MessageField(Category, 1, repeated=True)
 
 
+class TopicRequest(messages.Message):
+
+    ''' A request for a topic by slug. '''
+
+    slug = messages.StringField(1)
+    key = messages.StringField(2)
+
+
+class Topic(messages.Message):
+
+    ''' A user topic. '''
+
+    key = messages.StringField(1)
+    slug = messages.StringField(2)
+    name = messages.StringField(3)
+    description = messages.StringField(4)
+    user_count = messages.IntegerField(5)
+
+
+class Topics(messages.Message):
+
+    ''' A list of topics. '''
+
+    topics = messages.MessageField(Topic, 1, repeated=True)
+
+
 class CustomUrl(messages.Message):
 
     ''' A message to be used for custom urls. '''

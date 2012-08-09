@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import files, images, urlfetch
 from webapp2_extras import security as wsec
 
-from openfire.models.user import User, EmailAddress, Permissions
+from openfire.models.user import User, EmailAddress, Permissions, Topic
 from openfire.models.contribution import ContributionType
 from openfire.models.project import Proposal, Project, Category, Tier, Goal
 from openfire.models.assets import Asset, Avatar, Video, Image, CustomURL
@@ -139,6 +139,13 @@ def create_contribution_type(slug='slug', name='NAME', unit='CASH', plural='CASH
     ''' Create a new contribution type. '''
 
     return ContributionType(id=slug, slug=slug, name=name,  unit=unit, plural=plural, subunit=subunit, subunit_plural=subunit_plural).put()
+
+
+def create_topic(slug='test', name='Test Topic', description='some txt'):
+
+    ''' Create a topic. '''
+
+    return Topic(key=ndb.Key('Topic', slug), slug=slug, name=name, description=description).put
 
 
 def create_user(username='fakie', password='fakieiscool', firstname='Fakie', lastname='McFakerton', location='San Francisco, CA', bio='some bio', email=None, create_permissions=False):
@@ -320,7 +327,13 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
     serving_url = url
     if blob_file:
         # Upload the file to the blobstore.
-        blob_key = fetch_url_to_blobstore(blob_file)
+        try:
+            # Try to fetch the file from a url.
+            blob_key = fetch_url_to_blobstore(blob_file)
+        except:
+            # Fall back to loading from a local copy.
+            local_file = os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'img_links', name)
+            blob_key = upload_local_file_to_blobstore(local_file, mime_type)
 
         # Get the serving url for the image.
         serving_url = images.get_serving_url(blob_key, secure_url=True)

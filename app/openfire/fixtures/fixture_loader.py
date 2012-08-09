@@ -20,6 +20,7 @@ FIXTURE_INDEXES = ['user', 'update', 'project', 'category', 'activity']
 '''
 FIXTURE_FILES = [
     # ( <json file>, <function used to save the object>, <unique field used for key relations> )
+    ('topic', util.create_topic, 'slug'),
     ('user', util.create_user, 'username'),
     ('contribution_type', util.create_contribution_type, 'slug'),
     ('category', util.create_category, 'slug'),

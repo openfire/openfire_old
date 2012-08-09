@@ -40,6 +40,9 @@ class Tier extends Model
 # base project class
 class Project extends Model
 
+    @export: 'private'
+    @events: ['PROJECT_ASSET_ATTACHED']
+
     model:
         key: String()
         name: String()
@@ -120,13 +123,13 @@ class Project extends Model
             else
                 throw 'Too few arguments passed to attach(): function(object, callback=null){}'
 
-        @get_attached = (stash_name, key_or_index, index_only=false) =>
+        @get_attached = (name, key_or_index, index_only=false) =>
 
-            if stash_name? and key_or_index?
+            if name? and key_or_index?
 
-                stash_name = stash_name.toLowerCase()
+                name = name.toLowerCase()
 
-                if not @stashes[stash_name]?
+                if not @stashes[name]?
                     return false
                 else
                     if (i = parseInt(key_or_index, 10)) > 0 or i < 0 or i is 0    # if key parse doesn't return NaN, assume it's an index
@@ -134,18 +137,18 @@ class Project extends Model
 
                     else if key_or_index is true
                         # returns list
-                        return @stashes[stash_name].store
+                        return @stashes[name].store
 
-                    else if (_i = @stashes[stash_name].index[key_or_index])?
+                    else if (_i = @stashes[name].index[key_or_index])?
                         index = _i
 
                     else return false
 
-                    return if index_only then index else @stashes[stash_name].store[index]
+                    return if index_only then index else @stashes[name].store[index]
 
             else
                 # eventually, calling this with no arguments should sync assets with server. for now you get error.
-                throw 'Too few arguments passed to get_attached(): function(model, key_or_index, index_only=false)'
+                throw 'Too few arguments passed to get_attached(): function(modelname, key_or_index, index_only=false)'
 
 
         @get = (callback) =>
@@ -178,7 +181,6 @@ class ProjectController extends OpenfireController
     @events = [
         'PROJECT_CONTROLLER_READY',
         'PROJECT_CONTROLLER_INIT',
-        'PROJECT_ASSET_ATTACHED',
         'PROJECT_AVATAR_ADDED',
         'PROJECT_IMAGE_ADDED',
         'PROJECT_VIDEO_ADDED',
@@ -203,18 +205,21 @@ class ProjectController extends OpenfireController
 
         @internal =
 
-            remove_old_nodes: (list) =>
+            cleanup: (rootID) =>
 
-                _list = list
+                _list = [
+                    rootID,
+                    rootID+'-modal-dialog',
+                    'a-'+rootID,
+                    'a-'+rootID+'-modal-dialog'
+                ]
 
-                remove = (node) =>
-                    _node = document.getElementById(node)
-                    if _node?
-                        _node.parentNode.removeChild(_node)
+                remove = (nodeID) =>
+                    node = document.getElementById(nodeID)
+                    if node?
+                        node.parentNode.removeChild(node)
 
-                while _list.length > 0
-                    remove(_list.shift())
-
+                remove(_l) while _l = _list.shift()
                 return _list
 
             process_goal: (goal) =>
@@ -273,25 +278,82 @@ class ProjectController extends OpenfireController
 
                 return goal_wrapper
 
+            process_tier: (tier) =>
+
+                index = if tier.key? then @get_attached('tier', tier.key, true) else 'new'
+
+                name = _.create_element_string('h3',
+                    id: 'tier-name' + index
+                    class: 'tier-field name'
+                    contenteditable: true
+                , if tier.name? then tier.name else 'tier name')
+
+                amount = _.create_element_string('h3',
+                    id: 'tier-amount-' + index
+                    class: 'tier-field amount'
+                    contenteditable: true
+                , if tier.amount? then tier.amount else '$0.02')
+
+                description = _.create_element_string('p',
+                    id: 'tier-description-' + index
+                    class: 'rounded tier-field description'
+                    contenteditable: true
+                , if tier.description? then tier.description else 'default description')
+
+                if index isnt 'new'
+
+                    save_tier = _.create_element_string('button',
+                        'data-index': index
+                        'data-action': 'save'
+                        class: 'tier-button save'
+                    , 'save tier')
+
+                    reset_tier = _.create_element_string('button',
+                        'data-index': index
+                        'data-action': 'reset'
+                        class: 'tier-button reset'
+                    , 'reset tier')
+
+                    delete_tier = _.create_element_string('button',
+                        'data-index': index
+                        'data-action': 'delete'
+                        class: 'tier-button delete'
+                    , 'delete tier')
+
+                    buttons = [save_tier, reset_tier, delete_tier].join('&nbsp;')
+
+                else
+                    add_tier = _.create_element_string('button',
+                        'data-index': index
+                        'data-action': 'add'
+                        class: 'tier-button add'
+                    , 'add tier')
+
+                    buttons = [add_tier]
+
+                content = [name, amount, description, buttons].join('')
+
+                tier_wrapper = _.create_element_string('div',
+                    id: 'tier-editing-' + index
+                    class: 'tier'
+                , content)
+
+                return tier_wrapper
 
             prep_dropped_modal_html: (name, ext) =>
-
                 # takes filename, returns [premodal_element, trigger_element]
-                @internal.remove_old_nodes([
-                    'project-image-drop-choice',
-                    'a-project-image-drop-choice',
-                    'project-image-drop-choice-modal-dialog',
-                    'a-project-image-drop-choice-modal-dialog'
-                ])
+                base = 'project-image-drop-'
+
+                @internal.cleanup(base + 'choice')
 
                 preview = _.create_element_string('img',
-                    id: 'project-image-drop-preview'
+                    id: base + 'preview'
                     style: 'max-width: 140px;'
                     class: 'dropshadow'
                 )
 
                 filename_edit = _.create_element_string('span',
-                    id: 'project-image-drop-filename'
+                    id: base + 'filename'
                     class: 'modal-editable alone'
                     'data-ext': '.'+ext
                     contenteditable: true
@@ -302,19 +364,19 @@ class ProjectController extends OpenfireController
                 , 'Would you like to attach' + filename_edit + 'to your project?')
 
                 attach_avatar = _.create_element_string('button',
-                    id: 'project-image-drop-avatar'
+                    id: base + 'avatar'
                     class: 'rounded modal-button'
                     value: 'avatar'
                 , 'yes!<br>(as an avatar)')
 
                 attach_image = _.create_element_string('button',
-                    id: 'project-image-drop-image'
+                    id: base + 'image'
                     class: 'rounded modal-button'
                     value: 'image'
                 , 'yes!<br>(as an image)')
 
                 oops = _.create_element_string('button',
-                    id: 'project-image-drop-no'
+                    id: base + 'no'
                     class: 'rounded modal-button'
                     value: 'oops'
                 , 'oops!<br>(no thanks)')
@@ -323,14 +385,14 @@ class ProjectController extends OpenfireController
                 content = ['',preview,'','',greeting,'','',buttons].join('<br>')
 
                 pre_modal = _.create_element_string('div',
-                    id: 'project-image-drop-choice'
+                    id: base + 'choice'
                     style: 'width: 100%;margin: 0 auto;opacity: 0;text-align: center;background-color: #eee;font-size: 9pt;'
                     class: 'pre-modal'
                     'data-title': 'Hey! You dropped your photo!'
                 , content)
 
                 trigger = _.create_element_string('a',
-                    id: 'a-project-image-drop-choice'
+                    id: 'a-' + base + 'choice'
                     href: '#project-image-drop-choice'
                     style: 'display: none;'
                 )
@@ -339,12 +401,7 @@ class ProjectController extends OpenfireController
 
             prep_goals_modal_html: (goals) =>
 
-                @internal.remove_old_nodes([
-                    'project-goal-editor',
-                    'a-project-goal-editor',
-                    'project-goal-editor-modal-dialog',
-                    'a-project-goal-editor-modal-dialog'
-                ])
+                @internal.cleanup('project-goal-editor')
 
                 _goals = []
 
@@ -352,23 +409,49 @@ class ProjectController extends OpenfireController
                     amount: 0
                     description: 'Fill this out to add a goal!'
 
-
                 _goals.push(@internal.process_goal(blank_goal))
                 _goals.push(@internal.process_goal(g)) for g in goals
 
                 pre_modal = _.create_element_string('div',
                     id: 'project-goal-editor'
                     class: 'pre-modal'
-                    style: 'opacity: 0'
+                    style: 'opacity: 0;'
                     'data-title': 'editing project goals...'
-                ,_goals.join(''))
+                , _goals.join(''))
 
                 trigger = _.create_element_string('a',
                     id: 'a-project-goal-editor'
-                    style: 'display: none;'
-                )
+                    style: 'display: none;')
 
                 return [pre_modal, trigger]
+
+            prep_tiers_modal_html: (tiers) =>
+
+                @internal.cleanup('project-tier-editor')
+
+                _tiers = []
+
+                blank_tier = new Tier
+                    name: 'New Tier'
+                    amount: 0
+                    description: 'Fill this out to add a tier!'
+
+                _tiers.push(@internal.process_tier(blank_tier))
+                _tiers.push(@internal.process_tier(t)) for t in tiers
+
+                pre_modal = _.create_element_string('div',
+                    id: 'project-tier-editor'
+                    class: 'pre-modal'
+                    style: 'opacity: 0;'
+                    'data-title': 'editing project tiers...'
+                , _tiers.join(''))
+
+                trigger = _.create_element_string('a',
+                    id: 'a-project-tier-editor',
+                    style: 'display: none;')
+
+                return [pre_modal, trigger]
+
 
         @add_media = (file_or_url) =>
 
@@ -383,7 +466,7 @@ class ProjectController extends OpenfireController
                     e = file_or_url
                     files = e.dataTransfer.files
 
-                    return @add_media(fi, 'image') for fi in files if files?
+                    return @add_media(fi) for fi in files if files?
 
                 if file_or_url.size and file_or_url.type
                     # it's a file!
@@ -392,7 +475,7 @@ class ProjectController extends OpenfireController
                     filesize = file.size
                     file_ext = (fn = file.name.split('.')).pop()
 
-                    @log('Received dropped file: '+filetype, file)
+                    @log('Received dropped file: '+filetype, file.name)
 
                     # prep modal
                     modal_parts = @internal.prep_dropped_modal_html(fn.join('.'), file_ext)
@@ -445,6 +528,7 @@ class ProjectController extends OpenfireController
                         e.stopPropagation()
                         return _.get('project-image-drop-preview').setAttribute('src', e.target.result)
 
+                    # simple check for allowed filetypes
                     if /^image\/(png|jpeg|gif)$/gi.test(filetype)
 
                         # kick off preview
@@ -460,6 +544,8 @@ class ProjectController extends OpenfireController
                             (btn = e.target).innerHTML = 'Great!<br>Uploading...'
                             fn_el = document.getElementById('project-image-drop-filename')
                             filename = fn_el.innerText
+
+                            @log('Uploading dropped file as: ', [filename, file_ext].join('.'))
 
                             callback = (res) =>
                                 # post-upload callback
@@ -739,7 +825,7 @@ class ProjectController extends OpenfireController
                 
                 if not sync
                     goal = @get_attached('goal', goal_key)
-                    return if callback? then callback.call(@, goals) else goal
+                    return if callback? then callback.call(@, goal) else goal
 
                 else
                     # get from the server
@@ -759,8 +845,6 @@ class ProjectController extends OpenfireController
             list: (callback, sync) =>
 
                 ## list goals by project key
-                project_key = @project_key
-
                 if not sync?
                     if callback? and typeof callback is 'boolean'
                         sync = callback
@@ -773,11 +857,11 @@ class ProjectController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.project.list_goals(project: project_key).fulfill
+                    $.apptools.api.project.list_goals(project: @project_key).fulfill
 
                         success: (response) =>
                             goals = []
-                            goals.push(@attach(new Goal(target: project_key).from_message(goal))) for goal in response.goals
+                            goals.push(@attach(new Goal(target: @project_key).from_message(goal))) for goal in response.goals
 
                             return if callback? then callback.call(@, goals) else goals
 
@@ -824,14 +908,14 @@ class ProjectController extends OpenfireController
 
                     _g.target = @project_key for _g in goals
 
-                    modal_parts = @internal.prep_goals_modal_html(goals)
+                    goal_modal_parts = @internal.prep_goals_modal_html(goals)
 
                     return $.apptools.widgets.modal.create (() =>
-                        docfrag = _.create_doc_frag(modal_parts[0])
+                        docfrag = _.create_doc_frag(goal_modal_parts[0])
                         document.body.appendChild(docfrag)
                         return document.getElementById('project-goal-editor')
                     )(), (() =>
-                        docfrag = _.create_doc_frag(modal_parts[1])
+                        docfrag = _.create_doc_frag(goal_modal_parts[1])
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-project-goal-editor')
                     )(), ((m) =>
@@ -1101,55 +1185,65 @@ class ProjectController extends OpenfireController
 
         @tiers =
 
-            get: (tier_key, callback) =>
+            get: (tier_key, callback, sync) =>
+
                 ## get tier by key
 
-                if tier_key is false
-                    # just return local version
-                    tier_key = callback
-                    idx = @project.tiers_by_key[tier_key]
-                    return if idx then @project.tiers[idx] else null
+                if not sync?
+                    if callback? and typeof callback is 'boolean'
+                        sync = callback
+                        callback = null
+                    else sync is false
+
+                if not sync
+                    tier = @get_attached('tier', tier_key)
+                    return if callback? then callback.call(@, tier) else tier
 
                 else
                     # get from the server
-                    $.apptools.api.project.get_tier({key: tier_key}).fulfill
-
+                    $.apptools.api.project.get_tier(
+                        key: tier_key
+                        project: @project_key
+                    ).fulfill
                         success: (response) =>
                             tier = @attach(new Tier(target: @project_key).from_message(response.tier))
-
                             return if callback? then callback.call(@, tier) else tier
 
                         failure: (error) =>
                             alert 'tiers.get() failure'
 
-
-            list: (callback) =>
+            list: (callback, sync) =>
 
                 ## list tiers by project key
-                $.apptools.api.project.list_tiers({project: @project_key}).fulfill
 
-                    success: (response) =>
-                        tiers = []
-                        _at = (_t) =>
-                            _tier = new Tier(target: @project_key)
-                            _tier = _tier.from_message(_t)
-                            @attach(_tier)
-                            return _tier
+                if not sync?
+                    if callback? and typeof callback is 'boolean'
+                        sync = callback
+                        callback = null
+                    else sync is false
 
-                        if response.tiers
-                            tiers.push(_at(tier)) for tier in response.tiers
+                if not sync
+                    tiers = @get_attached('tier', true)
+                    return if callback? then callback.call(@, tiers) else tiers
 
-                        return if callback? then callback.call(@, tiers) else tiers
+                else
+                    # get from the server
+                    $.apptools.api.project.list_tiers(project: @project_key).fulfill
+                        success: (response) =>
+                            tiers = []
+                            tiers.push(@attach(new Goal(target: @project_key).from_message(tier))) for tier in response.tiers
 
-                    failure: (error) =>
-                        alert 'tiers.list() failure'
-                        @log('Error listing tiers: ' + error)
+                            return if callback? then callback.call(@, tiers) else tiers
+
+                        failure: (error) =>
+                            alert 'tiers.list() failure'
+                            @log('Error listing tiers: ' + error)
 
             put: (tier, callback) =>
 
                 ## put tier by key
-                $.apptools.api.project.put_tier(tier.to_message()).fulfill
 
+                $.apptools.api.project.put_tier(tier.to_message()).fulfill
                     success: (response) =>
                         alert 'tiers.put() success'
                         return if callback? then callback.call(@, response) else response.key
@@ -1160,8 +1254,8 @@ class ProjectController extends OpenfireController
             delete: (tier_key, callback) =>
 
                 ## delete tier by key
-                $.apptools.api.project.delete_tier({key: tier_key}).fulfill
 
+                $.apptools.api.project.delete_tier({key: tier_key}).fulfill
                     success: (response) =>
                         alert 'tiers.delete() success'
                         return if callback? then callback.call(@, response) else response.key
@@ -1169,159 +1263,273 @@ class ProjectController extends OpenfireController
                     failure: (error) =>
                         alert 'tiers.delete() failure'
 
-            edit: (tier_or_key) =>
+            edit: (e) =>
 
                 ## coordinates editing tier properties
-                base_id = 'project-tier-editor'
-                base_el = null
 
-                return @tiers.list((tiers) =>
-                    _pk = @project_key
-                    _idx = null
-                    _key = null
+                if (trigger = e.target)?
+                    trigger.classList.add('init') if (sync = not _.has_class(trigger, 'init'))
 
-                    $.apptools.widgets.modal.create((() =>
-                        old = document.getElementById(base_id+'-modal-dialog')
-                        if old?
-                            old.parentNode.removeChild(old)
+                else if typeof e is 'boolean'
+                    sync = e
 
-                        _old = document.getElementById(base_id)
-                        if _old?
-                            _old.parentNode.removeChild(_old)
+                else sync = false
 
-                        document.body.appendChild(_.create_doc_frag(_.create_element_string('div'
-                            id: base_id
-                            class: 'pre-modal'
-                            style: 'opacity: 0;'
-                            'data-title': 'editing project tiers...'
-                        , ((tier_div='') =>
-                            (tier_div += _.create_element_string('div'
-                                id: 'tier-editing-'+ (() =>
-                                    _idx = @get_attached('tier', t.key, true)
-                                    return _idx
-                                )()
-                                class: 'mini-editable tier'
+                return @tiers.list (tiers) =>
 
-                            , ((parts='') =>
-                                parts += _.create_element_string('h3',
-                                    class: 'tier-field amount'
-                                    id: 'tier-amount-' + _idx
-                                    contenteditable: true
-                                , t.amount)
-                                parts += _.create_element_string('p',
-                                    class: 'rounded tier-field description'
-                                    id: 'tier-description-' + _idx
-                                    contenteditable: true
-                                , (if t.description? then t.description else '<span class="shh">default description</span>'))
-                                parts += _.create_element_string('button',
-                                    id: 'tier-save-' + _idx,
-                                    class: 'tier-button save'
-                                ,'save tier')
-                                parts += _.create_element_string('button',
-                                    id: 'tier-get-' + _idx,
-                                    class: 'tier-button get'
-                                ,'refresh tier')
-                                parts += _.create_element_string('button',
-                                    id: 'tier-delete-' + _idx,
-                                    class: 'tier-button delete'
-                                ,'delete tier')
-                                return parts
-                            )()
-                            )) for t in tiers
-                            return tier_div
-                        )())))
-                        return document.getElementById(base_id)
+                    _t.target = @project_key for _t in tiers
+                    
+                    tier_modal_parts = @internal.prep_tiers_modal_html(tiers)
+
+                    return $.apptools.widgets.modal.create (() =>
+                        docfrag = _.create_doc_frag(tier_modal_parts[0])
+                        document.body.appendChild(docfrag)
+                        return document.getElementById('project-tier-editor')
                     )(), (() =>
-                        document.body.appendChild(_.create_doc_frag(_.create_element_string('a'
-                            id: 'a-'+base_id
-                            href: '#'+base_id
-                            style: 'display: none'
-                        , '')))
-                        return document.getElementById('a-'+base_id)
+                        docfrag = _.create_doc_frag(tier_modal_parts[1])
+                        document.body.appendChild(docfrag)
+                        return document.getElementById('a-project-tier-editor')
                     )(), (m) =>
-                        editors = []
-                        populate = (tfield) =>
+                        editor = document.getElementById(m._state.element_id)
 
-                            editor = $.apptools.widgets.editor.create(tfield)
-                            $.apptools.widgets.editor.enable(editor)
-                            _el = _.get((_id = editor._state.element_id))
-                            _idx = _id.split('-').pop()
+                        save_button.addEventListener('click', (_save = (e) =>
+                            @log('Tier save() click handler triggered. Saving...')
 
-                            document.getElementById('tier-save-'+_idx).addEventListener('click', (e) =>
+                            e.preventDefault()
+                            e.stopPropagation()
 
-                                if e? and e.preventDefault
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    clicked = e.target
-                                    _idx = clicked?.getAttribute('id').split('-').pop()
-                                    tier = @get_attached('tier', _idx)
-                                    _key = tier.key
+                            btn = e.target
+                            btn.removeEventListener('click')
+                            btn.innerHTML = 'Saving...'
+                            idx = btn.getAttribute('data-index')
 
-                                tier.target = @project_key
-                                tier.amount = parseInt(document.getElementById('tier-amount-'+_idx).innerHTML)
-                                tier.description = document.getElementById('tier-description-'+_idx).innerHTML
+                            tier = if idx isnt 'new' then @get_attached('tier', idx) else new Tier(target: @project_key)
+                            
+                            amt_edit_el = document.getElementById('tier-amount-'+idx)
+                            desc_edit_el = document.getElementById('tier-description-'+idx)
+                            name_edit_el = document.getElementById('tier-name-'+idx)
 
-                                return false if not tier.amount? or not tier.description?
+                            tier.amount = parseInt(amt_edit_el.innerHTML, 10)
+                            tier.description = desc_edit_el.innerText
+                            tier.name = name_edit_el.innerText
 
-                                $.apptools.api.project.put_tier(tier).fulfill
-                                    success: (response) =>
-                                        _el.style.backgroundColor = '#bada55'
-                                        clicked?.classList.add('success')
+                            return $.apptools.api.project.put_tier(tier.to_message()).fulfill
+                                success: (response) =>
+                                    @log('Tier saved! Applying changes...')
+                                    
+                                    return @attach tier.from_message(response), (_tier) =>
+                                        k = _tier.key
+
+                                        name_and_amt_el = document.getElementById('a-'+k)
+                                        
+                                        name_edit_el.innerHTML = _tier.name
+                                        amt_edit_el.innerHTML = _tier.amount
+
+                                        name_and_amt_el.innerHTML = _tier.name + ' - ' + _.currency(_tier.amount)
+
+                                        desc_el = document.getElementById(k)
+                                        desc_edit_el.innerHTML = _tier.description
+                                        desc_el.innerHTML = '<p>'+_tier.description+'</p>'
+
+                                        btn.style.backgroundColor = '#bada55'
+                                        btn.innerHTML = 'Tier saved!'
 
                                         setTimeout(() =>
-                                            $(_el).animate
-                                                'background-color': 'transparent'
-                                            ,
-                                                duration: 300
-                                                complete: () =>
-                                                    editor.hide()
-                                        , 200)
+                                            btn.style.backgroundColor = 'transparent'
+                                            btn.innerHTML = 'Save tier'
+                                            btn.addEventListener('click', _save, false)
+                                        , 500)
 
-                                        return @attach(new Tier(target: @project_key).from_message(response))
+                                        return _tier
+
+                                failure: (error) =>
+                                    @log('Sorry, something went wrong :( Try again?')
+                                    @log(error)
+                                    
+                                    btn.style.backgroundColor = '#ff9e9e'
+                                    btn.innerHTML = ':( Try again?'
+                                    return btn.addEventListener('click', _save, false)
+
+                        ), false) for save_button in _.get('save', editor)
+
+                        delete_button.addEventListener('click', (_delete = (e) =>
+                            @log('Tier delete() click handler triggered. Confirming tier delete...')
+
+                            e.preventDefault()
+                            e.stopPropagation()
+
+                            btn = e.target
+                            btn.removeEventListener('click')
+                            btn.innerHTML = 'Really?'
+                            idx = btn.getAttribute('data-index')
+
+                            tier = @get_attached('tier', idx)
+                            tier_editing_el = document.getElementById('tier-editing-'+idx)
+                            tier_el = document.getElementById(tier.key)
+                            tier_trigger = document.getElementById('a-'+tier.key)
+
+                            if confirm('Really delete '+tier.amount+' tier?')
+                                @log('Tier delete() confirmed. Deleting tier...')
+                                
+                                return $.apptools.api.project.delete_tier(key: tier.key).fulfill
+                                    success: (response) =>
+                                        @log('Tier deleted! Applying changes...')
+
+                                        btn.style.backgroundColor = '#bada55'
+                                        btn.innerHTML = 'Tier deleted!'
+
+                                        setTimeout(() =>
+                                            tier_editing_el.style.opacity = 0
+                                            setTimeout(() =>
+                                                tier_editing_el.parentNode.removeChild(tier_editing_el)
+                                                tier_el.parentNode.removeChild(tier_el)
+                                                tier_trigger.parentNode.removeChild(tier_trigger)
+                                            , 500)
+                                        , 1000)
+
+                                        return
 
                                     failure: (error) =>
-                                        _el.style.backgroundColor = 'red'
-                                        clicked.classList.add('failure')
-                                        alert 'tier put() failure'
-                            , false)
+                                        @log('Sorry, something went wrong :( Try again?')
+                                        @log(error)
 
-                            document.getElementById('tier-get-'+_idx).addEventListener('click', (e) =>
+                                        btn.style.backgroundColor = '#ff9e9e'
+                                        btn.innerHTML = ':( Try again?'
+                                        
+                                        return btn.addEventListener('click', _delete, false)
 
-                                if e?.preventDefault
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    clicked = e.target
-                                    _idx = clicked?.getAttribute('id').split('-').pop()
-                                    tier = @get_attached('tier', _idx)
-                                    _key = tier.key
+                            else
+                                @log('Tier delete() canceled by user.')
 
-                                return @tiers.get _key, (teer) =>
-                                    document.getElementById('tier-amount-'+_idx).innerHTML = teer.amount
-                                    document.getElementById('tier-description-'+_idx).innerHTML = teer.description
-                                    @attach(teer)
-                            , false)
+                                btn.innerHTML = 'Delete tier'
+                                return btn.addEventListener('click', _delete, false)
 
-                            document.getElementById('tier-delete-'+_idx).addEventListener('click', (e) =>
+                        ), false) for delete_button in _.get('delete', editor)
 
-                                if e?.preventDefault
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    clicked = e.target
-                                    _idx = clicked?.getAttribute('id').split('-').pop()
-                                    tier = @get_attached('tier', _idx)
-                                    _key = tier.key
+                        reset_button.addEventListener('click', (_reset = (e) =>
+                            @log('Tier reset() click handler triggered. Confirming tier reset...')
 
-                                return @tiers.delete(_key)
-                            , false)
+                            e.preventDefault()
+                            e.stopPropagation()
 
-                            (close_x = document.getElementById(base_id + '-modal-close')).removeEventListener('mousedown')
-                            close_x.addEventListener('click',
-                                () => return m.close()
-                            , false)
+                            btn = e.target
+                            btn.removeEventListener('click')
+                            btn.innerHTML = 'Really?'
+                            idx = btn.getAttribute('data-index')
 
-                            return editor
+                            tier = @get_attached('tier', idx)
 
-                        editors.push(populate(tier_field)) for tier_field in fields if (fields = _.get('tier', document.getElementById(base_id+'-modal-content')))?
+                            if confirm('Really discard your changes and reset tier to saved version?')
+                                @log('Tier reset() confirmed. Resetting tier to saved values...')
+
+                                return $.apptools.api.project.get_tier(key: tier.key).fulfill
+                                    success: (response) =>
+                                        @log('Tier reset! Applying changes')
+
+                                        btn.style.backgroundColor = '#bada55'
+                                        btn.innerHTML = 'Tier reset!'
+
+                                        return @attach tier.from_message(response), (_goal) =>
+                                            document.getElementById('tier-name-'+idx).innerHTML = _tier.name
+                                            document.getElementById('tier-amount-'+idx).innerHTML = _tier.amount
+                                            document.getElementById('tier-description-'+idx).innerHTML = _tier.description
+
+                                            setTimeout(() =>
+                                                btn.style.backgroundColor = 'transparent'
+                                                btn.innerHTML = 'Reset tier'
+                                                return btn.addEventListener('click', _reset, false)
+                                            , 500)
+
+                                            return _tier
+
+
+                                    failure: (error) =>
+                                        @log('Sorry, something went wrong :( Try again?')
+                                        @log(error)
+
+                                        btn.style.backgroundColor = '#ff9e9e'
+                                        btn.innerHTML = ':( Try again?'
+                                        return btn.addEventListener('click', _reset, false)
+
+                            else
+                                @log('Tier reset() canceled by user.')
+
+                                btn.innerHTML = 'Reset tier'
+                                return btn.addEventListener('click', _reset, false)
+
+                        ), false) for reset_button in _.get('reset', editor)
+
+                        add_button.addEventListener('click', (_add = (e) =>
+                            @log('Tier add() click handler triggered. Saving...')
+
+                            e.preventDefault()
+                            e.stopPropagation()
+
+                            btn = e.target
+                            btn.removeEventListener('click')
+                            btn.innerHTML = 'Adding...'
+                            idx = 'new'
+
+                            tier = new Tier(target: @project_key)
+                            
+                            name_edit_el = document.getElementById('tier-name-'+idx)
+                            amt_edit_el = document.getElementById('tier-amount-'+idx)
+                            desc_edit_el = document.getElementById('tier-description-'+idx)
+                            new_edit_el = amt_edit_el.parentNode
+
+                            tier.name = name_edit_el.innerText
+                            tier.amount = parseInt(amt_edit_el.innerHTML, 10)
+                            tier.description = desc_edit_el.innerText
+
+                            return $.apptools.api.project.put_tier(tier.to_message()).fulfill
+                                success: (response) =>
+                                    @log('Tier added! Applying changes...')
+
+                                    return @attach tier.from_message(response), (_tier) =>
+                                        k = _tier.key
+                                        index = @get_attached('tier', k, true)
+
+                                        df = _.create_doc_frag(@internal.process_tier(_tier))
+                                        new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
+
+                                        name_edit_el.innerText = 'New Tier'
+                                        amt_edit_el.innerHTML = 0
+                                        desc_edit_el.innerHTML = 'Fill this out to add a tier!'
+
+                                        btn.innerHTML = 'Add tier'
+                                        btn.addEventListener('click', _add, false)
+
+                                        added = document.getElementById('tier-editing-'+index)
+
+                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('save', added)
+                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('reset', added)
+                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('delete', added)
+
+                                        btn.style.backgroundColor = '#bada55'
+                                        btn.innerHTML = 'Tier added!'
+                                        return () =>
+                                            btn.addEventListener('click', _add, false)
+
+                                failure: (error) =>
+                                    @log('Sorry, something went wrong :( Try again?')
+                                    @log(error)
+                                    
+                                    btn.style.backgroundColor = '#ff9e9e'
+                                    btn.innerHTML = ':( Try again?'
+                                    return btn.addEventListener('click', _add, false)
+
+                        ), false) for add_button in _.get('add', editor)
+
+                        set_focus = (t_f) =>
+                            t_f.addEventListener('click', (_focus = (e) =>
+                                e.preventDefault()
+                                e.stopPropagation()
+                                field = e.target
+                                field.innerHTML = ''
+                                return field.focus()
+                                ), false)
+
+                        set_focus(tier_field) for tier_field in _.get('tier-field', editor)
 
                         return m.open()
 
@@ -1337,6 +1545,7 @@ class ProjectController extends OpenfireController
                             y: 0.5
 
                         calc: () ->
+
                             css = {}
                             r = @ratio
                             wW = window.innerWidth
@@ -1350,9 +1559,8 @@ class ProjectController extends OpenfireController
                             css.right = @initial.right
 
                             return css
-                    )
 
-                , true)
+                , sync
 
 
         @_init = () =>

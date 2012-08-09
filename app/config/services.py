@@ -123,6 +123,19 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Topic API - provides structured information about openfire user topics
+        'topic': {
+            'enabled': True,
+            'service': 'openfire.services.topic.TopicService',
+            'methods': ['get', 'list', 'put', 'delete'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## Content API - allows saving/retrieving of small content snippets
         'content': {
             'enabled': True,

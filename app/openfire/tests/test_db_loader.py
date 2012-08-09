@@ -1,7 +1,7 @@
 from openfire.models.project import Proposal, Project, Category, Tier, Goal
 from openfire.models.contribution import ContributionType
 from openfire.models.assets import CustomURL
-from openfire.models.user import User
+from openfire.models.user import User, Topic
 from google.appengine.ext import ndb
 
 '''
@@ -11,6 +11,10 @@ This module is used to create database entities for testing purposes.
 def create_category(slug='test', name='Test Category', description='some txt'):
     return Category(key=ndb.Key('Category', slug), slug=slug, name=name, description=description,
         ).put()
+
+
+def create_topic(slug='test', name='Test Topic', description='some txt'):
+    return Topic(key=ndb.Key('Topic', slug), slug=slug, name=name, description=description).put()
 
 
 def create_proposal(name='Test Proposal', status='s', public=True,
