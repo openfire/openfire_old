@@ -16,6 +16,7 @@ import copy
 
 import test_db_loader as db_loader
 from openfire.models.project import Category, Goal, Tier
+from openfire.models.user import Topic
 from openfire.models.assets import CustomURL
 
 from test_util import encrypt, decrypt
@@ -681,3 +682,91 @@ class MediaServiceTestCase(unittest.TestCase):
         #upload_url = upload_url.replace('testbed.example.com:80', 'localhost:8080')
         #upload_request = webapp2.Request.blank(upload_url)
         #response = upload_request.get_response(dispatch.gateway)
+
+
+class TopicServiceTestCase(unittest.TestCase):
+    ''' Test cases for the topic service.
+    '''
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def test_topic_list_method(self):
+
+        ''' Add a topic to the database then query. '''
+
+        slug = 'test-slug'
+        db_loader.create_topic(slug=slug)
+        response = generic_service_method_success_test(self, 'topic', 'list')
+        self.assertEqual(response['response']['type'], 'Topics',
+            'System topic list service method failed.')
+        self.assertEqual(len(response['response']['content']['topics']), 1,
+            'Failed to return the correct number of topics.')
+
+    def test_topic_get_method(self):
+
+        ''' Add a topic to the database then query. '''
+
+        topic_slug = 'test-slug'
+        db_loader.create_topic(slug=topic_slug)
+        response = generic_service_method_success_test(self, 'topic', 'get', params={'slug':topic_slug})
+        self.assertEqual(response['response']['type'], 'Topic',
+            'Topic get service method failed.')
+        self.assertEqual(response['response']['content']['slug'], topic_slug,
+            'Topic get method returned the wrong topic.')
+
+    def test_topic_put_method(self):
+
+        ''' Add a topic through the api and then update it. '''
+
+        slug = 'different'
+        name_1 = 'Name'
+        description_1 = 'Think.'
+        name_2 = 'Different Name'
+        description_2 = 'Think different.'
+
+        params = {
+            'slug': slug,
+            'name': name_1,
+            'description': description_1,
+        }
+
+        response = generic_service_method_success_test(self, 'topic', 'put', params=params)
+        self.assertEqual(response['response']['type'], 'Topic',
+            'Topic put service method failed to create a new topic.')
+        self.assertEqual(response['response']['content']['name'], name_1,
+            'Topic put failed to set the name.')
+        self.assertEqual(response['response']['content']['description'], description_1,
+            'Topic put failed to set the description.')
+
+        params['name'] = name_2
+        params['description'] = description_2
+        params['key'] = encrypt(response['response']['content']['key'])
+
+        response = generic_service_method_success_test(self, 'topic', 'put', params=params)
+        self.assertEqual(response['response']['type'], 'Topic',
+            'Topic put service method failed.')
+        self.assertEqual(response['response']['content']['name'], name_2,
+            'Topic put failed to change the name.')
+        self.assertEqual(response['response']['content']['description'], description_2,
+            'Topic put failed to change the description.')
+
+    def test_topic_delete_method(self):
+
+        ''' Add a topic and then delete it through the api. '''
+
+        slug = 'test-slug'
+        topic_key = db_loader.create_topic(slug=slug)
+        params = {
+            'key': encrypt(topic_key.urlsafe()),
+        }
+        response = generic_service_method_success_test(self, 'topic', 'delete', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Topic put service method failed.')
+        self.assertEqual(len(Topic.query().fetch(1)), 0, 'Failed to delete topic.')

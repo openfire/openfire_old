@@ -2,6 +2,14 @@
 from openfire.pipelines.model import ModelPipeline
 
 
+## TopicPipeline - fired when a Topic entity is put/deleted
+class TopicPipeline(ModelPipeline):
+
+    ''' Processes topic puts/deletes. '''
+
+    _model_binding = 'openfire.models.user.Topic'
+
+
 ## UserPipeline - fired when a User entity is put/deleted
 class UserPipeline(ModelPipeline):
 
