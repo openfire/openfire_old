@@ -49,8 +49,8 @@ _blocktypes = frozenset(['area', 'snippet', 'summary'])
 _dynamic_inheritance_nodes = (nodes.Extends, nodes.FromImport, nodes.Import, nodes.Include)
 
 ## Global Query Options
-_keys_only_opt = ndb.QueryOptions(keys_only=True, limit=3, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
-_projection_opt = ndb.QueryOptions(keys_only=False, limit=3, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+_keys_only_opt = ndb.QueryOptions(keys_only=True, limit=3, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST, deadline=3)
+_projection_opt = ndb.QueryOptions(keys_only=False, limit=3, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST, deadline=3)
 
 
 ## CoreContentAPI - manages the retrieval and update of dynamically editable site content
@@ -241,7 +241,7 @@ class CoreContentAPI(CoreAPI):
                 yield resultset_callback([], query=query)
 
         # if we should count first, kick off a count and call self with the result
-        if not isinstance(count, int) and count == True:
+        if not isinstance(count, int) and count is True:
             future = query.count_async(**kwargs)
             future.add_callback(self._run_query_async, query, False, future, resultset_callback, item_callback, **kwargs)
             yield future
@@ -317,7 +317,7 @@ class CoreContentAPI(CoreAPI):
 
         ''' Build a keys-only ndb.Query object with the _keys_only options object. '''
 
-        return kind.query(ancestor=parent, default_options=_keys_only.merge(ndb.QueryOptions(**kwargs)))
+        return kind.query(ancestor=parent, default_options=_keys_only_opt.merge(ndb.QueryOptions(**kwargs)))
 
     def _build_projection_query(self, kind, properties, parent=None, **kwargs):
 

@@ -260,6 +260,12 @@ config['openfire.output'] = {
 
 }
 
+config['openfire.matcher'] = {
+
+    'logging': True,
+
+}
+
 config['openfire.classes.WebHandler'] = {
 
     'debug': False,
