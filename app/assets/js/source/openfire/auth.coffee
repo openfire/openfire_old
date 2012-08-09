@@ -32,7 +32,7 @@ class Session extends OpenfireObject
 
 
 # base user class: it's a user.
-class User extends OpenfireObject
+class User extends Model
 
     @export: 'private'
     @events: []
@@ -44,7 +44,7 @@ class User extends OpenfireObject
 # base auth controller: handles frontend user & login services
 class AuthController extends OpenfireController
 
-    @events = []
+    @events: []
 
     constructor: (openfire, window) ->
 
