@@ -19,17 +19,25 @@
 #profile_dropdown
     background: white
     min-width: 200px
-    min-height: 45px
+    min-height: 0px
+    height: 0px
     padding: 10px
     position: relative
-    top: -3px
     z-index: -1
-    opacity: 0.0 !important
-    -webkit-transition-property: opacity, z-index
+    border: 1px solid transparent
+    border-top: none !important
+    opacity: 0.0
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.25)
+    -webkit-transition-property: height, min-height, opacity, z-index
 
     &.active
+        height: auto
+        min-height: 45px
         z-index: 1000
-        opacity: 1.0 !important
+        top: 0px
+        border-color: #d3d3d3
+        opacity: 1.0
+
 
     a
         position: relative

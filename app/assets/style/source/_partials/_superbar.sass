@@ -43,9 +43,10 @@
         display: list-item
 
 #superbar
-  -webkit-transition-property: background-color, box-shadow
+  -webkit-transition-property: background-color
   width: 100%
   font-size: 8.5pt
+  z-index: 1000
 
   #tinylogo
     position: absolute
@@ -67,12 +68,18 @@
         padding-right: 15px
         padding-left: 15px
         padding-bottom: 18px
+        border-left: 1px solid transparent
+        border-right: 1px solid transparent
+        
         &:hover
           background: white
         &.active
           background: white
+          border-left-color: #d3d3d3
+          border-right-color: #d3d3d3
       img
         display: inline
+        margin-left: 5px
     ul li
       padding: 0 10px
       float: right
