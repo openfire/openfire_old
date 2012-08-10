@@ -43,6 +43,8 @@ class User(AppModel):
     password = ndb.StringProperty('p', indexed=True, default=None)
     firstname = ndb.StringProperty('f', indexed=True)
     lastname = ndb.StringProperty('l', indexed=True)
+    activated = ndb.BooleanProperty('xa', default=False, indexed=True)
+    public = ndb.BooleanProperty('xp', default=False, indexed=True)
     bio = ndb.StringProperty('b', indexed=True)
     topics = ndb.KeyProperty('ts', indexed=True, repeated=True)
     location = ndb.StringProperty('loc', indexed=True)

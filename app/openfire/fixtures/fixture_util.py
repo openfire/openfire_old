@@ -145,10 +145,10 @@ def create_topic(slug='test', name='Test Topic', description='some txt'):
 
     ''' Create a topic. '''
 
-    return Topic(key=ndb.Key('Topic', slug), slug=slug, name=name, description=description).put
+    return Topic(key=ndb.Key('Topic', slug), slug=slug, name=name, description=description).put()
 
 
-def create_user(username='fakie', password='fakieiscool', firstname='Fakie', lastname='McFakerton', location='San Francisco, CA', bio='some bio', email=None, create_permissions=False):
+def create_user(username='fakie', password='fakieiscool', firstname='Fakie', lastname='McFakerton', location='San Francisco, CA', bio='some bio', email=None, create_permissions=False, activated=True, topics=[], public=True):
 
     '''
     Create a new user.
@@ -168,8 +168,8 @@ def create_user(username='fakie', password='fakieiscool', firstname='Fakie', las
     else:
         emails = False
 
-    user_key = User(key=ndb.Key('User', email), username=username, firstname=firstname, lastname=lastname,
-            location=location, bio=bio, password=pwd).put()
+    user_key = User(key=ndb.Key('User', username), username=username, firstname=firstname, lastname=lastname,
+            location=location, bio=bio, password=pwd, activated=activated, public=public, topics=topics).put()
 
     if emails:
         for email in emails:

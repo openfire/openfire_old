@@ -44,8 +44,11 @@ def create_custom_url(slug='test', target_kind='Project', target_id='1'):
     return CustomURL(key=ndb.Key('CustomURL', slug), slug=slug, target=ndb.Key(target_kind, target_id)).put()
 
 
-def create_user(username='fake', firstname='Fakie', lastname='McFakerton', bio='some bio'):
-    return User(key=ndb.Key('User', username), username=username, firstname=firstname, lastname=lastname, bio=bio).put()
+def create_user(username='fake', firstname='Fakie', lastname='McFakerton', bio='some bio',
+        location='somewhere', topics=[], activated=True, public=True):
+    return User(key=ndb.Key('User', username), username=username, firstname=firstname,
+                lastname=lastname, bio=bio, location=location, topics=topics, activated=activated,
+                public=public).put()
 
 
 def create_goal(target_id='fake', contribution_type_id='fake', amount=100, description='DESCRIPTION', backer_count=0, progress=50, met=False):

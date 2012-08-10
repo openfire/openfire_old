@@ -15,6 +15,7 @@ import json
 import copy
 
 import test_db_loader as db_loader
+from openfire.fixtures import fixture_util
 from openfire.models.project import Category, Goal, Tier
 from openfire.models.user import Topic
 from openfire.models.assets import CustomURL
@@ -770,3 +771,218 @@ class TopicServiceTestCase(unittest.TestCase):
         self.assertEqual(response['response']['type'], 'Echo',
             'Topic put service method failed.')
         self.assertEqual(len(Topic.query().fetch(1)), 0, 'Failed to delete topic.')
+
+
+class UserServiceTestCase(unittest.TestCase):
+
+    ''' Test cases for the user service.
+    '''
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+
+    def test_user_profile_method(self):
+
+        ''' Test the user profile service method. '''
+
+        topic1_key = fixture_util.create_topic(slug='topic1')
+        topic2_key = fixture_util.create_topic(slug='topic2')
+        user_key = fixture_util.create_user(email=['fakie@mcfakerton.com'], topics=[topic1_key, topic2_key])
+        user = user_key.get()
+        params = {
+            'user': user.username
+        }
+
+        # Test profile get.
+        response = generic_service_method_success_test(self, 'user', 'profile', params=params)
+        self.assertEqual(response['response']['type'], 'Profile',
+            'Failed to return profile response from user profile service.')
+        content = response['response']['content']
+        self.assertEqual(content['username'], user.username,
+                'Failed to return the correct username in the profile content service.')
+        self.assertEqual(content['firstname'], user.firstname,
+                'Failed to return the correct firstname in the profile content service.')
+        self.assertEqual(content['lastname'], user.lastname,
+                'Failed to return the correct lastname in the profile content service.')
+        self.assertEqual(content['bio'], user.bio,
+                'Failed to return the correct bio in the profile content service.')
+        self.assertEqual(len(content['email']), 1,
+                'Failed to return the correct number of emails in the profile content service.')
+        self.assertEqual(len(content['topics']), 2,
+                'Failed to return the correct number of topics in the profile content service.')
+
+        # Test profile update of bio and location fields.
+        params['profile'] = {
+            'bio': 'Some new bio',
+            'location': 'Some new location',
+        }
+        response = generic_service_method_success_test(self, 'user', 'profile', params=params)
+        self.assertEqual(response['response']['type'], 'Profile',
+            'Failed to return profile response from user profile service.')
+
+        # Make sure the response was correct.
+        content = response['response']['content']
+        self.assertEqual(content['username'], params['user'],
+                'Failed to return the correct username when updating user profile via service.')
+
+        # Make sure the user was updated.
+        user = user_key.get()
+        self.assertEqual(user.bio, params['profile']['bio'],
+                'Failed to update the user bio via the user profile service.')
+        self.assertEqual(user.location, params['profile']['location'],
+                'Failed to update the user location via the user profile service.')
+
+        # Make sure the response was correct.
+        self.assertEqual(content['bio'], user.bio,
+                'Failed to return the correct bio when updating user profile via service.')
+        self.assertEqual(content['location'], user.location,
+                'Failed to return the correct location when updating user profile via service.')
+
+        # Make sure you cannot update username or firstname.
+        params['profile'] = {
+            'username': 'NONONO',
+            'firstname': 'NONONO',
+            'lastname': 'NONONO',
+        }
+        response = generic_service_method_success_test(self, 'user', 'profile', params=params)
+        self.assertEqual(response['response']['type'], 'Profile',
+            'Failed to return profile response from user profile service.')
+
+        # Make sure things did not change.
+        user = user_key.get()
+        self.assertNotEqual(params['profile']['username'], user.username,
+                'Should not be able to update username via the user profile service.')
+        self.assertNotEqual(params['profile']['firstname'], user.firstname,
+                'Should not be able to update firstname via the user profile service.')
+        self.assertNotEqual(params['profile']['lastname'], user.lastname,
+                'Should not be able to update lastname via the user profile service.')
+
+
+    def test_user_set_topics_method(self):
+
+        ''' Test the user set_topics service method. '''
+
+        user_key = fixture_util.create_user()
+        user = user_key.get()
+        params = {
+            'user': user.username
+        }
+
+        topic1_key = fixture_util.create_topic(slug='topic1')
+        topic2_key = fixture_util.create_topic(slug='topic2')
+        topic3_key = fixture_util.create_topic(slug='topic3')
+        params = {
+            'user': user.username,
+            'topics': [],
+        }
+
+        # Test setting a single topic.
+        params['topics'] = [topic1_key.urlsafe()]
+        response = generic_service_method_success_test(self, 'user', 'set_topics', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+                'Failed to return echo response from user set_topics service.')
+
+        # Make sure the topic was set.
+        user = user_key.get()
+        self.assertEqual(len(user.topics), 1,
+                'Failed to set a topic for a user using the set_topic service')
+        self.assertEqual(user.topics[0], topic1_key,
+                'Failed to set the correct topic for a user using the set_topic service')
+
+        # Test setting multiple topics.
+        params['topics'] = [topic1_key.urlsafe(), topic2_key.urlsafe(), topic3_key.urlsafe()]
+        response = generic_service_method_success_test(self, 'user', 'set_topics', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+                'Failed to return echo response from user set_topics service.')
+
+        # Make sure the topics were set in order.
+        user = user_key.get()
+        self.assertEqual(len(user.topics), 3,
+                'Failed to set topics for a user using the set_topic service')
+        self.assertEqual(user.topics[0], topic1_key,
+                'Failed to set correct topic order for a user using the set_topic service')
+        self.assertEqual(user.topics[1], topic2_key,
+                'Failed to set correct topic order for a user using the set_topic service')
+        self.assertEqual(user.topics[2], topic3_key,
+                'Failed to set correct topic order for a user using the set_topic service')
+
+        # Test setting topics to none.
+        params['topics'] = None
+        response = generic_service_method_success_test(self, 'user', 'set_topics', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+                'Failed to return echo response from user set_topics service.')
+
+        # Make sure the topics were reset.
+        user = user_key.get()
+        self.assertEqual(len(user.topics), 0,
+                'Failed to set topics to none for a user using the set_topic service')
+
+        # Test setting multiple topics to test order.
+        params['topics'] = [topic3_key.urlsafe(), topic2_key.urlsafe(), topic1_key.urlsafe()]
+        response = generic_service_method_success_test(self, 'user', 'set_topics', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+                'Failed to return echo response from user set_topics service.')
+
+        # Make sure the topics were set in order.
+        user = user_key.get()
+        self.assertEqual(len(user.topics), 3,
+                'Failed to set topics for a user using the set_topic service')
+        self.assertEqual(user.topics[0], topic3_key,
+                'Failed to set correct topic order for a user using the set_topic service')
+        self.assertEqual(user.topics[1], topic2_key,
+                'Failed to set correct topic order for a user using the set_topic service')
+        self.assertEqual(user.topics[2], topic1_key,
+                'Failed to set correct topic order for a user using the set_topic service')
+
+
+    def test_user_account_method(self):
+
+        ''' Test the user account service method. '''
+
+        user_key = db_loader.create_user()
+        user = user_key.get()
+        params = {
+            'user': user.username
+        }
+        response = generic_service_method_success_test(self, 'user', 'account', params=params)
+        self.assertEqual(response['response']['type'], 'Account',
+            'Failed to return account response from user account service.')
+        #content = response['response']['content']
+
+
+    def test_user_follow_method(self):
+
+        ''' Test the user follow service method. '''
+
+        user_key = db_loader.create_user()
+        user = user_key.get()
+        params = {
+            'user': user.username
+        }
+        response = generic_service_method_success_test(self, 'user', 'follow', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Failed to return echo response from user follow service.')
+        #content = response['response']['content']
+
+
+    def test_user_followers_method(self):
+
+        ''' Test the user followers service method. '''
+
+        user_key = db_loader.create_user()
+        user = user_key.get()
+        params = {
+            'user': user.username
+        }
+        response = generic_service_method_success_test(self, 'user', 'followers', params=params)
+        self.assertEqual(response['response']['type'], 'FollowersResponse',
+            'Failed to return followers response from user followers service.')
+        #content = response['response']['content']
