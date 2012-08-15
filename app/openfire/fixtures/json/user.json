@@ -7,7 +7,9 @@
         "activated": true,
         "public": true,
         "location": "San Francisco, CA",
-        "bio": "hola yo soy pug",
+        "bio": "hey there i'm pug. i'm the ceo at openfire, which is the site you're using right now. it's pretty cool, isn't it? yeah, i like it too. so anyway, what's up?",
+        "position": "chief anger management counsel",
+        "organization": "openfire",
         "email": "david@openfi.re",
         "create_permissions": 1
     },
@@ -19,7 +21,9 @@
         "activated": true,
         "public": true,
         "location": "San Francisco, CA",
-        "bio": "fiesta ayayayay",
+        "bio": "hello, is this thing on? by 'this thing' i mean this cool app i'm using. no idea who built it or whatever but it's pretty cool.",
+        "position": "senior python charmer",
+        "organization": "openfire",
         "email": ["samuel.gammon@gmail.com", "sam@openfi.re", "sam@momentum.io"],
         "create_permissions": 1
     },
@@ -31,7 +35,9 @@
         "activated": true,
         "public": true,
         "location": "San Francisco, CA",
-        "bio": "hi i is david",
+        "bio": "hi, my name is david. i make this site look awesome. does it not look awesome? well yes, taste is a prerequisite.",
+        "position": "frontend ninja",
+        "organization": "openfire",
         "email": ["davidr@openfi.re", "xdavidrekowx@gmail.com", "david@momentum.io"],
         "create_permissions": 1
     },
@@ -43,7 +49,9 @@
         "activated": true,
         "public": true,
         "location": "San Francisco, CA",
-        "bio": "ethan i am",
+        "bio": "hey my name is ethan. i'm the cto and it's my job to make sure the technology behind this fantastic app works as intended! i'm responsible for the tech vision of this project, and i rock!",
+        "position": "chief kitten huffer",
+        "organization": "openfire",
         "email": ["ethan.leland@gmail.com", "ethan@openfi.re"],
         "create_permissions": 1
     }

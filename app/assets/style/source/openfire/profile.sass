@@ -1,0 +1,170 @@
+@import "../main"
+
+body
+	background-color: whitesmoke
+
+.profile
+	&.section
+		margin-top: 10px
+		padding: 5px
+		min-height: 50px
+
+		.dynamic
+
+			min-height: 50px
+			padding: 5px
+
+			&.editable
+				&:hover
+					background: yellow !important
+					cursor: pointer
+
+			&.mini-editable
+				&:hover
+					background: yellow !important
+					cursor: pointer
+
+#masthead
+
+	z-index: 500
+	height: 140px !important
+
+	#profiletop
+		position: absolute
+		min-width: 250px
+		height: 65px
+		left: 25%
+		right: 25%
+		bottom: 0
+
+		.left
+
+			#avatar
+				position: absolute
+				left: -2%
+				top: -10%
+				width: 175px
+				height: 175px
+				z-index: 500
+
+			#byline
+				position: absolute
+				left: 170px
+				padding-left: 5px
+				width: 80%
+				overflow: hidden
+
+				#topbanner
+
+					#name
+						float: left
+
+					#topics
+						padding-left: 15px
+						float: left
+						line-height: 20px
+						margin-top: 45px
+						text-transform: lowercase
+						color: #AAA
+
+				#userinfo
+					top: -10px
+					position: relative
+
+					ul
+						margin: 0
+						padding: 0
+						list-style: none
+
+						li
+							display: inline
+
+							&:nth-child(even)
+								margin-left: 10px
+
+								&:before
+									content: '·'
+									font-size: 11pt
+									font-weight: bold
+									width: 15px
+									right: 7px
+									position: relative
+
+
+#content
+	min-height: 600px
+	display: inline
+
+	#profile
+		width: 50%
+		min-height: 400px
+		margin-left: 26%
+		position: relative
+		border: 1px solid #BBB
+		border-top: none
+		padding-top: 50px
+		background: white
+
+		#leftbar
+			width: 140px
+			position: relative
+			float: left
+			margin-top: 65px
+			margin-left: 10px
+
+		#contentpane
+			min-height: 420px
+			margin-left: 158px
+			margin-right: 20px
+
+			#userbio
+
+
+				position: relative
+
+				div
+					padding: 3px
+					position: absolute
+					top: 0
+					bottom: 0
+					left: 0
+					right: 0
+
+				&.collapsed
+
+					height: 55px
+
+					&:hover
+						cursor: pointer
+						background-color: yellow !important
+
+					&:after
+						content: 'see more'
+						position: absolute
+						bottom: 0
+						left: 0
+						right: 0
+						display: block
+						text-align: center
+						border-top: 1px solid #AAA
+						border-bottom: 1px solid #AAA
+						font-family: "Karla"
+						text-transform: uppercase
+						font-size: 11px
+
+				&.expanded
+					max-height: 275px !important
+
+					&:after
+						content: 'see less'
+						position: absolute
+						bottom: 0
+						left: 0
+						right: 0
+						display: block
+						text-align: center
+						border-top: 1px solid #AAA
+						border-bottom: 1px solid #AAA
+						font-family: "Karla"
+						text-transform: uppercase
+						font-size: 11px

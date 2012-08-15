@@ -14,7 +14,7 @@ from openfire.models.user import Permissions
 ## core bridge imports
 from openfire.core.content import ContentBridge
 from openfire.core.sessions import SessionsBridge
-from openfire.handlers import NamespaceBridge
+from openfire.core.data.namespacing import NamespaceBridge
 
 
 class RemoteService(BaseService, SessionsBridge, ContentBridge, NamespaceBridge):

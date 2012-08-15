@@ -35,6 +35,7 @@ rules = [
         HandlerPrefixRoute('user.', [
             Route('/me', name='user/me', handler='UserProfile'),
             Route('/users', name='user/landing', handler='UserLanding'),
+            Route('/user/<key>', name='user/profile/bykey', handler='UserProfile'),
             Route('/user/<username>', name='user/profile', handler='UserProfile'),
             Route('/user/<username>/account', name='user/account', handler='UserAccount'),
         ]),

@@ -152,7 +152,8 @@ config['apptools.project.assets'] = {
 
             'assets': {
                 'landing': {'version': 0.3},  # styles for the landing
-                'project': {'version': 0.2}    # styles for the project page
+                'project': {'version': 0.2},  # styles for the project page
+                'profile': {'version': 0.1}   # styles for the profile page
             }
 
         },
