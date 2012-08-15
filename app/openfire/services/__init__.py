@@ -14,15 +14,19 @@ from openfire.models.user import Permissions
 ## core bridge imports
 from openfire.core.content import ContentBridge
 from openfire.core.sessions import SessionsBridge
+from openfire.handlers import NamespaceBridge
 
 
-class RemoteService(BaseService, SessionsBridge, ContentBridge):
+class RemoteService(BaseService, SessionsBridge, ContentBridge, NamespaceBridge):
 
     ''' Abstract parent for all openfire services. '''
 
     def initialize(self):
 
         ''' Initialize hook. '''
+
+        # Set up the datastore namespace
+        self.prepare_namespace(self.handler.request)
 
         ## extract the session & csrf headers
         self.session = self.get_session(make=False)
@@ -43,7 +47,6 @@ class RemoteService(BaseService, SessionsBridge, ContentBridge):
     def after_request_hook(self):
 
         ''' Response callback hook. '''
-
         if hasattr(self, 'session'):
             if self.session:
                 self.save_session()

@@ -26,6 +26,10 @@
 
     <!-- The jasmine test runner. -->
     <script type="text/javascript">
+
+        {%- from "macros/page_object.js" import build_page_object -%}
+        {{ build_page_object(page.services.services_manifest, page.services.config, page) }}
+
         (function() {
             var jasmineEnv = jasmine.getEnv();
             jasmineEnv.updateInterval = 1000;

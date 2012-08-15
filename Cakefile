@@ -755,7 +755,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 	out.shout 'coffee', 'Compiling openfire unit tests...'
 	out.spawn 'coffee', node_bin, [ coffee_bin,
 									'--join', fixpath(js_prefix, 'static', 'tests', 'tests.js'),
-									'--compile', fixpath(js_prefix, 'source', 'tests', 'tests.coffee')]
+									'--compile', fixpath(js_prefix, 'source', 'tests', 'api.coffee')]
 
 	out.say 'coffee', 'Done :)'
 
