@@ -242,9 +242,9 @@ config['apptools.project.services'] = {
 
         ## User API - allows user profiles/data and facepiles to be retrieved
         'user': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.user.UserService',
-            'methods': ['profile', 'account', 'follow', 'followers'],
+            'methods': ['profile', 'set_topics', 'account', 'follow', 'followers'],
 
             'config': {
                 'caching': 'none',

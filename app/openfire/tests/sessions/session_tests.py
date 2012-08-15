@@ -4,6 +4,7 @@ Sessions tests.
 """
 
 from openfire.tests import OFTestCase
+import openfire.fixtures.fixture_util as db_loader
 
 class DatastoreSessionLoaderTestCase(OFTestCase):
 

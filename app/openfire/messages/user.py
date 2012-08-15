@@ -1,4 +1,5 @@
 from protorpc import messages
+from openfire.messages.common import Topic
 
 
 class User(messages.Message):
@@ -12,7 +13,9 @@ class EmailAddress(messages.Message):
 
     ''' Represents a user's email address. '''
 
-    pass
+    key = messages.StringField(1)
+    address = messages.StringField(2)
+    label = messages.StringField(3)
 
 
 class Profile(messages.Message):
@@ -25,12 +28,12 @@ class Profile(messages.Message):
     '''
 
     username = messages.StringField(1)
-    email = messages.StringField(2)
+    email = messages.MessageField(EmailAddress, 2, repeated=True)
     firstname = messages.StringField(3)
     lastname = messages.StringField(4)
     bio = messages.StringField(5)
     location = messages.StringField(6)
-    topics = messages.StringField(7, repeated=True)
+    topics = messages.MessageField(Topic, 7, repeated=True)
 
 
 class ProfileRequest(messages.Message):
@@ -41,12 +44,20 @@ class ProfileRequest(messages.Message):
     profile = messages.MessageField(Profile, 2)
 
 
+class SetTopics(messages.Message):
+
+    ''' Set topics with a list of topic keys. '''
+
+    user = messages.StringField(1)
+    topics = messages.StringField(2, repeated=True)
+
+
 class Account(messages.Message):
 
     ''' Contains all account info for users. Can be request or response. '''
 
     username = messages.StringField(1)
-    email = messages.StringField(2)
+    email = messages.StringField(2, repeated=True)
 
 
 class AccountRequest(messages.Message):

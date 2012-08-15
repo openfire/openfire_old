@@ -4,18 +4,9 @@ Encryption/decryption tests.
 """
 
 import unittest
-from google.appengine.ext import testbed
-
-import bootstrap
-bootstrap.AppBootstrapper.prepareImports()
-from apptools import dispatch
-
-import webapp2
-from webapp2 import Request, Response
 
 from google.appengine.ext import ndb
-
-import test_db_loader as db_loader
+from openfire.tests import OFTestCase
 
 AES = None
 try:
@@ -23,25 +14,9 @@ try:
 except:
     pass
 
-class BasicEncryptTestCase(unittest.TestCase):
+class BasicEncryptTestCase(OFTestCase):
 
     ''' Tests basic b64 obfuscation. '''
-
-    def setUp(self):
-
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-        self.testbed.init_datastore_v3_stub()
-        self.testbed.init_memcache_stub()
-
-        from openfire.handlers.main import Landing
-        self.request = Request.blank('/')
-        self.response = Response()
-
-        self.handler = Landing(self.request, self.response)
-
-    def tearDown(self):
-        self.testbed.deactivate()
 
     def test_basic_encryption(self):
 
@@ -49,7 +24,7 @@ class BasicEncryptTestCase(unittest.TestCase):
         simple_cleartext = "hello this is a test of the basic encryption mechanism"
 
         # encrypt and decrypt
-        encrypted_text = self.handler.encrypt(simple_cleartext, simple=True, cipher=False)
+        encrypted_text = self.encrypt(simple_cleartext, simple=True, cipher=False)
         self.assertTrue(encrypted_text, 'Simple encryption failed to encrypt a cleartext string.')
 
     def test_basic_encryption_decryption(self):
@@ -58,8 +33,8 @@ class BasicEncryptTestCase(unittest.TestCase):
         simple_cleartext = "hello this is a test of the basic encryption mechanism"
 
         # encrypt and decrypt
-        encrypted_text = self.handler.encrypt(simple_cleartext, simple=True, cipher=False)
-        decrypted_text = self.handler.decrypt(encrypted_text)
+        encrypted_text = self.encrypt(simple_cleartext, simple=True, cipher=False)
+        decrypted_text = self.decrypt(encrypted_text)
 
         self.assertTrue(encrypted_text, 'Simple encryption failed to encrypt a cleartext string.')
         self.assertTrue(decrypted_text, 'Simple encryption failed to decrypt a ciphertext string.')
@@ -72,8 +47,8 @@ class BasicEncryptTestCase(unittest.TestCase):
         key_cleartext = key_original.urlsafe()
 
         # encrypt and decrypt
-        encrypted_key = self.handler.encrypt(key_cleartext, simple=True, cipher=False)
-        decrypted_key = self.handler.decrypt(encrypted_key)
+        encrypted_key = self.encrypt(key_cleartext, simple=True, cipher=False)
+        decrypted_key = self.decrypt(encrypted_key)
 
         try:
             key_reconstructed = ndb.Key(urlsafe=decrypted_key)
@@ -86,25 +61,9 @@ class BasicEncryptTestCase(unittest.TestCase):
         self.assertEqual(key_original, key_reconstructed, 'The resulting encrypted+decrypted key does not match the original key object.')
 
 
-class AdvancedEncryptTestCase(unittest.TestCase):
+class AdvancedEncryptTestCase(OFTestCase):
 
     ''' Tests AES-based encryption. '''
-
-    def setUp(self):
-
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-        self.testbed.init_datastore_v3_stub()
-        self.testbed.init_memcache_stub()
-
-        from openfire.handlers.main import Landing
-        self.request = Request.blank('/')
-        self.response = Response()
-
-        self.handler = Landing(self.request, self.response)
-
-    def tearDown(self):
-        self.testbed.deactivate()
 
     @unittest.expectedFailure
     def test_aes_support(self):
@@ -118,8 +77,8 @@ class AdvancedEncryptTestCase(unittest.TestCase):
         advanced_cleartext = "hello this is a test of the advanced encryption mechanism"
 
         # encrypt and decrypt
-        encrypted_text = self.handler.encrypt(advanced_cleartext, simple=False, cipher=True)
-        decrypted_text = self.handler.decrypt(encrypted_text)
+        encrypted_text = self.encrypt(advanced_cleartext, simple=False, cipher=True)
+        decrypted_text = self.decrypt(encrypted_text)
 
         self.assertEqual(advanced_cleartext, decrypted_text, 'Advanced encryption failed to properly encrypt or decrypt, because the resulting cleartext does not match.')
 
@@ -130,8 +89,8 @@ class AdvancedEncryptTestCase(unittest.TestCase):
         key_cleartext = key_original.urlsafe()
 
         # encrypt and decrypt
-        encrypted_key = self.handler.encrypt(key_cleartext, simple=False, cipher=True)
-        decrypted_key = self.handler.decrypt(encrypted_key)
+        encrypted_key = self.encrypt(key_cleartext, simple=False, cipher=True)
+        decrypted_key = self.decrypt(encrypted_key)
 
         try:
             key_reconstructed = ndb.Key(urlsafe=decrypted_key)

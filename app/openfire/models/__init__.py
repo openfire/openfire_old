@@ -122,16 +122,20 @@ class MessageConverterMixin(ModelMixin):
 
     _message_class = None
 
-    def to_message(self, include=None, exclude=None, strict=False):
+    def to_message(self, include=None, exclude=None, strict=False, message_class=None):
 
         ''' Convert an entity instance into a message instance. '''
 
-        response = self._message_class()
-
-        if self.key is not None:
-            response.key = unicode(self.key.urlsafe())
+        if message_class:
+            response = message_class()
         else:
-            response.key = None
+            response = self._message_class()
+
+        if hasattr(response, 'key'):
+            if self.key is not None:
+                response.key = unicode(self.key.urlsafe())
+            else:
+                response.key = None
 
         def _convert_prop(v):
 
@@ -202,12 +206,12 @@ class MessageConverterMixin(ModelMixin):
                     continue
         return obj
 
-    def mutate_from_message(self, message):
+    def mutate_from_message(self, message, exclude=[]):
 
         ''' Copy all the attributes except the key from message to this object. '''
 
         for k in [f.name for f in message.all_fields()]:
-            if k == 'key':
+            if k == 'key' or (exclude and k in exclude):
                 continue
             if hasattr(self, k) and getattr(message, k):
                 try:
