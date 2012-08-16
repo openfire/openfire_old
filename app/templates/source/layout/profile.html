@@ -24,7 +24,7 @@
 
                     <div id='avatar'>
                         <img {{ {
-                            'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify(user.email[0].id(), 'jpg', '175'),
+                            'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify((len(user.email) and user.email[0].id() or "codebot@openfi.re"), 'jpg', '175'),
                             'width': '175',
                             'height': '175',
                             'alt': 'you!',

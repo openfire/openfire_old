@@ -40,7 +40,9 @@ class UserPageTestCase(OFTestCase):
         self.of_handler_test('/users')
 
     def test_user_profile_page(self):
-        self.of_handler_test('/user/fakie')
+        user_key = db_loader.create_user(username='fakie')
+        db_loader.create_custom_url(slug='fakie', target_key=user_key)
+        self.of_handler_test('/fakie')
 
     def test_user_account_page(self):
         self.of_handler_test('/user/fakie/account')
