@@ -16,36 +16,46 @@ class Facepile extends CoreWidget
     @mount: 'facepile'
 
     template: [
-        '<div class="{{class}}">',
-            '{{#users}}',
-                '<a href="https://www.openfi.re/{{username}}" data-firstname="{{firstname}}">',
-                    '<img class="avatar" src="http://placehold.it/32x32">'
-                '</a>',
+        '<div class="{{=class}}">\n',
+            '{{@users}}',
+                '<a href="https://www.openfi.re/{{=username}}" data-firstname="{{=firstname}}">',
+                    '<img class="avatar" src="http://placehold.it/32x32">',
+                '</a>\n',
+                '<p class="bio">\n',
+                    '{{@bio}}',
+                        'age: {{age}}{{=age}}{{:age}}SO OLD{{/age}}\n',
+                        'height: {{height}}{{=height}}{{:height}}SO TALL{{/height}}\n',
+                        '{{!greeting}}nothing to say{{/greeting}}\n',
+                    '{{/bio}}',
+                '</p>',
             '{{/users}}',
-            '{{^users}}no users here :({{/users}}'
         '</div>'
     ].join('')
 
-    'new': (id, users) =>
+    'new': (id) =>
         ct = @constructor
-        return new ct(id, users)
+        return new ct(id)
 
-    render: () =>
+    render: (obj) =>
+        _.extend(@, obj) if obj?
 
-        renderer = Milk or null
-        return false if not renderer?
+        template = @template or new t(@constructor::template)
+        return false if not template?
 
-        template = @constructor::template
         id = @id
         element = _.get(id)
 
         console.log('Preparing to render', @constructor.name, 'into element at ID', id, 'with template', template)
-        element.outerHTML = renderer.render(template, @)
+        element.outerHTML = template.render(@)
+        element.classList.add('rendered') if not element.classList.contains('rendered')
 
+        @class = element.className
         return @
 
-    constructor: (@id, @users) ->
+    constructor: (@id) ->
+
         @class = @constructor.name.toLowerCase()
+        @template = new t(@template)
         return @
 
 class Followers extends Facepile
