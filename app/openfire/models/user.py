@@ -53,8 +53,12 @@ class User(AppModel):
     email = ndb.KeyProperty('em', indexed=True, repeated=True)
     avatar = ndb.KeyProperty('av')
     images = ndb.KeyProperty('im', repeated=True)
-    organization = ndb.StringProperty('org', indexed=True)
-    position = ndb.StringProperty('orgp', indexed=True)
+
+    def has_custom_url(self):
+
+        ''' Check and see if a custom URL is attached. '''
+
+        return (self.customurl is not None)
 
     def get_custom_url(self):
 
@@ -63,6 +67,12 @@ class User(AppModel):
         if self.customurl:
             return self.customurl.id()
         return None
+
+    def has_avatar(self):
+
+        ''' Check and see if an avatar is attached. '''
+
+        return (self.avatar is not None)
 
     def get_avatar_url(self, extension='jpg', size='32'):
 
@@ -83,12 +93,6 @@ class User(AppModel):
                 else:
                     return self.url_for('serve-asset', asset_key=str(asset.blob))
         return False
-
-    def has_avatar(self):
-
-        ''' Check and see if an avatar is attached. '''
-
-        return (self.avatar is not None)
 
 
 ## EmailAddress - links an email address to a user, for the purpose of signin/notifications/contact

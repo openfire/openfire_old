@@ -8,47 +8,6 @@
 
     <!-- Main Masthead -->
     <div id='masthead'>
-
-        <div id='profiletop'>
-
-            <!-- Avatar Stack -->
-            <div class='left'>
-
-                <div id='avatar'>
-                    <img {{ {
-                        'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify(user.email[0].id(), 'jpg', '175'),
-                        'width': '175',
-                        'height': '175',
-                        'alt': 'you!',
-                        'onclick': "javascript:window.location.href='%s';" % link('user/me')
-                    }|xmlattr }} /></a>
-                </div><!-- end #avatar -->
-
-                <div id='byline' class='collapsed foldable'>
-
-                    <div id='topbanner'>
-                        <h1 id='name'>{{ user.firstname }} {{ user.lastname }}</h1>
-                        <h3 id='topics'>
-                            <span class='interest topic' data-topic-slug='technology'>Technology</span>,
-                            <span class='interest topic' data-topic-slug='dentistry'>Dentistry</span>,
-                            <span class='interest topic' data-topic-slug='taxidermy'>Taxidermy</span>
-                        </h3><!-- end #topics -->
-                        <div class='clearfix'></div>
-                    </div><!-- end #name+topics -->
-
-                    <div id='userinfo'>
-                        <ul>
-                            <li>{{ user.position }} @ {{ user.organization }}</li>
-                            <li>located in <a href="#">{{ user.location|lower }}</a></li>
-                        </ul>
-                    </div><!-- end #userinfo -->
-
-                </div><!-- end #byline -->
-
-            </div><!-- end .left -->
-
-        </div><!-- end #profiletop -->
-
     </div><!-- end #masthead -->
 
     <!-- Content Fold -->
@@ -58,15 +17,75 @@
         <!-- Profile Content -->
         <div id='profile'>
 
+            <div id='profiletop'>
+
+                <!-- Avatar Stack -->
+                <div class='left'>
+
+                    <div id='avatar'>
+                        <img {{ {
+                            'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify(user.email[0].id(), 'jpg', '175'),
+                            'width': '175',
+                            'height': '175',
+                            'alt': 'you!',
+                            'onclick': "javascript:window.location.href='%s';" % link('user/me')
+                        }|xmlattr }} /></a>
+                        {% if edit_privs %}
+                            <div id='avatar_edit_overlay'>
+                                <a href="#" class='snapall absolute'>
+                                    <span class='momentron'>&#xf006d;</span> <span class='absolute snapall change_avatar_label'>Change avatar</span>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div><!-- end #avatar -->
+
+                    <div id='byline' class='collapsed foldable'>
+
+                        <div id='topbanner'>
+                            <h1 id='name'>{{ user.firstname }} {{ user.lastname }}</h1>
+                            <h3 id='topics'>
+                                <span class='interest topic' data-topic-slug='technology'>Technology</span>,
+                                <span class='interest topic' data-topic-slug='dentistry'>Dentistry</span>,
+                                <span class='interest topic' data-topic-slug='taxidermy'>Taxidermy</span>
+                            </h3><!-- end #topics -->
+                            <div class='clearfix'></div>
+                        </div><!-- end #name+topics -->
+
+                        <div id='userinfo'>
+                            <ul>
+                                <li>{{ user.bio|lower }}</li>
+                                <li>located in <a href="#">{{ user.location|lower }}</a></li>
+                            </ul>
+                        </div><!-- end #userinfo -->
+
+                    </div><!-- end #byline -->
+
+                </div><!-- end .left -->
+
+            </div><!-- end #profiletop -->
+
             <div id='leftbar'>
-                leftbar herr
+                <div id='social_profiles'>
+                    <div class='zocial facebook icon'></div>
+                    <div class='zocial googleplus icon'></div>
+                    <div class='zocial github icon'></div>
+                    <div class='zocial linkedin icon'></div>
+                </div>
             </div><!-- end #leftbar -->
 
             <div id='contentpane'>
 
-                <div id='userbio' class='collapsed profile section'>
-                    <div class='truncated'>{{ user.bio|truncate(250, true)|lower }}</div>
-                    <div class='hidden original'>{{ user.bio|lower }}</div>
+                <div {{ {
+
+                    'id': 'userbio',
+                    'data-keyname': 'profile_summary' if edit_privs == true else none,
+                    'data-namespace': encrypt(user.key.urlsafe()) if edit_privs == true else none,
+                    'class': 'dynamic mini-editable collapsed profile section' if edit_privs == true else 'dynamic collapsed profile section',
+
+                }|xmlattr }}>
+                    {% content 'profile_summary', user.key.urlsafe() %}
+                        <b>Welcome to openfire!</b>
+                    {% endcontent %}
                 </div><!-- end #userbio -->
 
                <div id='freeform' class='collapsed profile section'>

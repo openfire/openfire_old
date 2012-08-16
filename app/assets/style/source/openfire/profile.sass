@@ -29,68 +29,6 @@ body
 	z-index: 500
 	height: 140px !important
 
-	#profiletop
-		position: absolute
-		min-width: 250px
-		height: 65px
-		left: 25%
-		right: 25%
-		bottom: 0
-
-		.left
-
-			#avatar
-				position: absolute
-				left: -2%
-				top: -10%
-				width: 175px
-				height: 175px
-				z-index: 500
-
-			#byline
-				position: absolute
-				left: 170px
-				padding-left: 5px
-				width: 80%
-				overflow: hidden
-
-				#topbanner
-
-					#name
-						float: left
-
-					#topics
-						padding-left: 15px
-						float: left
-						line-height: 20px
-						margin-top: 45px
-						text-transform: lowercase
-						color: #AAA
-
-				#userinfo
-					top: -10px
-					position: relative
-
-					ul
-						margin: 0
-						padding: 0
-						list-style: none
-
-						li
-							display: inline
-
-							&:nth-child(even)
-								margin-left: 10px
-
-								&:before
-									content: '·'
-									font-size: 11pt
-									font-weight: bold
-									width: 15px
-									right: 7px
-									position: relative
-
-
 #content
 	min-height: 600px
 	display: inline
@@ -105,12 +43,115 @@ body
 		padding-top: 50px
 		background: white
 
+		#profiletop
+			position: absolute
+			height: 65px
+			left: -2%
+			right: 0
+			bottom: 0
+			top: -13%
+			z-index: 500
+
+			.left
+
+				#avatar
+					position: absolute
+					left: -2%
+					top: -10%
+					width: 175px
+					height: 175px
+					z-index: 500
+
+					#avatar_edit_overlay
+						position: absolute
+						bottom: 0
+						left: 0
+						right: 0
+						height: 32px
+						background: #222
+						opacity: 0.4
+						line-height: 32px
+						-webkit-transition-property: opacity
+
+						span.momentron
+							color: white
+							left: 7px
+							position: relative
+
+						span.change_avatar_label
+							left: 35px
+							top: 2px
+
+
+						a
+							color: whitesmoke
+							text-decoration: none
+
+						&:hover
+							opacity: 0.85
+
+							a
+								color: white !important
+
+				#byline
+					position: absolute
+					left: 170px
+					padding-left: 5px
+					width: 80%
+					overflow: hidden
+
+					#topbanner
+
+						#name
+							float: left
+
+						#topics
+							padding-left: 15px
+							float: left
+							line-height: 20px
+							margin-top: 45px
+							text-transform: lowercase
+							color: #AAA
+
+					#userinfo
+						top: -10px
+						position: relative
+
+						ul
+							margin: 0
+							padding: 0
+							list-style: none
+
+							li
+								display: inline
+
+								&:nth-child(even)
+									margin-left: 10px
+
+									&:before
+										content: '·'
+										font-size: 11pt
+										font-weight: bold
+										width: 15px
+										right: 7px
+										position: relative
+
 		#leftbar
 			width: 140px
 			position: relative
 			float: left
 			margin-top: 65px
 			margin-left: 10px
+
+			#social_profiles
+				position: absolute
+				left: -43px
+				width: 33px
+				text-align: center
+				font-size: 8px
+
+				div
+					margin-top: 5px
 
 		#contentpane
 			min-height: 420px
