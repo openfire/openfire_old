@@ -912,3 +912,162 @@ class UserServiceTestCase(OFTestCase):
         self.assertEqual(response['response']['type'], 'FollowersResponse',
             'Failed to return followers response from user followers service.')
         #content = response['response']['content']
+
+
+class PaymentServiceTestCase(OFTestCase):
+
+    ''' Test cases for the payment service. '''
+
+    def test_payment_create_user_payment_account(self):
+
+        ''' Test the payment create_user_payment_account service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'create_user_payment_account', params=params)
+        self.assertEqual(response['response']['type'], 'UserPaymentAccount',
+            'Failed to return correct response type from payment create_user_payment_account service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment create_user_payment_account service.')
+
+    def test_payment_get_user_payment_account(self):
+
+        ''' Test the payment get_user_payment_account service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'get_user_payment_account', params=params)
+        self.assertEqual(response['response']['type'], 'UserPaymentAccount',
+            'Failed to return correct response type from payment get_user_payment_account service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment get_user_payment_account service.')
+
+    def test_payment_create_project_payment_account(self):
+
+        ''' Test the payment create_project_payment_account service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'create_project_payment_account', params=params)
+        self.assertEqual(response['response']['type'], 'ProjectAccount',
+            'Failed to return correct response type from payment create_project_payment_account service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment create_project_payment_account service.')
+
+    def test_payment_get_project_payment_account(self):
+
+        ''' Test the payment get_project_payment_account service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'get_project_payment_account', params=params)
+        self.assertEqual(response['response']['type'], 'ProjectAccount',
+            'Failed to return correct response type from payment get_project_payment_account service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment get_project_payment_account service.')
+
+    def test_payment_payment_history(self):
+
+        ''' Test the payment payment_history service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'payment_history', params=params)
+        self.assertEqual(response['response']['type'], 'PaymentHistory',
+            'Failed to return correct response type from payment payment_history service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment payment_history service.')
+
+    def test_payment_admin_payment_history(self):
+
+        ''' Test the payment admin_payment_history service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'admin_payment_history', params=params)
+        self.assertEqual(response['response']['type'], 'PaymentHistory',
+            'Failed to return correct response type from payment admin_payment_history service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment admin_payment_history service.')
+
+    def test_payment_back_project(self):
+
+        ''' Test the payment back_project service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'back_project', params=params)
+        self.assertEqual(response['response']['type'], 'BackProject',
+            'Failed to return correct response type from payment back_project service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment back_project service.')
+
+    def test_payment_money_sources(self):
+
+        ''' Test the payment money_sources service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'money_sources', params=params)
+        self.assertEqual(response['response']['type'], 'MoneySources',
+            'Failed to return correct response type from payment money_sources service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment money_sources service.')
+
+    def test_payment_remove_money_source(self):
+
+        ''' Test the payment remove_money_source service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'remove_money_source', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Failed to return correct response type from payment remove_money_source service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment remove_money_source service.')
+
+    def test_payment_admin_money_sources(self):
+
+        ''' Test the payment admin_money_sources service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'admin_money_sources', params=params)
+        self.assertEqual(response['response']['type'], 'MoneySources',
+            'Failed to return correct response type from payment admin_money_sources service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment admin_money_sources service.')
+
+    def test_payment_refund_payment(self):
+
+        ''' Test the payment refund_payment service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'refund_payment', params=params)
+        self.assertEqual(response['response']['type'], 'RefundPayment',
+            'Failed to return correct response type from payment refund_payment service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment refund_payment service.')
+
+    def test_payment_withdraw_funds(self):
+
+        ''' Test the payment withdraw_funds service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'withdraw_funds', params=params)
+        self.assertEqual(response['response']['type'], 'WithdrawalRequest',
+            'Failed to return correct response type from payment withdraw_funds service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment withdraw_funds service.')
+
+    def test_payment_withdrawal_history(self):
+
+        ''' Test the payment withdrawal_history service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'withdrawal_history', params=params)
+        self.assertEqual(response['response']['type'], 'WithdrawalHistory',
+            'Failed to return correct response type from payment withdrawal_history service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment withdrawal_history service.')
+
+    def test_payment_admin_withdrawal_history(self):
+
+        ''' Test the payment admin_withdrawal_history service method. '''
+
+        params = {}
+        response = self.of_service_test('payment', 'admin_withdrawal_history', params=params)
+        self.assertEqual(response['response']['type'], 'WithdrawalHistory',
+            'Failed to return correct response type from payment admin_withdrawal_history service.')
+        content = response['response']['content']
+        #self.assetTrue(content, 'Failed to return content from the payment admin_withdrawal_history service.')
