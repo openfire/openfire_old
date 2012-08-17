@@ -15,10 +15,7 @@ class ProposalService(RemoteService):
 
         ''' Returns a list of proposals. '''
 
-        proposals = Proposal.query().fetch()
-        messages = []
-        for proposal in proposals:
-            messages.append(proposal.to_message())
+        messages = [proposal.to_message() for proposal in Proposal.query().fetch()]
         return proposal_messages.Proposals(proposals=messages)
 
 

@@ -1,56 +1,32 @@
 <h2>Proposals!</h2>
 <a id="a-new-proposal-dialog" href="#new-proposal-dialog">+ Add New Proposal</a>
-<div id="proposal-container">
-    <div class="proposal-header">
-        <div class="bbq-col">Name</div>
-        <div class="bbq-col">Summary</div>
-        <div class="bbq-col">Category</div>
-        <div class="bbq-col">Status</div>
-        <div class="bbq-col">Pitch</div>
-        <div class="bbq-col">Tech</div>
-        <div class="bbq-col">Keywords</div>
-        <div class="bbq-col">Creator</div>
-    </div>
-    {% for proposal in proposals %}
-    <div class="proposal">
-        <div class="proposal-info">
-            <span class="proposal-key" style="display: none;">{{ encrypt(proposal.key.urlsafe()) }}</span>
-            <span class="proposal-name bbq-editable">{{ proposal.name }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-summary bbq-editable">{{ proposal.summary }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-category bbq-not-editable">{{ proposal.category.urlsafe() }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-status bbq-editable">{{ proposal.status }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-pitch bbq-editable">{{ proposal.pitch }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-tech bbq-editable">{{ proposal.tech }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-keywords bbq-editable">{{ proposal.keywords }}</span>
-        </div>
-        <div class="proposal-info">
-            <span class="proposal-creator bbq-not-editable">{{ proposal.creator.urlsafe() }}</span>
-        </div>
-        <div class="proposal-actions">
-            <button class="delete" type="button">delete</button>
-            <button class="start-edit" type="button">edit</button>
-            <button class="cancel-edit" type="button" style="display: none;">cancel</button>
-            <button class="save-edit" type="button" style="display: none;">save</button>
-            <button class="promote-to-project" type="button">Promote to a project</button>
-            <button class="suspend" type="button">Suspend</button>
-            <button class="reject" type="button">Reject</button>
-        </div>
-    </div>
-    {% else %}
-    <div>No proposals yet!</div>
-    {% endfor %}
+<div class="content">
+    <table id="bbq-proposal-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Summary</th>
+                <th>Owners</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proposal in proposals %}
+            <tr>
+                <td>{{ proposal.name }}</td>
+                <td>{{ proposal.status }}</td>
+                <td>{{ proposal.summary }}</td>
+                <td>
+                    {% for owner in proposal.owners %}
+                        {{ owner.id() }}, &nbsp;
+                    {% endfor %}
+                </td>
+                <td>{{ proposal.category.id() }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 <div id="new-proposal-dialog" class="pre-modal" style="opacity: 0;">
     <div class="bbq-dialog-content">

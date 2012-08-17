@@ -30,7 +30,6 @@ class Session extends OpenfireObject
         @end = () =>
             return
 
-
 # base user class: it's a user.
 class User extends Model
 
@@ -42,7 +41,7 @@ class User extends Model
         firstname: String()
         lastname: String()
         bio: String()
-        topics: Array(Topic())
+        topics: Array()
         location: String()
         email: Array()
 
@@ -86,18 +85,9 @@ class UserController extends OpenfireController
         'USER_CONTROLLER_READY'
     ]
 
-    login: () ->
-        return
-
-    logout: () ->
-        return
-
-    create: () ->
-        return
-
     constructor: (openfire, window) ->
 
-         @_state =
+        @_state =
 
             init: false
 
@@ -143,13 +133,13 @@ class UserController extends OpenfireController
         @suggest_topic = () =>
             return
 
-	    @_init = () =>
-	        return
+        @_init = () =>
+            return
 
-	    return
+        return
 
 if @__openfire_preinit?
     @__openfire_preinit.abstract_base_objects.push(Session)
     @__openfire_preinit.abstract_base_classes.push(User)
     @__openfire_preinit.abstract_base_classes.push(Topic)
-	@__openfire_preinit.abstract_base_controllers.push(UserController)
+    @__openfire_preinit.abstract_base_controllers.push(UserController)

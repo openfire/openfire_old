@@ -148,8 +148,11 @@ class CustomUrlHandler(WebHandler):
 
         url_key = ndb.Key('CustomURL', customurl)
         url_object = url_key.get()
+        url_target = url_object.target.get()
         if not url_object:
             return self.error(404)  # Failed to find custom url
+        if not url_target:
+            return self.error(404)  # Custom URL exists, but parent doesn't
 
         kind = url_object.target.kind()
         context = {}
@@ -163,7 +166,8 @@ class CustomUrlHandler(WebHandler):
 
         elif kind == 'User':
             handler = self._user_handler_class(self.request, self.response)
-            context['username'] = url_object.target.id()
+            context['username'] = url_target.username
+            context['key'] = url_object.target.urlsafe()
 
         if not handler:
             return self.error(500)  # Failed to instantiate handler?

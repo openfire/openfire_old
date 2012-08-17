@@ -2,7 +2,6 @@
 import time
 import base64
 import webapp2
-import logging
 import hashlib
 import config as cfg
 from config import config
@@ -72,7 +71,7 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ''' Redirect to a third party provider. '''
 
-        logging.info('AUTH: Redirecting to provider URL "%s".' % url)
+        self.logging.info('AUTH: Redirecting to provider URL "%s".' % url)
         return self.redirect(url)
 
     def via_facebook(self):
@@ -162,7 +161,7 @@ class Login(WebHandler, SecurityConfigProvider):
 
         ## do routing
         if provider is not None:
-            logging.info('AUTH: User requested federated logon from provider "%s".' % provider)
+            self.logging.info('AUTH: User requested federated logon from provider "%s".' % provider)
             return {
 
                 # run code for whatever provider we're doing
@@ -179,7 +178,7 @@ class Login(WebHandler, SecurityConfigProvider):
             if self._securityConfig.get('authentication', {}).get('federation', {}).get('simple', False):
                 ## fallback to appengine-based logon
                 try:
-                    logging.info('AUTH: Decided on simple logon.')
+                    self.logging.info('AUTH: Decided on simple logon.')
                     login_url = self.api.users.create_login_url(self.request.environ.get('HTTP_REFERRER', '/'))
                     if login_url is not None:
                         return self.redirect(login_url)
@@ -202,13 +201,13 @@ class Login(WebHandler, SecurityConfigProvider):
             'security_config': self._securityConfig
         }
 
-        logging.info('AUTH: Processing organic logon request.')
+        self.logging.info('AUTH: Processing organic logon request.')
 
         ## return error for too many failed logins
         if 'bad_logon_count' in self.session and (self.session.get('bad_logon_count', 0) > 0):
             if self._securityConfig.get('config', {}).get('bad_logon_limit', 0) < self.session.get('bad_logon_count'):
 
-                logging.error('AUTH: User exceeded bad login count. Ratelimiting.')
+                self.logging.error('AUTH: User exceeded bad login count. Ratelimiting.')
 
                 context['error'] = 'You have been ratebanned.'
                 return self.render('security/login.html', **context)
@@ -228,7 +227,7 @@ class Login(WebHandler, SecurityConfigProvider):
                 context['error'] = 'Woops! Something went wrong. Please try again.'
                 return self.render('security/login.html', **context)
             else:
-                logging.info('AUTH: Calculated user key "%s".' % user_key)
+                self.logging.info('AUTH: Calculated user key "%s".' % user_key)
 
                 # resolve user by username
                 user = user_key.get()
@@ -242,12 +241,12 @@ class Login(WebHandler, SecurityConfigProvider):
                 # user found?
                 if user is not None:
 
-                    logging.info('AUTH: User found at username "%s".' % user.username)
+                    self.logging.info('AUTH: User found at username "%s".' % user.username)
 
                     # password match?
                     if user.password == hashed_password:
 
-                        logging.info('AUTH: Passwords match. Logon successful.')
+                        self.logging.info('AUTH: Passwords match. Logon successful.')
 
                         # log them in
                         self.build_authenticated_session(
@@ -262,22 +261,22 @@ class Login(WebHandler, SecurityConfigProvider):
 
                         # redirect them on
                         if self.session.get('continue_url'):
-                            logging.info('AUTH: Continue URL found. Redirecting to "%s".' % self.session.get('continue_url'))
+                            self.logging.info('AUTH: Continue URL found. Redirecting to "%s".' % self.session.get('continue_url'))
                             return self.redirect(self.session.get('continue_url'))
                         else:
-                            logging.info('AUTH: No continue URL found. Redirecting to landing.')
+                            self.logging.info('AUTH: No continue URL found. Redirecting to landing.')
                             return self.redirect_to('landing')
 
                     # password was wrong
                     else:
-                        logging.error('AUTH: Password MISMATCH. Logon unsuccessful.')
+                        self.logging.error('AUTH: Password MISMATCH. Logon unsuccessful.')
                         self.session['bad_logon_count'] = self.session.get('bad_logon_count', 0) + 1
                         context['error'] = 'Woops, there was a problem logging you in.'
                         return self.render('security/login.html', **context)
 
                 # username was wrong
                 else:
-                    logging.error('AUTH: User not found. Logon unsuccessful.')
+                    self.logging.error('AUTH: User not found. Logon unsuccessful.')
                     self.session['bad_logon_count'] = self.session.get('bad_logon_count', 0) + 1
                     context['error'] = 'Woops, there was a problem logging you in.<br />Are you sure your <a href="#">username is correct?</a>'
                     return self.render('security/login.html', **context)
@@ -341,13 +340,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         ''' Redirect to login with an error message or code '''
 
         if error_message:
-            logging.error('AUTH: Redirecting back to logon with error_message "%s".' % error_message)
+            self.logging.error('AUTH: Redirecting back to logon with error_message "%s".' % error_message)
             redirect_url = self.url_for('auth/login', fdmg=error_message)
         elif error_code:
-            logging.error('AUTH: Redirecting back to logon with error_code "%s".' % error_code)
+            self.logging.error('AUTH: Redirecting back to logon with error_code "%s".' % error_code)
             redirect_url = self.url_for('auth/login', fder=error_code)
         else:
-            logging.error('AUTH: Redirecting back to logon because of a generic failure.')
+            self.logging.error('AUTH: Redirecting back to logon because of a generic failure.')
             redirect_url = self.url_for('auth/login', fder='generic')
         return self.redirect(redirect_url)
 
@@ -375,20 +374,20 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
         # check state for CSRF protection
         if (self.decrypt(state) == self.session.get('sid')) and (csrf == hashlib.sha1(self.session.get('sid')).hexdigest()):
-            logging.info('FB: State and CSRF match. Decoding.')
+            self.logging.info('FB: State and CSRF match. Decoding.')
 
             # check for errors
             if error:
-                logging.warning('FB: Error flag present in callback. Uh oh.')
+                self.logging.warning('FB: Error flag present in callback. Uh oh.')
 
                 error_reason = self.request.get('error_reason')
                 error_description = self.request.get('error_description')
 
-                logging.warning('FB: Error reason: "%s".' % error_reason)
-                logging.warning('FB: Error description: "%s".' % error_description)
+                self.logging.warning('FB: Error reason: "%s".' % error_reason)
+                self.logging.warning('FB: Error description: "%s".' % error_description)
 
                 if error_reason == 'user_denied':
-                    logging.critical('Looks like the user shafted us. Redirecting.')
+                    self.logging.critical('Looks like the user shafted us. Redirecting.')
 
                     return self.redirect('/login?fder=authorization_denied')
 
@@ -420,13 +419,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
                 # successful reup
                 if access_token.status_code == 200:
-                    logging.info('FB: Access code endpoint fetch success.')
+                    self.logging.info('FB: Access code endpoint fetch success.')
                     params = {}
                     for b_item in access_token.content.split('&'):
                         k, v = b_item.split('=')
                         params[k] = v
 
-                    logging.info('FB: Access code: "%s". Expiration: "%s".' % (params.get('access_token'), params.get('expires')))
+                    self.logging.info('FB: Access code: "%s". Expiration: "%s".' % (params.get('access_token'), params.get('expires')))
 
                     access_token = params['access_token']
                     expires = params['expires']
@@ -441,7 +440,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
                     ## check for user existence via facebook email address
                     if user_info.status_code == 200:
-                        logging.info('FB: Graph `me` request success.')
+                        self.logging.info('FB: Graph `me` request success.')
                         user_struct = json.loads(user_info.content)
 
                         # Copy over user struct stuff
@@ -466,7 +465,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                             ukey = fb_user.key
 
                         # Log it
-                        logging.info('FB: Loggin in user with email "%s" and nickname "%s" and derived ukey "%s".' % (email, nickname, ukey))
+                        self.logging.info('FB: Loggin in user with email "%s" and nickname "%s" and derived ukey "%s".' % (email, nickname, ukey))
 
                         if ukey is not None:
                             # log them in
@@ -487,14 +486,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                             return self.redirect_to('auth/register', exi=base64.b64encode(user_struct['id']), state=hashlib.sha512(user_struct['id']).hexdigest())
 
                 else:
-                    logging.critical('FB: ERROR! Failed to get persistent auth token.')
-                    logging.critical('FB: Response from facebook: "%s".' % access_token.content)
+                    self.logging.critical('FB: ERROR! Failed to get persistent auth token.')
+                    self.logging.critical('FB: Response from facebook: "%s".' % access_token.content)
                     return self.redirect('/login?fder=access_token_fail')
 
-        # isgood
         else:
-            logging.critical('WARNING! POSSIBLE SECURITY BREACH.')
-            logging.critical('State variable did not match in callback.')
+            self.logging.critical('WARNING! POSSIBLE SECURITY BREACH.')
+            self.logging.critical('State variable did not match in callback.')
         return self.redirect("/login")
 
     def callback_google(self):

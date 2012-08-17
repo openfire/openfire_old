@@ -57,9 +57,9 @@ class Project extends Model
         goals: Array()
         tiers: Array()
 
-    constructor: (key) ->
+    constructor: () ->
 
-        super(key)
+        super
 
         @stashes = {}
         @internal =

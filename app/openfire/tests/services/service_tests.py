@@ -41,8 +41,10 @@ class ProjectServiceTestCase(OFTestCase):
 
         ''' Add one private and one public project to the database then query. '''
 
-        db_loader.create_project()
         db_loader.create_project(status='p')
+        project_key = db_loader.create_project()
+        db_loader.create_tier(parent_key=project_key, name='test name')
+        db_loader.create_goal(parent_key=project_key, amount=100)
         response = self.of_service_test('project', 'list')
         self.assertEqual(response['response']['type'], 'Projects',
             'System project list service method failed.')
@@ -365,12 +367,30 @@ class ProposalServiceTestCase(OFTestCase):
 
         ''' Add a proposal to the database then query. '''
 
+        # Add a blank proposal and make sure it exists.
         db_loader.create_proposal()
         response = self.of_service_test('proposal', 'list')
         self.assertEqual(response['response']['type'], 'Proposals',
             'System proposal list service method failed.')
         self.assertEqual(len(response['response']['content']['proposals']), 1,
             'Failed to return the correct number of proposals.')
+
+        # Add a proposal with a goal and make sure it still works.
+        db_loader.create_proposal(goals=[{'amount':100}])
+        response = self.of_service_test('proposal', 'list')
+        self.assertEqual(response['response']['type'], 'Proposals',
+            'System proposal list service method failed when adding a goal.')
+        self.assertEqual(len(response['response']['content']['proposals']), 2,
+            'Failed to return the correct number of proposals when adding a goal.')
+
+        # Add a proposal with a tier and make sure it still works.
+        db_loader.create_proposal(tiers=[{'name':'some tier'}])
+        response = self.of_service_test('proposal', 'list')
+        self.assertEqual(response['response']['type'], 'Proposals',
+            'System proposal list service method failed when adding a tier.')
+        self.assertEqual(len(response['response']['content']['proposals']), 3,
+            'Failed to return the correct number of proposals when adding a tier.')
+
 
     def test_proposal_get_method(self):
 

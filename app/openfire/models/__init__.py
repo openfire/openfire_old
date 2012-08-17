@@ -12,6 +12,7 @@ from apptools.util import debug
 # External Imports
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import eventloop
+from protorpc.messages import MessageField
 
 # Openfire Imports
 from openfire.pipelines.model import ModelPipeline
@@ -139,6 +140,8 @@ class MessageConverterMixin(ModelMixin):
 
         def _convert_prop(v):
 
+            ''' Helper method to convert a property to be assigned to a message. '''
+
             if isinstance(v, ndb.Key):
                 return v.urlsafe()
 
@@ -167,9 +170,41 @@ class MessageConverterMixin(ModelMixin):
                     if strict:
                         return v
 
+        def _convert_to_message_field(message_class, v):
+
+            ''' Helper method to convert a value to the provided message type. '''
+
+            if isinstance(v, list):
+                if not len(v):
+                    return []
+                if isinstance(v[0], ndb.Key):
+                    objs = ndb.get_multi(v)
+                    return [obj.to_message() for obj in objs]
+                else:
+                    messages = []
+                    for i in v:
+                        messages.append(_convert_to_message_field(message_class, i))
+                    return messages
+
+            elif isinstance(v, dict):
+                message = message_class()
+                for key, val in v.items():
+                    if hasattr(message, key):
+                        setattr(message, key, _convert_prop(val))
+                return message
+
+            else:
+                # Not list or dict, attempt to convert with other methods.
+                return _convert_prop(v)
+
+        # Convert each property and assign it to the response message.
         for k, v in self.to_dict(include=include, exclude=exclude).items():
             if hasattr(response, k):
-                setattr(response, k, _convert_prop(v))
+                response_field = response.field_by_name(k)
+                if isinstance(response_field, MessageField):
+                    setattr(response, k, _convert_to_message_field(response_field.type, v))
+                else:
+                    setattr(response, k, _convert_prop(v))
 
         return response
 
