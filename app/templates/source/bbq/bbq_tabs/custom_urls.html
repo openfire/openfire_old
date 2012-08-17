@@ -1,24 +1,22 @@
 <h2>Custom URLs!</h2>
 <a id="a-new-custom-url-dialog" href="#new-custom-url-dialog">+ Add New Custom Url</a>
-<div id="custom-url-container">
-    <div class="custom-url-header">
-        <div class="bbq-col">Slug</div>
-        <div class="bbq-col">Target</div>
-    </div>
-    {% for custom_url in custom_urls %}
-    <div class="custom-url">
-        <div class="custom-url-info">
-            <span class="custom-url-slug bbq-editable">{{ custom_url.slug }}</span>
-        </div>
-        <div class="custom-url-info">
-            <span class="custom-url-name bbq-editable">{{ custom_url.target }}</span>
-            <span class="custom-url-key" style="display: none;">{{ encrypt(custom_url.key.urlsafe()) }}</span>
-        </div>
-        <div class="custom-url-actions">
-            <button class="delete" type="button">delete</button>
-        </div>
-    </div>
-    {% endfor %}
+<div class="content">
+    <table id="bbq-custom-url-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Slug</th>
+                <th>Target</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for custom_url in custom_urls %}
+            <tr>
+                <td>{{ custom_url.slug }}</td>
+                <td>{{ custom_url.target }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 <div id="new-custom-url-dialog" class="pre-modal" style="opacity: 0;">
     <div class="bbq-dialog-content">
