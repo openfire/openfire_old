@@ -1611,6 +1611,7 @@ class ProjectController extends OpenfireController
 # proposal controller
 class ProposalController extends OpenfireController
 
+    @mount = 'proposal'
     @events = []
 
     constructor: (openfire, window) ->
