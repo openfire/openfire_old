@@ -1,0 +1,43 @@
+<h2>openfire categories</h2>
+<a id="a-new-category-dialog" href="#new-category-dialog">+ Add New Category</a>
+<div class="content">
+    <table id="bbq-category-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td>{{ category.name }}</td>
+                <td>{{ category.slug }}</td>
+                <td>{{ category.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="new-category-dialog" class="pre-modal bbq-dialog" style="opacity: 0;">
+    <form id="new-category-frm">
+        <p>
+            <label for="new-category-name-input">Name:</label>
+            <input type="text" id="new-category-name-input" name="name">
+        </p>
+        <p>
+            <label for="new-category-url-input">URL Slug:</label>
+            <input type="text" id="new-category-url-input" name="url">
+        </p>
+        <p>
+            <label for="new-category-description-input">Description:</label>
+            <input type="text" id="new-category-description-input" name="description">
+        </p>
+        <p>
+            <button id="save-new-category-btn" class="save-new-dialog" type="button">Yeah, add that!</button>
+            <button id="cancel-new-category-btn" class="cancel-new-dialog" type="button">Never mind.</button>
+        </p>
+    </form>
+</div>

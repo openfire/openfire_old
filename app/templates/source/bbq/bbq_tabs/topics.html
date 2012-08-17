@@ -1,0 +1,24 @@
+<h2>openfire topics</h2>
+<a id="a-new-topic-dialog" href="#new-topic-dialog">+ Add New Topic</a>
+<div class="content">
+    <table id="bbq-topic-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>User Count</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for topic in topics %}
+            <tr>
+                <td>{{ topic.name }}</td>
+                <td>{{ topic.slug }}</td>
+                <td>{{ topic.user_count }}</td>
+                <td>{{ topic.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

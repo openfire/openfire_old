@@ -1,0 +1,36 @@
+<h2>openfire projects</h2>
+<div class="content">
+    <table id="bbq-project-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Status</th>
+                <th>Summary</th>
+                <th>Owners</th>
+                <th>Category</th>
+                <th>Progress</th>
+                <th>Total Raised</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td><a href="/{{ project.get_custom_url() }}">{{ project.name }}</a></td>
+                <td>{{ project.get_custom_url() }}</td>
+                <td>{{ project.status }}</td>
+                <td>{{ project.summary }}</td>
+                <td>
+                    {% for owner in project.owners %}
+                        {{ owner.id() }}, &nbsp;
+                    {% endfor %}
+                </td>
+                <td>{{ project.category.id() }}</td>
+                <td>{{ project.progress }}%</td>
+                <td>${{ project.money }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
