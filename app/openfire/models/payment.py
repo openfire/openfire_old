@@ -3,30 +3,49 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 from openfire.models import AppModel
 
-#from openfire.messages import common
-#from openfire.messages import payment
+from openfire.messages import payments as messages
+from openfire.pipelines.model import payment as pipelines
 
 
-class WePayUserAccount(AppModel):
+class UserPaymentAccount(AppModel):
 
-    ''' An object to store WePay user account information. '''
+    ''' An object to store user account information for third party sites. '''
+
+    _message_class = messages.UserPaymentAccount
+    _pipeline_class = pipelines.UserPaymentAccountPipeline
 
     # openfire user.
     user = ndb.KeyProperty('u', indexed=True, required=True)
 
-    # WePay specific information for an account.
+
+class WePayUserPaymentAccount(UserPaymentAccount):
+
+    ''' An object to store WePay specific user account information. '''
+
+    _message_class = messages.UserPaymentAccount
+    _pipeline_class = pipelines.UserPaymentAccountPipeline
+
+    # WePay user account info.
     wepay_user_id = ndb.IntegerProperty('wu', indexed=True, required=True)
     wepay_email = ndb.StringProperty('we', indexed=True, required=True)
     wepay_access_token = ndb.StringProperty('wt', indexed=True, required=True)
     wepay_token_expires = ndb.DateTimeProperty('wx', indexed=True, required=False)
 
 
-class Account(polymodel.PolyModel):
+class ProjectAccount(polymodel.PolyModel):
 
-    ''' An account is a polymodel that is tied to a project. '''
+    '''An account is a polymodel that is tied to a project.
+
+    It is used for accepting payments for a project.
+    '''
+
+    _message_class = messages.ProjectAccount
+    _pipeline_class = pipelines.ProjectAccountPipeline
 
     # Accounts are tied to projects.
     project = ndb.KeyProperty('p', indexed=True, required=True)
+    name = ndb.StringProperty('n', indexed=False, required=True)
+    description = ndb.StringProperty('d', indexed=False, required=True)
 
     # Account balance.
     balance = ndb.FloatProperty('b', indexed=True, required=True)
@@ -38,17 +57,22 @@ class Account(polymodel.PolyModel):
     transactions = ndb.KeyProperty('t', indexed=True, repeated=True)
 
 
-class WePayProjectAccount(Account):
+class WePayProjectAccount(ProjectAccount):
 
     ''' An subclass of account for WePay accounts. '''
 
+    _message_class = messages.ProjectAccount
+    _pipeline_class = pipelines.ProjectAccountPipeline
+
     wepay_account_id = ndb.IntegerProperty('wi', indexed=True, required=True)
-    wepay_account_description = ndb.StringProperty('wd', indexed=False, required=True)
 
 
 class Payment(AppModel):
 
     ''' An object used to track a single payment. '''
+
+    _message_class = messages.Payment
+    _pipeline_class = pipelines.PaymentPipeline
 
     description = ndb.StringProperty('n', indexed=True, required=True)
     amount = ndb.StringProperty('a', indexed=True, required=True)
@@ -83,6 +107,9 @@ class Transaction(polymodel.PolyModel):
 
     ''' A polymodel used to track a single third party transaction dealing with payments or accounts. '''
 
+    _message_class = messages.Transaction
+    _pipeline_class = pipelines.TransactionPipeline
+
     # Action: (Execute, Authorize, Cancel, Retry, Refund, Withdrawal).
     action = ndb.StringProperty('a', indexed=True, choices=['ex', 'au', 'c', 'rt', 'rf', 'w'])
 
@@ -98,6 +125,9 @@ class WePayCheckoutTransaction(Transaction):
 
     ''' A subclass of Transaction to deal with WePay checkout transactions. '''
 
+    _message_class = messages.Transaction
+    _pipeline_class = pipelines.TransactionPipeline
+
     # Associated payment object.
     payment = ndb.KeyProperty('p', indexed=True, required=True)
 
@@ -112,12 +142,19 @@ class WePayCheckoutTransaction(Transaction):
     good_or_service = ndb.StringProperty('gos', indexed=True, required=True, choices=['g', 's', 'd', 'p'], default='s')
 
 
-class WePayWithdrawlTransaction(AppModel):
+class WePayWithdrawalTransaction(Transaction):
 
     ''' A subclass of Transaction to deal with WePay specific transactions. '''
 
+    _message_class = messages.WithdrawalRequest
+    _pipeline_class = pipelines.TransactionPipeline
+
     # Account to withdraw funds from.
     account = ndb.KeyProperty('wa', indexed=True, required=True)
+    note = ndb.StringProperty('nt', indexed=False, required=False)
+
+    # User withdrawing the funds.
+    user = ndb.KeyProperty('us', indexed=True, required=True)
 
     # Optional money source for the disbursement.
     to_money_source = ndb.KeyProperty('tm', indexed=True, required=False)
@@ -133,6 +170,9 @@ class WePayWithdrawlTransaction(AppModel):
 class MoneySource(polymodel.PolyModel):
 
     ''' A polymodel used for payment sources such as credit cards and bank accounts. '''
+
+    _message_class = messages.MoneySource
+    _pipeline_class = pipelines.MoneySourcePipeline
 
     # Owner is the User or Project this source is tied to.
     owner = ndb.KeyProperty('t', indexed=True, required=True)
@@ -151,6 +191,9 @@ class MoneySource(polymodel.PolyModel):
 class WePayCreditCard(MoneySource):
 
     ''' A subclass of MoneySource to save WePay credit card info for use and reuse. '''
+
+    _message_class = messages.MoneySource
+    _pipeline_class = pipelines.MoneySourcePipeline
 
     wepay_cc_id = ndb.IntegerProperty('cc', indexed=True, required=False)
     wepay_cc_authorized = ndb.BooleanProperty('wa', indexed=True, default=False)

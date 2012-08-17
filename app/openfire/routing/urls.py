@@ -99,6 +99,13 @@ rules = [
             ])
         ]),
 
+        ## === Payment URLs === ##
+        HandlerPrefixRoute('payment.', [
+            PathPrefixRoute('/_payment', [
+                Route('/handler', name='payment-handler', handler='PaymentHandler'),
+            ])
+        ]),
+
         ## == Tests == ##
         Route('/_test/multipart', name='multipart-test', handler='dev.TestMultipart'),
         Route('/_test/multipart/passthrough', name='multipart-test-passthrough', handler='dev.TestPassthrough'),
