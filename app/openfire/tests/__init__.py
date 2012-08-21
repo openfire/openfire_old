@@ -105,14 +105,16 @@ class OFTestCase(unittest.TestCase):
         return responseDict
 
     def of_handler_test(self, url, desired_response_code=200, expect_response_content=True,
-                error='generic handler error'):
+                error='generic handler error', is_post=False, post_data=None):
 
         ''' A generic success test for a given url.
 
         Returns the response that was retreived from the gateway.
         '''
 
-        request = webapp2.Request.blank(url)
+        request = webapp2.Request.blank(url, POST=post_data)
+        if is_post:
+            request.method = 'POST'
         response = request.get_response(dispatch.gateway)
         self.assertEqual(response.status_int, desired_response_code, error)
         if expect_response_content:

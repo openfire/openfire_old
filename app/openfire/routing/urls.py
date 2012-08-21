@@ -43,7 +43,6 @@ rules = [
         ## === Propose URLs === ##
         HandlerPrefixRoute('propose.', [
             Route('/propose', name='propose/landing', handler='ProposeLanding'),
-            Route('/apply', name='apply', handler='Apply'),
             Route('/proposal/<key>', name='proposal/home', handler='ProposalHome'),
         ]),
 
