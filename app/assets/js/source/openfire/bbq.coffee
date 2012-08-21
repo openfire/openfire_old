@@ -250,7 +250,8 @@ class BBQController
 
         @_init = () =>
             $(document).ready ->
-                $('.bbq-datatable').dataTable()
+                if $('.bbq-datatable')?.length
+                    $('.bbq-datatable').dataTable()
             @initBbqNewInlines()
             @initBbqObjects()
 

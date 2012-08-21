@@ -92,10 +92,6 @@ class ProjectHome(WebHandler):
                 avatar = avatar.to_dict()
                 avatar['asset'] = asset
 
-            # 404 if project not found
-            if project is None:
-                return self.error(404)
-
             allowed_viewers = ndb.get_multi(project.owners + project.viewers)
 
             # make sure the user is allowed to view

@@ -734,6 +734,8 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', '_core.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'model.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'user.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'propose.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'proposal.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'widgets.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
@@ -746,6 +748,8 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', 'model.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'user.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'bbq.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'propose.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'proposal.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'widgets.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]

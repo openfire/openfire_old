@@ -9,6 +9,8 @@ from openfire.messages import common
 from openfire.messages import project
 from openfire.messages import proposal
 
+from openfire.models.assets import Avatar, Video
+
 # Pipeline Classes
 from openfire.pipelines.model import project as pipelines
 
@@ -105,6 +107,10 @@ class Proposal(AppModel):
     # Tiers + Goals
     tiers = ndb.LocalStructuredProperty(Tier, 'tr', repeated=True, compressed=True)
     goals = ndb.LocalStructuredProperty(Goal, 'gl', repeated=True, compressed=True)
+
+    # Avatar + Video
+    avatar = ndb.LocalStructuredProperty(Avatar, 'av')
+    video = ndb.LocalStructuredProperty(Video, 'vi')
 
 
 ## Projects
