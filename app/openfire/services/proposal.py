@@ -35,20 +35,28 @@ class ProposalService(RemoteService):
         ''' Create a new or or edit an existing proposal. '''
 
         if not request.key:
-            # Create a new proposal.
+
+            # Create a new proposal. Must be logged in.
+            if not self.session or not self.session.get('ukey', False):
+                # Not logged in.
+                return proposal_messages.Proposal()
+
+            # Set the creator and owner to the logged in user.
+            ukey = ndb.Key(urlsafe=self.session['ukey'])
             proposal = Proposal()
+            proposal.creator = ukey
+            proposal.owners = [ukey]
+
         else:
             # Get the proposal to edit.
             proposal_key = ndb.Key(urlsafe=self.decrypt(request.key))
             proposal = proposal_key.get()
 
         if not proposal:
-            # TODO: What to do on error?
             return proposal_messages.Proposal()
 
         # Update the proposal.
         proposal.mutate_from_message(request)
-        proposal.slug = "TODO: Remove me! (OF-64)"
         proposal.put()
 
         return proposal.to_message()

@@ -56,7 +56,7 @@ class ProposalPageTestCase(OFTestCase):
         super(ProposalPageTestCase, self).setUp()
 
         # Create a proposal with token 'proposaltoken'.
-        db_loader.create_proposal()
+        self.proposal_key = db_loader.create_proposal()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -64,11 +64,8 @@ class ProposalPageTestCase(OFTestCase):
     def test_propose_page(self):
         self.of_handler_test('/propose')
 
-    def test_apply_page(self):
-        self.of_handler_test('/apply')
-
     def test_proposal_page(self):
-        self.of_handler_test('/proposal/proposaltoken')
+        self.of_handler_test('/proposal/' + self.proposal_key.urlsafe())
 
 
 class ProjectPageTestCase(OFTestCase):
