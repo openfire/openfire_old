@@ -40,6 +40,7 @@ class AnalyticsController extends OpenfireController
             vars: {}
             agent: {}
             trackers: {}
+            initialized: false
 
             # tracked analytics operations
             data:
@@ -78,38 +79,38 @@ class AnalyticsController extends OpenfireController
                     openfire: null
                     project: null
 
+                linker: true
                 anonymize: false
                 samplerate: 1
                 multitrack: false
 
+        ## object init
         @_init = (openfire) =>
 
-            _.ready (window) =>
-                if window._gacfg?
-                    $.openfire.analytics.internal.initialize(window._gat, window._gaq, window._gacfg)
-                else
-                    $.openfire.analytics.internal.initialize(window._gat, window._gaq)
-                return
-            return
 
         ## internal methods
         @internal =
 
-            initialize: (_gat, _gaq, config={}) =>
+            initialize: (queue, tracker, config=null, event=null) =>
 
-                # splice in overrides from config
-                @state.config = _.extend(true, {}, @state.config, config)
-                $.apptools.dev.verbose('OF:Analytics', 'Initializing Google Analytics integration.', _gat, _gaq, @state.config)
+                if not @state.initialized
+                    $.apptools.dev.verbose('OF:Analytics', 'Initializing Google Analytics integration.')
 
-                # bind apptools events
-                @internal.bind_events()
+                    if (not config?) and (window._gac?)
+                        config = window._gac
 
-                if (not _gat?) or (not _gaq?)
-                    $.apptools.dev.error('OF:Analytics', 'Failed to find Google Analytics. Make sure it\'s installed and initialization is properly deferred.')
-                else
-                    # copy over analytics apis
-                    @state._ga.queue = _gaq
-                    @state._ga.tracker = _gat
+                    # splice in overrides from config
+                    @state.config = _.extend(true, {}, @state.config, config)
+                    $.apptools.dev.verbose('OF:Analytics', 'Merged analytics config.', config)
+
+                    # bind apptools events
+                    @internal.bind_events()
+
+                    # copy over analytics apis and state
+                    installed_trackers = [k for k in @state.config.account_ids]
+                    @state.initialized = installed_trackers.length
+                    @state._ga.queue = queue
+                    @state._ga.tracker = tracker
 
                     # init openfire tracker
                     @internal.provision_tracker('openfire', @state.config.account_ids.openfire)
@@ -119,18 +120,27 @@ class AnalyticsController extends OpenfireController
                         for key, value of @state.config.account_ids
                             if key != 'openfire'
                                 @internal.provision_tracker(key, value)
-
                 return @
 
             bind_events: () =>
 
                 ## bind tracker initialization logic
-                _.bind 'ANALYTICS_INIT', (name, tracker) =>
-                    $.apptools.dev.verbose('OF:Analytics', 'Tracker initialized.', name, tracker)
+                _.bind 'ANALYTICS_INIT', (tracker) =>
+                    $.apptools.dev.verbose('OF:Analytics', 'Tracker initialized.', tracker)
+                    boot_cmd_list = []
+                    if @state.config.linker
+                        boot_cmd_list.push ['_setAllowLinker', true]
+                    boot_cmd_list.push ['_setAccount', @state.config.account_ids[tracker.name]]
+                    @internal.push_command boot_cmd_list, tracker.name
+                    @state.initialized--
 
-                    # queue anonymization if it's on
-                    if @state.config.anonymize
-                        _.trigger 'ANALYTICS_PUSH', ['_gat._anonymize_ip']
+                    if @state.initialized == 0
+                        @state.initialized = true
+
+                        ## nothing left to init, trigger ready
+                        _.trigger 'ANALYTICS_READY', @state.trackers
+
+                    return
 
                 ## bind tracker command logic
                 _.bind 'ANALYTICS_PUSH', (method, args...) =>
@@ -139,10 +149,12 @@ class AnalyticsController extends OpenfireController
                     # add the method on first, then dispatch to the trackers
                     args.unshift(method)
                     @internal.push_command args
+                    return
 
                 ## bind tracker ready logic
                 _.bind 'ANALYTICS_READY', (trackers) =>
                     $.apptools.dev.verbose('OF:Analytics', 'Analytics is READY to receive events.', 'config:', @state.config, 'trackers:', trackers)
+                    _.trigger 'ANALYTICS_PUSH', ['_trackPageview']
 
 
                 ## bridge low-level tracking events to the command queue
@@ -207,7 +219,7 @@ class AnalyticsController extends OpenfireController
 
                            ], (args, source) =>
 
-                                event_spec = source.split('_')[0]
+                                event_spec = source.split('_')[1]
                                 args.unshift(event_spec)
                                 $.apptools.dev.log 'OF:Analytics', 'Emitted "' + event_spec + '".', args
                                 return args
@@ -220,17 +232,47 @@ class AnalyticsController extends OpenfireController
                 $.apptools.events.trigger('ANALYTICS_INIT', name: name, tracker: @state.trackers[name])
                 return @state.trackers[name]
 
-            push_command: (command, all_trackers=true) =>
+            push_command: (command, tracker=null) =>
 
-                if all_trackers
-                    targets = @state.trackers
+                $.apptools.dev.verbose('OF:Analytics', 'Pushing command.', command, tracker)
+
+                # resolve trackers to push command to
+                if tracker == null
+                    targets = _.extend({}, @state.trackers)
                 else
-                    targets = [@state.trackers.openfire]
+                    if _.is_array(tracker)
+                        for t in tracker
+                            targets[t] = @state.trackers[t]
+                    else
+                        targets = {}
+                        targets[tracker] = @state.trackers[tracker]
 
+                $.apptools.dev.verbose('OF:Analytics', 'Resolved target trackers.', targets)
+
+                # push each command
                 touched_trackers = 0
-                for target in targets
-                    target.push command
+                for name, tracker of targets
+
+                    command_spec = []
+                    if _.is_array(command)
+
+                        # if it's one level of commands...
+                        if _.is_string(command[0])
+                            command[0] = [name, command[0]].join('.')
+                            command_spec.push command
+                        else
+                            for cmd_statement in command
+                                if not _.is_string(cmd_statement[0])
+                                    continue  # don't do anything if it's more than one level deep
+                                else
+                                    cmd_statement[0] = [name, cmd_statement[0]].join('.')
+                                command_spec.push cmd_statement
+
+                    @state._ga.queue.push command_spec...
+                    $.apptools.dev.verbose('OF:Analytics', 'Pushed command to tracker "' + name + '".', command_spec)
                     touched_trackers++
+
+                $.apptools.dev.log('OF:Analytics', 'Pushed command to ' + touched_trackers.toString() + ' trackers.', command, targets)
 
                 return touched_trackers
 

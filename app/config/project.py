@@ -42,7 +42,8 @@ config['apptools.project.output'] = {
 
     'analytics': {  # Analytics Settings
         'enable': True,              # whether to insert analytics code
-        'account_id': 'UA-31611943-2'   # your google anlytics site ID
+        'account_id': 'UA-31611943-2',   # your google anlytics site ID,
+        'webclient': 'https://lyr9.net/static/analytics/ga.js'    # location of the JS webclient
     },
 
     'appcache': {  # HTML5 appcaching
