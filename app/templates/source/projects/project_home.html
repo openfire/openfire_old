@@ -1,1 +1,18 @@
 {% extends "layout/project.html" %}
+
+{% block postsouth %}
+<script type='text/javascript'>
+
+	_.ready(function (w) {
+		var gpcfg = {lang: 'en-US', parsetags: 'explicit'},
+			pps = _.create_doc_frag(_.create_element_string('script', {
+				'async': '', 'type': 'text/javascript', 'src': 'https://apis.google.com/js/plusone.js', 'data-render': 'explicit'
+			}, JSON.stringify({'parsetags': 'explcit'}))),
+			psc = document.getElementsByTagName('script')[0],
+			lcp = psc.lastChild;
+			lcp.onload = function (ev) { gapi.plusone.render(document.getElementById('plusone')); }
+			w.__gcfg = gpcfg; psc.parentNode.insertBefore(lcp);
+	});
+
+</script>
+{% endblock postsouth %}

@@ -31,7 +31,7 @@
 					$.apptools.dev.verbose('OF:Analytics', 'Loaded Google Analytics webclient.', ev);
 					$.openfire.analytics.internal.initialize(w._gaq, w._gat, _gac, ev);
 				}
-				//scpr.parentNode.insertBefore(aswc);
+				scpr.parentNode.insertBefore(aswc);
 		});
 
 	{%- endif -%}

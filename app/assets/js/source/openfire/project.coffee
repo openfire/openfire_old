@@ -822,7 +822,7 @@ class ProjectController extends OpenfireController
                         sync = callback
                         callback = null
                     else sync = false
-                
+
                 if not sync
                     goal = @get_attached('goal', goal_key)
                     return if callback? then callback.call(@, goal) else goal
@@ -933,7 +933,7 @@ class ProjectController extends OpenfireController
                             idx = btn.getAttribute('data-index')
 
                             goal = if idx isnt 'new' then @get_attached('goal', idx) else new Goal(target: @project_key)
-                            
+
                             amt_edit_el = document.getElementById('goal-amount-'+idx)
                             desc_edit_el = document.getElementById('goal-description-'+idx)
 
@@ -943,7 +943,7 @@ class ProjectController extends OpenfireController
                             return $.apptools.api.project.put_goal(goal.to_message()).fulfill
                                 success: (response) =>
                                     @log('Goal saved! Applying changes...')
-                                    
+
                                     return @attach goal.from_message(response), (_goal) =>
                                         k = _goal.key
 
@@ -963,13 +963,13 @@ class ProjectController extends OpenfireController
                                             btn.addEventListener('click', _save, false)
                                         , 500)
 
-                                        return _goal                                           
-                                            
+                                        return _goal
+
 
                                 failure: (error) =>
                                     @log('Sorry, something went wrong :( Try again?')
                                     @log(error)
-                                    
+
                                     btn.style.backgroundColor = '#ff9e9e'
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _save, false)
@@ -994,7 +994,7 @@ class ProjectController extends OpenfireController
 
                             if confirm('Really delete '+goal.amount+' goal?')
                                 @log('Goal delete() confirmed. Deleting goal...')
-                                
+
                                 return $.apptools.api.project.delete_goal(key: goal.key).fulfill
                                     success: (response) =>
                                         @log('Goal deleted! Applying changes...')
@@ -1019,7 +1019,7 @@ class ProjectController extends OpenfireController
 
                                         btn.style.backgroundColor = '#ff9e9e'
                                         btn.innerHTML = ':( Try again?'
-                                        
+
                                         return btn.addEventListener('click', _delete, false)
 
                             else
@@ -1094,7 +1094,7 @@ class ProjectController extends OpenfireController
                             idx = 'new'
 
                             goal = new Goal(target: @project_key)
-                            
+
                             amt_edit_el = document.getElementById('goal-amount-'+idx)
                             desc_edit_el = document.getElementById('goal-description-'+idx)
                             new_edit_el = amt_edit_el.parentNode
@@ -1133,7 +1133,7 @@ class ProjectController extends OpenfireController
                                 failure: (error) =>
                                     @log('Sorry, something went wrong :( Try again?')
                                     @log(error)
-                                    
+
                                     btn.style.backgroundColor = '#ff9e9e'
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _add, false)
@@ -1278,7 +1278,7 @@ class ProjectController extends OpenfireController
                 return @tiers.list (tiers) =>
 
                     _t.target = @project_key for _t in tiers
-                    
+
                     tier_modal_parts = @internal.prep_tiers_modal_html(tiers)
 
                     return $.apptools.widgets.modal.create (() =>
@@ -1304,7 +1304,7 @@ class ProjectController extends OpenfireController
                             idx = btn.getAttribute('data-index')
 
                             tier = if idx isnt 'new' then @get_attached('tier', idx) else new Tier(target: @project_key)
-                            
+
                             amt_edit_el = document.getElementById('tier-amount-'+idx)
                             desc_edit_el = document.getElementById('tier-description-'+idx)
                             name_edit_el = document.getElementById('tier-name-'+idx)
@@ -1316,12 +1316,12 @@ class ProjectController extends OpenfireController
                             return $.apptools.api.project.put_tier(tier.to_message()).fulfill
                                 success: (response) =>
                                     @log('Tier saved! Applying changes...')
-                                    
+
                                     return @attach tier.from_message(response), (_tier) =>
                                         k = _tier.key
 
                                         name_and_amt_el = document.getElementById('a-'+k)
-                                        
+
                                         name_edit_el.innerHTML = _tier.name
                                         amt_edit_el.innerHTML = _tier.amount
 
@@ -1345,7 +1345,7 @@ class ProjectController extends OpenfireController
                                 failure: (error) =>
                                     @log('Sorry, something went wrong :( Try again?')
                                     @log(error)
-                                    
+
                                     btn.style.backgroundColor = '#ff9e9e'
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _save, false)
@@ -1370,7 +1370,7 @@ class ProjectController extends OpenfireController
 
                             if confirm('Really delete '+tier.amount+' tier?')
                                 @log('Tier delete() confirmed. Deleting tier...')
-                                
+
                                 return $.apptools.api.project.delete_tier(key: tier.key).fulfill
                                     success: (response) =>
                                         @log('Tier deleted! Applying changes...')
@@ -1395,7 +1395,7 @@ class ProjectController extends OpenfireController
 
                                         btn.style.backgroundColor = '#ff9e9e'
                                         btn.innerHTML = ':( Try again?'
-                                        
+
                                         return btn.addEventListener('click', _delete, false)
 
                             else
@@ -1471,7 +1471,7 @@ class ProjectController extends OpenfireController
                             idx = 'new'
 
                             tier = new Tier(target: @project_key)
-                            
+
                             name_edit_el = document.getElementById('tier-name-'+idx)
                             amt_edit_el = document.getElementById('tier-amount-'+idx)
                             desc_edit_el = document.getElementById('tier-description-'+idx)
@@ -1513,7 +1513,7 @@ class ProjectController extends OpenfireController
                                 failure: (error) =>
                                     @log('Sorry, something went wrong :( Try again?')
                                     @log(error)
-                                    
+
                                     btn.style.backgroundColor = '#ff9e9e'
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _add, false)
@@ -1621,11 +1621,6 @@ class ProposalController extends OpenfireController
 
 
 if @__openfire_preinit?
-    @__openfire_preinit.abstract_base_objects.push(Asset)
-    @__openfire_preinit.abstract_base_objects.push(ProjectImage)
-    @__openfire_preinit.abstract_base_objects.push(ProjectVideo)
-    @__openfire_preinit.abstract_base_objects.push(ProjectAvatar)
-    @__openfire_preinit.abstract_base_classes.push(Project)
-    @__openfire_preinit.abstract_base_classes.push(Proposal)
-    @__openfire_preinit.abstract_base_controllers.push(ProjectController)
-    @__openfire_preinit.abstract_base_controllers.push(ProposalController)
+    @__openfire_preinit.abstract_base_objects.push Asset, ProjectImage, ProjectVideo, ProjectAvatar
+    @__openfire_preinit.abstract_base_classes.push Project, Proposal
+    @__openfire_preinit.abstract_base_controllers.push ProjectController, ProposalController

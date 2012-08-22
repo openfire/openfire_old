@@ -20,32 +20,27 @@
 <script async src="http://{{ transport.services.endpoint }}/_ah/channel/jsapi"></script>
 {%- endif -%}
 {% endif %}
-{#<script id='google-jssdk' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-<script id='facebook-jssdk' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script> #}
 
-{# <!-- Services Manifest --> #}{#
+{#} <!-- Services Manifest --> #}
 {%- if page.services or page.analytics or transport.realtime.enabled -%}
-<script>
+<script type='text/javascript'>
 {%- block page_services -%}
 	{%- if page.services -%}
 	{%- from "macros/page_object.js" import build_page_object -%}
 	{{ build_page_object(page.services.services_manifest, page.services.config, page) }}
 	{%- endif -%}
+	{%- if transport.services.secure -%}
+		$.apptools.api.rpc.action_prefix = 'https://{{ transport.services.endpoint }}';
+	{%- else -%}
+		$.apptools.api.rpc.action_prefix = 'http://{{ transport.services.endpoint }}';
+	{%- endif -%}
 {%- endblock -%}
-
-{%- if transport.services.secure -%}
-	$.apptools.api.rpc.action_prefix = 'https://{{ transport.services.endpoint }}';
-{%- else -%}
-	$.apptools.api.rpc.action_prefix = 'http://{{ transport.services.endpoint }}';
-{%- endif -%}
-
 {%- if transport.realtime.enabled -%}
 	$.apptools.push.config = {
 		token: "{{ transport.realtime.token }}",
 		renew: {{ transport.realtime.timeout }},
 	};
 {%- endif -%}
-
 {%- block page_analytics -%}
 	{%- if page.analytics -%}
 		{% from "macros/page_analytics.js" import google_analytics_async %}
@@ -53,4 +48,4 @@
 	{%- endif -%}
 {%- endblock -%}
 </script>
-{%- endif -%}#}
+{%- endif -%}

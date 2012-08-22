@@ -321,4 +321,6 @@ class BBQController
 
 
 if @__openfire_preinit?
-    @__openfire_preinit.abstract_base_controllers.push(BBQController)
+    @__openfire_preinit.abstract_base_objects.push BBQBaseObject, BBQCategory, BBQProposal, BBQProject, BBQCustomUrl
+    @__openfire_preinit.abstract_base_classes.push BBQController
+    @__openfire_preinit.abstract_base_controllers.push BBQController
