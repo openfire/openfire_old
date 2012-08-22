@@ -100,7 +100,7 @@ class Openfire
 
                     # register any object events
                     if obj.events?
-                        window.apptools?.events?.register(event) for event in obj.events
+                        window.apptools?.events?.register(obj.events)
 
                     # instantiate and bind to window, if obj isn't private
                     if not (exp = obj.export)? or exp isnt 'private' then (obj = new obj(@)) and window[o] = obj else obj = new obj()
@@ -114,7 +114,7 @@ class Openfire
                 class: (cls) =>
                     @sys.state.classes[(cl=cls.constructor.name)] = cls
                     if cls.events?
-                        window.apptools?.events?.register(event) for event in cls.events
+                        window.apptools?.events?.register(cls.events)
                     if not (exp = cls.export)? or exp isnt 'private' then (cls = new cls(@)) and window[cl] = cls else cls = new cls()
                     cls._init?()
 
@@ -126,9 +126,9 @@ class Openfire
 
                     @sys.state.controllers[ctrlr.mount] = ctrlr
                     if ctrlr.events?
-                        window.apptools?.events?.register(event) for event in ctrlr.events
+                        window.apptools?.events?.register(ctrlr.events)
                     if not (exp = ctrlr.export)? or exp isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[ctrlr.constructor.name] = ctrlr else ctrlr = new ctrlr(window)
-                    
+
                     @[mount_point] = ctrlr
                     ctrlr._init?()
 

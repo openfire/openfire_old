@@ -170,10 +170,10 @@ class AnalyticsController extends OpenfireController
                            [
                                 'ANALYTICS_PUSH'
 
-                           ], (args, source) ->
+                           ], (args, source) =>
 
                                 # resolve GA method from event name
-                                command_spec = [@state.config._ga.bindings[source]]
+                                command_spec = [@state._ga.bindings[source]]
 
                                 # if it's an array with more than one item, it's position args
                                 if _.is_array(args) and args.length > 1
@@ -314,7 +314,7 @@ class AnalyticsController extends OpenfireController
 
                 if _.is_string(scope)
                     scope = _.indexOf(@state.config._ga.scopes, scope)
-                _.trigger 'ANALYTICS_SETVAR', [slot, name, value, scope]
+                _.trigger 'ANALYTICS_SETVAR', [slot, name, value, scope]...
                 return @
 
         @track =
@@ -328,7 +328,7 @@ class AnalyticsController extends OpenfireController
                     _command_spec.push value
                 if non_interaction != false
                     _command_spec.push non_interaction
-                _.trigger 'ANALYTICS_TRACK_EVENT', _command_spec
+                _.trigger 'ANALYTICS_TRACK_EVENT', _command_spec...
                 return @
 
             social: (network, action, target=null, path=null) =>
@@ -338,7 +338,7 @@ class AnalyticsController extends OpenfireController
                     _command_spec.push target
                 if path?
                     _command_spec.push path
-                _.trigger 'ANALYTICS_TRACK_SOCIAL', _command_spec
+                _.trigger 'ANALYTICS_TRACK_SOCIAL', _command_spec...
                 return @
 
             timing: (category, variable, time, label=null, samplerate=null) =>
@@ -348,7 +348,7 @@ class AnalyticsController extends OpenfireController
                     _command_spec.push label
                 if samplerate?
                     _command_spec.push samplerate
-                _.trigger 'ANALYTICS_TRACK_TIMING', _command_spec
+                _.trigger 'ANALYTICS_TRACK_TIMING', _command_spec...
                 return @
 
             pageview: (page_url=null) =>
@@ -356,7 +356,7 @@ class AnalyticsController extends OpenfireController
                 _command_spec = []
                 if page_url?
                     _command_spec.push page_url
-                _.trigger 'ANALYTICS_TRACK_PAGEVIEW', _command_spec
+                _.trigger 'ANALYTICS_TRACK_PAGEVIEW', _command_spec...
                 return @
 
             campaign: (content_key, medium, name, source, term, nokey=null) =>
