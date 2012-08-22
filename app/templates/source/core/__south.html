@@ -1,10 +1,7 @@
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{{ asset.script('jquery', 'core') }}"><\/script>')</script>
-
 <!-- Core Scripts -->
-<script src="{{ asset.script('modernizr', 'core') }}"></script>
+<script src="{{ asset.script('jquery', 'core') }}"></script>
 <script src="{{ asset.script('d3', 'core') }}"></script>
-<script async src="/assets/js/static/core/jquery/easing.min.js"></script>
+<script src="{{ asset.script('jacked', 'core') }}"></script>
 
 <!-- Base Scripts -->
 {% if security.permissions.admin %}
@@ -26,7 +23,7 @@
 {#<script id='google-jssdk' async type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 <script id='facebook-jssdk' async type="text/javascript" src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=468309289847671"></script> #}
 
-{# <!-- Services Manifest --> #}
+{# <!-- Services Manifest --> #}{#
 {%- if page.services or page.analytics or transport.realtime.enabled -%}
 <script>
 {%- block page_services -%}
@@ -56,4 +53,4 @@
 	{%- endif -%}
 {%- endblock -%}
 </script>
-{%- endif -%}
+{%- endif -%}#}

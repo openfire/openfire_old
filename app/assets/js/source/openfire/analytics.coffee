@@ -122,7 +122,7 @@ class AnalyticsController extends OpenfireController
                                 @internal.provision_tracker(key, value)
                 return @
 
-            bind_events: () =>
+            bind_events: (event) =>
 
                 ## bind tracker initialization logic
                 _.bind 'ANALYTICS_INIT', (tracker) =>
@@ -131,6 +131,8 @@ class AnalyticsController extends OpenfireController
                     if @state.config.linker
                         boot_cmd_list.push ['_setAllowLinker', true]
                     boot_cmd_list.push ['_setAccount', @state.config.account_ids[tracker.name]]
+                    if event? and event.srcElement.hasAttribute('data-hostname')
+                        boot_cmd_list.push ['_setDomainName', event.srcElement.getAttribute('data-hostname')]
                     @internal.push_command boot_cmd_list, tracker.name
                     @state.initialized--
 
