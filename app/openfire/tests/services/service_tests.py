@@ -912,3 +912,28 @@ class UserServiceTestCase(OFTestCase):
         self.assertEqual(response['response']['type'], 'FollowersResponse',
             'Failed to return followers response from user followers service.')
         #content = response['response']['content']
+
+
+class SearchServiceTestCase(OFTestCase):
+
+    ''' Test cases for the search service. '''
+
+    def test_search_autocomplete_method(self):
+
+        ''' Add a topic to the database then query through the auto complete service. '''
+
+        slug = 'test'
+        db_loader.create_topic(slug=slug)
+        params = {
+            'query': slug,
+            'index': 'topic',
+        }
+        response = self.of_service_test('search', 'autocomplete', params=params)
+        self.assertEqual(response['response']['type'], 'SearchResponse',
+            'Search autocomplete service method failed to return proper response.')
+        self.assertEqual(len(response['response']['content']['ids']), 1,
+            'Failed to return the correct number of topics through autocomplete.')
+        self.assertEqual(response['response']['content']['ids'][0], slug,
+            'Failed to return the correct topic id through autocomplete.')
+
+

@@ -63,7 +63,8 @@ class AutocompleteRequest(messages.Message):
 
     ''' A request for autocomplete. '''
 
-    pass
+    query = messages.StringField(1)
+    index = messages.StringField(2)
 
 
 #### ++++ Response Messages ++++ ####
@@ -71,4 +72,4 @@ class SearchResponse(messages.Message):
 
     ''' Response to a search query. '''
 
-    pass
+    ids = messages.StringField(1, repeated=True)

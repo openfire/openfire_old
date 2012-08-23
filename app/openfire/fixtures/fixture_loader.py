@@ -4,7 +4,7 @@ import os
 
 
 # Model indexes.
-FIXTURE_INDEXES = ['user', 'update', 'project', 'category', 'activity']
+FIXTURE_INDEXES = ['user', 'update', 'project', 'topic', 'category', 'activity']
 
 
 '''

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from google.appengine.ext import ndb
+from openfire.core.indexer import IndexerAPI
+from openfire.models.indexer.index import Index
+from openfire.models.indexer.entry import IndexEntry
 from openfire.pipelines.model import ModelPipeline
 
 
@@ -8,6 +12,14 @@ class TopicPipeline(ModelPipeline):
     ''' Processes topic puts/deletes. '''
 
     _model_binding = 'openfire.models.user.Topic'
+
+    def put(self, key, model):
+
+        ''' Use the post-put hook to save the autocomplete search index. '''
+
+        subs = IndexerAPI.substring_list(model.slug, min_len=3)
+        topic_index = IndexEntry.new(ndb.Key(Index, 'topic'), model.slug, substrings=subs)
+        topic_index.put()
 
 
 ## UserPipeline - fired when a User entity is put/deleted
