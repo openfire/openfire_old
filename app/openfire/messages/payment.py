@@ -1,5 +1,11 @@
 from protorpc import messages
 
+class AuthURL(messages.Message):
+
+    ''' Return an auth url to allow openfire to manage a user's payments. '''
+
+    url = messages.StringField(1)
+
 
 class UserPaymentAccount(messages.Message):
 
@@ -9,15 +15,6 @@ class UserPaymentAccount(messages.Message):
     user = messages.StringField(2)
     wepay_email = messages.StringField(3)
     wepay_user_id = messages.IntegerField(4)
-
-
-class CreateProjectAccount(messages.Message):
-
-    ''' Create a project payment account. '''
-
-    project = messages.StringField(1)
-    name = messages.StringField(2)
-    description = messages.StringField(3)
 
 
 class ProjectAccount(messages.Message):

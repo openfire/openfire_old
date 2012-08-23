@@ -5,31 +5,38 @@ from openfire.services import RemoteService
 from openfire.messages import payment as payment_messages
 #from openfire.models.payment import Payment
 
+from openfire.core.payment import PaymentAPI
+
 
 class PaymentService(RemoteService):
 
     ''' Payment service api. '''
 
-    @remote.method(payment_messages.UserPaymentAccount, payment_messages.UserPaymentAccount)
-    def create_user_payment_account(self, request):
+    @remote.method(message_types.VoidMessage, payment_messages.AuthURL)
+    def get_auth_url(self, request):
 
-        ''' Create a wepay account for a user or link existing wepay account to user. '''
+        ''' Generate an oauth url that the user can visit to authorize the openfire app. '''
 
-        return payment_messages.UserPaymentAccount()
+        url = PaymentAPI.generate_auth_url(request.sessions.user)
+        return payment_messages.AuthURL(url=url)
 
     @remote.method(payment_messages.UserPaymentAccount, payment_messages.UserPaymentAccount)
     def get_user_payment_account(self, request):
 
         ''' Get payment account info for a user. '''
 
-        return payment_messages.UserPaymentAccount()
+        account = ndb.Key(urlsafe=request.key).get()
+        return account.to_message()
 
-    @remote.method(payment_messages.CreateProjectAccount, payment_messages.ProjectAccount)
+    @remote.method(payment_messages.ProjectAccount, payment_messages.ProjectAccount)
     def create_project_payment_account(self, request):
 
         ''' Create a wepay sub-account on a user's payment account to collect money for a project. '''
 
-        return payment_messages.ProjectAccount()
+        project_key = ndb.Key(urlsafe=request.project)
+        project_account = PaymentAPI.create_project_payment_account(project_key, request.name,
+                request.description, request.wepay_account_id)
+        return project_account.to_message()
 
     @remote.method(payment_messages.ProjectAccount, payment_messages.ProjectAccount)
     def get_project_payment_account(self, request):

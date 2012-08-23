@@ -192,7 +192,7 @@ config['apptools.project.services'] = {
         'payment': {
             'enabled': True,
             'service': 'openfire.services.payment.PaymentService',
-            'methods': ['create_user_payment_account', 'get_user_payment_account',
+            'methods': ['get_auth_url', 'get_user_payment_account',
                         'create_project_payment_account', 'get_project_payment_account',
                         'payment_history', 'admin_payment_history', 'back_project',
                         'money_sources', 'remove_money_source', 'admin_money_sources', 'refund_payment',

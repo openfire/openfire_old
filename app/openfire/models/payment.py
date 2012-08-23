@@ -3,7 +3,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 from openfire.models import AppModel
 
-from openfire.messages import payments as messages
+from openfire.messages import payment as messages
 from openfire.pipelines.model import payment as pipelines
 
 
@@ -27,7 +27,6 @@ class WePayUserPaymentAccount(UserPaymentAccount):
 
     # WePay user account info.
     wepay_user_id = ndb.IntegerProperty('wu', indexed=True, required=True)
-    wepay_email = ndb.StringProperty('we', indexed=True, required=True)
     wepay_access_token = ndb.StringProperty('wt', indexed=True, required=True)
     wepay_token_expires = ndb.DateTimeProperty('wx', indexed=True, required=False)
 
@@ -76,7 +75,7 @@ class Payment(AppModel):
 
     description = ndb.StringProperty('n', indexed=True, required=True)
     amount = ndb.StringProperty('a', indexed=True, required=True)
-    commission = ndb.FloatProperty('cut', indexed=True, required=True, default=0.0)
+    commission = ndb.FloatProperty('cut', indexed=True, default=0.0)
 
     # Status set: (Initial, Pending, Executing, Executed, Refunding, Refunded, Cancelled, Error).
     status = ndb.StringProperty('s', indexed=True, required=True, choices=[
@@ -99,7 +98,7 @@ class Payment(AppModel):
     to_money_source = ndb.KeyProperty('tm', indexed=True, required=False)
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)
-    updated = ndb.DateTimeProperty('u', indexed=True, auto_add=True)
+    updated = ndb.DateTimeProperty('u', indexed=True, auto_now=True)
     archived = ndb.BooleanProperty('x', indexed=True, default=False)
 
 
@@ -117,7 +116,7 @@ class Transaction(polymodel.PolyModel):
     status = ndb.StringProperty('s', indexed=True, choices=['i', 'p', 'c', 'x', 'e'])
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)
-    updated = ndb.DateTimeProperty('u', indexed=True, auto_add=True)
+    updated = ndb.DateTimeProperty('u', indexed=True, auto_now=True)
     archived = ndb.BooleanProperty('x', indexed=True, default=False)
 
 
@@ -139,7 +138,7 @@ class WePayCheckoutTransaction(Transaction):
             'n', 'a', 'r', 'cp', 's', 'c', 'rf', 'cb', 'f', 'e'])
 
     # Good or service is required by WePay. Choices are (GOODS, SERVICE, DONATION, PERSONAL).
-    good_or_service = ndb.StringProperty('gos', indexed=True, required=True, choices=['g', 's', 'd', 'p'], default='s')
+    good_or_service = ndb.StringProperty('gos', indexed=True, choices=['g', 's', 'd', 'p'], default='s')
 
 
 class WePayWithdrawalTransaction(Transaction):
@@ -183,7 +182,7 @@ class MoneySource(polymodel.PolyModel):
     save_for_reuse = ndb.BooleanProperty('s', default=True)
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)
-    updated = ndb.DateTimeProperty('u', indexed=True, auto_add=True)
+    updated = ndb.DateTimeProperty('u', indexed=True, auto_now=True)
     first_use = ndb.DateTimeProperty('fu', indexed=True, required=False)
     last_use = ndb.DateTimeProperty('lu', indexed=True, required=False)
 
