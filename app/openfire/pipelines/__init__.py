@@ -7,4 +7,5 @@ class AppPipeline(pipeline.Pipeline):
 
     ''' Abstract pipeline for all openfire pipelines. '''
 
-    pass
+    def finalized(self):
+        return
