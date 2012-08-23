@@ -63,10 +63,10 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'modernizr': {'min': False, 'version': '2.0.6'},  # Modernizr - browser polyfill + compatibility testing
-                'jquery': {'min': True, 'version': '1.8.0'},      # jQuery: Write Less, Do More!
+                'modernizr': {'min': False, 'version': '2.0.6-c'},          # Modernizr - browser polyfill + compatibility testing
+                'jquery': {'min': True, 'version': '1.8.0'},                # jQuery: Write Less, Do More!
                 'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},   # D3 - Visualizations
-                'jacked': {'min': True, 'version': '1.0'},  # Jacked - tweening animation engine
+                'jacked': {'min': True, 'version': '1.0'},                  # Jacked - tweening animation engine
             }
 
         },
@@ -80,8 +80,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'base': {'min': True, 'version': 1.2},  # RPC, events, dev, storage, user, etc (see $.apptools)
-                'admin': {'name': 'base.admin', 'min': True, 'version': 1.2}  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'base': {'min': True, 'version': 1.5},  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'admin': {'name': 'base.admin', 'min': True, 'version': 1.5}  # RPC, events, dev, storage, user, etc (see $.apptools)
             }
 
         },
@@ -95,8 +95,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'app': {'min': True, 'version': 0.2},  # openfire app base
-                'admin': {'name': 'app.admin', 'min': True, 'version': 0.2}  # openfire app base for admins
+                'app': {'min': True, 'version': 0.3},  # openfire app base
+                'admin': {'name': 'app.admin', 'min': True, 'version': 0.3}  # openfire app base for admins
             }
 
         },
@@ -134,11 +134,11 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'main': {'version': 0.2},  # reset, main, layout, forms
-                'ie': {'version': 0.2},    # fixes for internet explorer (grrr...)
-                'print': {'version': 0.2},  # proper format for printing
-                'admin': {'version': 0.2},   # admin
-                'security': {'version': 0.1}  # login/register/etc
+                'main': {'version': 0.3},  # reset, main, layout, forms
+                'ie': {'version': 0.3},    # fixes for internet explorer (grrr...)
+                'print': {'version': 0.3},  # proper format for printing
+                'admin': {'version': 0.3},   # admin
+                'security': {'version': 0.2}  # login/register/etc
             }
 
         },
@@ -152,9 +152,9 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'landing': {'version': 0.3},  # styles for the landing
-                'project': {'version': 0.2},  # styles for the project page
-                'profile': {'version': 0.1}   # styles for the profile page
+                'landing': {'version': 0.4},  # styles for the landing
+                'project': {'version': 0.3},  # styles for the project page
+                'profile': {'version': 0.2}   # styles for the profile page
             }
 
         },

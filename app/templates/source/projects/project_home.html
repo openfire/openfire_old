@@ -2,5 +2,5 @@
 
 {% block jsready %}
 {%- from "macros/page_social.js" import social_naked -%}
-{{ social_naked()|safe }}
+{{ social_naked(page)|safe }}
 {% endblock jsready %}
