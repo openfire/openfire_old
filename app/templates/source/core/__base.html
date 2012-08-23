@@ -121,6 +121,47 @@
 
 {% block presouth %}{% endblock presouth %}
 {% include "core/__south.html" with context %}
+
+{% block page_services %}
+{% if page.services %}
+<script id='js_config' type='text/javascript' data-role='pageconfig'>
+	{% from "macros/page_object.js" import build_page_object %}
+	{{ build_native_page_object(page) }}
+</script>
+{% endif %}
+{% endblock page_services %}
+
+{% block pageready %}
+<script id='js_deferred' type='text/javascript' data-role='pageready'>
+{% block pre_pageready %}{% endblock pre_pageready %}
+_.ready(function (window) {
+
+	var __cfgst = 'js_config', _dftst = 'js_deferred',
+		_ofjscfg = document.getElementById(_cfgst), _ofdfrd = document.getElementById(_dfrst),
+		_ofinject = _.create_doc_frag('');
+
+	{% block pre_jsready %}{% endblock pre_jsready %}
+
+	{% block jsready %}
+	{% endblock jsready %}
+
+	{% block post_jsready %}{% endblock post_jsready %}
+
+	{% block page_analytics %}
+
+	{% if page.analytics %}
+	{% from "macros/page_analytics.js" import google_analytics_async %}
+	{{ google_analytics_naked(page.analytics) }}
+	{% endif %}
+
+	{% endblock %}
+
+	_ofinject.insertBefore(_.reduce(_lazy, function (x, y) { x.firstChild.parentNode.insertBefore(y); }));
+});
+{% block post_pageready %}{% endblock post_pageready %}
+</script>
+{% endblock pageready %}
+
 {% block postsouth %}{% endblock postsouth %}
 </body>
 </html>

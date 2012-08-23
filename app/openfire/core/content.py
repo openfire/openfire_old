@@ -4,6 +4,7 @@
 
 ## Base Imports
 import time
+import json
 import config
 import webapp2
 import hashlib
@@ -819,7 +820,8 @@ class ContentBridge(object):
             # hook up filters
             filters = {
                 'currency': lambda x: self._format_as_currency(x, False),
-                'percentage': lambda x: self._format_as_currency(x, True)
+                'percentage': lambda x: self._format_as_currency(x, True),
+                'json': json.dumps
             }
 
             # generate environment

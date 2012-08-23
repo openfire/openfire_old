@@ -24,7 +24,8 @@ if 'lib' not in sys.path or 'lib/distlib' not in sys.path:
 _config = {}
 _compiled_config = None
 
-## Check if we're running the app server
+## Check if we're running the app server, set strict mode
+strict = False
 debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 
 
