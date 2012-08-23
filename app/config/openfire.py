@@ -346,7 +346,7 @@ config['openfire.datamodel.integration.pipelines'] = {
 
     'enable': True,  # enable/disable pipelines integration
     'logging': False,  # enable/disable logging
-    'autostart': False,  # automatically kick off bound pipelines
+    'autostart': True,  # automatically kick off bound pipelines
     'trigger_queue': 'trigger'  # task queue to send pipelines to
 
 }

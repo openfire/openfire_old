@@ -62,12 +62,16 @@ class OFTestCase(unittest.TestCase):
         self.testbed.init_blobstore_stub()
         self.testbed.init_images_stub()
         self.testbed.init_urlfetch_stub()
+        self.testbed.init_taskqueue_stub()
+
+        os.environ['RUNNING_TESTS'] = 'TESTING'
 
     def tearDown(self):
 
         ''' A generic google app engine test tear down method. '''
 
         self.testbed.deactivate()
+        os.environ['RUNNING_TESTS'] = ''
 
     def encrypt(self, value, simple=True, cipher=True):
 

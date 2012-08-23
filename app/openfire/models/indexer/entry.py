@@ -11,6 +11,8 @@ class IndexEntry(IndexerModel):
 
     ''' A value entry in the index. '''
 
+    substrings = ndb.StringProperty('s', repeated=True, indexed=True)
+
     @classmethod
     def new(cls, index, value, **kwargs):
 

@@ -5,6 +5,7 @@
 import config
 import webapp2
 import datetime
+import os
 
 # AppTools Imports
 from apptools.util import debug
@@ -80,7 +81,13 @@ class PipelineTriggerMixin(ModelMixin):
             if p:
                 if start:
                     cls.__logging.info('Starting hooked pipeline...')
-                    pipeline = p.start(queue_name=cls.__config.get('trigger_queue', 'default'))
+
+                    running_tests = os.environ.get('RUNNING_TESTS')
+                    if running_tests:
+                        pipeline = p.start_test(queue_name=cls.__config.get('trigger_queue', 'default'))
+                    else:
+                        pipeline = p.start(queue_name=cls.__config.get('trigger_queue', 'default'))
+
                     cls.__logging.info('Hooked pipeline away: "%s"' % pipeline)
                     return pipeline
                 cls.__logging.info('Autostart is off. NOT starting constructed pipeline.')

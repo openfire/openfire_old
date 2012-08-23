@@ -1,6 +1,9 @@
+from google.appengine.ext import ndb
 from protorpc import remote
 from openfire.messages import search
 from openfire.services import RemoteService
+from openfire.models.indexer.index import Index
+from openfire.models.indexer.entry import IndexEntry
 
 
 class SearchService(RemoteService):
@@ -21,9 +24,16 @@ class SearchService(RemoteService):
 
 		return search.SearchResponse()
 
-	@remote.method(search.AutocompleteRequest, search.SearchResponse)
-	def autocomplete(self, request):
+        @remote.method(search.AutocompleteRequest, search.SearchResponse)
+        def autocomplete(self, request):
 
-		''' Generalized autocomplete. '''
+            ''' Generalized autocomplete. '''
 
-		return search.SearchResponse()
+            ids = []
+            if request.index:
+                query = IndexEntry.query(IndexEntry.substrings == request.query, ancestor = ndb.Key(Index, request.index))
+            else:
+                query = IndexEntry.query(IndexEntry.substrings == request.query)
+            for key in query.iter(keys_only=True):
+                ids.append(key.id())
+            return search.SearchResponse(ids=ids)

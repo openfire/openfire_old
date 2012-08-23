@@ -246,13 +246,13 @@ config['apptools.project.services'] = {
 
         ## Search API - provides methods to retrieve/traverse quick/autocomplete/fulltext search results
         'search': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.search.SearchService',
             'methods': ['quick', 'advanced', 'autocomplete'],
 
             'config': {
                 'caching': 'none',
-                'security': 'private',
+                'security': 'none',
                 'recording': 'none'
             }
         },
