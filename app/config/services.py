@@ -188,6 +188,23 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Payment API - dealing with everything payments.
+        'payment': {
+            'enabled': True,
+            'service': 'openfire.services.payment.PaymentService',
+            'methods': ['create_user_payment_account', 'get_user_payment_account',
+                        'create_project_payment_account', 'get_project_payment_account',
+                        'payment_history', 'admin_payment_history', 'back_project',
+                        'money_sources', 'remove_money_source', 'admin_money_sources', 'refund_payment',
+                        'withdraw_funds', 'withdrawal_history', 'admin_withdrawal_history'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## Project API - provides structured information about openfire projects
         'project': {
             'enabled': True,

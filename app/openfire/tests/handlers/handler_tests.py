@@ -118,3 +118,12 @@ class CustomUrlTestCase(OFTestCase):
     def test_custom_user_url(self):
         db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
         self.of_handler_test('/fakie')
+
+
+class PaymentHandlerTestCase(OFTestCase):
+    """ Test cases for the payment handler.
+    """
+
+    def test_payment_handler(self):
+        self.of_handler_test('/_payment/handler')
+
