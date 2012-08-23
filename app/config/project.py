@@ -42,6 +42,8 @@ config['apptools.project.output'] = {
 
     'analytics': {  # Analytics Settings
         'enable': True,              # whether to insert analytics code
+        'multitrack': True,			 # whether to enable support for multiple trackers
+        'anonymize': False,			 # whether to anonymize IPs before analytics
         'account_id': {
             'dev': 'UA-31611943-3',         # used when running from the devserver
             'staging': 'UA-31611943-2',    # used on the staging version of the site

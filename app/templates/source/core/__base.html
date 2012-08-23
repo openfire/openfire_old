@@ -124,41 +124,37 @@
 
 {% block page_services %}
 {% if page.services %}
-<script id='js_config' type='text/javascript' data-role='pageconfig'>
-	{% from "macros/page_object.js" import build_page_object %}
-	{{ build_native_page_object(page) }}
+<script id='js-config' type='application/json' data-role='pageconfig'>
+{%- block js_pageobject -%}
+{% from "macros/page_object.js" import build_native_page_object %}
+{{ build_native_page_object(page, transport, security) }}
+{%- endblock js_pageobject %}
 </script>
 {% endif %}
-{% endblock page_services %}
+{%- endblock page_services -%}
 
 {% block pageready %}
-<script id='js_deferred' type='text/javascript' data-role='pageready'>
-{% block pre_pageready %}{% endblock pre_pageready %}
+<script id='js-deferred' type='text/javascript' data-role='pageready'>
+{%- block pre_pageready -%}{% endblock pre_pageready %}
 _.ready(function (window) {
-
-	var __cfgst = 'js_config', _dftst = 'js_deferred',
-		_ofjscfg = document.getElementById(_cfgst), _ofdfrd = document.getElementById(_dfrst),
-		_ofinject = _.create_doc_frag('');
-
-	{% block pre_jsready %}{% endblock pre_jsready %}
-
-	{% block jsready %}
-	{% endblock jsready %}
-
-	{% block post_jsready %}{% endblock post_jsready %}
-
-	{% block page_analytics %}
-
-	{% if page.analytics %}
-	{% from "macros/page_analytics.js" import google_analytics_async %}
-	{{ google_analytics_naked(page.analytics) }}
-	{% endif %}
-
-	{% endblock %}
-
-	_ofinject.insertBefore(_.reduce(_lazy, function (x, y) { x.firstChild.parentNode.insertBefore(y); }));
+	var _gaq = _gaq || [], _gat = _gat || {}, _cfgst = 'js-config', _dfrst = 'js-deferred', _dfeln = 'script', _dfelt = 'text/javascript',
+		_ofjscfg = document.getElementById(_cfgst), _ofdfrd = document.getElementById(_dfrst), _ofinject = document.createDocumentFragment(),
+		_ofcfg = JSON.parse(document.getElementById(_cfgst).innerText), _ofrpc = $.apptools.api.rpc.factory(_ofcfg.services.apis),
+		_ofusr = _ofcfg.user ? $.apptools.user.setUserInfo({current_user: _ofcfg.user}) : {}, _ofrpcap = $.apptools.api.rpc.action_prefix = _ofcfg.services.endpoint,
+		{%- block pageready_js -%}
+		{%- block page_analytics -%}
+		{%- if page.analytics -%}
+		{%- from "macros/page_analytics.js" import google_analytics_naked -%}
+		{{ google_analytics_naked(page.analytics, page.analytics.multitrack, page.analytics.anonymize) }}
+		{%- endif -%}{%- endblock -%}
+		{%- block pre_jsready -%}{%- endblock pre_jsready -%}
+		{%- block jsready -%}{% endblock jsready %}
+		{%- block jsinject %}
+		undefined = _ofdfrd.parentElement.appendChild(_ofinject);
+		{%- endblock jsinject -%}
+		{%- block post_jsready -%}{% endblock post_jsready %}{% endblock pageready_js %}
 });
-{% block post_pageready %}{% endblock post_pageready %}
+{% block post_pageready %}{%- endblock post_pageready -%}
 </script>
 {% endblock pageready %}
 

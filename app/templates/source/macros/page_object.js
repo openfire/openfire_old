@@ -1,5 +1,4 @@
-{%- macro build_native_page_object(page, **kwargs) -%}
-
+{%- macro build_native_page_object(page, transport, security) -%}
 {{ {
 
 	'platform': {
@@ -14,37 +13,36 @@
 		'logging': (util.config.debug or api.users.is_current_user_admin()),
 		'eventlog': util.config.debug,
 		'verbose': util.config.debug,
-		'strict': util.config.strict
+		'strict': false
 	},
 
 	'push': {
-		'token': transport.realtime.channel if transport.realtime.enabled else none,
+		'token': transport.realtime.channel if transport.realtime.enabled else '',
 		'timeout': transport.realtime.timeout if transport.realtime.enabled else 0
 	} if transport.realtime.enabled else {},
 
 	'user': {
-		'k': encrypt(security.current_user.key.urlsafe()),
+		'k': util.handler.encrypt(security.current_user.key.urlsafe()),
 		'username': security.current_user.username,
 		'firstname': security.current_user.firstname,
 		'lastname': security.current_user.lastname,
-		'email': security.current_user.email(),
+		'email': security.current_user.email[0].id(),
 		'is_user_admin': api.users.is_current_user_admin(),
 		'custom_url': security.current_user.get_custom_url(),
-		'avatar': encrypt(security.current_user.avatar.urlsafe()) if security.current_user.has_avatar() else none,
-		'avatar_asset': encrypt(security.current_user.avatar.id()) if security.current_user.has_avatar() else none
-	} if security.current_user != none else none,
+		'avatar': util.handler.encrypt(security.current_user.avatar.urlsafe()) if security.current_user.has_avatar() else false,
+		'avatar_asset': util.handler.encrypt(security.current_user.avatar.id()) if security.current_user.has_avatar() else false
+	} if security.current_user != none else false,
 
 	'services': {
 
-		'endpoint': ['https', transport.services.endpoint].join('://') if transport.services.secure else ['http', transport.services.endpoint].join('://'),
+		'endpoint': '://'.join(['https', transport.services.endpoint]) if transport.services.secure else '://'.join(['http', transport.services.endpoint]),
 		'consumer': transport.services.consumer,
 		'scope': transport.services.scope,
-		'apis': [{'name': service, 'base_uri': action, 'methods': cfg.methods, 'config': opts} for service, action, cfg, opts in page.services.services_manifest]
+		'apis': transport.services.make_object(page.services)
 
 	}
 
-}.update(kwargs)|json|safe }}
-
+}|json|safe }}
 {%- endmacro -%}
 
 {%- macro build_page_object(services, config, page) -%}

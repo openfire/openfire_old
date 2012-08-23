@@ -276,6 +276,17 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         else:
             return super(WebHandler, self).render(*args, **kwargs)
 
+    def _make_services_object(self, services):
+
+		''' Make a dict suitable for JSON representing an API service. '''
+
+		return [{
+			'name': service,
+			'base_uri': action,
+			'methods': cfg['methods'],
+			'opts': opts
+		} for service, action, cfg, opts in services['services_manifest']]
+
     def _bindRuntimeTemplateContext(self, context):
 
         ''' Bind in the session '''
@@ -320,7 +331,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
                     'secure': False,
                     'endpoint': self.request.environ.get('HTTP_HOST'),
                     'consumer': 'ofapp',
-                    'scope': 'readonly'
+                    'scope': 'readonly',
+                    'make_object': lambda x: self._make_services_object(x)
                 },
 
                 # realtime/push config

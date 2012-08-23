@@ -35,9 +35,10 @@ class ProjectHome(WebHandler):
 
     ''' openfire page. '''
 
-    should_log = True     # activate handler-specific logging
-    should_cache = False   # activate fullpage caching
-    cache_timeout = 1200  # memcache fullpage caching timeout
+    should_log = True       # activate handler-specific logging
+    should_cache = False    # activate fullpage caching
+    should_preload = False  # whether to activate preloading    
+    cache_timeout = 1200    # memcache fullpage caching timeout
     template = 'projects/project_home.html'
 
     @webapp2.cached_property

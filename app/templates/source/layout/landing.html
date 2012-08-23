@@ -119,10 +119,8 @@
 </div>
 {% endblock %}
 
-{% block postsouth %}
-    <script type="text/javascript">
-        window.setTimeout(function() {
-            var graph = new ActivityGraph();
-        }, 250);
-    </script>
-{% endblock %}
+{% block post_jsready %}
+		window.setTimeout(function() {
+			var graph = new ActivityGraph();
+		}, 250);
+{%- endblock post_jsready -%}

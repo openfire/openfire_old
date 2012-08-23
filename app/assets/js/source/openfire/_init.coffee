@@ -96,15 +96,15 @@ class Openfire
                 # installs an openfire base object
                 object: (obj) =>
                     # stash for future queries
-                    @sys.state.objects[(o=obj.constructor.name)] = obj
+                    @sys.state.objects[(o=obj.name)] = obj
 
                     # register any object events
                     if obj.events?
                         window.apptools?.events?.register(obj.events)
 
                     # instantiate and bind to window, if obj isn't private
-                    if (obj = new obj(@)) and not (exp = obj.export)? or exp isnt 'private'
-                        window[o] = obj
+                    window[o] = obj unless obj.export is 'private'
+                    obj = new obj(@)
 
                     # lastly init, if it needs it
                     obj._init?()
@@ -113,24 +113,27 @@ class Openfire
 
                 # installs an openfire base class
                 class: (cls) =>
-                    @sys.state.classes[(cl=cls.constructor.name)] = cls
+                    @sys.state.classes[(cl=cls.name)] = cls
                     if cls.events?
                         window.apptools?.events?.register(cls.events)
-                    if (cls = new cls(@)) and not (exp = cls.export)? or exp isnt 'private'
-                        window[cl] = cls
+                    
+                    window[cl] = cls unless cls.export is 'private'
+                    cls = new cls(@)
+
                     cls._init?()
 
                     return cls
 
                 # installs an openfire controller
                 controller: (ctrlr) =>
-                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.constructor.name.toLowerCase()
+                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.name.toLowerCase()
 
-                    @sys.state.controllers[ctrlr.mount] = ctrlr
+                    @sys.state.controllers[mount_point] = ctrlr
                     if ctrlr.events?
                         window.apptools?.events?.register(ctrlr.events)
-                    if (ctrlr = new ctrlr(@, window)) and not (exp = ctrlr.export)? or exp isnt 'private'
-                        window[ctrlr.constructor.name] = ctrlr
+
+                    window[mount_point] = ctrlr unless ctrlr.export is 'private'
+                    ctrlr = new ctrlr(@, window)
 
                     @[mount_point] = ctrlr
                     ctrlr._init?()
