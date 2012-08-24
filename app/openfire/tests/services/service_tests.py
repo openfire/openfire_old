@@ -930,58 +930,6 @@ class UserServiceTestCase(OFTestCase):
         #content = response['response']['content']
 
 
-class SearchServiceTestCase(OFTestCase):
-
-    ''' Test cases for the search service. '''
-
-    def test_search_autocomplete_method(self):
-
-        ''' Add a topic to the database then query through the auto complete service. '''
-
-        slug = 'test'
-        db_loader.create_topic(slug=slug)
-        params = {
-            'query': slug,
-            'index': 'topic',
-        }
-        response = self.of_service_test('search', 'autocomplete', params=params)
-        self.assertEqual(response['response']['type'], 'SearchResponse',
-            'Search autocomplete service method failed to return proper response.')
-        self.assertEqual(len(response['response']['content']['ids']), 1,
-            'Failed to return the correct number of topics through autocomplete.')
-        self.assertEqual(response['response']['content']['ids'][0], slug,
-            'Failed to return the correct topic id through autocomplete.')
-
-    def test_search_topic_autocomplete_method(self):
-
-        ''' Add a topic to the database then query through the topic auto complete service. '''
-
-        slug = 'test'
-        topic_key = db_loader.create_topic(slug=slug)
-        params = {
-            'query': slug,
-        }
-
-        # Test a positive response.
-        response = self.of_service_test('search', 'topic_autocomplete', params=params)
-        self.assertEqual(response['response']['type'], 'Topics',
-            'Topic autocomplete service method failed to return proper response.')
-        self.assertEqual(len(response['response']['content']['topics']), 1,
-            'Failed to return the correct number of topics through topic autocomplete.')
-        self.assertEqual(response['response']['content']['topics'][0]['key'], topic_key.urlsafe(),
-            'Failed to return the correct topic key through autocomplete.')
-        self.assertEqual(response['response']['content']['topics'][0]['slug'], slug,
-            'Failed to return the correct topic slug through autocomplete.')
-
-        # Test a negative response.
-        params['query'] = 'NOWAY'
-        response = self.of_service_test('search', 'topic_autocomplete', params=params)
-        self.assertEqual(response['response']['type'], 'Topics',
-            'Topic autocomplete service method failed to return proper response.')
-        self.assertEqual(len(response['response']['content']), 0,
-            'Failed to return the correct number of topics (0) through topic autocomplete.')
-
-
 class PaymentServiceTestCase(OFTestCase):
 
     ''' Test cases for the payment service. '''
@@ -1162,3 +1110,32 @@ class SearchServiceTestCase(OFTestCase):
             'Failed to return the correct number of topics through autocomplete.')
         self.assertEqual(response['response']['content']['ids'][0], slug,
             'Failed to return the correct topic id through autocomplete.')
+
+    def test_search_topic_autocomplete_method(self):
+
+        ''' Add a topic to the database then query through the topic auto complete service. '''
+
+        slug = 'test'
+        topic_key = db_loader.create_topic(slug=slug)
+        params = {
+            'query': slug,
+        }
+
+        # Test a positive response.
+        response = self.of_service_test('search', 'topic_autocomplete', params=params)
+        self.assertEqual(response['response']['type'], 'Topics',
+            'Topic autocomplete service method failed to return proper response.')
+        self.assertEqual(len(response['response']['content']['topics']), 1,
+            'Failed to return the correct number of topics through topic autocomplete.')
+        self.assertEqual(response['response']['content']['topics'][0]['key'], topic_key.urlsafe(),
+            'Failed to return the correct topic key through autocomplete.')
+        self.assertEqual(response['response']['content']['topics'][0]['slug'], slug,
+            'Failed to return the correct topic slug through autocomplete.')
+
+        # Test a negative response.
+        params['query'] = 'NOWAY'
+        response = self.of_service_test('search', 'topic_autocomplete', params=params)
+        self.assertEqual(response['response']['type'], 'Topics',
+            'Topic autocomplete service method failed to return proper response.')
+        self.assertEqual(len(response['response']['content']), 0,
+            'Failed to return the correct number of topics (0) through topic autocomplete.')
