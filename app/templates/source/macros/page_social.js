@@ -1,6 +1,5 @@
 {% macro social_naked(page) %}
-		_gap1i = 'plusone', _gap1r = 'https://apis.google.com/js/plusone.js', _fbi = 'fbsdk',
-		_fbr = 'https://connect.facebook.net/en_US/all.js#xfbml=1&appId=257586781019220',
+		_gap1i = 'plusone', _gap1r = 'https://apis.google.com/js/plusone.js', _fbi = 'fbsdk', _fbr = 'https://connect.facebook.net/en_US/all.js',
 		undefined = _ofinject.appendChild(_.create_doc_frag(_.create_element_string(_dfeln, {
 			'id': ['js', _gap1i].join('-'), 'async': '', 'type': _dfelt, 'src': _gap1r, }, JSON.stringify({{ {'lang': 'en-US', 'parsetags': 'explicit'}|json|safe }})))),
 		_p1onload = _ofinject.lastChild.onload = function (ev) { gapi.plusone.render(_gap1i, {size: 'standard', annotation: 'none', 'width': 250, expandTo: 'bottom', callback: function (p1o) { $.openfire.analytics.track.social('google+', '+1', {}, '{{ page.url }}') }}); },

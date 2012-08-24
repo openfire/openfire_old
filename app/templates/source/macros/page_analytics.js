@@ -4,7 +4,7 @@
 	{%- set __ = account_ids.update({'openfire': config.account_id.dev}) -%}
 	{%- set __ = config.update({'selected_client': config.webclient.dev}) -%}
 {% else %}
-	{%- if (util.request.environ.get('HTTPS') != 'off') and not (util.handler.force_https) -%}
+	{%- if (util.request.get('environ', {}).get('HTTPS', {}) != 'off') and not (util.handler.force_https) -%}
 		{%- set __ = config.update({'selected_client': config.webclient.https}) -%}
 	{%- else -%}
 		{%- set __ = config.update({'selected_client': config.webclient.http}) -%}
@@ -28,7 +28,7 @@
 		{%- set __ = account_ids.update({'openfire': config.account_id.dev}) -%}
 		{%- set __ = config.update({'selected_client': config.webclient.dev}) -%}
 	{%- else -%}
-		{%- if (util.request.environ.get('HTTPS') != 'off') and not (util.handler.force_https) -%}
+		{%- if (util.request.get('environ', {}).get('HTTPS', 'off') != 'off') and not (util.handler.force_https) -%}
 			{%- set __ = config.update({'selected_client': config.webclient.https}) -%}
 		{%- else -%}
 			{%- set __ = config.update({'selected_client': config.webclient.http}) -%}
