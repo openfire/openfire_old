@@ -248,7 +248,7 @@ config['apptools.project.services'] = {
         'search': {
             'enabled': True,
             'service': 'openfire.services.search.SearchService',
-            'methods': ['quick', 'advanced', 'autocomplete'],
+            'methods': ['quick', 'advanced', 'autocomplete', 'topic_autocomplete'],
 
             'config': {
                 'caching': 'none',
