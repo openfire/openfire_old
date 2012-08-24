@@ -1,6 +1,7 @@
 import config
 from openfire.core.payment import wepay_api
-from openfire.models.payment import WePayUserPaymentAccount, WePayCreditCard
+from openfire.models.payment import (WePayUserPaymentAccount, WePayCreditCard, WePayCheckoutTransaction,
+        WePayWithdrawalTransaction)
 
 class CoreWePayAPI(object):
 
@@ -128,17 +129,103 @@ class CoreWePayAPI(object):
         return wepay_cc
 
 
-    def execute_payments(self, payments):
+    def execute_payment(self, payment):
 
-        ''' Execute many payments at once using WePay. '''
+        ''' Execute one payment using WePay. '''
 
-        pass
+        # Begin a checkout transaction.
+        transaction = WePayCheckoutTransaction(
+            action='ex',
+            status='i',
+            payment=payment.key,
+        )
+        transaction.put()
 
-    def refund_payments(self, payments):
+        payment.current_transaction = transaction.key
+        payment.transactions.append(transaction.key)
+        payment.status = 'x'
+        payment.put()
 
-        ''' Refund payments. '''
+        # Make the WePay create checkout API call.
+        wepay_obj = self.get_wepay_object()
+        response = wepay_obj.call('/checkout/create', {
+            # Required.
+            'account_id': payment.to_account.get().wepay_account_id,
+            'short_description': payment.description,
+            'type': 'DONATION', # TODO: Is this OK, or do we have to do goods?
+            'amount': payment.amount,
 
-        pass
+            # Required for cc tokenization.
+            'payment_method_type': 'credit_card',
+            'payment_method_id': payment.from_money_source.get().wepay_cc_id,
+
+            # Internal payment settings.
+            'reference_id': transaction.key.urlsafe(),
+            'app_fee': payment.commission,
+            'fee_payer': 'Payee',
+            'redirect_uri': self.config.get('redirect_uri', '/me'),
+            'callback_uri': self.config.get('callback_uri', '/_payment/handler'),
+            'auto_capture': True,
+
+            # Other fields that are not required but we could use.
+            #'long_description': ,
+            #'payer_email_message': ,
+            #'payee_email_message': ,
+            #'require_shipping': ,
+            #'shipping_fee': ,
+            #'charge_tax': ,
+            #'prefill_info': ,
+            #'funding_sources': ,
+
+            # Other fields that are not required and we should never use.
+            #'mode': ,
+            #'preapproval_id': ,
+        })
+
+        # Update the transaction with the returned checkout ID and state.
+        transaction.wepay_checkout_id = response['checkout_id']
+        transaction.wepay_checkout_status = response['state'] # TODO: Make this state_2_staus or something.
+        transaction.put()
+
+    def refund_payment(self, transaction, reason, amount=None):
+
+        ''' Refund a payment. '''
+
+        # Make the WePay create checkout API call.
+        wepay_obj = self.get_wepay_object()
+        params = {
+            'checkout_id': transaction.wepay_checkout_id,
+            'refund_reason': reason,
+        }
+        if amount != None:
+            params['amount'] = amount
+        response = wepay_obj.call('/checkout/refund', params)
+        transaction.wepay_checkout_status = response['state'] # TODO: Make this state_2_staus or something.
+        transaction.put()
+        return True
+
+    def generate_withdrawal(self, user, account, amount, note):
+
+        ''' Generate a url and object to track withdrawing funds from a payment account. '''
+
+        wepay_obj = self.get_wepay_object()
+        response = wepay_obj.call('/withdrawal/create', {
+            'account_id': account.wepay_account_id,
+            'amount': amount,
+            'note': note,
+            'redirect_uri': self.config.get('redirect_uri', '/me'),
+            'callback_uri': self.config.get('callback_uri', '/_payment/handler'),
+        })
+        withdrawal = WePayWithdrawalTransaction(
+            action='w',
+            account=account.key,
+            note=note,
+            user=user,
+            wepay_withdrawal_id=response['withdrawal_id'],
+            wepay_withdrawal_uri=response['withdrawal_uri'],
+        )
+        withdrawal.put()
+        return withdrawal
 
 
 WePayAPI = CoreWePayAPI()

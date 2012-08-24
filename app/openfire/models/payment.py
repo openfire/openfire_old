@@ -74,7 +74,7 @@ class Payment(AppModel):
     _pipeline_class = pipelines.PaymentPipeline
 
     description = ndb.StringProperty('n', indexed=True, required=True)
-    amount = ndb.StringProperty('a', indexed=True, required=True)
+    amount = ndb.FloatProperty('a', indexed=True, required=True)
     commission = ndb.FloatProperty('cut', indexed=True, default=0.0)
 
     # Status set: (Pledged, Executing, Executed, Refunding, Refunded, Cancelled, Error).
@@ -112,7 +112,7 @@ class Transaction(polymodel.PolyModel):
     action = ndb.StringProperty('a', indexed=True, choices=['ex', 'au', 'c', 'rt', 'rf', 'w'])
 
     # openfire status: (Initial, Pending, Completed, Cancelled, Error).
-    status = ndb.StringProperty('s', indexed=True, choices=['i', 'p', 'c', 'x', 'e'])
+    status = ndb.StringProperty('s', indexed=True, choices=['i', 'p', 'c', 'x', 'e'], default='i')
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)
     updated = ndb.DateTimeProperty('u', indexed=True, auto_now=True)
@@ -129,15 +129,16 @@ class WePayCheckoutTransaction(Transaction):
     # Associated payment object.
     payment = ndb.KeyProperty('p', indexed=True, required=True)
 
-    # WePay checkout ID.
-    wepay_checkout_id = ndb.IntegerProperty('wi', indexed=True, required=True)
+    # WePay checkout ID and URI.
+    wepay_checkout_id = ndb.IntegerProperty('wi', indexed=True, required=False)
+    wepay_checkout_uri = ndb.StringProperty('wu', indexed=True, required=False)
 
     # WePay States: (New, Authorized, Reserved, Captured, Settled, Cancelled, Refunded, Charged Back, Failed, Expired)
     wepay_checkout_status = ndb.StringProperty('ws', indexed=True, required=True, choices=[
-            'n', 'a', 'r', 'cp', 's', 'c', 'rf', 'cb', 'f', 'e'])
+            'n', 'a', 'r', 'cp', 's', 'c', 'rf', 'cb', 'f', 'e'], default='n')
 
     # Good or service is required by WePay. Choices are (GOODS, SERVICE, DONATION, PERSONAL).
-    good_or_service = ndb.StringProperty('gos', indexed=True, choices=['g', 's', 'd', 'p'], default='s')
+    good_or_service = ndb.StringProperty('gos', indexed=True, choices=['g', 's', 'd', 'p'], default='d')
 
 
 class WePayWithdrawalTransaction(Transaction):
@@ -154,15 +155,13 @@ class WePayWithdrawalTransaction(Transaction):
     # User withdrawing the funds.
     user = ndb.KeyProperty('us', indexed=True, required=True)
 
-    # Optional money source for the disbursement.
-    to_money_source = ndb.KeyProperty('tm', indexed=True, required=False)
-
-    # WePay withdrawal object ID.
+    # WePay withdrawal object ID and URI.
     wepay_withdrawal_id = ndb.IntegerProperty('wi', indexed=True, required=True)
+    wepay_withdrawal_uri = ndb.StringProperty('wu', indexed=True, required=False)
 
     # WePay States: (New, Authorized, Captured, Settled, Cancelled, Refunded, Failed, Expired)
     wepay_withdrawal_status = ndb.StringProperty('ws', indexed=True, required=True, choices=[
-            'n', 'a', 'cp', 's', 'c', 'rf', 'f', 'e'])
+            'n', 'a', 'cp', 's', 'c', 'rf', 'f', 'e'], default='n')
 
 
 class MoneySource(polymodel.PolyModel):

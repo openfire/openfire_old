@@ -67,7 +67,7 @@ class Payment(messages.Message):
     status = messages.StringField(5)
     error_message = messages.StringField(6)
     current_transaction = messages.MessageField(Transaction, 7)
-    transactions = messages.MessageField(Transaction, 8)
+    transactions = messages.MessageField(Transaction, 8, repeated=True)
     from_user = messages.StringField(9)
     from_account = messages.MessageField(UserPaymentAccount, 10)
     from_money_source = messages.MessageField(MoneySource, 11)
@@ -84,7 +84,7 @@ class PaymentHistory(messages.Message):
     ''' A payment history for a user or project. '''
 
     target = messages.StringField(1)
-    payments = messages.MessageField(Payment, 2)
+    payments = messages.MessageField(Payment, 2, repeated=True)
     start = messages.StringField(3)
     end = messages.StringField(4)
 
@@ -122,7 +122,7 @@ class MoneySources(messages.Message):
     ''' User money sources. '''
 
     user = messages.StringField(1)
-    sources = messages.MessageField(MoneySource, 2)
+    sources = messages.MessageField(MoneySource, 2, repeated=True)
 
 
 class RemoveMoneySource(messages.Message):
@@ -144,16 +144,23 @@ class WithdrawalRequest(messages.Message):
 
     ''' Request to withdraw funds from a project account. '''
 
-    project_account = messages.StringField(1)
+    account = messages.StringField(1)
     amount = messages.StringField(2)
-    to_account = messages.StringField(3)
-    note = messages.StringField(4)
-    status = messages.StringField(5)
+    note = messages.StringField(3)
+
+
+class WithdrawalResponse(messages.Message):
+
+    ''' Response allowing a user to withdraw funds from the provided url. '''
+
+    url = messages.StringField(1)
 
 
 class WithdrawalHistory(messages.Message):
 
-    ''' Withdrawal history for a user. '''
+    ''' Withdrawal history for a payment account. '''
 
-    user = messages.StringField(1)
-    withdrawals = messages.MessageField(WithdrawalRequest, 2)
+    account = messages.StringField(1)
+    withdrawals = messages.MessageField(WithdrawalRequest, 2, repeated=True)
+    start = messages.StringField(3)
+    end = messages.StringField(4)

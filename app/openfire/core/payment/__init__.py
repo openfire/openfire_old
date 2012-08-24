@@ -1,3 +1,4 @@
+from google.appengine.ext import ndb
 from openfire.core.payment.wepay import WePayAPI
 from openfire.models.payment import Payment, ProjectAccount, WePayProjectAccount
 
@@ -28,17 +29,19 @@ class CorePaymentAPI(object):
 
         ''' Create a sub account for a user to use to collect payments for a project. '''
 
-        account_id = WePayAPI.create_payment_account(name, description, wepay_account_id)
-        new_account = WePayProjectAccount(project=project_key, name=name, description=description, wepay_account_id=account_id)
+        wepay_account_id = WePayAPI.create_payment_account(name, description, wepay_account_id)
+        account_key = ndb.Key(WePayProjectAccount, project_key.urlsafe())
+        new_account = WePayProjectAccount(key=account_key, project=project_key, name=name,
+                description=description, wepay_account_id=wepay_account_id)
         new_account.put()
         return new_account
 
-    def account_for_project_key(self, project_key):
+    def account_for_project(self, project_key):
 
         ''' Return the payment account for the given project key, or none. '''
 
-        # TODO: Make it so that the id of the payment account key is the urlsafe key of the project.
-        return None
+        account_key = ndb.Key(WePayProjectAccount, project_key.urlsafe())
+        return account_key.get()
 
     def save_user_cc(self, user, cc_info):
 
@@ -50,7 +53,7 @@ class CorePaymentAPI(object):
 
         ''' Create a payment that records the contribution amount that will be charged if the project ignites. '''
 
-        description = 'todo: make description'
+        description = 'TODO: make description'
         payment = Payment(
             amount=amount,
             commission=self._calculate_commission(amount),
@@ -59,22 +62,36 @@ class CorePaymentAPI(object):
             from_user=money_source.owner,
             from_money_source=money_source,
             to_project=project_key,
-            to_account=self.account_for_project_key(project_key),
+            to_account=self.account_for_project(project_key),
         )
         payment.put()
         return payment
 
-    def charge_payments(self):
+    def charge_payments(self, payments):
 
         ''' Charge many payments at once when a project goal is completed. '''
 
-        pass
+        return [WePayAPI.execute_payment(p) for p in payments]
 
-    def refund_payments(self, payments):
+    def refund_payment(self, payment, amount=None):
 
-        ''' Refund payments. '''
+        ''' Refund a single payment. '''
 
-        pass
+        if not payment.current_transaction:
+            return False
+        transaction = payment.current_transaction.get()
+        if not transaction:
+            return False
+        return WePayAPI.refund_payment(transaction, amount)
+
+    def generate_withdrawal_url(self, user, account, amount, note):
+
+        ''' Generate a url where a user can withdraw money from a project payment account. '''
+
+        withdrawal = WePayAPI.generate_withdrawal(user, account, amount, note)
+        if not withdrawal:
+            return None
+        return withdrawal.wepay_withdrawal_uri
 
 
 # Payment API singleton.
