@@ -77,9 +77,9 @@ class Payment(AppModel):
     amount = ndb.StringProperty('a', indexed=True, required=True)
     commission = ndb.FloatProperty('cut', indexed=True, default=0.0)
 
-    # Status set: (Initial, Pending, Executing, Executed, Refunding, Refunded, Cancelled, Error).
+    # Status set: (Pledged, Executing, Executed, Refunding, Refunded, Cancelled, Error).
     status = ndb.StringProperty('s', indexed=True, required=True, choices=[
-            'i', 'p', 'x', 'ex', 'rg', 'rd', 'c', 'err'])
+            'p', 'x', 'ex', 'rg', 'rd', 'c', 'err'])
     error_message = ndb.StringProperty('em', required=False)
 
     # If a transaction is currently taking place, we keep its key on the payment model.
@@ -90,12 +90,11 @@ class Payment(AppModel):
 
     # From and to. All are required except from_account.
     from_user = ndb.KeyProperty('fu', indexed=True, required=True)
-    from_account = ndb.KeyProperty('fa', indexed=True, required=False)
-    from_money_source = ndb.KeyProperty('fm', indexed=True, required=False)
+    from_money_source = ndb.KeyProperty('fm', indexed=True, required=True)
 
     to_project = ndb.KeyProperty('tp', indexed=True, required=True)
     to_account = ndb.KeyProperty('ta', indexed=True, required=True)
-    to_money_source = ndb.KeyProperty('tm', indexed=True, required=False)
+    to_project_tier = ndb.KeyProperty('tt', indexed=True, required=False)
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)
     updated = ndb.DateTimeProperty('u', indexed=True, auto_now=True)

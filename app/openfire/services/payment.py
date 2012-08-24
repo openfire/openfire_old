@@ -43,33 +43,39 @@ class PaymentService(RemoteService):
 
         ''' Get payment account info for a project. '''
 
-        return payment_messages.ProjectAccount()
+        if not request.project:
+            return payment_messages.ProjectAccount()
 
-    @remote.method(payment_messages.PaymentHistory, payment_messages.PaymentHistory)
-    def payment_history(self, request):
+        if not request.key:
+            return payment_messages.ProjectAccount()
+        account = ndb.Key(urlsafe=request.key).get()
+        return account.to_message()
 
-        ''' Display a history of payments for a user or project. '''
-
-        return payment_messages.PaymentHistory()
-
-    @remote.method(payment_messages.PaymentHistory, payment_messages.PaymentHistory)
-    def admin_payment_history(self, request):
-
-        ''' View all payment history. Admin only. '''
-
-        return payment_messages.PaymentHistory()
-
-    @remote.method(payment_messages.BackProject, payment_messages.BackProject)
+    @remote.method(payment_messages.BackProject, Echo)
     def back_project(self, request):
 
         ''' Back a project with a credit card. Save and authorize the CC info, create a payment for tipping point. '''
 
-        return payment_messages.BackProject()
+        # If no money source is given, save the cc info as a money source first.
+        if not request.money_source and request.new_cc:
+            money_source = PaymentAPI.save_user_cc(request.session.user, request.new_cc)
+        elif request.money_source:
+            money_source = request.money_source
+        else:
+            # TODO: No money source provided?
+            return Echo(message='No money source provided.')
+
+        # Make a record of the payment amount to be charged if the projects ignites.
+        payment = PaymentAPI.back_project(request.project, request.tier, request.amount, money_source)
+        if not payment:
+            # TODO: What to do on error?
+            return Echo(message='There was an error...try again?')
+        return Echo(message='Thanks for contributing!')
 
     @remote.method(payment_messages.MoneySources, payment_messages.MoneySources)
     def money_sources(self, request):
 
-        ''' List money sources (saved credit cards) for a user payment account. '''
+        ''' List money sources (saved credit cards) for a user account. '''
 
         return payment_messages.MoneySources()
 
@@ -86,6 +92,20 @@ class PaymentService(RemoteService):
         ''' List all money sources. Admin only. '''
 
         return payment_messages.MoneySources()
+
+    @remote.method(payment_messages.PaymentHistory, payment_messages.PaymentHistory)
+    def payment_history(self, request):
+
+        ''' Display a history of payments for a user or project. '''
+
+        return payment_messages.PaymentHistory()
+
+    @remote.method(payment_messages.PaymentHistory, payment_messages.PaymentHistory)
+    def admin_payment_history(self, request):
+
+        ''' View all payment history. Admin only. '''
+
+        return payment_messages.PaymentHistory()
 
     @remote.method(payment_messages.RefundPayment, payment_messages.RefundPayment)
     def refund_payment(self, request):

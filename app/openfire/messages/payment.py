@@ -89,6 +89,22 @@ class PaymentHistory(messages.Message):
     end = messages.StringField(4)
 
 
+class CreditCard(messages.Message):
+    cc_num = messages.StringField(1)
+    ccv = messages.StringField(2)
+    expire_month = messages.StringField(3)
+    expire_year = messages.StringField(4)
+    user_name = messages.StringField(5)
+    email = messages.StringField(6)
+    address1 = messages.StringField(7)
+    address2 = messages.StringField(8)
+    city = messages.StringField(9)
+    state = messages.StringField(10)
+    country = messages.StringField(11)
+    zipcode = messages.StringField(12)
+    save_for_reuse = messages.BooleanField(13)
+
+
 class BackProject(messages.Message):
 
     ''' Request to back a project with money. '''
@@ -97,8 +113,8 @@ class BackProject(messages.Message):
     project = messages.StringField(2)
     tier = messages.StringField(3)
     amount = messages.StringField(4)
-    cc = messages.StringField(5)
-    save_cc = messages.BooleanField(6)
+    money_source = messages.MessageField(MoneySource, 5)
+    new_cc = messages.MessageField(CreditCard, 6)
 
 
 class MoneySources(messages.Message):

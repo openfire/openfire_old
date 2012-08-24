@@ -1,6 +1,6 @@
 import config
 from openfire.core.payment import wepay_api
-from openfire.models.payment import WePayUserPaymentAccount
+from openfire.models.payment import WePayUserPaymentAccount, WePayCreditCard
 
 class CoreWePayAPI(object):
 
@@ -75,17 +75,58 @@ class CoreWePayAPI(object):
         }
         try:
             obj = self.get_wepay_object(access_token=account.wepay_access_token)
-            response = obj.call('/account/create/', params=params)
+            response = obj.call('/account/create', params=params)
         except wepay_api.WePayError, e:
             return None # TODO: Better error with wepay re-auth url.
         return response['account_id']
 
 
-    def add_cc_to_account(self):
+    def save_cc_for_user(self, user, cc_info):
 
-        ''' Create a credit card entity in WePay and link it to a user account. '''
+        ''' Create a credit card entity in WePay, link it to a user account, and authorize it. '''
 
-        pass
+        # Make the WePay API call.
+        wepay_obj = self.get_wepay_object()
+        response = wepay_obj.call('/credit_card/create', {
+            'client_id': self.config.get('client_id', ''),
+            'user_name': cc_info.user_name,
+            'email': cc_info.email,
+            'cc_number': cc_info.cc_num,
+            'cvv': cc_info.ccv,
+            'expiration_month': cc_info.expire_month,
+            'expiration_year': cc_info.expire_year,
+            'address': {
+                'address1': cc_info.address1,
+                'address2': cc_info.address2,
+                'city': cc_info.city,
+                'state': cc_info.state,
+                'country': cc_info.country,
+                'zip': cc_info.zipcode
+            }
+        })
+
+        # Save the credit card object linked to the user.
+        wepay_cc = WePayCreditCard(
+            owner=user,
+            description=cc_info.cc_num[:4],
+            wepay_cc_id=response['credit_card_id'],
+            wepay_cc_state=response['state'],
+            save_for_reuse=cc_info.save_for_reuse,
+        )
+        wepay_cc.put()
+
+        # Authorize the credit card since we are not going to charge it immediately.
+        auth_response = wepay_obj.call('/credit_card/authorize', {
+            'client_id': self.config.get('client_id', ''),
+            'client_secret': self.config.get('client_secret', ''),
+            'credit_card_id': wepay_cc.wepay_cc_id
+        })
+        if auth_response['state'] != wepay_cc.wepay_cc_state:
+            wepay_cc.wepay_cc_state = auth_response['state']
+            wepay_cc.put()
+
+        return wepay_cc
+
 
     def execute_payments(self, payments):
 

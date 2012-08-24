@@ -1,9 +1,16 @@
 from openfire.core.payment.wepay import WePayAPI
-from openfire.models.payment import WePayProjectAccount
+from openfire.models.payment import Payment, ProjectAccount, WePayProjectAccount
 
 class CorePaymentAPI(object):
 
     ''' A core API for payments. '''
+
+    def _calculate_commission(self, amount):
+
+        ''' Calculate how much commission openfire should take from a particular pledge. '''
+
+        # TODO
+        return 1
 
     def generate_auth_url(self, user):
 
@@ -26,11 +33,36 @@ class CorePaymentAPI(object):
         new_account.put()
         return new_account
 
-    def add_payment_source(self):
+    def account_for_project_key(self, project_key):
 
-        ''' Adds a payment source to a user. '''
+        ''' Return the payment account for the given project key, or none. '''
 
-        pass
+        # TODO: Make it so that the id of the payment account key is the urlsafe key of the project.
+        return None
+
+    def save_user_cc(self, user, cc_info):
+
+        ''' Adds a credit card money source to a user. '''
+
+        return WePayAPI.save_cc_for_user(user, cc_info)
+
+    def back_project(self, project_key, tier_key, amount, money_source):
+
+        ''' Create a payment that records the contribution amount that will be charged if the project ignites. '''
+
+        description = 'todo: make description'
+        payment = Payment(
+            amount=amount,
+            commission=self._calculate_commission(amount),
+            description=description,
+            status='p',
+            from_user=money_source.owner,
+            from_money_source=money_source,
+            to_project=project_key,
+            to_account=self.account_for_project_key(project_key),
+        )
+        payment.put()
+        return payment
 
     def charge_payments(self):
 
