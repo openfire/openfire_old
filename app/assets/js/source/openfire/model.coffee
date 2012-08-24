@@ -1,9 +1,5 @@
 ## Openfire models
 
-# represents javascript key
-class Key extends Model
-
-
 # A single project card
 class ProjectCard  extends Model
 

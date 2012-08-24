@@ -80,14 +80,51 @@
 .editable,
 .mini-editable
   border: none
+  cursor: pointer
 
-.editorbutton
-  color: #737377
-  margin: 5px
-  display: inline-block
+  &:hover,
+  &:focus
+    background-color: #F7F694
 
-  &:hover
-    color: #aaa
+  &:focus
+    cursor: text
+
+.editor
+  -webkit-transition-property: top, opacity, z-index
+  opacity: 0
+  z-index: 1
+  width: auto
+  height: 40px
+  padding: 10px
+  top: -45px
+
+  &.active
+    opacity: 1
+    z-index: 999
+    top: 5px
+
+  .editorbutton
+    color: #737377
+    margin: 5px
+    display: inline-block
+
+    &::after
+      display: none
+      position: fixed
+      top: 25px
+      right: 15%
+      color: #333
+      content: attr(value)
+      background-color: #bada55
+
+    &:hover
+      color: #aaa
+
+      &::after
+        display: block
+
+  .editorstep
+    text-align: center
 
 @-webkit-keyframes rotate
   from

@@ -104,11 +104,11 @@ class Openfire
 
                     # instantiate and bind to window, if obj isn't private
                     window[o] = obj unless obj.export is 'private'
+
                     obj = new obj(@)
 
                     # lastly init, if it needs it
                     obj._init?()
-
                     return obj
 
                 # installs an openfire base class
@@ -116,12 +116,11 @@ class Openfire
                     @sys.state.classes[(cl=cls.name)] = cls
                     if cls.events?
                         window.apptools?.events?.register(cls.events)
-                    
+
                     window[cl] = cls unless cls.export is 'private'
                     cls = new cls(@)
 
                     cls._init?()
-
                     return cls
 
                 # installs an openfire controller
@@ -137,7 +136,6 @@ class Openfire
 
                     @[mount_point] = ctrlr
                     ctrlr._init?()
-
                     return ctrlr
 
 

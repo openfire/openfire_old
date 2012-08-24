@@ -23,47 +23,47 @@ class Session extends OpenfireObject
                 return
 
         # start a session
-        @start = () =>
+        @start = @open = () =>
             return
 
         # end the session
-        @end = () =>
+        @end = @close = () =>
             return
 
 # base user class: it's a user.
 class User extends Model
 
-    @export: 'private'
+    @export: 'public'
     @events: []
 
     model:
+        key: String()
         username: String()
         firstname: String()
         lastname: String()
         bio: String()
-        topics: Array()
+        topics: ListField(Topic)
         location: String()
-        email: Array()
+        email: ListField(Email)
 
-    constructor: () ->
-        
-        super
-
-        @attach_topic = (topic, callback) ->
-            return
-
+    attach_topic: (topic, callback) =>
+        return @
 
 
 # topic: describes a topic of interest, attached to a User
 class Topic extends Model
 
-    @export: 'private'
+    @export: 'public'
 
     model:
+        key: String()
         slug: String()
         name: String()
         description: String()
         user_count: Number()
+
+# an account email, attached to a user
+class Email extends Model
 
 
 class UserController extends OpenfireController
@@ -88,28 +88,21 @@ class UserController extends OpenfireController
     constructor: (openfire, window) ->
 
         @_state =
-
             init: false
 
+        @user = new User()
         @session = new Session()
 
         # auth methods
-        @open = () =>
-            return @session.start()
-
-        @close = () =>
-            return @session.end()
-
         @login = () =>
             return
 
         @logout = () =>
             return
 
-
-        # user methods
-        @create = () =>
-            return        
+        # user methods (won't use until accts)
+        @new = () =>
+            return
 
         @get = () =>
             return
@@ -121,22 +114,63 @@ class UserController extends OpenfireController
             return
 
         # profile methods
-        @update_profile = () =>
-            return
+        @profile =
 
-        @attach_avatar = () =>
-            return
+            get: (sync=false) =>
+                return @user if not sync
+                return $.apptools.api.user.profile(user: @user.key).fulfill
+                    success: (response) =>
+                        return @user.from_message(response)
+                    failure: (error) =>
+                        $.apptools.dev.error('User profile get() error:', error)
+                        return @user
 
-        @add_topic = () =>
-            return
+            put: () =>
+                return $.apptools.api.user.profile(@user.to_message()).fulfill
+                    success: (response) =>
+                        return @user.from_message(response)
+                    failure: (error) =>
+                        $.apptools.dev.error('User profile put() error:', error)
+                        return @user
 
-        @suggest_topic = () =>
-            return
+            edit: () =>
+
+        # topic methods
+        @topics =
+
+            list: (sync=false) =>
+                return @profile.get(sync).topics
+
+            add: () =>
+
+            remove: () =>
+
+            pick: (topic) =>
+                @user.topics.pick(topic)
+                return @user
+
+            set: (topic_array) =>
+                @user.topics = new ListField().join(topic_array)
+                return @user
+
+            edit: () =>
+
+            suggest: () =>
+
+        # avatar methods
+        @avatar =
+            list: () =>
+
+            edit: () =>
+
+            attach: () =>
+
+            remove: () =>
 
         @_init = () =>
-            return
+            return @
 
-        return
+        return @
 
 if @__openfire_preinit?
     @__openfire_preinit.abstract_base_objects.push(Session)

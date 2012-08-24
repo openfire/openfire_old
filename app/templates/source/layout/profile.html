@@ -17,99 +17,113 @@
         <!-- Profile Content -->
         <div id='profile'>
 
-            <div id='profiletop'>
+            <div class="left" id='profiletop'>
 
                 <!-- Avatar Stack -->
-                <div class='left'>
+                <div class="left" id='avatar'>
+                    <img {{ {
+                        'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify((len(user.email) and user.email[0].id() or "codebot@openfi.re"), 'jpg', '175'),
+                        'width': '175',
+                        'height': '175',
+                        'alt': 'you!',
+                        'onclick': "javascript:window.location.href='%s';" % link('user/me')
+                    }|xmlattr }} /></a>
+                    {% if edit_privs %}
+                        <div id='avatar_edit_overlay'>
+                            <a href="#"><span class='left momentron'>&#xf006d;</span>&nbsp;&nbsp;<span class='change_avatar_label'>Change avatar</span></a>
+                        </div>
+                    {% endif %}
+                </div><!-- end #avatar.left -->
 
-                    <div id='avatar'>
-                        <img {{ {
-                            'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify((len(user.email) and user.email[0].id() or "codebot@openfi.re"), 'jpg', '175'),
-                            'width': '175',
-                            'height': '175',
-                            'alt': 'you!',
-                            'onclick': "javascript:window.location.href='%s';" % link('user/me')
-                        }|xmlattr }} /></a>
+                <div id='byline' class='foldable'>
+
+                    <div id='topbanner'>
+                        <h1 id='name'>{{ user.firstname }} {{ user.lastname }}</h1>
+                        <h3 id='topics'>
+
+                            <span class='interest topic tag' data-topic-slug='technology'>
+                                Technology{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
+                            </span>,
+                            <span class='interest topic tag' data-topic-slug='dentistry'>
+                                Dentistry{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
+                            </span>,
+                            <span class='interest topic tag' data-topic-slug='taxidermy'>
+                                Taxidermy{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
+                            </span>
+                            {% if edit_privs %}
+                                <span class="tag add" value="add topic">add topic</span>
+                            {% endif %}
+                        </h3><!-- end #topics -->
+                    </div><!-- end #name+topics -->
+
+                    <div id='userinfo'>
+                        <span>{{ user.bio|lower }}</span>
+                        <span><a href="#">{{ user.location|lower }}</a></span>
                         {% if edit_privs %}
-                            <div id='avatar_edit_overlay'>
-                                <a href="#" class='snapall absolute'>
-                                    <span class='momentron'>&#xf006d;</span> <span class='absolute snapall change_avatar_label'>Change avatar</span>
-                                </a>
-                            </div>
+                            <span class="right"><a href="#">(edit)</a></span>
                         {% endif %}
-                    </div><!-- end #avatar -->
+                    </div><!-- end #userinfo -->
 
-                    <div id='byline' class='collapsed foldable'>
+                    <div {{ {
 
-                        <div id='topbanner'>
-                            <h1 id='name'>{{ user.firstname }} {{ user.lastname }}</h1>
-                            <h3 id='topics'>
-                                <span class='interest topic' data-topic-slug='technology'>Technology</span>,
-                                <span class='interest topic' data-topic-slug='dentistry'>Dentistry</span>,
-                                <span class='interest topic' data-topic-slug='taxidermy'>Taxidermy</span>
-                            </h3><!-- end #topics -->
-                            <div class='clearfix'></div>
-                        </div><!-- end #name+topics -->
+                        'id': 'userbio',
+                        'data-keyname': 'profile_summary' if edit_privs == true else none,
+                        'data-namespace': encrypt(user.key.urlsafe()) if edit_privs == true else none,
+                        'data-options': util.converters.json.dumps({"bundle": "basic"}),
+                        'class': 'right dynamic mini-editable profile section' if edit_privs == true else 'right dynamic profile section',
 
-                        <div id='userinfo'>
-                            <ul>
-                                <li>{{ user.bio|lower }}</li>
-                                <li>located in <a href="#">{{ user.location|lower }}</a></li>
-                            </ul>
-                        </div><!-- end #userinfo -->
+                    }|xmlattr }}>
+                        {% content 'profile_summary', user.key.urlsafe() %}
+                            {{ lipsum(3) }}
+                            {% endcontent %}
+                        <div id="userbio-toggle" data-href="#userbio" class="target-link"></div>
+                    </div><!-- end #userbio -->
 
-                    </div><!-- end #byline -->
 
-                </div><!-- end .left -->
+                </div><!-- end #byline -->
 
             </div><!-- end #profiletop -->
 
-            <div id='leftbar'>
-                <div id='social_profiles'>
-                    <div class='zocial facebook icon'></div>
-                    <div class='zocial googleplus icon'></div>
-                    <div class='zocial github icon'></div>
-                    <div class='zocial linkedin icon'></div>
-                </div>
-            </div><!-- end #leftbar -->
+            <div id="profilemain">
 
-            <div id='contentpane'>
+                <div id='leftbar'>
+                    <div id='social_profiles'>
+                        <div class='zocial facebook icon'></div>
+                        <div class='zocial googleplus icon'></div>
+                        <div class='zocial github icon'></div>
+                        <div class='zocial linkedin icon'></div>
+                        {% if edit_privs %}<button class="tag add"></button>{% endif %}
+                    </div>
+                </div><!-- end #leftbar -->
 
-                <div {{ {
+                <div id="rightbar">
+                    <div id="userstats">
+                        {% if edit_privs %}
+                        <div id="user-contributions"><h5>contributions</h5></div>
+                        <div id="user-proposals"><h5>proposals</h5></div>
+                        {% endif %}
 
-                    'id': 'userbio',
-                    'data-keyname': 'profile_summary' if edit_privs == true else none,
-                    'data-namespace': encrypt(user.key.urlsafe()) if edit_privs == true else none,
-                    'class': 'dynamic mini-editable collapsed profile section' if edit_privs == true else 'dynamic collapsed profile section',
+                        <div id="user-followers"><h5>followers</h5></div>
+                        <div id="user-activity"><h5>activity</h5></div>
+                    </div>
+                </div><!-- end #rightbar -->
 
-                }|xmlattr }}>
-                    {% content 'profile_summary', user.key.urlsafe() %}
-                        Sagittis montes litora fringilla lobortis condimentum donec, suscipit conubia ad amet class diam, purus ac vestibulum eget proin, tempor fermentum.
-                    {% endcontent %}
-                </div><!-- end #userbio -->
+                <div id='contentpane'>
 
-               <div id='freeform' class='collapsed profile section'>
-                    {% block freeform %}
-                        <div {{ {
+                    <div id="user-teams">
+                        <h4>Teams</h4>
+                        teams teams teams
+                    </div>
+                    <div id="user-projects">
+                        <h4>Projects</h4>
+                        projects projects projects
+                    </div>
 
-                            'id': 'profile_freeform',
-                            'data-keyname': 'profile_freeform' if edit_privs == true else none,
-                            'data-namespace': encrypt(user.key.urlsafe()) if edit_privs == true else none,
-                            'class': 'dynamic mini-editable' if edit_privs == true else 'dynamic'
+                </div><!-- end #contentpane -->
 
-                        }|xmlattr }}>
-
-                            {% content 'profile_freeform', user.key.urlsafe() %}
-                                <b>Default content! I am overridden when you edit!</b>
-                            {% endcontent %}
-
-                        </div><!-- end #profile_freeform -->
-                    {% endblock freeform %}
-                </div><!-- end #freeform -->
-
-            </div><!-- end #contentpane -->
-
+            </div><!-- end #profilemain -->
         </div><!-- end #profile -->
+
     </div><!-- end #content -->
 
 {% endblock %}
