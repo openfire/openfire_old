@@ -116,7 +116,7 @@ class Openfire
                     @sys.state.classes[(cl=cls.name)] = cls
                     if cls.events?
                         window.apptools?.events?.register(cls.events)
-                    
+
                     window[cl] = cls unless cls.export is 'private'
                     cls = new cls(@)
 
