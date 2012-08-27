@@ -30,6 +30,21 @@ class Session extends OpenfireObject
         @end = @close = () =>
             return
 
+
+# topic: describes a topic of interest, attached to a User
+class Topic extends Model
+
+    @export: 'public'
+    model:
+        key: String()
+        slug: String()
+        name: String()
+        description: String()
+        user_count: Number()
+
+# an account email, attached to a user
+class Email extends Model
+
 # base user class: it's a user.
 class User extends Model
 
@@ -46,24 +61,27 @@ class User extends Model
         location: String()
         email: ListField(Email)
 
+    constructor: (@user) ->
+        super
+
+        @get = () =>
+            return $.apptools.api.user.profile(user: @key).fulfill
+                success: (r) =>
+                    @from_message(r)
+                    return @
+                failure: (e) =>
+                    return @
+
+        @put = (sync=false) =>
+            return $.apptools.api.user.profile(@to_message()).fulfill
+                success: (r) =>
+                    @from_message(r)
+                    return @
+                failure: (e) =>
+                    return @
+
     attach_topic: (topic, callback) =>
         return @
-
-
-# topic: describes a topic of interest, attached to a User
-class Topic extends Model
-
-    @export: 'public'
-
-    model:
-        key: String()
-        slug: String()
-        name: String()
-        description: String()
-        user_count: Number()
-
-# an account email, attached to a user
-class Email extends Model
 
 
 class UserController extends OpenfireController
@@ -85,13 +103,15 @@ class UserController extends OpenfireController
         'USER_CONTROLLER_READY'
     ]
 
+    template: ''
+
     constructor: (openfire, window) ->
+
+        @user = (if (k=$.apptools.user.current_user)? then new User($.apptools.user.current_user.k) else null)
+        super()
 
         @_state =
             init: false
-
-        @user = new User()
-        @session = new Session()
 
         # auth methods
         @login = () =>
@@ -104,11 +124,11 @@ class UserController extends OpenfireController
         @new = () =>
             return
 
-        @get = () =>
-            return
+        @get = (sync=false) =>
+            return (if sync then @user.get() else @user)
 
-        @update = () =>
-            return
+        @put = (sync=false) =>
+            return (if sync then @user.put() else @user)
 
         @delete = () =>
             return
@@ -116,16 +136,13 @@ class UserController extends OpenfireController
         # profile methods
         @profile =
 
-            get: (sync=false) =>
-                return @user if not sync
-                return $.apptools.api.user.profile(user: @user.key).fulfill
-                    success: (response) =>
-                        return @user.from_message(response)
-                    failure: (error) =>
-                        $.apptools.dev.error('User profile get() error:', error)
-                        return @user
+            get: (sync=false, cb) =>
+                if typeof sync is 'function'
+                    cb = sync
+                    sync = false
+                return @get(sync)
 
-            put: () =>
+            put: (cb) =>
                 return $.apptools.api.user.profile(@user.to_message()).fulfill
                     success: (response) =>
                         return @user.from_message(response)
@@ -140,20 +157,46 @@ class UserController extends OpenfireController
 
             list: (sync=false) =>
                 return @profile.get(sync).topics
-
             add: () =>
-
             remove: () =>
 
             pick: (topic) =>
                 @user.topics.pick(topic)
                 return @user
 
-            set: (topic_array) =>
-                @user.topics = new ListField().join(topic_array)
-                return @user
+            set: (topic_array, sync=false) =>
+                user = @user
+                user.topics = new ListField().join(topic_array)
+                return (@user = user) if not sync
+                return $.apptools.api.user.set_topics(user.to_message()).fulfill
+                    success: (response) =>
+                        return @user = user.from_message(response)
+                    failure: (error) =>
+                        console.log('Error setting user topics:', error)
+                        return user
 
             edit: () =>
+                modal_id = 'user-topic-editor'
+                topics = @topics.list(true)
+                @template.t = '{{>topics}}<span class="topic-edit" id="topic-edit-{{=key}}">{{=name}}</span>{{/topics}}'
+
+                if !!(modal = $.apptools.widgets.modal.get(modal_id))
+                    return modal.render(@template.render(@user.to_message()))
+
+                else
+                    df = _.create_doc_frag _.create_element_string('div',
+                        id: modal_id
+                        class: 'pre-modal'
+                        style: 'opacity: 0;'
+                        'data-title': 'editing user topics...'
+                    , @template.render(@user.to_message())), _.create_element_string('a',
+                        id: 'a-'+modal_id
+                        style: 'display: none'
+                    , '')
+
+                    return $.apptools.widgets.modal.create(document.body.appendChild(df.firstChild), document.body.appendChild(df.lastChild), (m) =>
+                        return m.open()
+                    , {})
 
             suggest: () =>
 

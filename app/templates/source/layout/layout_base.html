@@ -44,16 +44,9 @@
 					<a href='{{ link("auth/logout") }}' title='Log Out'>Log Out</a>
 				</div>
 			</li>
-		{% else %}
-			<li>
-				<div id='topbox_topfold'>
-					<a id='loginsignup_trigger' href="{{ link('auth/login') }}" title="Log In">Log In</a> &amp; <a id='signup_trigger' href="{{ link('auth/register') }}">Sign Up</a>
-				</div>
 
-				<div id='loginsignup_dropdown' class='xhidden'>
-					loginsignup
-				</div>
-			</li>
+		{% else %}
+			<li><a id='login_trigger' href="{{ link('auth/login') }}" title="Log In">Log In &amp; Signup</a></li>
 		{% endif %}
 
 	</ul>
