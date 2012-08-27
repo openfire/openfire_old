@@ -59,6 +59,7 @@
                     <div id='userinfo'>
                         <span>{{ user.bio|lower }}</span>
                         <span><a href="#">{{ user.location|lower }}</a></span>
+
                         {% if edit_privs %}
                             <span class="right"><a href="#">(edit)</a></span>
                         {% endif %}
