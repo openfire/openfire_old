@@ -65,6 +65,7 @@ config['apptools.project.assets'] = {
             'assets': {
                 'modernizr': {'min': False, 'version': '2.0.6-c'},          # Modernizr - browser polyfill + compatibility testing
                 'jquery': {'min': True, 'version': '1.8.0'},                # jQuery: Write Less, Do More!
+                'jquery-full': {'min': True, 'version': '1.8.0', 'name': 'jquery.full'},
                 'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},   # D3 - Visualizations
                 'jacked': {'min': True, 'version': '1.0'},                  # Jacked - tweening animation engine
             }

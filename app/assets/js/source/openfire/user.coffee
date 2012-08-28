@@ -65,7 +65,7 @@ class User extends Model
         super
 
         @get = () =>
-            return $.apptools.api.user.profile(user: @key).fulfill
+            return $.apptools.api.user.profile(user: @username).fulfill
                 success: (r) =>
                     @from_message(r)
                     return @
@@ -106,8 +106,10 @@ class UserController extends OpenfireController
     template: ''
 
     constructor: (openfire, window) ->
+        if (u = $.apptools.user.current_user)?
+            @user = new User(username: u.username)
+            @user.get()
 
-        @user = (if (k=$.apptools.user.current_user)? then new User($.apptools.user.current_user.k) else null)
         super()
 
         @_state =
@@ -120,19 +122,6 @@ class UserController extends OpenfireController
         @logout = () =>
             return
 
-        # user methods (won't use until accts)
-        @new = () =>
-            return
-
-        @get = (sync=false) =>
-            return (if sync then @user.get() else @user)
-
-        @put = (sync=false) =>
-            return (if sync then @user.put() else @user)
-
-        @delete = () =>
-            return
-
         # profile methods
         @profile =
 
@@ -140,7 +129,8 @@ class UserController extends OpenfireController
                 if typeof sync is 'function'
                     cb = sync
                     sync = false
-                return @get(sync)
+                profile = @get(sync)
+                return (if cb? then cb(profile) else profile)
 
             put: (cb) =>
                 return $.apptools.api.user.profile(@user.to_message()).fulfill
@@ -155,48 +145,54 @@ class UserController extends OpenfireController
         # topic methods
         @topics =
 
-            list: (sync=false) =>
-                return @profile.get(sync).topics
+            list: (sync=false, cb) =>
+                if typeof sync is 'function'
+                    cb = sync
+                    sync = false
+                topics = @get(sync).topics
+                return (if cb? then cb(topics) else topics)
+
             add: () =>
             remove: () =>
-
-            pick: (topic) =>
-                @user.topics.pick(topic)
-                return @user
 
             set: (topic_array, sync=false) =>
                 user = @user
                 user.topics = new ListField().join(topic_array)
                 return (@user = user) if not sync
                 return $.apptools.api.user.set_topics(user.to_message()).fulfill
-                    success: (response) =>
+                    success: (r) =>
+                        _.get('#topics').innerHTML = @template.render('{{>topics}}<span class="interest topic tag" data-topic-slug="{{=slug}}">{{=name}}<span class="delete-tag">x</span></span>{{/topics}}', user)
                         return @user = user.from_message(response)
-                    failure: (error) =>
+                    failure: (e) =>
                         console.log('Error setting user topics:', error)
-                        return user
+                        return @user
 
             edit: () =>
                 modal_id = 'user-topic-editor'
-                topics = @topics.list(true)
-                @template.t = '{{>topics}}<span class="topic-edit" id="topic-edit-{{=key}}">{{=name}}</span>{{/topics}}'
+                t = '{{>topics}}<span class="topic-edit" id="topic-edit-{{=key}}">{{=name}}</span>{{/topics}}'
 
-                if !!(modal = $.apptools.widgets.modal.get(modal_id))
-                    return modal.render(@template.render(@user.to_message()))
+                return @topics.list true, (topics) =>
 
-                else
-                    df = _.create_doc_frag _.create_element_string('div',
-                        id: modal_id
-                        class: 'pre-modal'
-                        style: 'opacity: 0;'
-                        'data-title': 'editing user topics...'
-                    , @template.render(@user.to_message())), _.create_element_string('a',
-                        id: 'a-'+modal_id
-                        style: 'display: none'
-                    , '')
+                    if !!(modal = $.apptools.widgets.modal.get(modal_id))
+                        return modal.render(@template.render(t, @user.to_message()))
 
-                    return $.apptools.widgets.modal.create(document.body.appendChild(df.firstChild), document.body.appendChild(df.lastChild), (m) =>
-                        return m.open()
-                    , {})
+                    else
+                        df = _.create_doc_frag _.create_element_string('div',
+                            id: modal_id
+                            class: 'pre-modal'
+                            style: 'opacity: 0;'
+                            'data-title': 'editing user topics...'
+                        , @template.render(t, @user.to_message())), _.create_element_string('a',
+                            id: 'a-'+modal_id
+                            style: 'display: none'
+                        , '')
+                        modal = df.firstChild
+                        trigger = df.lastChild
+                        document.body.appendChild(df)
+
+                        return $.apptools.widgets.modal.create(modal, trigger, (m) =>
+                            return m.open()
+                        , {})
 
             suggest: () =>
 
