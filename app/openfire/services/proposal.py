@@ -5,6 +5,8 @@ from openfire.services import RemoteService
 from openfire.messages import proposal as proposal_messages
 from openfire.messages import common as common_messages
 from openfire.models.project import Proposal, Project
+from openfire.models.payment import WePayUserPaymentAccount
+from openfire.core.payment import PaymentAPI
 
 class ProposalService(RemoteService):
 
@@ -114,6 +116,15 @@ class ProposalService(RemoteService):
                 owners=proposal.owners,
         )
         new_project.put()
+
+        # If any of the owners has a payment account linked, create a collection account for this project.
+        for owner_key in proposal.owners:
+            accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == owner_key).fetch()
+            if accounts and len(accounts):
+                # Create a collection account for this project owner only.
+                PaymentAPI.create_project_payment_account(new_project.key, new_project.name,
+                        'Collection account for ' + new_project.name, accounts[0])
+                break
 
         # Accept the proposal
         proposal.status = 'a'

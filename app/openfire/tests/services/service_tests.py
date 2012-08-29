@@ -1006,7 +1006,7 @@ class PaymentServiceTestCase(OFTestCase):
 
         params = {}
         response = self.of_service_test('payment', 'back_project', params=params)
-        self.assertEqual(response['response']['type'], 'BackProject',
+        self.assertEqual(response['response']['type'], 'Echo',
             'Failed to return correct response type from payment back_project service.')
         content = response['response']['content']
         #self.assetTrue(content, 'Failed to return content from the payment back_project service.')
@@ -1050,7 +1050,7 @@ class PaymentServiceTestCase(OFTestCase):
 
         params = {}
         response = self.of_service_test('payment', 'refund_payment', params=params)
-        self.assertEqual(response['response']['type'], 'RefundPayment',
+        self.assertEqual(response['response']['type'], 'Echo',
             'Failed to return correct response type from payment refund_payment service.')
         content = response['response']['content']
         #self.assetTrue(content, 'Failed to return content from the payment refund_payment service.')
@@ -1061,7 +1061,7 @@ class PaymentServiceTestCase(OFTestCase):
 
         params = {}
         response = self.of_service_test('payment', 'withdraw_funds', params=params)
-        self.assertEqual(response['response']['type'], 'WithdrawalRequest',
+        self.assertEqual(response['response']['type'], 'WithdrawalResponse',
             'Failed to return correct response type from payment withdraw_funds service.')
         content = response['response']['content']
         #self.assetTrue(content, 'Failed to return content from the payment withdraw_funds service.')

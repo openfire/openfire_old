@@ -4,4 +4,33 @@
     <div>
         <p>Edit your account info</p>
     </div>
+
+    <div>
+        <h2>Payment Accounts</h2>
+        {% if wepay_account %}
+            <div>
+                <span>You have linked your WePay account with openfire.</span>
+                <span>WePay User ID: {{ wepay_account.wepay_user_id }}</span>
+            </div>
+            <div>
+            {% if project_accounts %}
+                <span>Here is a list of your payment accounts for your project</span>
+                {% for account in project_accounts %}
+                    <li class="wepay-project-account">
+                        <span class="wepay-account-name">{{ account.name }}</span>
+                        <span class="wepay-account-balance">${{ account.balance }}</span>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <span>You do not have any project payment accounts.</span>
+            {% endif %}
+            </div>
+        {% else %}
+            <button id="link-wepay-account-btn" type="button">Link a WePay Account</button>
+            <div id="link-wepay-account-inline" style="display: none;">
+                <span>Visit this WePay link to authorize openfire to access your new or existing WePay account.</span>
+                <span><a href="" id="link-wepay-account-link"></a></span>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

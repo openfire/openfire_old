@@ -14,18 +14,21 @@ class PaymentService(RemoteService):
 
     ''' Payment service api. '''
 
-    @remote.method(message_types.VoidMessage, payment_messages.AuthURL)
+    @remote.method(payment_messages.AuthURL, payment_messages.AuthURL)
     def get_auth_url(self, request):
 
         ''' Generate an oauth url that the user can visit to authorize the openfire app. '''
 
-        url = PaymentAPI.generate_auth_url(request.session.user)
+        url = PaymentAPI.generate_auth_url(self.user)
         return payment_messages.AuthURL(url=url)
 
     @remote.method(payment_messages.UserPaymentAccount, payment_messages.UserPaymentAccount)
     def get_user_payment_account(self, request):
 
         ''' Get payment account info for a user. '''
+
+        if not request.key:
+            return payment_messages.UserPaymentAccount()
 
         account = ndb.Key(urlsafe=request.key).get()
         return account.to_message()
@@ -34,6 +37,9 @@ class PaymentService(RemoteService):
     def create_project_payment_account(self, request):
 
         ''' Create a wepay sub-account on a user's payment account to collect money for a project. '''
+
+        if not request.project:
+            return payment_messages.ProjectAccount()
 
         project_key = ndb.Key(urlsafe=request.project)
         project_account = PaymentAPI.create_project_payment_account(project_key, request.name,
@@ -79,6 +85,9 @@ class PaymentService(RemoteService):
 
         ''' List money sources (saved credit cards) for a user account. '''
 
+        if not request.user:
+            return payment_messages.MoneySources()
+
         user_key = ndb.Key(urlsafe=request.user)
         user = user_key.get()
         if not user:
@@ -93,6 +102,9 @@ class PaymentService(RemoteService):
     def remove_money_source(self, request):
 
         ''' Remove a money source from a user payment account by setting save for reuse to false. '''
+
+        if not request.source:
+            return Echo(message='No money source provided')
 
         source_key = ndb.Key(urlsafe=request.source)
         source = source_key.get()
@@ -118,6 +130,9 @@ class PaymentService(RemoteService):
         ''' Display a history of payments for a user or project. '''
 
         # TODO: Permissions.
+
+        if not request.target:
+            return payment_messages.PaymentHistory()
 
         target_key = ndb.Key(urlsafe=request.target)
         kind = target_key.kind()
@@ -158,6 +173,9 @@ class PaymentService(RemoteService):
 
         ''' Start a refund for a payment. '''
 
+        if not request.payment:
+            return Echo(message='No payment provided.')
+
         payment_key = ndb.Key(urlsafe=request.payment)
         payment = payment_key.get()
         if not payment:
@@ -173,6 +191,9 @@ class PaymentService(RemoteService):
 
         ''' Request to withdraw funds. Provides a wepay link to do the actual withdrawal. '''
 
+        if not request.account:
+            return payment_messages.WithdrawalResponse()
+
         account_key = ndb.Key(urlsafe=request.account)
         account = account_key.get()
         if not account:
@@ -186,6 +207,9 @@ class PaymentService(RemoteService):
         ''' Get a history of withdrawals for a project account. '''
 
         # TODO: Permissions.
+
+        if not request.account:
+            return payment_messages.WithdrawalHistory()
 
         account_key = ndb.Key(urlsafe=request.account)
         query = WePayWithdrawalTransaction.query(WePayWithdrawalTransaction.account == account_key)

@@ -19,20 +19,20 @@ class CorePaymentAPI(object):
 
         return WePayAPI.generate_oauth_url(user)
 
-    def create_user_payment_account(self, user, **kwargs):
+    def create_user_payment_account(self, user, *args):
 
         ''' Links an already created 3rd party account to an openfire user. '''
 
-        return WePayAPI.create_account_for_user(user, **kwargs)
+        return WePayAPI.create_account_for_user(user, *args)
 
-    def create_project_payment_account(self, project_key, name, description, wepay_account_id):
+    def create_project_payment_account(self, project_key, name, description, wepay_account):
 
         ''' Create a sub account for a user to use to collect payments for a project. '''
 
-        wepay_account_id = WePayAPI.create_payment_account(name, description, wepay_account_id)
+        wepay_account_id = WePayAPI.create_payment_account(name, description, wepay_account.wepay_user_id)
         account_key = ndb.Key(WePayProjectAccount, project_key.urlsafe())
-        new_account = WePayProjectAccount(key=account_key, project=project_key, name=name,
-                description=description, wepay_account_id=wepay_account_id)
+        new_account = WePayProjectAccount(key=account_key, project=project_key, payment_account=wepay_account.key,
+                name=name, description=description, wepay_account_id=wepay_account_id)
         new_account.put()
         return new_account
 

@@ -126,4 +126,3 @@ class PaymentHandlerTestCase(OFTestCase):
 
     def test_payment_handler(self):
         self.of_handler_test('/_payment/handler')
-

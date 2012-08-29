@@ -41,13 +41,14 @@ class ProjectAccount(polymodel.PolyModel):
     _message_class = messages.ProjectAccount
     _pipeline_class = pipelines.ProjectAccountPipeline
 
-    # Accounts are tied to projects.
+    # Accounts are tied to payment accounts and projects.
+    payment_account = ndb.KeyProperty('a', indexed=True, required=True)
     project = ndb.KeyProperty('p', indexed=True, required=True)
     name = ndb.StringProperty('n', indexed=False, required=True)
     description = ndb.StringProperty('d', indexed=False, required=True)
 
     # Account balance.
-    balance = ndb.FloatProperty('b', indexed=True, required=True)
+    balance = ndb.FloatProperty('b', indexed=True, default=0.0)
 
     # If a transaction is currently taking place, we keep its key on the account model.
     current_transaction = ndb.KeyProperty('ct', indexed=True, required=False)
@@ -134,7 +135,7 @@ class WePayCheckoutTransaction(Transaction):
     wepay_checkout_uri = ndb.StringProperty('wu', indexed=True, required=False)
 
     # WePay States: (New, Authorized, Reserved, Captured, Settled, Cancelled, Refunded, Charged Back, Failed, Expired)
-    wepay_checkout_status = ndb.StringProperty('ws', indexed=True, required=True, choices=[
+    wepay_checkout_status = ndb.StringProperty('ws', indexed=True, choices=[
             'n', 'a', 'r', 'cp', 's', 'c', 'rf', 'cb', 'f', 'e'], default='n')
 
     # Good or service is required by WePay. Choices are (GOODS, SERVICE, DONATION, PERSONAL).
@@ -160,7 +161,7 @@ class WePayWithdrawalTransaction(Transaction):
     wepay_withdrawal_uri = ndb.StringProperty('wu', indexed=True, required=False)
 
     # WePay States: (New, Authorized, Captured, Settled, Cancelled, Refunded, Failed, Expired)
-    wepay_withdrawal_status = ndb.StringProperty('ws', indexed=True, required=True, choices=[
+    wepay_withdrawal_status = ndb.StringProperty('ws', indexed=True, choices=[
             'n', 'a', 'cp', 's', 'c', 'rf', 'f', 'e'], default='n')
 
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import webapp2
 from google.appengine.ext import ndb
-from openfire.models.user import User
 from openfire.handlers import WebHandler
+from openfire.models.user import User
+from openfire.models.payment import WePayUserPaymentAccount, WePayProjectAccount
 
 
 class UserLanding(WebHandler):
@@ -161,5 +162,29 @@ class UserAccount(WebHandler):
 
         ''' Render account.html. '''
 
-        self.render('user/account.html')
+        # if there is no user logged in
+        if self.user is None:
+
+            self.logging.info('No user logged in on settings page. Redirecting to auth/login.')
+
+            # forward to login page, with /me as a continue URL
+            if self.session:
+                self.session['continue_url'] = self.url_for('user/me')
+            return self.redirect_to('auth/login')
+
+        wepay_account = None
+        project_accounts = []
+        wepay_accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == self.user.key).fetch()
+        if wepay_accounts and len(wepay_accounts):
+            # Currently we only allow one WePay account per user.
+            wepay_account = wepay_accounts[0]
+            project_accounts = WePayProjectAccount.query(WePayProjectAccount.payment_account.IN([a.key for a in wepay_accounts])).fetch()
+
+        context = {
+            'user': self.user,
+            'wepay_account': wepay_account,
+            'project_accounts': project_accounts,
+        }
+
+        self.render('user/account.html', **context)
         return

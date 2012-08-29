@@ -1,0 +1,61 @@
+
+<h2>User Payment Accounts</h2>
+<div class="content">
+    <table id="bbq-user-payment-account-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>User Key</th>
+                <th>WePay User ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in wepay_accounts %}
+            <tr>
+                <td>{{ account.user }}</td>
+                <td>{{ account.wepay_user_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<br />
+<br />
+
+<h2>Project Payment Accounts</h2>
+<div class="content">
+    <table id="bbq-project-payment-account-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>User Payment Account</th>
+                <th>Project</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Balance</th>
+                <th>Current Transaction</th>
+                <th>All Transactions</th>
+                <th>WePay Account ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in project_accounts %}
+            <tr>
+                <td>{{ account.payment_account }}</td>
+                <td>{{ account.project }}</td>
+                <td>{{ account.name }}</td>
+                <td>{{ account.description }}</td>
+                <td>{{ account.balance }}</td>
+                <td>{{ account.current_transaction }}</td>
+                <td>
+                    {% for transaction in account.transactions %}
+                        {{ transaction }},&nbsp;
+                    {% else %}
+                        No current transaction.
+                    {% endfor %}
+                </td>
+                <td>{{ account.wepay_account_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

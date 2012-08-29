@@ -28,11 +28,12 @@ class ProposeController
                 @createProposal()
 
             $(document).ready ->
-                $("#propose-wizard").smartWizard
-                    labelFinish: 'Create proposal'
-                    onShowStep: onShowStepCb
-                    onLeaveStep: onLeaveStepCb
-                    onFinish: onFinishCb
+                if $("#propose-wizard").smartWizard
+                    $("#propose-wizard").smartWizard
+                        labelFinish: 'Create proposal'
+                        onShowStep: onShowStepCb
+                        onLeaveStep: onLeaveStepCb
+                        onFinish: onFinishCb
 
         @createProposal = () =>
             @collectProposeForm()

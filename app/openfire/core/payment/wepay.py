@@ -26,17 +26,17 @@ class CoreWePayAPI(object):
         wepay_obj = self.get_wepay_object()
         user_email = ''
         if user.email and len(user.email):
-            user_email = user.email[0].address
+            user_email = user.email[0].id()
         options = {
             'state': user.key.urlsafe(),
             'user_name': '%s %s' % (user.firstname, user.lastname),
             'user_email': user_email
         }
         return wepay_obj.get_authorization_url(
-            redirect_uri=self.config.get('redirect_uri', ''),
-            client_id=self.config.get('client_id', ''),
+            redirect_uri=self.config['redirect_uri'],
+            client_id=self.config[self.config['use_production'] and 'production' or 'staging']['client_id'],
             options=options,
-            scope=self.config.get('auth_scope', ''),
+            scope=self.config['auth_scope'],
         )
 
     def create_account_for_user(self, user, code):
@@ -46,12 +46,14 @@ class CoreWePayAPI(object):
         obj = self.get_wepay_object()
         token_response = obj.get_token(
             redirect_uri=self.config.get('redirect_uri', ''),
-            client_id=self.config.get('client_id', ''),
-            client_secret=self.config.get('client_secret', ''),
+            client_id=self.config[self.config['use_production'] and 'production' or 'staging']['client_id'],
+            client_secret=self.config[self.config['use_production'] and 'production' or 'staging']['client_secret'],
             code=code,
         )
+
+        # Currently we do not set an explicit key to the new user payment account.
         account = WePayUserPaymentAccount(
-            user=user,
+            user=user.key,
             wepay_user_id=token_response.get('user_id', ''),
             wepay_access_token=token_response.get('access_token', ''),
             wepay_token_expires=token_response.get('expires_in', None), # TODO: Convert format if needed?
