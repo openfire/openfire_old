@@ -156,6 +156,8 @@ def main():
 
     sys.path.insert(0, app)
 
+    import config
+
     log('Bootstrapping...')
 
     import bootstrap
@@ -166,6 +168,10 @@ def main():
 
     log('Installing output extensions...')
 
+    try:
+        import json
+    except ImportError, e:
+        import simplejson as json
     import webapp2
     from openfire.handlers.main import Landing
     from openfire.core.output.extensions import content
@@ -177,7 +183,13 @@ def main():
     request = webapp2.Request.blank('/')
     handler = Landing(request, webapp2.Response(), preload=False)
 
-    environment = Environment(extensions=[autoescape, with_, do, loopcontrols])
+    j2cfg = config.config.get('webapp2_extras.jinja2')
+    j2cfg['globals'] = Landing.baseContext
+    j2cfg['filters'] = {'json': json.dumps}
+
+    environment = Environment(extensions=[autoescape, with_, do, loopcontrols], optimized=True)
+    environment.filters['json'] = json.dumps
+
     environment.extend(wsgi_current_application=object(), wsgi_current_handler=handler)
     environment.add_extension(content.DynamicContent)
     environment.add_extension(fragment.FragmentCache)

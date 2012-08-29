@@ -1,215 +1,284 @@
 @import "../main"
+h1, h2, h3
+    display: inline
+
+h1
+    line-height: 60pt
+
+h4, h5, h6
+    -webkit-margin-before: 0
+    -webkit-margin-after: 0
+    margin-top: 10px
+    margin-bottom: 10px
+
+
+.tag
+    border: none
+    border-radius: 4px
+    font-family: "Karla"
+    font-size: 11px
+    font-weight: 700
+    text-transform: uppercase
+    padding: 3px
+    margin-right: 5px
+    margin-left: 5px
+    cursor: pointer
+
+    &.topic
+        background-color: #ffb246
+        color: white
+
+        &:hover
+            background-color: #f57720
+
+            .delete-tag
+                color: #f57720
+
+                &:hover
+                    color: #ffb246
+
+                &:active
+                    color: white
+
+    .delete-tag
+        text-transform: lowercase
+        font-size: 14px
+        line-height: 9px
+        margin-left: 4px
+        color: #f57720
+
+    &.add
+        color: #dfdfdf
+        background-color: #999
+        text-align: right
+        line-height: 11px
+        &::before
+            display: inline
+            content: '+'
+            font-size: 16px
+            margin-right: 4px
+
+        &:empty
+            position: relative
+            width: 2em
+            margin: 5px 0 0
+            text-align: center
+            &::before
+                margin: 0 !important
+
+        &:hover
+            color: white
+            background-color: #777
+
+        &:active
+            &::before
+                color: #ffb246
 
 body
-	background-color: whitesmoke
+    background-color: whitesmoke
 
 .profile
-	&.section
-		margin-top: 10px
-		padding: 5px
-		min-height: 50px
+    &.section
+        margin-top: 10px
+        padding: 5px
+        min-height: 50px
 
-		.dynamic
+        .dynamic
 
-			min-height: 50px
-			padding: 5px
-
-			&.editable
-				&:hover
-					background: yellow !important
-					cursor: pointer
-
-			&.mini-editable
-				&:hover
-					background: yellow !important
-					cursor: pointer
+            min-height: 50px
+            padding: 5px
 
 #masthead
-
-	z-index: 500
-	height: 140px !important
+    position: auto !important
+    z-index: 500
+    height: 140px !important
 
 #content
-	min-height: 600px
-	display: inline
+    min-height: 600px
+    display: inline
 
-	#profile
-		width: 50%
-		min-height: 400px
-		margin-left: 26%
-		position: relative
-		border: 1px solid #BBB
-		border-top: none
-		padding-top: 50px
-		background: white
+    #profile
+        width: 50%
+        margin-left: 20%
+        background: white
+        border: 1px solid #d4d4d4
+        border-top: none
 
-		#profiletop
-			position: absolute
-			height: 65px
-			left: -2%
-			right: 0
-			bottom: 0
-			top: -13%
-			z-index: 500
+        #profiletop
+            z-index: 502
+            position: relative
+            width: 98%
+            margin-top: -70px
+            margin-right: 2%
 
-			.left
+            #avatar
+                margin-right: 15px
+                margin-left: -30px
+                width: 175px
+                height: 175px
+                z-index: 503
 
-				#avatar
-					position: absolute
-					left: -2%
-					top: -10%
-					width: 175px
-					height: 175px
-					z-index: 500
+                #avatar_edit_overlay
+                    position: relative
+                    top: -32px
+                    height: 32px
+                    background: #222
+                    opacity: 0.4
+                    line-height: 32px
+                    -webkit-transition-property: opacity
 
-					#avatar_edit_overlay
-						position: absolute
-						bottom: 0
-						left: 0
-						right: 0
-						height: 32px
-						background: #222
-						opacity: 0.4
-						line-height: 32px
-						-webkit-transition-property: opacity
+                    a
+                        display: block
+                        height: 100%
+                        width: 100%
+                        color: whitesmoke
+                        text-decoration: none
 
-						span.momentron
-							color: white
-							left: 7px
-							position: relative
+                        span.momentron,
+                        span.change_avatar_label
+                            line-height: 32px
+                            vertical-align: middle
+                            color: white
+                            position: relative
+                            margin-left: 5px
 
-						span.change_avatar_label
-							left: 35px
-							top: 2px
+                    &:hover
+                        opacity: 0.85
+
+                        a
+                            color: white !important
+
+            #byline
+                overflow: hidden
+
+                #topbanner
+
+                    #topics
 
 
-						a
-							color: whitesmoke
-							text-decoration: none
+                #userinfo
+                    background-color: whitesmoke
+                    span
+                        margin-right: 10px
+                        &:last-child
+                            margin-right: 0
 
-						&:hover
-							opacity: 0.85
+                #userbio
+                    -webkit-transition-property: max-height
+                    position: relative
+                    overflow: hidden
+                    text-overflow: ellipsis
+                    max-height: 55px
+                    width: 98%
+                    background-color: rgba(255,255,255,0.4)
+                    padding-bottom: 20px
 
-							a
-								color: white !important
+                    p
+                        display: inline
 
-				#byline
-					position: absolute
-					left: 170px
-					padding-left: 5px
-					width: 80%
-					overflow: hidden
+                    #userbio-toggle
+                        position: absolute
+                        bottom: 0
+                        left: 0
+                        right: 0
+                        padding: 0
+                        margin: 0
+                        cursor: pointer
+                        background-color: whitesmoke
+                        text-align: center
+                        border:
+                            top: 1px solid #AAA
+                            bottom: 1px solid #aaa
 
-					#topbanner
+                        &::after
+                            display: block
+                            content: "see more"
+                            text-transform: uppercase
+                            font:
+                                family: "Karla"
+                                size: 8pt
+                            color: #333
+                            vertical-align: middle
+                            line-height: 11px
+                            padding: 2px
+                            margin: 0 auto
 
-						#name
-							float: left
+                        &:hover
+                            background-color: #dedede
+                            &::after
+                                color: black
 
-						#topics
-							padding-left: 15px
-							float: left
-							line-height: 20px
-							margin-top: 45px
-							text-transform: lowercase
-							color: #AAA
 
-					#userinfo
-						top: -10px
-						position: relative
+                    &.active
+                        max-height: 275px !important
+                        #userbio-toggle
+                            &::after
+                                content: "see less"
 
-						ul
-							margin: 0
-							padding: 0
-							list-style: none
 
-							li
-								display: inline
 
-								&:nth-child(even)
-									margin-left: 10px
+        #profilemain
+            min-height: 400px
+            position: relative
 
-									&:before
-										content: '·'
-										font-size: 11pt
-										font-weight: bold
-										width: 15px
-										right: 7px
-										position: relative
 
-		#leftbar
-			width: 140px
-			position: relative
-			float: left
-			margin-top: 65px
-			margin-left: 10px
+            #leftbar
+                width: 140px
+                margin-left: 10px
 
-			#social_profiles
-				position: absolute
-				left: -43px
-				width: 33px
-				text-align: center
-				font-size: 8px
+                #social_profiles
+                    position: absolute
+                    left: -33px
+                    top: 110px
+                    width: 33px
+                    text-align: center
+                    font-size: 8px
 
-				div
-					margin-top: 5px
+                    div
+                        margin-top: 5px
 
-		#contentpane
-			min-height: 420px
-			margin-left: 158px
-			margin-right: 20px
+            #rightbar
+                width: 140px
+                margin-right: 10px
 
-			#userbio
+                #userstats
+                    position: absolute
+                    right: -180px
+                    width: 170px
+                    text-align: center
+                    div
+                        margin-top: 10px
+                        background-color: #bada55
 
-				position: relative
-				overflow: hidden
-				text-overflow: ellipsis
+            #contentpane
+                z-index: 498
+                position: absolute
+                top: 115px
+                left: 2%
+                bottom: 2%
+                right: 2%
+                min-height: 420px
 
-				p
-					display: inline
+                h4
+                    color: #777
+                    font-size: 13px
+                    width: 100
+                    background: #ccc
+                    display: block
+                    padding: 5px
+                    text-transform: uppercase
+                    letter-spacing: 2px
 
-				div
-					padding: 3px
-					position: absolute
-					top: 0
-					bottom: 0
-					left: 0
-					right: 0
-
-				&.collapsed
-
-					height: 55px
-
-					&:hover
-						cursor: pointer
-						background-color: yellow !important
-
-					&:after
-						content: 'see more'
-						position: absolute
-						bottom: 0
-						left: 0
-						right: 0
-						display: block
-						text-align: center
-						border-top: 1px solid #AAA
-						border-bottom: 1px solid #AAA
-						font-family: "Karla"
-						text-transform: uppercase
-						font-size: 11px
-
-				&.expanded
-					max-height: 275px !important
-
-					&:after
-						content: 'see less'
-						position: absolute
-						bottom: 0
-						left: 0
-						right: 0
-						display: block
-						text-align: center
-						border-top: 1px solid #AAA
-						border-bottom: 1px solid #AAA
-						font-family: "Karla"
-						text-transform: uppercase
-						font-size: 11px
+.topic-edit
+    font:
+        family: "Karla"
+        size: 16px
+        weight: bold
+    display: block
+    width: 100%
+    text-align: center
+    padding: 0 20px
+    line-height: 56px
+    vertical-align: middle
+    background-color: #dedede
+    color: #444

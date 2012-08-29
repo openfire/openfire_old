@@ -42,7 +42,18 @@ config['apptools.project.output'] = {
 
     'analytics': {  # Analytics Settings
         'enable': True,              # whether to insert analytics code
-        'account_id': 'UA-31611943-2'   # your google anlytics site ID
+        'multitrack': True,			 # whether to enable support for multiple trackers
+        'anonymize': False,			 # whether to anonymize IPs before analytics
+        'account_id': {
+            'dev': 'UA-31611943-3',         # used when running from the devserver
+            'staging': 'UA-31611943-2',    # used on the staging version of the site
+            'production': 'UA-31611943-1'  # used on the production version of the site
+        },
+        'webclient':{
+            'dev': 'https://ssl.google-analytics.com/u/ga_debug.js',
+            'http': 'http://www.google-analytics.com/ga.js',
+            'https': 'https://ssl.google-analytics.com/ga.js'
+        }
     },
 
     'appcache': {  # HTML5 appcaching

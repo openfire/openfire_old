@@ -80,14 +80,54 @@
 .editable,
 .mini-editable
   border: none
+  cursor: pointer
+  line-height: 12px
 
-.editorbutton
-  color: #737377
-  margin: 5px
-  display: inline-block
+  &:hover,
+  &:focus
+    background-color: #F7F694
 
-  &:hover
-    color: #aaa
+  &:focus
+    cursor: text
+
+.editor
+  -webkit-transition-property: top, opacity
+  -webkit-transition-duration: 300
+  opacity: 0
+  z-index: 1
+  width: auto
+  top: -45px
+
+  span
+    display: block
+
+  &.active
+    opacity: 1
+    z-index: 999
+    top: 10px
+
+  .editorbutton
+    color: #737377
+    margin: 5px
+    display: inline-block
+
+    &::after
+      display: none
+      position: fixed
+      top: 25px
+      right: 15%
+      color: #333
+      content: attr(value)
+      background-color: #bada55
+
+    &:hover
+      color: #aaa
+
+      &::after
+        display: block
+
+  .editorstep
+    text-align: center
 
 @-webkit-keyframes rotate
   from
@@ -168,4 +208,11 @@ span
   color: #606060 !important
 
 // openfire specific widgets
-.facepile
+.autocomplete
+  -webkit-transition-duration: 125
+  -webkit-transition-property: opacity
+  opacity: 0
+  margin: 0
+
+  &.active
+    opacity: 1

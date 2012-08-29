@@ -1,1 +1,6 @@
 {% extends "layout/project.html" %}
+
+{% block jsready %}
+{%- from "macros/page_social.js" import social_naked -%}
+{{ social_naked(page)|safe }}
+{% endblock jsready %}

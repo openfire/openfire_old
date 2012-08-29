@@ -11,7 +11,6 @@
     <!-- #masthead -->
 
     <div id='content'>
-        <div id="fb-root"></div>
         <div id='project'>
 
             {% if security.current_user.key in project.owners %}
@@ -193,9 +192,8 @@
                     <h1 data-href="#project" class="target-link" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
                     <div id='deetactions'>
                         <div class='buttongroup' data-action="Share This">
-                            <button id='fbshare' class='zocial facebook sharebutton icon'></button>
-                            <button id='twshare' class='zocial twitter sharebutton icon'></button>
-                            <button id='g+share' class='zocial googleplus sharebutton icon'></button>
+                            <div id="fblike" class="fb-like" data-send="false" data-width="250" data-show-faces="false" data-font="trebuchet ms"></div>
+							<div id='plusone' class="g-plusone" data-size="small" data-annotation="inline" data-width="250"></div>
                         </div> <!-- end .buttongroup -->
                     </div> <!-- end #deetactions -->
                 </div> <!-- end #projecttitle -->

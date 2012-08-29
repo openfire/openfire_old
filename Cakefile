@@ -738,6 +738,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', 'proposal.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'widgets.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'analytics.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling openfire JS for admins...'
@@ -752,6 +753,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', 'proposal.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'widgets.coffee'),
+									fixpath(js_prefix, 'source', 'openfire', 'analytics.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling openfire unit tests...'

@@ -37,7 +37,7 @@
                                 <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
                                     {% if project.avatar %}
                                         {% if project.avatar.location %}
-                                        <img src="{{ project.avatar.location }}" title="{{ project.name }} - {{ project.summary }}" />
+                                        <img src="{{ project.avatar.location }}" width="140" height="120" title="{{ project.name }} - {{ project.summary }}" />
                                         {% else %}
                                             {% if project.avatar.url %}
                                                 <img src="{{ project.avatar.url }}" title="{{ project.name }} - {{ project.summary }}" />
@@ -119,10 +119,8 @@
 </div>
 {% endblock %}
 
-{% block postsouth %}
-    <script type="text/javascript">
-        window.setTimeout(function() {
-            var graph = new ActivityGraph();
-        }, 250);
-    </script>
-{% endblock %}
+{% block post_jsready %}
+		window.setTimeout(function() {
+			var graph = new ActivityGraph();
+		}, 250);
+{%- endblock post_jsready -%}

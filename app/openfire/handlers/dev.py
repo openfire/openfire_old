@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from apptools import BaseHandler
 
 from openfire.models import system
+from openfire.handlers import WebHandler
 from openfire.handlers import NamespaceBridge
 
 from openfire.fixtures import fixture_loader
@@ -60,9 +61,11 @@ class DevModels(BaseHandler, NamespaceBridge):
         return self.redirect_to('landing')
 
 
-class JasmineTests(BaseHandler, NamespaceBridge):
+class JasmineTests(WebHandler, NamespaceBridge):
 
     ''' Return the page that will run all of our jasmine unit tests. '''
+
+    template = 'test/jasmine_tests.html'
 
     def get(self):
 

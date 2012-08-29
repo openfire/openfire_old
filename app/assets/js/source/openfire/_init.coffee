@@ -96,42 +96,46 @@ class Openfire
                 # installs an openfire base object
                 object: (obj) =>
                     # stash for future queries
-                    @sys.state.objects[(o=obj.constructor.name)] = obj
+                    @sys.state.objects[(o=obj.name)] = obj
 
                     # register any object events
                     if obj.events?
-                        window.apptools?.events?.register(event) for event in obj.events
+                        window.apptools?.events?.register(obj.events)
 
                     # instantiate and bind to window, if obj isn't private
-                    if not (exp = obj.export)? or exp isnt 'private' then (obj = new obj(@)) and window[o] = obj else obj = new obj()
+                    window[o] = obj unless obj.export is 'private'
+
+                    obj = new obj(@)
 
                     # lastly init, if it needs it
                     obj._init?()
-
                     return obj
 
                 # installs an openfire base class
                 class: (cls) =>
-                    @sys.state.classes[(cl=cls.constructor.name)] = cls
+                    @sys.state.classes[(cl=cls.name)] = cls
                     if cls.events?
-                        window.apptools?.events?.register(event) for event in cls.events
-                    if not (exp = cls.export)? or exp isnt 'private' then (cls = new cls(@)) and window[cl] = cls else cls = new cls()
-                    cls._init?()
+                        window.apptools?.events?.register(cls.events)
 
+                    window[cl] = cls unless cls.export is 'private'
+                    cls = new cls(@)
+
+                    cls._init?()
                     return cls
 
                 # installs an openfire controller
                 controller: (ctrlr) =>
-                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.constructor.name.toLowerCase()
+                    mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.name.toLowerCase()
 
-                    @sys.state.controllers[ctrlr.mount] = ctrlr
+                    @sys.state.controllers[mount_point] = ctrlr
                     if ctrlr.events?
-                        window.apptools?.events?.register(event) for event in ctrlr.events
-                    if not (exp = ctrlr.export)? or exp isnt 'private' then (ctrlr = new ctrlr(@, window)) and window[ctrlr.constructor.name] = ctrlr else ctrlr = new ctrlr(window)
-                    
+                        window.apptools?.events?.register(ctrlr.events)
+
+                    window[mount_point] = ctrlr unless ctrlr.export is 'private'
+                    ctrlr = new ctrlr(@, window)
+
                     @[mount_point] = ctrlr
                     ctrlr._init?()
-
                     return ctrlr
 
 

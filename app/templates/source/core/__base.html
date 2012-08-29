@@ -107,6 +107,18 @@
 		{% block postnorth %}{% endblock %}
 
 		<title>{% block title %}openfire!{% endblock title %}</title>
+
+		{% block page_services %}
+		{% if page.services %}
+		<script id='js-config' type='application/json' data-role='pageconfig'>
+		{%- block js_pageobject -%}
+		{% from "macros/page_object.js" import build_native_page_object %}
+		{{ build_native_page_object(page, transport, security) }}
+		{%- endblock js_pageobject %}
+		</script>
+		{% endif %}
+		{%- endblock page_services -%}
+
 	{% endblock %}
 </head>
 
@@ -116,11 +128,36 @@
 	<!-- JS Templates -->
 </div>
 
+<div id="fb-root"></div>
 {% block body %}
 {% endblock body %}
 
 {% block presouth %}{% endblock presouth %}
 {% include "core/__south.html" with context %}
+
+{% block pageready %}
+<script id='js-deferred' type='text/javascript' data-role='pageready'>
+{%- block pre_pageready -%}{% endblock pre_pageready %}
+_.ready(function (window) {
+	var _gaq = _gaq || [], _gat = _gat || {}, _cfgst = 'js-config', _dfrst = 'js-deferred', _dfeln = 'script', _dfelt = 'text/javascript',
+		_ofjscfg = document.getElementById(_cfgst), _ofdfrd = document.getElementById(_dfrst), _ofinject = document.createDocumentFragment(),
+		{%- block pageready_js -%}
+		{%- block page_analytics -%}
+		{%- if page.analytics -%}
+		{%- from "macros/page_analytics.js" import google_analytics_naked -%}
+		{{ google_analytics_naked(page.analytics, page.analytics.multitrack, page.analytics.anonymize) }}
+		{%- endif -%}{%- endblock -%}
+		{%- block pre_jsready -%}{%- endblock pre_jsready -%}
+		{%- block jsready -%}{% endblock jsready %}
+		{%- block jsinject %}
+		undefined = _ofdfrd.parentElement.appendChild(_ofinject);
+		{%- endblock jsinject -%}
+		{%- block post_jsready -%}{% endblock post_jsready %}{% endblock pageready_js %}
+});
+{% block post_pageready %}{%- endblock post_pageready -%}
+</script>
+{% endblock pageready %}
+
 {% block postsouth %}{% endblock postsouth %}
 </body>
 </html>
