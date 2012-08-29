@@ -280,12 +280,11 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
 		''' Make a dict suitable for JSON representing an API service. '''
 
-		return [{
-			'name': service,
-			'base_uri': action,
-			'methods': cfg['methods'],
-			'opts': opts
-		} for service, action, cfg, opts in services['services_manifest']]
+		return [[
+			service,
+			cfg['methods'],
+			opts
+		] for service, action, cfg, opts in services['services_manifest']]
 
     def _bindRuntimeTemplateContext(self, context):
 

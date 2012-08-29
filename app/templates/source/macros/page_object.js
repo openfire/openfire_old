@@ -14,7 +14,7 @@
 		'eventlog': util.config.debug,
 		'verbose': util.config.debug,
 		'strict': false
-	},
+	} if util.config.debug else null,
 
 	'push': {
 		'token': transport.realtime.channel if transport.realtime.enabled else '',
