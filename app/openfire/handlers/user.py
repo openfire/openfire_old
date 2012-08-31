@@ -3,7 +3,7 @@ import webapp2
 from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.models.user import User
-from openfire.models.payment import WePayUserPaymentAccount, WePayProjectAccount
+from openfire.models.payment import Payment, MoneySource, WePayUserPaymentAccount, WePayProjectAccount
 
 
 class UserLanding(WebHandler):
@@ -178,12 +178,20 @@ class UserAccount(WebHandler):
         if wepay_accounts and len(wepay_accounts):
             # Currently we only allow one WePay account per user.
             wepay_account = wepay_accounts[0]
-            project_accounts = WePayProjectAccount.query(WePayProjectAccount.payment_account.IN([a.key for a in wepay_accounts])).fetch()
+            for account in WePayProjectAccount.query(WePayProjectAccount.payment_account.IN([a.key for a in wepay_accounts])).fetch():
+                # Project accounts is a list of (account, payment history) tuples.
+                project_accounts.append((account, Payment.query(Payment.to_account == account.key).fetch()))
+
+        payments = Payment.query(Payment.from_user == self.user.key).fetch()
+
+        money_sources = MoneySource.query(MoneySource.owner == self.user.key, MoneySource.save_for_reuse == True).fetch()
 
         context = {
             'user': self.user,
             'wepay_account': wepay_account,
             'project_accounts': project_accounts,
+            'money_sources': money_sources,
+            'payments': payments,
         }
 
         self.render('user/account.html', **context)

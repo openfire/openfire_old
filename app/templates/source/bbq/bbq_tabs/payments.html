@@ -3,17 +3,37 @@
     <table id="bbq-payment-table" class="bbq-datatable">
         <thead>
             <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>etc...</th>
+                <th>From User</th>
+                <th>To Project</th>
+                <th>Project Tier</th>
+                <th>Amount</th>
+                <th>Commission</th>
+                <th>Status</th>
+                <th>Current Transaction</th>
+                <th>All Transactions</th>
+                <th>From Money Source</th>
+                <th>To Account</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Archived</th>
             </tr>
         </thead>
         <tbody>
             {% for payment in payments %}
             <tr>
-                <td>TODO</td>
-                <td>TODO</td>
-                <td>TODO</td>
+                <td>{{ payment.from_user }}</td>
+                <td>{{ payment.to_project.get().name }}</td>
+                <td>{{ payment.to_project_tier }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.commission }}</td>
+                <td>{{ payment.status }}</td>
+                <td>{{ payment.current_transaction }}</td>
+                <td>{{ payment.transactions }}</td>
+                <td>{{ payment.from_money_source }}</td>
+                <td>{{ payment.to_account }}</td>
+                <td>{{ payment.created }}</td>
+                <td>{{ payment.updated }}</td>
+                <td>{{ payment.archived }}</td>
             </tr>
             {% endfor %}
         </tbody>

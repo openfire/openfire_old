@@ -6,7 +6,7 @@
     </div>
 
     <div>
-        <h2>Payment Accounts</h2>
+        <h2>Project Payment Accounts</h2>
         {% if wepay_account %}
             <div>
                 <span>You have linked your WePay account with openfire.</span>
@@ -15,10 +15,33 @@
             <div>
             {% if project_accounts %}
                 <span>Here is a list of your payment accounts for your project</span>
-                {% for account in project_accounts %}
+                {% for account, payments in project_accounts %}
                     <li class="wepay-project-account">
                         <span class="wepay-account-name">{{ account.name }}</span>
                         <span class="wepay-account-balance">${{ account.balance }}</span>
+                        <div>
+                            <h4>{{ account.name }} payment history</h4>
+                            <table border="1">
+                                <thead>
+                                    <th>From User</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                    <tr>
+                                        <td>{{ payment.from_user }}</td>
+                                        <td>{{ currency(payment.amount) }}</td>
+                                        <td>{{ payment.status }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td>No payments.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </li>
                 {% endfor %}
             {% else %}
@@ -33,4 +56,48 @@
             </div>
         {% endif %}
     </div>
+
+    <br />
+    <br />
+
+    <div>
+        <h2>Your Payment History</h2>
+        <table border="1">
+            <thead>
+                <th>To Project</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.to_project.get().name }}</td>
+                    <td>{{ currency(payment.amount) }}</td>
+                    <td>{{ payment.status }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td>No payments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <br />
+    <br />
+
+    <div>
+        <h2>Your Saved Money Sources</h2>
+        <ul>
+        {% for source in money_sources %}
+            <li>
+                <span>{{ source.description }}</span>
+            </li>
+        {% else %}
+            <li>No saved money sources</li>
+        {% endfor %}
+        <ul>
+    </div>
+
 {% endblock %}

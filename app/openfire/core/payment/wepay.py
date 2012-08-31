@@ -45,7 +45,7 @@ class CoreWePayAPI(object):
 
         obj = self.get_wepay_object()
         token_response = obj.get_token(
-            redirect_uri=self.config.get('redirect_uri', ''),
+            redirect_uri=self.config.get('redirect_uri', '/me'),
             client_id=self.config[self.config['use_production'] and 'production' or 'staging']['client_id'],
             client_secret=self.config[self.config['use_production'] and 'production' or 'staging']['client_secret'],
             code=code,
@@ -90,8 +90,8 @@ class CoreWePayAPI(object):
 
         # Make the WePay API call.
         wepay_obj = self.get_wepay_object()
-        response = wepay_obj.call('/credit_card/create', {
-            'client_id': self.config.get('client_id', ''),
+        cc_params = {
+            'client_id': self.config[self.config['use_production'] and 'production' or 'staging']['client_id'],
             'user_name': cc_info.user_name,
             'email': cc_info.email,
             'cc_number': cc_info.cc_num,
@@ -100,17 +100,20 @@ class CoreWePayAPI(object):
             'expiration_year': cc_info.expire_year,
             'address': {
                 'address1': cc_info.address1,
-                'address2': cc_info.address2,
                 'city': cc_info.city,
                 'state': cc_info.state,
                 'country': cc_info.country,
                 'zip': cc_info.zipcode
             }
-        })
+        }
+        # Only add the address2 if it is populated.
+        if cc_info.address2:
+            cc_params['address']['address2'] = cc_info.address2
+        response = wepay_obj.call('/credit_card/create', cc_params)
 
         # Save the credit card object linked to the user.
         wepay_cc = WePayCreditCard(
-            owner=user,
+            owner=user.key,
             description=cc_info.cc_num[:4],
             wepay_cc_id=response['credit_card_id'],
             wepay_cc_state=response['state'],
@@ -120,12 +123,14 @@ class CoreWePayAPI(object):
 
         # Authorize the credit card since we are not going to charge it immediately.
         auth_response = wepay_obj.call('/credit_card/authorize', {
-            'client_id': self.config.get('client_id', ''),
-            'client_secret': self.config.get('client_secret', ''),
+            'client_id': self.config[self.config['use_production'] and 'production' or 'staging']['client_id'],
+            'client_secret': self.config[self.config['use_production'] and 'production' or 'staging']['client_secret'],
             'credit_card_id': wepay_cc.wepay_cc_id
         })
         if auth_response['state'] != wepay_cc.wepay_cc_state:
             wepay_cc.wepay_cc_state = auth_response['state']
+            if auth_response.get('credit_card_name', None):
+                wepay_cc.description = auth_response['credit_card_name']
             wepay_cc.put()
 
         return wepay_cc

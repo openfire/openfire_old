@@ -3,7 +3,7 @@ from apptools.services.builtin import Echo
 from protorpc import message_types, remote
 from openfire.services import RemoteService
 from openfire.messages import payment as payment_messages
-from openfire.models.payment import MoneySource, Payment, Transaction, WePayWithdrawalTransaction
+from openfire.models.payment import MoneySource, Payment, Transaction, WePayWithdrawalTransaction, WePayUserPaymentAccount
 from openfire.models.user import User
 from openfire.models.project import Project
 
@@ -42,8 +42,19 @@ class PaymentService(RemoteService):
             return payment_messages.ProjectAccount()
 
         project_key = ndb.Key(urlsafe=request.project)
+        project = project_key.get()
+
+        # If any of the owners have a payment account linked, create a collection account for this project.
+        account = None
+        for owner_key in project.owners:
+            accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == owner_key).fetch()
+            if accounts and len(accounts):
+                # Create a collection account for this project owner's account only.
+                account = accounts[0]
+                break
+
         project_account = PaymentAPI.create_project_payment_account(project_key, request.name,
-                request.description, request.wepay_account_id)
+                request.description, account)
         return project_account.to_message()
 
     @remote.method(payment_messages.ProjectAccount, payment_messages.ProjectAccount)
@@ -64,17 +75,19 @@ class PaymentService(RemoteService):
 
         ''' Back a project with a credit card. Save and authorize the CC info, create a payment for tipping point. '''
 
+        if not self.user:
+            return Echo(message='You are not logged in.')
+
         # If no money source is given, save the cc info as a money source first.
         if not request.money_source and request.new_cc:
-            money_source = PaymentAPI.save_user_cc(request.session.user, request.new_cc)
+            money_source = PaymentAPI.save_user_cc(self.user, request.new_cc)
         elif request.money_source:
-            money_source = request.money_source
+            money_source = ndb.Key(urlsafe=request.money_source).get()
         else:
-            # TODO: No money source provided?
             return Echo(message='No money source provided.')
 
         # Make a record of the payment amount to be charged if the projects ignites.
-        payment = PaymentAPI.back_project(request.project, request.tier, float(request.amount), money_source)
+        payment = PaymentAPI.back_project(ndb.Key(urlsafe=request.project), request.tier, float(request.amount), money_source)
         if not payment:
             # TODO: What to do on error?
             return Echo(message='There was an error...try again?')
@@ -85,18 +98,13 @@ class PaymentService(RemoteService):
 
         ''' List money sources (saved credit cards) for a user account. '''
 
-        if not request.user:
+        if not self.user:
             return payment_messages.MoneySources()
-
-        user_key = ndb.Key(urlsafe=request.user)
-        user = user_key.get()
-        if not user:
-            return payment_messages.MoneySources()
-        sources = MoneySource.query(MoneySource.owner == user, MoneySource.save_for_reuse == True).fetch()
+        sources = MoneySource.query(MoneySource.owner == self.user.key, MoneySource.save_for_reuse == True).fetch()
         msgs = []
         for source in sources:
             msgs.append(source.to_message())
-        return payment_messages.MoneySources(user=request.user, sources=msgs)
+        return payment_messages.MoneySources(user=self.user.key.urlsafe(), sources=msgs)
 
     @remote.method(payment_messages.RemoveMoneySource, Echo)
     def remove_money_source(self, request):
@@ -198,7 +206,7 @@ class PaymentService(RemoteService):
         account = account_key.get()
         if not account:
             return payment_messages.WithdrawalRequest()
-        withdrawal_url = PaymentAPI.generate_withdrawal_url(request.session.user, account, request.amount, request.note)
+        withdrawal_url = PaymentAPI.generate_withdrawal_url(self.user, account, request.amount, request.note)
         return payment_messages.WithdrawalResponse(url=withdrawal_url)
 
     @remote.method(payment_messages.WithdrawalHistory, payment_messages.WithdrawalHistory)
