@@ -102,30 +102,36 @@ class Openfire
                     if obj.events?
                         window.apptools?.events?.register(obj.events)
 
-                    # instantiate and bind to window, if obj isn't private
+                    # bind to window, if obj isn't private
                     window[o] = obj unless obj.export is 'private'
-
-                    obj = new obj(@)
-
-                    # lastly init, if it needs it
-                    obj._init?()
                     return obj
 
                 # installs an openfire base class
                 class: (cls) =>
+                    if (mount = cls.mount)?
+                        if not @[mount]
+                            @[mount] = []
+                        if @[mount] instanceof Array
+                            @[mount].push(cls)
+                            return
+                        else
+                            cls = new cls(@)
+                            cls._init?(@)
+                            return
+
                     @sys.state.classes[(cl=cls.name)] = cls
                     if cls.events?
                         window.apptools?.events?.register(cls.events)
 
                     window[cl] = cls unless cls.export is 'private'
-                    cls = new cls(@)
-
-                    cls._init?()
                     return cls
 
                 # installs an openfire controller
                 controller: (ctrlr) =>
                     mount_point = if ctrlr.mount? then ctrlr.mount else ctrlr.name.toLowerCase()
+                    if @[mount_point]?
+                        deferred_cls = @[mount_point]
+                        @[mount_point] = null
 
                     @sys.state.controllers[mount_point] = ctrlr
                     if ctrlr.events?
@@ -135,7 +141,10 @@ class Openfire
                     ctrlr = new ctrlr(@, window)
 
                     @[mount_point] = ctrlr
-                    ctrlr._init?()
+                    ctrlr._init?(@)
+
+                    @sys.install.class(cls) for cls in deferred_cls if deferred_cls?
+
                     return ctrlr
 
 

@@ -373,5 +373,4 @@ class AnalyticsController extends OpenfireController
                 return
 
 if @__openfire_preinit?
-    @__openfire_preinit.abstract_base_classes.push AnalyticsController
     @__openfire_preinit.abstract_base_controllers.push AnalyticsController

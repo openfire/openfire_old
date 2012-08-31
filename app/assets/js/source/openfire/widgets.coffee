@@ -6,9 +6,16 @@ class WidgetController extends OpenfireController
     @export: 'private'
     constructor: (openfire, window) ->
         @state =
-            widgets: []
-        @widget = null
+            init: false
+
+        @register = (name, api) =>
+            return (if api? and not @[name]? then @[name] = api else false)
+
+        @setAPI = (name, api) =>
+            return (if api? and @[name]? then @[name] = api else false)
+
         @_init = () =>
+            @state.init = true
             return @
 
         return @
@@ -19,13 +26,50 @@ class Facepile extends CoreWidget
     @export: 'private'
     @template: null
 
+class AutocompleteAPI extends CoreWidgetAPI
+
+    @mount: 'widgets'
+    @export: 'private'
+    constructor: (openfire) ->
+
+        @_state =
+            store: []
+            index: {}
+
+        @get = (id) =>
+            return (if (i = @_state.index[id])? then @_state.store[i] else false)
+
+        @new = (element, options) =>
+            if not options?
+                options = element.getAttribute('data-options')
+                options = JSON.parse(options) if options?
+            autocomplete = new Autocomplete(element, options)
+
+            @_state.index[autocomplete.element_id] = @_state.store.push(autocomplete) - 1
+            autocomplete._init?()
+
+            return autocomplete
+
+        @_init = (openfire) =>
+            openfire.widgets.register('autocomplete', @)
+
+            autos = _.get('.autocomplete')
+            @new(auto) for auto in autos if autos.length > 0
+
+            @_state.init = true
+            return @
+
+
 class Autocomplete extends CoreWidget
 
     @export: 'public'
-    @template: '<div id="{{=id}}" class="absolute autocomplete"></div>'
+    @template: '<div id="{{=id}}" class="absolute autocomplete-results"></div>'
 
-    constructor: (openfire, element_id, options) ->
-        super(element_id)
+    constructor: (target, options) ->
+        return false if not target.getAttribute('id')?
+
+        @element_id = target.getAttribute('id')
+        super(@element_id)
 
         @choice = null
 
@@ -45,11 +89,15 @@ class Autocomplete extends CoreWidget
         @_state.config = _.extend({}, @_state.config, options)
 
         @show = () =>
+            _.bind(document.body, 'click', @hide)
+
             _.get(@id).classList.add('active')
             @_state.active = true
             return @
 
         @hide = () =>
+            _.unbind(document.body, 'click', @hide)
+
             _.get(@id).classList.remove('active')
             @_state.active = false
             return @
@@ -57,16 +105,14 @@ class Autocomplete extends CoreWidget
         @render = () =>
 
             el = _.get(@element_id)
-            w = el.scrollWidth
-            h = el.scrollHeight
+            h = el.offsetHeight or el.scrollHeight
             offset = _.get_offset(el)
 
             autoCSS =
-                width: w + 'px'
                 top:  offset.top + h + 'px'
-                left: offset.left + 'px'
+                left: offset.left + 3 + 'px'
 
-            df = _.create_doc_frag(@template.render(@))
+            df = _.create_doc_frag(@template.parse(@))
             df.firstChild.style[prop] = val for prop, val of autoCSS
             document.body.appendChild(df)
 
@@ -74,27 +120,28 @@ class Autocomplete extends CoreWidget
 
             @template.t = @_state.config.item_template ||= [
                 '{{>_state.results}}',
-                    '<div id="autocomplete-result-{{=slug}}" class="autocomplete-result" data-name="{{<name}}">',
+                    '<div id="autocomplete-result-{{=slug}}" class="autocomplete-result" data-name="{{=name}}">',
                         '{{avatar}}',
                             '<img class="preview-small" src="{{=avatar}}">',
                             '<h6>{{=firstname}} {{=lastname}} ({{=username}})</h6>',
                             '<span>{{=location}}</span>',
                         '{{:avatar}}',
-                            '<h6>{{&1}}</h6>',
-                            '<span>{{=description}}</span>',
+                            '<h4{{none}} class="disabled"{{/none}}>{{=name}}</h4>',
+                            '{{description}}<span>{{=description}}</span>{{/description}}',
                         '{{/avatar}}',
                     '</div>',
                 '{{/_state.results}}'
             ].join('')
 
             return @render = () =>
-                @hide()
-                setTimeout(@show, 350)
 
-                html = @template.render(@)
-                el = _.get(@id)
+                html = @template.parse(@)
+                el = _.get('#'+@id)
                 el.innerHTML = html
-                _.bind(_.get('.autocomplete-result', el), 'click', @fill, true)
+                result_els = _.filter(_.get('.autocomplete-result', el), (v)-> return (v.classList? and not v.classList.contains('disabled')))
+                _.bind(result_els, 'click', @fill)
+
+                @show() if not @_state.active
 
                 return @
 
@@ -104,17 +151,29 @@ class Autocomplete extends CoreWidget
                 e.preventDefault()
                 e.stopPropagation()
 
+                _.unbind(_.get('.autocomplete-result'), 'click', @fill)
+
                 el = _.get('#'+@element_id)
                 name = e.target.getAttribute('data-name')
+                if not name?
+                    node = e.target
+                    while node = node.parentNode
+                        continue if not node.classList.contains('autocomplete-result')
+                        name = node.getAttribute('data-name')
+                        break
                 choices = @_state.results
                 for c in choices
                     continue if c.name isnt name
                     @choice = c
                     break
                 return false if not !!@choice
-                el.value = name
 
-                return @
+                if @finish?
+                    el.value = ''
+                    @finish(@)
+                else el.value = name
+
+                return @hide()
 
             else throw 'Autocomplete fill() requires bound event object as first parameter.'
 
@@ -126,14 +185,21 @@ class Autocomplete extends CoreWidget
 
                 el = e.target
                 input = el.value or el.innerText
+
                 if input.length < @_state.config.length
+                    @hide() if @_state.active
                     return false
                 else
                     api = @_state.config.api
                     return $.apptools.api.search[api](query: input).fulfill
                         success: (res) =>
+                            results = res[@_state.config.result_key]
                             @_state.cache = @_state.results
-                            @_state.results = res[@_state.config.result_key]
+                            @_state.results = (if results? then results else [{
+                                slug: 'none'
+                                name: 'no results found'
+                                none: true
+                            }])
                             return @render()
 
                         failure: (err) =>
@@ -155,5 +221,5 @@ class Autocomplete extends CoreWidget
 
 
 
-@__openfire_preinit.abstract_base_classes.push Facepile, Autocomplete
+@__openfire_preinit.abstract_base_classes.push Facepile, AutocompleteAPI, Autocomplete
 @__openfire_preinit.abstract_base_controllers.push WidgetController

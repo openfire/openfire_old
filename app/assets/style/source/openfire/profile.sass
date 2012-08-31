@@ -15,16 +15,25 @@ h4, h5, h6
 .tag
     border: none
     border-radius: 4px
-    font-family: "Karla"
-    font-size: 11px
-    font-weight: 700
+    font:
+        family: "Karla"
+        size: 11px
+        weight: 700
     text-transform: uppercase
     padding: 3px
-    margin-right: 5px
-    margin-left: 5px
+    margin:
+        right: 5px
+        left: 5px
     cursor: pointer
+    color: #dfdfdf
+    background-color: #999
 
-    &.topic
+    &:hover
+        color: white
+        background-color: #777
+
+    &.topic,
+    &.topic-edit
         background-color: #ffb246
         color: white
 
@@ -48,8 +57,6 @@ h4, h5, h6
         color: #f57720
 
     &.add
-        color: #dfdfdf
-        background-color: #999
         text-align: right
         line-height: 11px
         &::before
@@ -65,10 +72,6 @@ h4, h5, h6
             text-align: center
             &::before
                 margin: 0 !important
-
-        &:hover
-            color: white
-            background-color: #777
 
         &:active
             &::before
@@ -269,16 +272,59 @@ body
                     text-transform: uppercase
                     letter-spacing: 2px
 
-.topic-edit
+.topics-existing,
+.topics-new
+    text-align: center
+
+    h4
+        display: block
+        color: #444
+
+.topics-existing
+    left: 7px
+    top: 7px
+    background-color: #aaa
+    width: 60%
+    padding: 1px
+    overflow-y: auto
+    padding-bottom: 22px
+
+.topics-new
+    top: 7px
+    width: 40%
+
+    div.control
+        bottom: 20px
+
+.topic-edit,
+.topic-edit .right
     font:
         family: "Karla"
-        size: 16px
+        size: 26px
         weight: bold
-    display: block
-    width: 100%
     text-align: center
-    padding: 0 20px
+    padding: 0
     line-height: 56px
     vertical-align: middle
+
+.topic-edit
+    text-transform: uppercase
+    display: block
+    width: 100%
     background-color: #dedede
     color: #444
+    border-bottom: 2px solid #cdcdcd
+    border-top: 2px solid #efefef
+
+    .right
+        span
+            margin: 0 7px
+            cursor: pointer
+            font-family: "momentron" !important
+
+        .promote:hover
+            color: green
+        .demote:hover
+            color: #777
+        .remove:hover
+            color: red

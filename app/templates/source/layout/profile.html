@@ -43,15 +43,17 @@
 
                             <span class='interest topic tag' data-topic-slug='technology'>
                                 Technology{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
-                            </span>,
+                            </span>
                             <span class='interest topic tag' data-topic-slug='dentistry'>
                                 Dentistry{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
-                            </span>,
+                            </span>
                             <span class='interest topic tag' data-topic-slug='taxidermy'>
                                 Taxidermy{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
                             </span>
                             {% if edit_privs %}
-                                <span class="tag add" value="add topic">add / edit topics</span>
+                                <span class="tag" id="edit-topics">edit topics</span>
+                            {% else %}
+                                <span class="tag" id="all-topics">all topics</span>
                             {% endif %}
                         </h3><!-- end #topics -->
                     </div><!-- end #name+topics -->

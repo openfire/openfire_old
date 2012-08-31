@@ -10,44 +10,48 @@
   border: 1px solid #dadada
   z-index: 998
 
-.modal-ui
-  left: 0
-  bottom: 0
-  width: 100%
-  height: 22px
-  background-color: white
-  border-bottom-right-radius: 7px
-  border-bottom-left-radius: 7px
+  .modal-content
+    color: black
 
-.modal-title,
-.modal-close
-  font:
-    family: 'Karla', sans-serif
-    size: 13px
-    weight: 700
-  line-height: 12px
-  text-transform: uppercase
-  cursor: pointer
+  .modal-ui
+    left: 0
+    bottom: 0
+    width: 100%
+    height: 22px
+    background-color: white
+    border-bottom-right-radius: 7px
+    border-bottom-left-radius: 7px
 
-.modal-title
-  color: #5e5e5e
-  max-width: 400px
-  left: 5px
-  bottom: 3px
-  padding: 3px
+    .modal-title,
+    .modal-close
+      font:
+        family: 'Karla', sans-serif
+        size: 13px
+        weight: 700
+      line-height: 12px
+      text-transform: uppercase
+      cursor: pointer
 
-.modal-close
-  color: #393939
-  right: 5px
-  bottom: 3px
-  padding: 3px
-  border-radius: 2px
-  opacity: 0.5
+    .modal-title
+      color: #5e5e5e
+      max-width: 400px
+      left: 5px
+      bottom: 3px
+      padding: 3px
 
-  &:hover
-    cursor: pointer
-    background-color: #e3e3ee
-    opacity: 1
+    .modal-close
+      color: #393939
+      right: 5px
+      bottom: 3px
+      padding: 3px
+      border-radius: 2px
+      opacity: 0.5
+
+      &:hover
+        cursor: pointer
+        background-color: #e3e3ee
+        opacity: 1
+
 
 // accordion
 .accordion
@@ -208,11 +212,58 @@ span
   color: #606060 !important
 
 // openfire specific widgets
-.autocomplete
-  -webkit-transition-duration: 125
+input.autocomplete
+  display: block
+  font-size: 16pt
+  font-family: "Karla"
+  padding: 10px
+  border-radius: 3px
+  border: 1px solid #ccc
+  line-height: 18pt
+  vertical-align: middle
+  box-shadow: inset 1px 1px 3px 2px rgba(0,0,0,0.1)
+  margin:
+    right: auto
+    left: auto
+
+  width: 250px
+
+.autocomplete-results
+  -webkit-transition-duration: 0.05s
   -webkit-transition-property: opacity
   opacity: 0
   margin: 0
+  background-color: whitesmoke
+  width: 270px
 
   &.active
+    z-index: 998
     opacity: 1
+
+  .autocomplete-result
+    border: 1px solid
+    border-top-color: #eee
+    border-left-color: #eee
+    border-right-color: #cecece
+    border-bottom-color: #cecece
+
+    &:hover
+      cursor: pointer
+      background-color: #dedede
+
+    h4
+      color: black
+      margin: 0px auto
+      display: block
+      padding: 5px
+
+      &.disabled
+        font-size: 11px
+        text-align: center
+        font-weight: 400
+        font-style: italic
+        color: #777
+
+        &:hover
+          cursor: auto
+          background-color: transparent

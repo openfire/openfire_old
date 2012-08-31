@@ -126,13 +126,6 @@ def build_indexes(index_list):
     ndb.put_multi(entry_dict.values())
     index.IndexEvent(id='_entries_init_').put()
 
-    ## mappings
-    mapping_dict = {}
-    for i in index_list:
-        mapping_dict[i] = entry_dict[i].map(index_dict[i].key)
-    ndb.put_multi(mapping_dict.values())
-    index.IndexEvent(id='_mappings_init_').put()
-
 
 def create_contribution_type(slug='slug', name='NAME', unit='CASH', plural='CASH', subunit='DOLLAR', subunit_plural='DOLLARS'):
 
