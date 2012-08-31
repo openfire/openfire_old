@@ -73,7 +73,7 @@ class Payment(messages.Message):
     from_money_source = messages.MessageField(MoneySource, 11)
     to_user = messages.StringField(12)
     to_account = messages.MessageField(UserPaymentAccount, 13)
-    to_money_source = messages.MessageField(MoneySource, 14)
+    to_project_tier = messages.StringField(14)
     created = messages.StringField(15)
     updated = messages.StringField(16)
     archived = messages.StringField(17)
@@ -113,7 +113,7 @@ class BackProject(messages.Message):
     project = messages.StringField(2)
     tier = messages.StringField(3)
     amount = messages.StringField(4)
-    money_source = messages.MessageField(MoneySource, 5)
+    money_source = messages.StringField(5)
     new_cc = messages.MessageField(CreditCard, 6)
 
 

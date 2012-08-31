@@ -31,8 +31,23 @@
     },
     {
         "parent_key": "project__BlueSeed",
+        "amount":  1000,
+        "description": "We'll learn how to sail."
+    },
+    {
+        "parent_key": "project__BlueSeed",
+        "amount":  10000,
+        "description": "We'll buy a sunfish!"
+    },
+    {
+        "parent_key": "project__BlueSeed",
+        "amount":  100000,
+        "description": "We'll buy a Tayana 37!"
+    },
+    {
+        "parent_key": "project__BlueSeed",
         "amount":  1000000,
-        "description": "We'll buy a boat!"
+        "description": "We'll buy a much larger boat!"
     },
     {
         "parent_key": "project__Carrotmob",

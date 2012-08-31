@@ -53,16 +53,16 @@ class CorePaymentAPI(object):
 
         ''' Create a payment that records the contribution amount that will be charged if the project ignites. '''
 
-        description = 'TODO: make description'
+        description = 'TODO: make description?'
         payment = Payment(
             amount=amount,
             commission=self._calculate_commission(amount),
             description=description,
             status='p',
             from_user=money_source.owner,
-            from_money_source=money_source,
+            from_money_source=money_source.key,
             to_project=project_key,
-            to_account=self.account_for_project(project_key),
+            to_account=self.account_for_project(project_key).key,
         )
         payment.put()
         return payment

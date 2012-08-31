@@ -31,7 +31,7 @@ class WePayUserPaymentAccount(UserPaymentAccount):
     wepay_token_expires = ndb.DateTimeProperty('wx', indexed=True, required=False)
 
 
-class ProjectAccount(polymodel.PolyModel):
+class ProjectAccount(polymodel.PolyModel, AppModel):
 
     '''An account is a polymodel that is tied to a project.
 
@@ -102,7 +102,7 @@ class Payment(AppModel):
     archived = ndb.BooleanProperty('x', indexed=True, default=False)
 
 
-class Transaction(polymodel.PolyModel):
+class Transaction(polymodel.PolyModel, AppModel):
 
     ''' A polymodel used to track a single third party transaction dealing with payments or accounts. '''
 
@@ -165,7 +165,7 @@ class WePayWithdrawalTransaction(Transaction):
             'n', 'a', 'cp', 's', 'c', 'rf', 'f', 'e'], default='n')
 
 
-class MoneySource(polymodel.PolyModel):
+class MoneySource(polymodel.PolyModel, AppModel):
 
     ''' A polymodel used for payment sources such as credit cards and bank accounts. '''
 
