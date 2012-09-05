@@ -44,6 +44,11 @@ class PaymentService(RemoteService):
         project_key = ndb.Key(urlsafe=request.project)
         project = project_key.get()
 
+        # If an account already exists, just return that.
+        existing_account = PaymentAPI.account_for_project(project_key)
+        if existing_account:
+            return existing_account.to_message()
+
         # If any of the owners have a payment account linked, create a collection account for this project.
         account = None
         for owner_key in project.owners:
@@ -53,8 +58,15 @@ class PaymentService(RemoteService):
                 account = accounts[0]
                 break
 
-        project_account = PaymentAPI.create_project_payment_account(project_key, request.name,
-                request.description, account)
+        # Get or create the name and description.
+        name = request.name
+        if not name:
+            name = project.name
+        description = request.description
+        if not description:
+            description = "Collection account for " + project.name
+
+        project_account = PaymentAPI.create_project_payment_account(project_key, name, description, account)
         return project_account.to_message()
 
     @remote.method(payment_messages.ProjectAccount, payment_messages.ProjectAccount)
@@ -112,7 +124,7 @@ class PaymentService(RemoteService):
         ''' Remove a money source from a user payment account by setting save for reuse to false. '''
 
         if not request.source:
-            return Echo(message='No money source provided')
+            return Echo(message='No money source provided.')
 
         source_key = ndb.Key(urlsafe=request.source)
         source = source_key.get()
@@ -176,6 +188,27 @@ class PaymentService(RemoteService):
         payments = [p.to_message for p in query.fetch()]
         return payment_messages.PaymentHistory(payments=payments, start=request.start, end=request.end, target=request.target)
 
+    @remote.method(payment_messages.CancelPayment, Echo)
+    def cancel_payment(self, request):
+
+        ''' Cancel a payment that has not yet been charged. '''
+
+        if not request.payment:
+            return Echo(message='No payment provided.')
+
+        payment_key = ndb.Key(urlsafe=request.payment)
+        payment = payment_key.get()
+        if not payment:
+            return Echo(message='Payment not found.')
+
+        reason = request.reason
+        if not reason:
+            reason = "UNKNOWN"
+        canceled = PaymentAPI.cancel_payment(payment, reason)
+        if not canceled:
+            return Echo(message='Failed to cancel payment.')
+        return Echo(message='success')
+
     @remote.method(payment_messages.RefundPayment, Echo)
     def refund_payment(self, request):
 
@@ -189,7 +222,10 @@ class PaymentService(RemoteService):
         if not payment:
             return Echo(message='Payment not found.')
 
-        refunded = PaymentAPI.refund_payment(payment, request.amount)
+        reason = request.reason
+        if not reason:
+            reason = "UNKNOWN"
+        refunded = PaymentAPI.refund_payment(payment, reason, request.amount)
         if not refunded:
             return Echo(message='Failed to refund payment.')
         return Echo(message='success')

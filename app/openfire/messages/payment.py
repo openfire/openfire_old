@@ -132,12 +132,21 @@ class RemoveMoneySource(messages.Message):
     source = messages.StringField(1)
 
 
+class CancelPayment(messages.Message):
+
+    ''' Cancel a payment that has not yet been charged. '''
+
+    payment = messages.StringField(1)
+    reason = messages.StringField(2)
+
+
 class RefundPayment(messages.Message):
 
     ''' Start a payment refund. '''
 
     payment = messages.StringField(1)
-    amount = messages.StringField(2)
+    reason = messages.StringField(2)
+    amount = messages.StringField(3)
 
 
 class WithdrawalRequest(messages.Message):

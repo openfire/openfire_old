@@ -745,38 +745,15 @@ class ProjectController extends OpenfireController
                 success: (response) =>
                     selector = document.getElementById("back-project-money-source-input")
                     options = selector.innerHTML
-                    for source in response.sources
-                        options += "<option value='" + source.key + "'>" + source.description + "</option>"
+                    if response.sources and response.sources.length
+                        for source in response.sources
+                            options += "<option value='" + source.key + "'>" + source.description + "</option>"
                     selector.innerHTML = options
                     $.apptools.widgets.modal.get("back-project-dialog").open()
                 failure: (error) =>
                     alert("Failed to start donation. Are you logged in?")
             return
 
-            """
-            ## back a project
-            # to do - figure out how to get the user, create UI for backing
-            $.apptools.api.project.back(
-                project: @project_key
-                user: null
-                contribution: null
-            ).fulfill
-                success: (response) =>
-                    @log('backing functionality currently stubbed.')
-                    $('#back-text').animate opacity: 0,
-                        duration: 250
-                        complete: () =>
-                            document.getElementById('back-text').innerHTML = 'you rock.'
-                            document.getElementById('back').classList.add('backed')
-                            $('#back-text').animate opacity: 1,
-                                duration: 250
-                                complete: () =>
-                                    alert 'back() success'
-
-
-                failure: (error) =>
-                    alert 'back() failure'
-            """
 
         @follow = () =>
 

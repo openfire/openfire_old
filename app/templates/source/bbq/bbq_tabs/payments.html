@@ -28,7 +28,13 @@
                 <td>{{ payment.commission }}</td>
                 <td>{{ payment.status }}</td>
                 <td>{{ payment.current_transaction }}</td>
-                <td>{{ payment.transactions }}</td>
+                <td>
+                    {% for transaction in payment.all_transactions %}
+                        {{ transaction }},&nbsp;
+                    {% else %}
+                        No transactions.
+                    {% endfor %}
+                </td>
                 <td>{{ payment.from_money_source }}</td>
                 <td>{{ payment.to_account }}</td>
                 <td>{{ payment.created }}</td>

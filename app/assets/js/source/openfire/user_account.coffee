@@ -9,6 +9,18 @@ class UserAccountController extends OpenfireController
             if linkWePayBtn
                 linkWePayBtn.addEventListener('click', @linkWePayAccount, false)
 
+            createAccountBtns = document.getElementsByClassName('create-account-for-project')
+            for btn in createAccountBtns
+                btn.addEventListener('click', @createAccoutForProject, false)
+
+            removeMoneySourceBtns = document.getElementsByClassName('remove-money-source')
+            for btn in removeMoneySourceBtns
+                btn.addEventListener('click', @removeMoneySource, false)
+
+            cancelPaymentBtns = document.getElementsByClassName('cancel-payment')
+            for btn in cancelPaymentBtns
+                btn.addEventListener('click', @cancelPayment, false)
+
         @linkWePayAccount = () =>
             $.apptools.api.payment.get_auth_url().fulfill
                 success: (response) =>
@@ -18,6 +30,36 @@ class UserAccountController extends OpenfireController
 
                 failure: (error) =>
                     @log "Failed to get auth url to link WePay account: " + error
+
+        @createAccoutForProject = () ->
+            $.apptools.api.payment.create_project_payment_account(
+                "project": this.id
+            ).fulfill
+                success: (response) =>
+                    alert("Success! Reloading page...")
+                    window.location.reload()
+                failure: (error) =>
+                    alert("failure!")
+
+        @removeMoneySource = () ->
+            $.apptools.api.payment.remove_money_source(
+                "source": this.id
+            ).fulfill
+                success: (response) =>
+                    alert("Success! Reloading page...")
+                    window.location.reload()
+                failure: (error) =>
+                    alert("failure!")
+
+        @cancelPayment= () ->
+            $.apptools.api.payment.cancel_payment(
+                "payment": this.id
+            ).fulfill
+                success: (response) =>
+                    alert("Success! Reloading page...")
+                    window.location.reload()
+                failure: (error) =>
+                    alert("failure!")
 
 
 if @__openfire_preinit?

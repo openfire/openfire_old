@@ -19,6 +19,8 @@ import hashlib
 ## Webapp2 Imports
 import webapp2
 
+from decimal import Decimal
+
 ## Google Imports
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import context
@@ -209,9 +211,9 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
         return self.response
 
-    def _format_as_currency(self, number, isPercent=False):
+    def _format_as_percentage(self, number):
 
-        ''' Format a number as a currency or percentage. '''
+        ''' Format a number as a percentage. '''
 
         # create result array
         formatted_number = [i for i in reversed(list(str(number)))]
@@ -223,11 +225,51 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
                         if ((b % 3) == 0)])
             if (i != 0)])
 
-        # build, format as currency/percentage, return
+        # build, format as percentage, return
         return ''.join([char for char in filter(lambda x: x is not None,
-                ['$' if not isPercent else None,
-                 ''.join([i for i in reversed(formatted_number)]),
-                 '%' if isPercent else None])])
+                [''.join([i for i in reversed(formatted_number)]), '%'])])
+
+    def _format_as_currency(self, number, places=2, curr='', sep=',', dp='.', pos='', neg='-', trailneg=''):
+
+        '''
+        Format a number as currency. Using standard python 'moneyfmt' recipe for Decimals.
+
+        arguments:
+            places:  required number of places after the decimal point
+            curr:    optional currency symbol before the sign (may be blank)
+            sep:     optional grouping separator (comma, period, space, or blank)
+            dp:      decimal point indicator (comma or period)
+                     only specify as blank when places is zero
+            pos:     optional sign for positive numbers: '+', space or blank
+            neg:     optional sign for negative numbers: '-', '(', space or blank
+            trailneg:optional trailing minus indicator:  '-', ')', space or blank
+        '''
+
+        if not number:
+            number = 0.0
+        value = Decimal(number)
+        q = Decimal(10) ** -places
+        sign, digits, exp = value.quantize(q).as_tuple()
+        result = []
+        digits = map(str, digits)
+        build, next = result.append, digits.pop
+        if sign:
+            build(trailneg)
+        for i in range(places):
+            build(next() if digits else '0')
+        build(dp)
+        if not digits:
+            build('0')
+        i = 0
+        while digits:
+            build(next())
+            i += 1
+            if i == 3 and digits:
+                i = 0
+                build(sep)
+        build(curr)
+        build(neg if sign else pos)
+        return '$' + ''.join(reversed(result))
 
     def build_session2(self):
 
@@ -303,8 +345,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
             'decrypt': lambda x: self.decrypt(x),
 
             # formatter shortcuts (also installed as filters)
-            'currency': lambda x: self._format_as_currency(x, False),
-            'percentage': lambda x: self._format_as_currency(x, True),
+            'currency': lambda x: self._format_as_currency(x),
+            'percentage': lambda x: self._format_as_percentage(x),
 
             # media utils
             'gravatarify': lambda email, ext, size: ''.join([

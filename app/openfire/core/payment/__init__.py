@@ -10,7 +10,7 @@ class CorePaymentAPI(object):
 
         ''' Calculate how much commission openfire should take from a particular pledge. '''
 
-        # TODO
+        # TODO: Calculate our commission. For now just take $1.
         return 1
 
     def generate_auth_url(self, user):
@@ -73,7 +73,23 @@ class CorePaymentAPI(object):
 
         return [WePayAPI.execute_payment(p) for p in payments]
 
-    def refund_payment(self, payment, amount=None):
+    def cancel_payment(self, payment, reason):
+
+        ''' Cancel a single payment. '''
+
+        if payment.current_transaction:
+            transaction = payment.current_transaction.get()
+            if not transaction:
+                return False
+            canceled = WePayAPI.cancel_payment(transaction, reason)
+            if not canceled:
+                return False
+
+        payment.status = 'c'
+        payment.put()
+        return True
+
+    def refund_payment(self, payment, reason, amount=None):
 
         ''' Refund a single payment. '''
 
@@ -82,7 +98,7 @@ class CorePaymentAPI(object):
         transaction = payment.current_transaction.get()
         if not transaction:
             return False
-        return WePayAPI.refund_payment(transaction, amount)
+        return WePayAPI.refund_payment(transaction, reason, amount)
 
     def generate_withdrawal_url(self, user, account, amount, note):
 

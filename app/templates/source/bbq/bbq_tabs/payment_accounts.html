@@ -32,7 +32,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Balance</th>
-                <th>Current Transaction</th>
+                <th>Current Transactions</th>
                 <th>All Transactions</th>
                 <th>WePay Account ID</th>
             </tr>
@@ -45,12 +45,18 @@
                 <td>{{ account.name }}</td>
                 <td>{{ account.description }}</td>
                 <td>{{ account.balance }}</td>
-                <td>{{ account.current_transaction }}</td>
                 <td>
-                    {% for transaction in account.transactions %}
+                    {% for transaction in account.current_transactions %}
                         {{ transaction }},&nbsp;
                     {% else %}
-                        No current transaction.
+                        No current transactions.
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for transaction in account.all_transactions %}
+                        {{ transaction }},&nbsp;
+                    {% else %}
+                        No transactions.
                     {% endfor %}
                 </td>
                 <td>{{ account.wepay_account_id }}</td>

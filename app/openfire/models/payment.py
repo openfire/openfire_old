@@ -50,11 +50,11 @@ class ProjectAccount(polymodel.PolyModel, AppModel):
     # Account balance.
     balance = ndb.FloatProperty('b', indexed=True, default=0.0)
 
-    # If a transaction is currently taking place, we keep its key on the account model.
-    current_transaction = ndb.KeyProperty('ct', indexed=True, required=False)
+    # Keep track of all transactions currently in progress for the account.
+    current_transactions = ndb.KeyProperty('ct', indexed=True, repeated=True)
 
     # All transactions in MRU order.
-    transactions = ndb.KeyProperty('t', indexed=True, repeated=True)
+    all_transactions = ndb.KeyProperty('t', indexed=True, repeated=True)
 
 
 class WePayProjectAccount(ProjectAccount):
@@ -87,7 +87,7 @@ class Payment(AppModel):
     current_transaction = ndb.KeyProperty('ct', indexed=True, required=False)
 
     # All transactions in mru order.
-    transactions = ndb.KeyProperty('t', indexed=True, repeated=True)
+    all_transactions = ndb.KeyProperty('t', indexed=True, repeated=True)
 
     # From and to. All are required except from_account.
     from_user = ndb.KeyProperty('fu', indexed=True, required=True)

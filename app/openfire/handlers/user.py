@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.models.user import User
 from openfire.models.payment import Payment, MoneySource, WePayUserPaymentAccount, WePayProjectAccount
+from openfire.models.project import Project
 
 
 class UserLanding(WebHandler):
@@ -173,17 +174,30 @@ class UserAccount(WebHandler):
             return self.redirect_to('auth/login')
 
         wepay_account = None
-        project_accounts = []
         wepay_accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == self.user.key).fetch()
+        owned_projects = Project.query(Project.owners == self.user.key).fetch()
+
+        project_accounts = {}
+        for project in owned_projects:
+            project_accounts[project.key.urlsafe()] = {
+                'project': project,
+                'account': None,
+                'history': [],
+            }
+
         if wepay_accounts and len(wepay_accounts):
             # Currently we only allow one WePay account per user.
             wepay_account = wepay_accounts[0]
-            for account in WePayProjectAccount.query(WePayProjectAccount.payment_account.IN([a.key for a in wepay_accounts])).fetch():
-                # Project accounts is a list of (account, payment history) tuples.
-                project_accounts.append((account, Payment.query(Payment.to_account == account.key).fetch()))
+            payment_account_query = WePayProjectAccount.query(
+                WePayProjectAccount.payment_account.IN([a.key for a in wepay_accounts]),
+                WePayProjectAccount.project.IN([p.key for p in owned_projects]),
+            )
+            for account in payment_account_query.fetch():
+                history = Payment.query(Payment.to_account == account.key).fetch()
+                project_accounts[account.project.urlsafe()]['account'] = account
+                project_accounts[account.project.urlsafe()]['history'] = history
 
         payments = Payment.query(Payment.from_user == self.user.key).fetch()
-
         money_sources = MoneySource.query(MoneySource.owner == self.user.key, MoneySource.save_for_reuse == True).fetch()
 
         context = {

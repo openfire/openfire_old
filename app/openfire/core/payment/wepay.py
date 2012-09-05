@@ -194,11 +194,26 @@ class CoreWePayAPI(object):
         transaction.wepay_checkout_status = response['state'] # TODO: Make this state_2_staus or something.
         transaction.put()
 
+    def cancel_payment(self, transaction, reason):
+
+        ''' Cancel a payment. '''
+
+        # Make the WePay cancel checkout API call.
+        wepay_obj = self.get_wepay_object()
+        params = {
+            'checkout_id': transaction.wepay_checkout_id,
+            'cancel_reason': reason,
+        }
+        response = wepay_obj.call('/checkout/cancel', params)
+        transaction.wepay_checkout_status = response['state'] # TODO: Make this state_2_staus or something.
+        transaction.put()
+        return True
+
     def refund_payment(self, transaction, reason, amount=None):
 
         ''' Refund a payment. '''
 
-        # Make the WePay create checkout API call.
+        # Make the WePay refund checkout API call.
         wepay_obj = self.get_wepay_object()
         params = {
             'checkout_id': transaction.wepay_checkout_id,

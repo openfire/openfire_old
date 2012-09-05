@@ -15,45 +15,59 @@
             <div>
             {% if project_accounts %}
                 <span>Here is a list of your payment accounts for your project</span>
-                {% for account, payments in project_accounts %}
-                    <li class="wepay-project-account">
-                        <span class="wepay-account-name">{{ account.name }}</span>
-                        <span class="wepay-account-balance">${{ account.balance }}</span>
-                        <div>
-                            <h4>{{ account.name }} payment history</h4>
-                            <table border="1">
-                                <thead>
-                                    <th>From User</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </thead>
-                                <tbody>
-                                    {% for payment in payments %}
-                                    <tr>
-                                        <td>{{ payment.from_user }}</td>
-                                        <td>{{ currency(payment.amount) }}</td>
-                                        <td>{{ payment.status }}</td>
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td>No payments.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                {% for project_key, account_dict in project_accounts.iteritems() %}
+                    <h5>{{ account_dict['project'].name }}</h5>
+                    {% if account_dict['account'] %}
+                        <div class="wepay-project-account">
+                            <span class="wepay-account-name">{{ account_dict['account'].name }}</span>
+                            <span class="wepay-account-balance">${{ account_dict['account'].balance }}</span>
+                            <div>
+                                <h4>{{ account_dict['account'].name }} payment history</h4>
+                                <table border="1">
+                                    <thead>
+                                        <th>From User</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for payment in account_dict['history'] %}
+                                        <tr>
+                                            <td>{{ payment.from_user }}</td>
+                                            <td>{{ currency(payment.amount) }}</td>
+                                            <td>{{ payment.status }}</td>
+                                            <td>
+                                                <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td>No payments.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </li>
+                    {% else %}
+                        <div>
+                            <button class="create-account-for-project" id="{{ project_key }}" type="button">Create account for {{ account_dict['project'].name }}</button>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 <span>You do not have any project payment accounts.</span>
             {% endif %}
             </div>
+
         {% else %}
+
             <button id="link-wepay-account-btn" type="button">Link a WePay Account</button>
             <div id="link-wepay-account-inline" style="display: none;">
                 <span>Visit this WePay link to authorize openfire to access your new or existing WePay account.</span>
                 <span><a href="" id="link-wepay-account-link"></a></span>
             </div>
+
         {% endif %}
     </div>
 
@@ -67,6 +81,7 @@
                 <th>To Project</th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th>Actions</th>
             </thead>
             <tbody>
                 {% for payment in payments %}
@@ -74,6 +89,9 @@
                     <td>{{ payment.to_project.get().name }}</td>
                     <td>{{ currency(payment.amount) }}</td>
                     <td>{{ payment.status }}</td>
+                    <td>
+                        <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
@@ -93,6 +111,7 @@
         {% for source in money_sources %}
             <li>
                 <span>{{ source.description }}</span>
+                <span><button id="{{ source.key.urlsafe() }}" class="remove-money-source">Remove</button></span>
             </li>
         {% else %}
             <li>No saved money sources</li>
