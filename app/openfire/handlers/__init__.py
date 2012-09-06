@@ -182,7 +182,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
             self.session = self.build_session()
 
         try:
-
             if self.sessions and self.apply_redirect:
                 # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
                 if self.session.get('redirect') is not None:
