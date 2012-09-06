@@ -6,9 +6,11 @@
 @import _core/initializr
 
 // media queries / base classes
-@import _core/mediaqueries
 @import _core/print
 @import _core/base
+
+math
+  display: none
 
 *
   font-family: "Source Sans Pro", "Myriad Pro", Arial, sans-serif
@@ -17,9 +19,6 @@
 
 body
   font: 80% Verdana, sans-serif
-
-math
-  display: none
 
 h1, h2, h3
   -webkit-margin-before: 0
@@ -35,7 +34,6 @@ h1
 p
   margin: 15px 0
   padding: 5px 0
-
 
 .lightorange
   color: #ffb246
@@ -56,6 +54,10 @@ p
   left: 0
   right: 0
   z-index: 500
+
+  &.wrapper
+    width: 100%
+
   #content::before
     display: block
     content: ""
@@ -75,9 +77,15 @@ p
     #oflogo
       position: absolute
       -webkit-transition-property: top
+      max-width: 92%
+      height: auto
     #title
       position: absolute
       -webkit-transition-property: opacity, right
+      font:
+        family: "Satisfy", cursive
+      line-height: 18pt
+      text-align: right
 
 #mainvideo
   -webkit-transition-property: height, min-height
