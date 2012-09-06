@@ -331,6 +331,9 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
             # Try to fetch the file from a url.
             blob_key = fetch_url_to_blobstore(blob_file)
         except:
+            pass
+
+        if not blob_key:
             # Fall back to loading from a local copy.
             local_file = os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'img_links', name)
             blob_key = upload_local_file_to_blobstore(local_file, mime_type)

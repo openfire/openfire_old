@@ -356,7 +356,7 @@ config['openfire.wepay'] = {
     'use_production': False,
     'auth_scope': 'manage_accounts,view_balance,collect_payments,refund_payments,view_user,send_money',
     'redirect_uri': 'https://openfi.re/_payment/handler',
-    'callback_uri': 'https://openfi.re/_payment/handler',
+    'callback_uri': 'https://openfi.re/_payment/ipn',
 
     'staging': {
         'client_id': '118300',

@@ -110,5 +110,33 @@
         "amount": 10,
         "description": "Early access to our online database.",
         "delivery": "10/1/2012"
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "name": "User",
+        "amount": 10,
+        "description": "Early access to the website.",
+        "delivery": "12/1/2012"
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "name": "User",
+        "amount": 100,
+        "description": "Your name on the front page of the website for the first month (small text).",
+        "delivery": "12/1/2012"
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "name": "User",
+        "amount": 1000,
+        "description": "A hat.",
+        "delivery": "12/1/2012"
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "name": "User",
+        "amount": 10000,
+        "description": "You can pet on animal of your choosing.",
+        "delivery": "12/1/2012"
     }
 ]

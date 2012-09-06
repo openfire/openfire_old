@@ -21,6 +21,7 @@
                         <div class="wepay-project-account">
                             <span class="wepay-account-name">{{ account_dict['account'].name }}</span>
                             <span class="wepay-account-balance">${{ account_dict['account'].balance }}</span>
+                            <button id="{{ account_dict['account'].key.urlsafe() }}" class="update-account-balance">update</button>
                             <div>
                                 <h4>{{ account_dict['account'].name }} payment history</h4>
                                 <table border="1">
@@ -91,6 +92,11 @@
                     <td>{{ payment.status }}</td>
                     <td>
                         <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
+                        {% if payment.current_transaction %}
+                            <a href="/_payment/ipn?checkout_id={{ payment.current_transaction.get().wepay_checkout_id }}" target="_blank">update</a>
+                        {% else %}
+                            not in progress
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}

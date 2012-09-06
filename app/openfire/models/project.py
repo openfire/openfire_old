@@ -52,10 +52,10 @@ class Goal(AppModel):
 
     target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
-    amount = ndb.IntegerProperty('a', indexed=True, required=True)
+    amount = ndb.FloatProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('d', indexed=False)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
-    progress = ndb.IntegerProperty('pg', indexed=True, choices=range(0, 100), default=0)
+    progress = ndb.IntegerProperty('pg', indexed=True, default=0)
     met = ndb.BooleanProperty('m', indexed=True, default=False)
 
 
@@ -70,7 +70,7 @@ class Tier(AppModel):
     name = ndb.StringProperty('n', indexed=False)
     target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
-    amount = ndb.IntegerProperty('a', indexed=True, required=True)
+    amount = ndb.FloatProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('pd', indexed=False)
     delivery = ndb.StringProperty('d', indexed=False)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
@@ -145,12 +145,15 @@ class Project(AppModel):
     # Progress
     backers = ndb.IntegerProperty('b', default=0)
     followers = ndb.IntegerProperty('f', default=0)
-    money = ndb.IntegerProperty('mn', default=0)
-    progress = ndb.IntegerProperty('pro', default=0, choices=frozenset(range(0, 100)))
+    money = ndb.FloatProperty('mn', default=0.0)
+    progress = ndb.IntegerProperty('pro', default=0)
 
     # Tiers + Goals
     tiers = ndb.KeyProperty('tr', repeated=True)
     goals = ndb.KeyProperty('gl', repeated=True)
+
+    # Payments
+    payments = ndb.KeyProperty('pm', repeated=True)
 
     # Avatar + Media
     avatar = ndb.KeyProperty('av')

@@ -102,6 +102,7 @@ rules = [
         HandlerPrefixRoute('payment.', [
             PathPrefixRoute('/_payment', [
                 Route('/handler', name='payment-handler', handler='PaymentHandler'),
+                Route('/ipn', name='payment-ipn-handler', handler='WePayIPNHandler'),
             ])
         ]),
 

@@ -28,3 +28,36 @@ class PaymentHandler(WebHandler):
             self.logging.error('Failed to wepay user payment account in oauth callback handler.')
 
         return self.redirect('/me')
+
+
+class WePayIPNHandler(WebHandler):
+
+    ''' A hander dedicated to the WePay IPN system. '''
+
+    def _process_wepay_update(self, checkout_id, withdrawal_id):
+
+        ''' Common method to process the checkout or withdrawal id. '''
+
+        if checkout_id:
+            return PaymentAPI.payment_updated(int(checkout_id))
+        if withdrawal_id:
+            return PaymentAPI.withdrawal_updated(int(withdrawal_id))
+        return None
+
+    def post(self):
+
+        ''' Handle WePay IPN posts to update a checkout or withdrawal. '''
+
+        checkout_id = self.request.POST.get('checkout_id', None)
+        withdrawal_id = self.request.POST.get('withdrawal_id', None)
+        self._process_wepay_update(checkout_id, withdrawal_id)
+        return self.redirect('/')
+
+    def get(self):
+
+        ''' Fake WePay IPN posts with a get url for dev purposes. '''
+
+        checkout_id = self.request.GET.get('checkout_id', None)
+        withdrawal_id = self.request.GET.get('withdrawal_id', None)
+        self._process_wepay_update(checkout_id, withdrawal_id)
+        return self.redirect('/')

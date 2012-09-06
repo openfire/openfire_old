@@ -1,5 +1,5 @@
 
-<h2>User Payment Accounts</h2>
+<h2>User WePay Accounts</h2>
 <div class="content">
     <table id="bbq-user-payment-account-table" class="bbq-datatable">
         <thead>
@@ -60,6 +60,41 @@
                     {% endfor %}
                 </td>
                 <td>{{ account.wepay_account_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<h2>openfire saved credit card accounts</h2>
+<div class="content">
+    <table id="bbq-cc-account-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Owner</th>
+                <th>Description</th>
+                <th>ID</th>
+                <th>Save for Re-Use</th>
+                <th>Created</th>
+                <th>First Use</th>
+                <th>Last Use</th>
+                <th>Authorized</th>
+                <th>State</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for credit_card in credit_cards %}
+            <tr>
+                <td>{{ credit_card.owner }}</td>
+                <td>{{ credit_card.description }}</td>
+                <td>{{ credit_card.wepay_cc_id }}</td>
+                <td>{{ credit_card.save_for_reuse }}</td>
+                <td>{{ credit_card.created }}</td>
+                <td>{{ credit_card.first_use }}</td>
+                <td>{{ credit_card.last_use }}</td>
+                <td>{{ credit_card.wepay_cc_authorized }}</td>
+                <td>{{ credit_card.wepay_cc_state }}</td>
             </tr>
             {% endfor %}
         </tbody>

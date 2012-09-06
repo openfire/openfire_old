@@ -112,8 +112,8 @@ class Transaction(polymodel.PolyModel, AppModel):
     # Action: (Execute, Authorize, Cancel, Retry, Refund, Withdrawal).
     action = ndb.StringProperty('a', indexed=True, choices=['ex', 'au', 'c', 'rt', 'rf', 'w'])
 
-    # openfire status: (Initial, Pending, Completed, Cancelled, Error).
-    status = ndb.StringProperty('s', indexed=True, choices=['i', 'p', 'c', 'x', 'e'], default='i')
+    # openfire status: (Initial, Pending, Completed, Cancelled, Refunded, Error).
+    status = ndb.StringProperty('s', indexed=True, choices=['i', 'p', 'c', 'x', 'r', 'e'], default='i')
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)
     updated = ndb.DateTimeProperty('u', indexed=True, auto_now=True)

@@ -26,6 +26,7 @@ class ProjectAccount(messages.Message):
     name = messages.StringField(3)
     description = messages.StringField(4)
     wepay_account_id = messages.IntegerField(5)
+    balance = messages.FloatField(6)
 
 
 class Transaction(messages.Message):

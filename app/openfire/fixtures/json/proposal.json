@@ -132,5 +132,18 @@
         "owners_keys": ["user__sam", "user__david"],
         "public": true,
         "viewers_keys": ["user__pug", "user__ethan"]
+    },
+    {
+        "name": "Save the Everything",
+        "status": "a",
+        "category_key": "category__conservation",
+        "summary": "Save it all. All of it.",
+        "pitch": "We can and should save every species in a comfortable way.",
+        "tech": "Everything.",
+        "keywords": ["conservation", "animals"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan"],
+        "public": true,
+        "viewers_keys": ["user__ethan", "user__pug"]
     }
 ]

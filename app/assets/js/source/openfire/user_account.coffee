@@ -21,6 +21,12 @@ class UserAccountController extends OpenfireController
             for btn in cancelPaymentBtns
                 btn.addEventListener('click', @cancelPayment, false)
 
+            updateAccountBalanceBtns = document.getElementsByClassName('update-account-balance')
+            for btn in updateAccountBalanceBtns
+                btn.addEventListener('click', @updateAccountBalance, false)
+
+
+
         @linkWePayAccount = () =>
             $.apptools.api.payment.get_auth_url().fulfill
                 success: (response) =>
@@ -54,6 +60,16 @@ class UserAccountController extends OpenfireController
         @cancelPayment= () ->
             $.apptools.api.payment.cancel_payment(
                 "payment": this.id
+            ).fulfill
+                success: (response) =>
+                    alert("Success! Reloading page...")
+                    window.location.reload()
+                failure: (error) =>
+                    alert("failure!")
+
+        @updateAccountBalance = () ->
+            $.apptools.api.payment.update_account_balance(
+                "key": this.id
             ).fulfill
                 success: (response) =>
                     alert("Success! Reloading page...")

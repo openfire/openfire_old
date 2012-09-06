@@ -45,7 +45,7 @@ class PaymentService(RemoteService):
         project = project_key.get()
 
         # If an account already exists, just return that.
-        existing_account = PaymentAPI.account_for_project(project_key)
+        existing_account = PaymentAPI.account_for_project(project)
         if existing_account:
             return existing_account.to_message()
 
@@ -82,6 +82,17 @@ class PaymentService(RemoteService):
         account = ndb.Key(urlsafe=request.key).get()
         return account.to_message()
 
+    @remote.method(payment_messages.ProjectAccount, payment_messages.ProjectAccount)
+    def update_account_balance(self, request):
+
+        ''' Update the balance of a project account. '''
+
+        if not request.key:
+            return payment_messages.ProjectAccount()
+        account = ndb.Key(urlsafe=request.key).get()
+        PaymentAPI.update_account_balance(account)
+        return account.to_message()
+
     @remote.method(payment_messages.BackProject, Echo)
     def back_project(self, request):
 
@@ -89,6 +100,13 @@ class PaymentService(RemoteService):
 
         if not self.user:
             return Echo(message='You are not logged in.')
+        if not request.project:
+            return Echo(message='No project provided.')
+
+        project_key = ndb.Key(urlsafe=request.project)
+        project = project_key.get()
+        if not project:
+            return Echo(message='Failed to find project.')
 
         # If no money source is given, save the cc info as a money source first.
         if not request.money_source and request.new_cc:
@@ -99,7 +117,7 @@ class PaymentService(RemoteService):
             return Echo(message='No money source provided.')
 
         # Make a record of the payment amount to be charged if the projects ignites.
-        payment = PaymentAPI.back_project(ndb.Key(urlsafe=request.project), request.tier, float(request.amount), money_source)
+        payment = PaymentAPI.back_project(project, request.tier, float(request.amount), money_source)
         if not payment:
             # TODO: What to do on error?
             return Echo(message='There was an error...try again?')

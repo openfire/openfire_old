@@ -58,5 +58,10 @@
         "parent_key": "project__Open Source Ecology",
         "amount":  1000000,
         "description": "We'll plant a whole lot of stuff!"
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "amount":  10000,
+        "description": "We'll start a website that can be a place to discuss how best to save certain species."
     }
 ]
