@@ -65,6 +65,7 @@ class OFTestCase(unittest.TestCase):
         self.testbed.init_taskqueue_stub()
 
         os.environ['RUNNING_TESTS'] = 'TESTING'
+        os.environ['HTTP_HOST'] = 'open-fire-staging.appspot.com'
 
     def tearDown(self):
 
@@ -125,6 +126,35 @@ class OFTestCase(unittest.TestCase):
             self.assertTrue(len(response.body), error)
         return response
 
+
+class LoggedInTestCase(OFTestCase):
+
+    '''
+    A testcase that logs in a user during setup and adds the cookie data to
+    of_service_test and of_handler_test.
+
+    NOT CURRENTLY IN USE. ONCE BasicLoginTest WORKS, THIS WILL BE UPDATED.
+    '''
+
+    def setUp(self):
+        super(LoggedInTestCase, self).setUp()
+
+        login_post = {
+            'username': 'ethan.leland@gmail.com',
+            'password': 'ethaniscool',
+        }
+
+        self.of_handler_test('/_dev/data', desired_response_code=302, expect_response_content=False,
+                error='Failed to load the fixture data at /_dev/data.')
+
+        request = webapp2.Request.blank('/login', POST=login_post)
+        request.method = 'POST'
+        response = request.get_response(dispatch.gateway)
+
+    def tearDown(self):
+        super(LoggedInTestCase, self).tearDown()
+        request = webapp2.Request.blank('/logout')
+        response = request.get_response(dispatch.gateway)
 
 
 '''

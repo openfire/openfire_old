@@ -47,7 +47,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
     template = None
 
     # Session Properties
-    session = None
+    session = {}
     sessions = True
     force_session = True
     apply_redirect = True
@@ -146,6 +146,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         if request and response:
             # Pass up to webapp2 first
             self.initialize(request, response)
+        else:
+            self.initialize(webapp2.get_request(), webapp2.Response())
 
     def initialize(self, request, response):
 

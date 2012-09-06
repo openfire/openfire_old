@@ -6,7 +6,7 @@ Service tests.
 import unittest
 from google.appengine.ext import testbed, ndb, blobstore
 
-from openfire.tests import OFTestCase
+from openfire.tests import OFTestCase, LoggedInTestCase
 from openfire.models.user import Topic
 from openfire.models.assets import CustomURL
 from openfire.models.project import Category, Goal, Tier
@@ -930,7 +930,7 @@ class UserServiceTestCase(OFTestCase):
         #content = response['response']['content']
 
 
-class PaymentServiceTestCase(OFTestCase):
+class PaymentServiceTestCase(LoggedInTestCase):
 
     ''' Test cases for the payment service. '''
 
@@ -945,6 +945,7 @@ class PaymentServiceTestCase(OFTestCase):
         content = response['response']['content']
         #self.assetTrue(content, 'Failed to return content from the payment create_user_payment_account service.')
 
+    """
     def test_payment_get_user_payment_account(self):
 
         ''' Test the payment get_user_payment_account service method. '''
@@ -1087,6 +1088,7 @@ class PaymentServiceTestCase(OFTestCase):
             'Failed to return correct response type from payment admin_withdrawal_history service.')
         content = response['response']['content']
         #self.assetTrue(content, 'Failed to return content from the payment admin_withdrawal_history service.')
+    """
 
 
 class SearchServiceTestCase(OFTestCase):
