@@ -113,29 +113,29 @@
     },
     {
         "parent_key": "project__Save the Everything",
-        "name": "User",
+        "name": "Nice Person",
         "amount": 10,
         "description": "Early access to the website.",
         "delivery": "12/1/2012"
     },
     {
         "parent_key": "project__Save the Everything",
-        "name": "User",
+        "name": "Nicer Person",
         "amount": 100,
         "description": "Your name on the front page of the website for the first month (small text).",
         "delivery": "12/1/2012"
     },
     {
         "parent_key": "project__Save the Everything",
-        "name": "User",
+        "name": "Really a Very Nice Person",
         "amount": 1000,
         "description": "A hat.",
         "delivery": "12/1/2012"
     },
     {
         "parent_key": "project__Save the Everything",
-        "name": "User",
-        "amount": 10000,
+        "name": "Wow, Such a Nice Person, and Good Looking as Well!",
+        "amount": 5000,
         "description": "You can pet on animal of your choosing.",
         "delivery": "12/1/2012"
     }
