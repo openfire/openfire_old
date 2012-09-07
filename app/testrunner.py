@@ -18,7 +18,7 @@ GAE_PATH    Path to the Google App Engine SDK installation
 APP_DIR     Path to your 'app' directory"""
 
 
-PATTERN = 'login_test*'
+PATTERN = 'test*'
 
 
 def main(gae_path, app_path):

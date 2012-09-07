@@ -9,7 +9,9 @@
 			<form action="{{ link('landing') }}" method='post'>
 				<input id='email' type='email' placeholder='email address' />
 				<input id='name' type='text' placeholder='your name' />
+                {#
 				<input id='token' type='hidden' value='{{ util.converters.base64.b64encode(token) }}' />
+                #}
 				<input id='putsignup' type='submit' value='Sign up!' />
 			</form>
 		</div><!-- end #login_wrapper -->
