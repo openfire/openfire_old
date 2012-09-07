@@ -45,7 +45,6 @@ class SecurityConfigProvider(object):
 
         ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
 
-        import pdb; pdb.set_trace()
         self.authenticated = True
         self.session['authenticated'] = True
         if isinstance(email, ndb.Key):
