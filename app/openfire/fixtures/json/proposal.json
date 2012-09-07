@@ -11,12 +11,13 @@
         "creator_key": "user__sam",
         "owners_keys": ["user__sam", "user__david"],
         "viewers_keys": ["user__pug", "user__ethan"],
-        "goals": [
-            {"amount": 1000},
-            {"amount": 10000},
-            {"amount": 50000},
-            {"amount": 100000}
-        ],
+        "future_goal": {
+            "summary": "Show where all the money has gone.",
+            "description": "Show where every dollar has been spent in politics."
+        },
+        "initial_goal": {
+            "amount": 5000
+        },
         "tiers": [
             {
                 "name": "Friend",
@@ -132,5 +133,18 @@
         "owners_keys": ["user__sam", "user__david"],
         "public": true,
         "viewers_keys": ["user__pug", "user__ethan"]
+    },
+    {
+        "name": "Save the Everything",
+        "status": "a",
+        "category_key": "category__conservation",
+        "summary": "Save it all. All of it.",
+        "pitch": "We can and should save every species in a comfortable way.",
+        "tech": "Everything.",
+        "keywords": ["conservation", "animals"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan"],
+        "public": true,
+        "viewers_keys": ["user__ethan", "user__pug"]
     }
 ]

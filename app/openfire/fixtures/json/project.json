@@ -84,5 +84,19 @@
         "owners_keys": ["user__sam", "user__david"],
         "public": true,
         "viewers_keys": ["user__pug", "user__ethan"]
+    },
+    {
+        "name": "Save the Everything",
+        "proposal_key": "proposal__Save the Everything",
+        "status": "o",
+        "category_key": "category__conservation",
+        "summary": "Save all the animals in the world!!",
+        "pitch": "Raise money to let experts take care of endangered species better than a zoo ever could.",
+        "tech": "Everything",
+        "keywords": ["conservation", "animals"],
+        "creator_key": "user__ethan",
+        "owners_keys": ["user__ethan"],
+        "public": true,
+        "viewers_keys": ["user__ethan", "user__pug"]
     }
 ]

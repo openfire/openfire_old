@@ -188,11 +188,28 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Payment API - dealing with everything payments.
+        'payment': {
+            'enabled': True,
+            'service': 'openfire.services.payment.PaymentService',
+            'methods': ['get_auth_url', 'get_user_payment_account', 'update_account_balance',
+                        'create_project_payment_account', 'get_project_payment_account',
+                        'payment_history', 'admin_payment_history', 'back_project', 'cancel_payment',
+                        'money_sources', 'remove_money_source', 'admin_money_sources', 'refund_payment',
+                        'withdraw_funds', 'withdrawal_history', 'admin_withdrawal_history'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## Project API - provides structured information about openfire projects
         'project': {
             'enabled': True,
             'service': 'openfire.services.project.ProjectService',
-            'methods': ['get', 'list', 'put', 'go_live', 'delete', 'comment', 'comments', 'post', 'posts', 'media', 'follow', 'followers', 'backers', 'back', 'suspend', 'shutdown', 'get_tier', 'list_tiers', 'put_tier', 'delete_tier', 'get_goal', 'list_goals', 'put_goal', 'delete_goal'],
+            'methods': ['get', 'list', 'put', 'go_live', 'delete', 'comment', 'comments', 'post', 'posts', 'media', 'follow', 'followers', 'backers', 'suspend', 'shutdown', 'get_tier', 'list_tiers', 'put_tier', 'delete_tier', 'get_goal', 'list_goals', 'put_goal', 'delete_goal'],
 
             'config': {
                 'caching': 'none',

@@ -1,0 +1,32 @@
+[
+    {
+        "parent_key": "goal__fatcatmap",
+        "summary": "An even better website.",
+        "description": "We'll build an even better website with more features."
+    },
+    {
+        "parent_key": "goal__fatcatmap",
+        "summary": "An even BETTER website.",
+        "description": "We'll build an even BETTER website with more features."
+    },
+    {
+        "parent_key": "goal__fatcatmap",
+        "summary": "A slightly worse website.",
+        "description": "We'll remove some features and add a few bottlenecks."
+    },
+    {
+        "parent_key": "goal__savetheeverything",
+        "summary": "Hire an expert",
+        "description": "Hire a wildlife vet to start consulting."
+    },
+    {
+        "parent_key": "goal__savetheeverything",
+        "summary": "Build a headquarters",
+        "description": "Start a headquarters somewhere with the first animal habitat."
+    },
+    {
+        "parent_key": "goal__savetheeverything",
+        "summary": "Assist zoos",
+        "description": "Create an emergency fund for zoos that need the most help now."
+    }
+]

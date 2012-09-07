@@ -350,3 +350,26 @@ config['openfire.datamodel.integration.pipelines'] = {
     'trigger_queue': 'trigger'  # task queue to send pipelines to
 
 }
+
+config['openfire.wepay'] = {
+
+    'use_production': False,
+    'auth_scope': 'manage_accounts,view_balance,collect_payments,refund_payments,view_user,send_money',
+    'redirect_uri': 'https://openfi.re/_payment/handler',
+    'callback_uri': 'https://openfi.re/_payment/ipn',
+
+    'staging': {
+        'client_id': '118300',
+        'client_secret': '48dd71abfe',
+        'access_token': 'fb77d3d42778180b1753bc4ce941cfb0935f56514529aff8402aeee5107b7f98',
+        'account_id': '27031',
+    },
+
+    'production': {
+        'client_id': '147593',
+        'client_secret': '1e91d1ddc1',
+        'access_token': '590b005d46dbbd3610e488898e778ac1f43b100dcf3ef2b6930ecd46a640cda4',
+        'account_id': '240546',
+    },
+
+}

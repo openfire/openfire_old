@@ -95,6 +95,11 @@ class Goal(messages.Message):
     met = messages.BooleanField(8)
     created = messages.StringField(9)
     modified = messages.StringField(10)
+    amount_pledged = messages.FloatField(11)
+    amount_processed = messages.FloatField(12)
+    funding_deadline = messages.StringField(13)
+    deliverable_description = messages.StringField(14)
+    deliverable_deadline = messages.StringField(15)
 
 
 class Goals(messages.Message):
@@ -127,8 +132,9 @@ class Tier(messages.Message):
     amount = messages.IntegerField(5)
     description = messages.StringField(6)
     delivery = messages.StringField(7)
-    backer_count = messages.IntegerField(8)
-    backer_limit = messages.IntegerField(9)
+    next_step_votes = messages.IntegerField(8)
+    backer_count = messages.IntegerField(9)
+    backer_limit = messages.IntegerField(10)
 
 
 class Tiers(messages.Message):
@@ -145,6 +151,32 @@ class TierRequest(messages.Message):
 
     key = messages.StringField(1)
     project = messages.StringField(2)
+
+
+class NextStep(messages.Message):
+
+    ''' A next step for a goal. '''
+
+    key = messages.StringField(1)
+    summary = messages.StringField(2)
+    description = messages.StringField(3)
+    votes = messages.IntegerField(4)
+
+
+class NextSteps(messages.Message):
+
+    ''' A group of next steps for a goal. '''
+
+    steps = messages.MessageField(NextStep, 1, repeated=True)
+
+
+class FutureGoal(messages.Message):
+
+    ''' A big future goal. '''
+
+    key = messages.StringField(1)
+    summary = messages.StringField(2)
+    description = messages.StringField(3)
 
 
 class Comment(messages.Message):

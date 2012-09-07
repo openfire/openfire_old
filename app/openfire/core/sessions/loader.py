@@ -101,7 +101,6 @@ class MemcacheSessionLoader(OpenfireSessionLoader):
         session = memcache.get(self._en(id))
 
         self.logging.info('Memcache result: "%s"' % session)
-
         return session
 
     def put_session(self, id, struct, handler):

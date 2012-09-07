@@ -702,30 +702,58 @@ class ProjectController extends OpenfireController
             else throw new UserPermissionsError(@constructor.name, 'Current user is not a project owner.')
             ###
 
+        @close_back_dialog = () =>
+            $.apptools.widgets.modal.get("back-project-dialog").close()
+
+        @submit_payment = () =>
+            # Simple way to submit a back project request with a new credit card for now.
+            params =
+                user: null # TODO: Get user so that we can double check with the session? Should we do that?
+                project: @project_key
+                tier: document.getElementById("back-project-tier-input").value
+                amount: document.getElementById("back-project-amount-input").value
+                money_source: document.getElementById("back-project-money-source-input").value
+                new_cc:
+                    cc_num: document.getElementById("back-project-cc-num-input").value
+                    ccv: document.getElementById("back-project-cc-ccv-input").value
+                    expire_month: document.getElementById("back-project-cc-month-input").value
+                    expire_year: document.getElementById("back-project-cc-year-input").value
+                    user_name: document.getElementById("back-project-cc-name-input").value
+                    email: document.getElementById("back-project-cc-email-input").value
+                    address1: document.getElementById("back-project-cc-address-1-input").value
+                    address2: document.getElementById("back-project-cc-address-2-input").value
+                    city: document.getElementById("back-project-cc-city-input").value
+                    state: document.getElementById("back-project-cc-state-input").value
+                    country: document.getElementById("back-project-cc-country-input").value
+                    zipcode: document.getElementById("back-project-cc-zipcode-input").value
+                    save_for_reuse: document.getElementById("back-project-cc-save-input").checked
+
+            # Submit the back request via the payment.back_project service.
+            $.apptools.api.payment.back_project(params).fulfill
+                success: (response) =>
+                    alert("Success! " + response.message)
+                    document.getElementById('back-text').innerHTML = 'you rock.'
+                    document.getElementById('back').classList.add('backed')
+                failure: (error) =>
+                    alert("Failure! " + error.message)
+
+
         @back = () =>
 
-            ## back a project
-            # to do - figure out how to get the user, create UI for backing
-            $.apptools.api.project.back(
-                project: @project_key
-                user: null
-                contribution: null
-            ).fulfill
+            # Get any existing money sources for this user and populate them in the dialog, then open it.
+            $.apptools.api.payment.money_sources().fulfill
                 success: (response) =>
-                    @log('backing functionality currently stubbed.')
-                    $('#back-text').animate opacity: 0,
-                        duration: 250
-                        complete: () =>
-                            document.getElementById('back-text').innerHTML = 'you rock.'
-                            document.getElementById('back').classList.add('backed')
-                            $('#back-text').animate opacity: 1,
-                                duration: 250
-                                complete: () =>
-                                    alert 'back() success'
-
-
+                    selector = document.getElementById("back-project-money-source-input")
+                    options = selector.innerHTML
+                    if response.sources and response.sources.length
+                        for source in response.sources
+                            options += "<option value='" + source.key + "'>" + source.description + "</option>"
+                    selector.innerHTML = options
+                    $.apptools.widgets.modal.get("back-project-dialog").open()
                 failure: (error) =>
-                    alert 'back() failure'
+                    alert("Failed to start donation. Are you logged in?")
+            return
+
 
         @follow = () =>
 
@@ -1576,6 +1604,10 @@ class ProjectController extends OpenfireController
                 document.getElementById('follow').addEventListener('click', @follow, false)
                 document.getElementById('share').addEventListener('click', @share, false)
                 document.getElementById('back').addEventListener('click', @back, false)
+
+                # Event listeners in the back project dialog.
+                document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
+                document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)

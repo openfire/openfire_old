@@ -1,0 +1,88 @@
+<p>
+    <label for="back-project-tier-input">Tier:</label>
+    <select id="back-project-tier-input" name="tier">
+    {% for tier in tiers %}
+        <option value="{{ encrypt(tier.key.urlsafe()) }}">{{ tier.name }} - {{ currency(tier.amount) }}</option>
+    {% else %}
+        <option value="">no project tiers to donate to yet!</option>
+    {% endfor %}
+    </select>
+</p>
+<p>
+    <label for="back-project-next-step-input">Next Step:</label>
+    <select id="back-project-next-step-input" name="tier">
+    {% for step in next_steps %}
+        <option value="{{ encrypt(step.key.urlsafe()) }}">{{ step.summary }}</option>
+    {% else %}
+        <option value="">no next steps to vote for yet!</option>
+    {% endfor %}
+    </select>
+</p>
+<p>
+    <label for="back-project-amount-input">Amount:</label>
+    <input type="text" id="back-project-amount-input">
+</p>
+<h3>Choose an existing payment source or enter your credit card info</h3>
+<p>
+    <label for="back-project-money-source-input">Existing Payment Source:</label>
+    <select id="back-project-money-source-input">
+        <option value="">- - - - -</option>
+    </select>
+</p>
+<p>
+    <label for="back-project-cc-num-input">Credit Card Number:</label>
+    <input type="text" id="back-project-cc-num-input">
+</p>
+<p>
+    <label for="back-project-cc-ccv-input">Card CCV:</label>
+    <input type="text" id="back-project-cc-ccv-input">
+</p>
+<p>
+    <label for="back-project-cc-month-input">CC Expire Month:</label>
+    <input type="text" id="back-project-cc-month-input">
+</p>
+<p>
+    <label for="back-project-cc-year-input">CC Expire Year:</label>
+    <input type="text" id="back-project-cc-year-input">
+</p>
+<p>
+    <label for="back-project-cc-name-input">CC Full Name:</label>
+    <input type="text" id="back-project-cc-name-input">
+</p>
+<p>
+    <label for="back-project-cc-email-input">CC Email:</label>
+    <input type="text" id="back-project-cc-email-input">
+</p>
+<p>
+    <label for="back-project-cc-address-1-input">CC Address 1:</label>
+    <input type="text" id="back-project-cc-address-1-input">
+</p>
+<p>
+    <label for="back-project-cc-address-2-input">CC Address 2:</label>
+    <input type="text" id="back-project-cc-address-2-input">
+</p>
+<p>
+    <label for="back-project-cc-city-input">CC City:</label>
+    <input type="text" id="back-project-cc-city-input">
+</p>
+<p>
+    <label for="back-project-cc-state-input">CC State:</label>
+    <input type="text" id="back-project-cc-state-input">
+</p>
+<p>
+    <label for="back-project-cc-country-input">CC Country:</label>
+    <input type="text" id="back-project-cc-country-input">
+</p>
+<p>
+    <label for="back-project-cc-zipcode-input">CC Zipcode:</label>
+    <input type="text" id="back-project-cc-zipcode-input">
+</p>
+<p>
+    <label for="back-project-cc-save-input">Save CC for Reuse?</label>
+    <input type="checkbox" id="back-project-cc-save-input">
+</p>
+<button id="cancel-back-project" type="button">Cancel</button>
+<button id="submit-back-project" type="button">Submit</button>
+<br />
+<br />
+<br />

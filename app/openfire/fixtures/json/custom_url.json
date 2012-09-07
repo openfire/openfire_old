@@ -38,5 +38,9 @@
     {
         "slug": "carrotmob",
         "target_key": "project__Carrotmob"
+    },
+    {
+        "slug": "savetheeverything",
+        "target_key": "project__Save the Everything"
     }
 ]

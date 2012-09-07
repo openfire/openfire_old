@@ -40,5 +40,12 @@
         "url": "/assets/img/static/projects/cardstock/ose.png",
         "name": "ose.png",
         "mime": "image/png"
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "blob_file": "http://develop.open-fire-staging.appspot.com/assets/img/static/projects/cardstock/ste.png",
+        "url": "/assets/img/static/projects/cardstock/ste.png",
+        "name": "ste.png",
+        "mime": "image/png"
     }
 ]

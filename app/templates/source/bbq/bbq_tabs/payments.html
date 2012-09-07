@@ -3,17 +3,113 @@
     <table id="bbq-payment-table" class="bbq-datatable">
         <thead>
             <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>etc...</th>
+                <th>From User</th>
+                <th>To Project</th>
+                <th>Project Goal</th>
+                <th>Project Tier</th>
+                <th>Amount</th>
+                <th>Commission</th>
+                <th>Status</th>
+                <th>Current Transaction</th>
+                <th>All Transactions</th>
+                <th>From Money Source</th>
+                <th>To Account</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Archived</th>
             </tr>
         </thead>
         <tbody>
             {% for payment in payments %}
             <tr>
-                <td>TODO</td>
-                <td>TODO</td>
-                <td>TODO</td>
+                <td>{{ payment.from_user }}</td>
+                <td>{{ payment.to_project.get().name }}</td>
+                <td>{{ payment.to_project_goal }}</td>
+                <td>{{ payment.to_project_tier }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.commission }}</td>
+                <td>{{ payment.status }}</td>
+                <td>{{ payment.current_transaction }}</td>
+                <td>
+                    {% for transaction in payment.all_transactions %}
+                        {{ transaction }},&nbsp;
+                    {% else %}
+                        No transactions.
+                    {% endfor %}
+                </td>
+                <td>{{ payment.from_money_source }}</td>
+                <td>{{ payment.to_account }}</td>
+                <td>{{ payment.created }}</td>
+                <td>{{ payment.updated }}</td>
+                <td>{{ payment.archived }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2>openfire payment checkout transactions</h2>
+<div class="content">
+    <table id="bbq-checkout-transaction-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Payment</th>
+                <th>WePay Checkout ID</th>
+                <th>WePay Checkout URI</th>
+                <th>WePay Checkout Status</th>
+                <th>Good or Service</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for checkout in checkouts %}
+            <tr>
+                <td>{{ checkout.action }}</td>
+                <td>{{ checkout.status }}</td>
+                <td>{{ checkout.created }}</td>
+                <td>{{ checkout.updated }}</td>
+                <td>{{ checkout.payment }}</td>
+                <td>{{ checkout.wepay_checkout_id }}</td>
+                <td>{{ checkout.wepay_checkout_uri }}</td>
+                <td>{{ checkout.wepay_checkout_status }}</td>
+                <td>{{ checkout.good_or_service }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2>openfire payment withdrawal transactions</h2>
+<div class="content">
+    <table id="bbq-withdrawal-transaction-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Account</th>
+                <th>User</th>
+                <th>WePay Withdrawal ID</th>
+                <th>WePay Withdrawal URI</th>
+                <th>WePay Withdrawal Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for withdrawal in withdrawals %}
+            <tr>
+                <td>{{ withdrawal.action }}</td>
+                <td>{{ withdrawal.status }}</td>
+                <td>{{ withdrawal.created }}</td>
+                <td>{{ withdrawal.updated }}</td>
+                <td>{{ withdrawal.account }}</td>
+                <td>{{ withdrawal.user }}</td>
+                <td>{{ withdrawal.wepay_withdrawal_id }}</td>
+                <td>{{ withdrawal.wepay_withdrawal_uri }}</td>
+                <td>{{ withdrawal.wepay_withdrawal_status }}</td>
             </tr>
             {% endfor %}
         </tbody>
