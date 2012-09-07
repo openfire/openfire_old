@@ -186,7 +186,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
             self.session = self.build_session()
 
         try:
-
             if self.sessions and self.apply_redirect:
                 # If we detect a triggered redirect, do it and remove the trigger (CRUCIAL.)
                 if self.session.get('redirect') is not None:
@@ -324,12 +323,11 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
 		''' Make a dict suitable for JSON representing an API service. '''
 
-		return [{
-			'name': service,
-			'base_uri': action,
-			'methods': cfg['methods'],
-			'opts': opts
-		} for service, action, cfg, opts in services['services_manifest']]
+		return [[
+			service,
+			cfg['methods'],
+			opts
+		] for service, action, cfg, opts in services['services_manifest']]
 
     def _bindRuntimeTemplateContext(self, context):
 

@@ -126,7 +126,46 @@ config['apptools.project.assets'] = {
     # Cascading Style Sheets
     'style': {
 
-        # Compiled (SASS) FCM Stylesheets
+        # Source (SASS) Stylesheets
+        ('source', 'source'): {
+
+            'assets': {
+
+                ## Core
+                'base': {'name': '_base.sass', 'module': '_core', 'version': 0.1},
+                'h5bp': {'name': '_h5bp.sass', 'module': '_core', 'version': 0.1},
+                'init': {'name': '_initializer.sass', 'module': '_core', 'version': 0.1},
+                'config': {'name': '_config.sass', 'module': '_core', 'version': 0.1},
+                'fonts': {'name': '_fonts.sass', 'module': '_core', 'version': 0.1},
+                'media': {'name': '_mediaqueries.sass', 'module': '_core', 'version': 0.1},
+                'print': {'name': '_print.sass', 'module': '_core', 'version': 0.1},
+
+                ## Partials
+                'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.1},
+                'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.1},
+                'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.1},
+                'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.1},
+
+                ## Openfire
+                'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.1},
+                'landing': {'name': 'landing.sass', 'module': 'openfire', 'version': 0.1},
+                'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.1},
+                'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.1},
+
+                ## Main
+                'ie': {'name': 'ie.sass', 'version': 0.1},
+                'bbq': {'name': 'bbq.sass', 'version': 0.1},
+                'main': {'name': 'main.sass', 'version': 0.1},
+                'admin': {'name': 'admin.sass', 'version': 0.1},
+                'mobile': {'name': 'mobile.sass', 'version': 0.1},
+                'jasmine': {'name': 'jasmine.sass', 'version': 0.1},
+                'security': {'name': 'security.sass', 'version': 0.1},
+
+            }
+
+        },
+
+        # Compiled (CSS) Stylesheets
         ('compiled', 'compiled'): {
 
             'config': {
