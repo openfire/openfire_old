@@ -231,8 +231,6 @@ class SessionsBridge(object):
 
         ''' Proxy stuff to the Core Sessions API. '''
 
-        import pdb; pdb.set_trace()
-
         self.logging.info('Saving session: "%s"' % self.session)
         return self.__acquire_session_bridge().save_session(self.__session_id, self.session, self)
 

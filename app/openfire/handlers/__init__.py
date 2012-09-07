@@ -181,7 +181,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
         ''' Retrieve session + dispatch '''
 
-        import pdb; pdb.set_trace()
         if self.sessions:
             # Resolve user session
             self.session = self.build_session()
