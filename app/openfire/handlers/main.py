@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import config as cfg
+from config import config
 from openfire.models import user
 from openfire.models import assets
 from openfire.models import project as p
@@ -7,6 +9,18 @@ from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.handlers.project import ProjectHome
 from openfire.handlers.user import UserProfile
+from webapp2_extras.security import generate_random_string
+
+
+class Placeholder(WebHandler):
+
+	''' openfire placeholder! '''
+
+	def get(self):
+
+		''' Return a rendered submission form. '''
+
+		return self.render('main/placeholder.html', token=generate_random_string(32))
 
 
 class Landing(WebHandler):
@@ -20,6 +34,9 @@ class Landing(WebHandler):
     def get(self):
 
         ''' Render landing.html or landing_noauth.html. '''
+
+        if config.get('openfire').get('disabled') == True:
+             return Placeholder(self.request, self.response).get()
 
         ## fully cached page context
         context = self.api.memcache.get('landing_page_context')

@@ -1229,6 +1229,7 @@ class Router(object):
         return route.build(request, args, kwargs)
 
     def default_dispatcher(self, request, response):
+
         """Dispatches a handler.
 
         :param request:
