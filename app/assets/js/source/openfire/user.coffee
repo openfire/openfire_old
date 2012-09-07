@@ -224,7 +224,7 @@ class UserController extends OpenfireController
 
                 return @topics.list false, (topics) =>
 
-                    auto_id = '#topic-add-search'
+                    auto_id = 'topic-add-search'
 
                     modal_callback = () =>
                         _bind = (b) =>

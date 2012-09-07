@@ -185,6 +185,7 @@ class Autocomplete extends CoreWidget
 
                 el = e.target
                 input = el.value or el.innerText
+                input = input.toLowerCase()
 
                 if input.length < @_state.config.length
                     @hide() if @_state.active

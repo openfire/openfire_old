@@ -20,7 +20,7 @@
             <div class="left" id='profiletop'>
 
                 <!-- Avatar Stack -->
-                <div class="left" id='avatar'>
+                <div id='avatar'>
                     <img {{ {
                         'src': user.has_avatar() and user.get_avatar_url('jpg', '175') or gravatarify((len(user.email) and user.email[0].id() or "codebot@openfi.re"), 'jpg', '175'),
                         'width': '175',
@@ -35,28 +35,37 @@
                     {% endif %}
                 </div><!-- end #avatar.left -->
 
-                <div id='byline' class='foldable'>
+                <div id='topbanner'>
+                    <h1 id='name'>{{ user.firstname }} {{ user.lastname }}</h1>
+                    <span id='topics'>
 
-                    <div id='topbanner'>
-                        <h1 id='name'>{{ user.firstname }} {{ user.lastname }}</h1>
-                        <h3 id='topics'>
+                        {% if len(user.topics) > 0 %}
 
-                            <span class='interest topic tag' data-topic-slug='technology'>
-                                Technology{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
-                            </span>
-                            <span class='interest topic tag' data-topic-slug='dentistry'>
-                                Dentistry{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
-                            </span>
-                            <span class='interest topic tag' data-topic-slug='taxidermy'>
-                                Taxidermy{% if edit_privs %}<span class='delete-tag'>x</span>{% endif %}
-                            </span>
-                            {% if edit_privs %}
-                                <span class="tag" id="edit-topics">edit topics</span>
-                            {% else %}
-                                <span class="tag" id="all-topics">all topics</span>
-                            {% endif %}
-                        </h3><!-- end #topics -->
-                    </div><!-- end #name+topics -->
+                            {% for i, topic in enumerate(topics) %}
+                                {% if i <= 2 %}
+                                    <span class='interest topic tag' data-topic-slug='{{ topic.slug }}'>{{ topic.name }}</span>
+                                    {% else %}{% break %}
+                                {% endif %}
+                            {% endfor %}
+
+                        {% else %}
+
+                            <span class='interest topic tag' data-topic-slug='technology'>Technology</span>
+                            <span class='interest topic tag' data-topic-slug='dentistry'>Dentistry</span>
+                            <span class='interest topic tag' data-topic-slug='taxidermy'>Taxidermy</span>
+
+                        {% endif %}
+
+                        {% if edit_privs %}
+                            <span class="tag" id="edit-topics">edit topics</span>
+                        {% else %}
+                            <span class="tag" id="all-topics">all topics</span>
+                        {% endif %}
+
+                    </span><!-- end #topics -->
+                </div><!-- end #name+topics -->
+
+                <div id='byline'>
 
                     <div id='userinfo'>
                         <span>{{ user.bio|lower }}</span>
@@ -73,7 +82,7 @@
                         'data-keyname': 'profile_summary' if edit_privs == true else none,
                         'data-namespace': encrypt(user.key.urlsafe()) if edit_privs == true else none,
                         'data-options': util.converters.json.dumps({"bundle": "basic"}),
-                        'class': 'right dynamic mini-editable profile section' if edit_privs == true else 'right dynamic profile section',
+                        'class': 'dynamic mini-editable profile section' if edit_privs == true else 'right dynamic profile section',
 
                     }|xmlattr }}>
                         {% content 'profile_summary', user.key.urlsafe() %}
