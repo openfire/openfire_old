@@ -43,6 +43,22 @@ class TierPipeline(ModelPipeline):
     _model_binding = 'openfire.models.project.Tier'
 
 
+## NextStepPipeline - fired when a NextStep entity is put/deleted
+class NextStepPipeline(ModelPipeline):
+
+    ''' Processes next step puts/deletes. '''
+
+    _model_binding = 'openfire.models.project.NextStep'
+
+
+## FutureGoalPipeline - fired when a FutureGoal entity is put/deleted
+class FutureGoalPipeline(ModelPipeline):
+
+    ''' Processes future goal puts/deletes. '''
+
+    _model_binding = 'openfire.models.project.FutureGoal'
+
+
 ## BackerPipeline - fired when a Backer entity is put/deleted
 class BackerPipeline(ModelPipeline):
 

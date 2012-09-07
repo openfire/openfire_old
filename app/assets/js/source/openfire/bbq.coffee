@@ -18,6 +18,7 @@ class BBQBaseObject
         @_element = el
         @_dataDict = {}
 
+        """
         this._element.find('button.start-edit').click () ->
             _this._element.find('.save-edit').show()
             _this._element.find('.start-edit').hide()
@@ -37,9 +38,11 @@ class BBQBaseObject
 
         this._element.find('button.delete').click () ->
             _this.delete()
+        """
 
     getAttr: (prefix, name) ->
-        return this._element.find('.' + prefix + '-' + name).val() or this._element.find('.' + prefix + '-' + name).html()
+        return "TODO: Need _element.find()!"
+        #return this._element.find('.' + prefix + '-' + name).val() or this._element.find('.' + prefix + '-' + name).html()
 
     loadData: () ->
         for dataName in @dataList
@@ -83,12 +86,15 @@ class BBQProposal extends BBQBaseObject
         super el
         @proposalKey = @getAttr 'proposal', 'key'
 
+        """
+        TODO: Need el.find()!
         el.find('button.promote-to-project').click ->
             _this.promote()
         el.find('button.suspend').click ->
             _this.suspend()
         el.find('button.reject').click ->
             _this.reject()
+        """
 
     put: () ->
         @loadData()
@@ -122,6 +128,8 @@ class BBQProject extends BBQBaseObject
         super el
         @projectKey = @getAttr('project', 'key')
 
+        """
+        TODO: Need el.find()!
         el.find('button.go-live').click ->
             _this.goLive()
         el.find('button.suspend').click ->
@@ -132,6 +140,7 @@ class BBQProject extends BBQBaseObject
         document.getElementById('project-' + @projectKey + '-image').addEventListener('drop', @uploadImage, false)
         document.getElementById('project-' + @projectKey + '-avatar').addEventListener('drop', @uploadAvatar, false)
         document.getElementById('add-project-' + @projectKey + '-video').addEventListener('click', @addVideo, false)
+        """
 
     uploadImage: (e) =>
         e.preventDefault()
@@ -250,7 +259,8 @@ class BBQController
 
         @_init = () =>
             $(document).ready ->
-                $('.bbq-datatable').dataTable()
+                if $('.bbq-datatable')?.length
+                    $('.bbq-datatable').dataTable()
             @initBbqNewInlines()
             @initBbqObjects()
 

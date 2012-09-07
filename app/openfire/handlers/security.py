@@ -234,9 +234,10 @@ class Login(WebHandler, SecurityConfigProvider):
 
                 if user is None:
                     # try resolving as email
-                    email = email_key.get()
-                    if email is not None:
-                        user = email.key.parent().get()
+                    if email_key is not None:
+                        email = email_key.get()
+                        if email is not None:
+                            user = email.key.parent().get()
 
                 # user found?
                 if user is not None:
@@ -314,7 +315,7 @@ class Register(WebHandler, SecurityConfigProvider):
 
         ''' Dev signup handler. Will need to be rewritten with an actual registration form. '''
 
-        pass
+        return self.render('security/register.html')
 
 
 class Provider(WebHandler, SecurityConfigProvider):
@@ -518,7 +519,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
             if user is not None:
                 self.build_authenticated_session(
-                    email=user.email,
+                    email=user.email[0].id(),
                     nickname=user.firstname + ' ' + user.lastname,
                     ukey=user.key,
                     uid=u.user_id()
@@ -526,7 +527,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                 return self.redirect_success()
             else:
                 self.build_authenticated_session(
-                    email=u.email,
+                    email=u.email(),
                     nickname=u.nickname(),
                     ukey=ndb.Key(user_models.User, u.email()),
                     uid=u.user_id()

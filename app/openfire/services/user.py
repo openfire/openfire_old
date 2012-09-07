@@ -45,8 +45,6 @@ class UserService(RemoteService):
 
         ''' Set topics for a user to display. '''
 
-        #import pdb; pdb.set_trace()
-
         try:
             try:
                 ## try pulling by key first

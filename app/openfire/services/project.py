@@ -180,13 +180,6 @@ class ProjectService(RemoteService):
 
         return project_messages.Backers()
 
-    @remote.method(project_messages.BackProject, Echo)
-    def back(self, request):
-
-        ''' Become a backer of a project. '''
-
-        return Echo(message='')
-
     @remote.method(project_messages.SuspendProject, Echo)
     def suspend(self, request):
 

@@ -315,6 +315,8 @@ class SessionsBridge(object):
                         else:
                             registration_url = self.url_for('auth/register', go=self.request.path_qs)
 
-                        return self.redirect(registration_url)
+                        self.session['redirect'] = self.url_for('auth/register')
+                        self.session['returnto'] = self.request.url
+                        self.session['register'] = True
 
         return self.session

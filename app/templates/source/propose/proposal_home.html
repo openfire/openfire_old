@@ -1,7 +1,285 @@
 {% extends "layout/proposal.html" %}
 
+{% block postnorth %}
+    <link rel="stylesheet" href="{{ asset.style('proposal', 'openfire') }}">
+{% endblock postnorth %}
+
 {% block main %}
-    <div>
-        <p>view/edit your proposal...</p>
+
+    <!-- Main Masthead -->
+    <div id='masthead'></div>
+    <!-- #masthead -->
+
+    <div id='content'>
+        <div id="fb-root"></div>
+        <div id='proposal'>
+
+            {% if security.current_user.key in proposal.owners %}
+                <div id='promote' data-section-title="admin">
+                    <div id='promote-dropzone' class='dropzone'>drop images here</div>
+                    <button id='promote-goals' value="goals">edit goals</button>
+                    <button id='promote-tiers' value="tiers">edit tiers</button>
+                </div>
+            {% endif %}
+
+            <div id='sidebar' class='pre-sticky'>
+                <header>
+                    <div id='sidebuttons' class='buttons'>
+                        <button id='share' class='momentron'>&#xf0085;</button>
+                    </div>
+                    <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ proposal.name }}</h1></div>
+                </header> <!-- end header -->
+
+                <hr class="hr-inset most">
+
+                <section id='quickinfo'>
+                    {% block right %}
+
+                        <div id='global_progress'>
+                            <!-- proposal progress -->
+                            <div id='progress' data-value="{{ proposal.progress }}" data-max="100"{% if proposal.progress == 100 %} class="done"{% endif %}>
+                                <div id='progress-inner' style='width: {{ proposal.progress }}%;'>{{ proposal.progress }}%</div>
+                            </div>
+                        </div><!-- end #global_progress -->
+
+                        <div id='proposal_goals' data-section-title="goals">
+                            {% if proposal.goals %}
+                            <div id="proposal-goals-accordion" class='css-accordion widget'>
+                                {% for goal in goals %}
+                                    <a id="a-{{ encrypt(goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(goal.key.urlsafe()) }}" class="target-link{% if goal.amount < proposal.money %} reached{% endif %}">{{ currency(goal.amount) }}</a>
+                                    <div id="{{ encrypt(goal.key.urlsafe()) }}" class="fold">
+                                        <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                                <b>no proposal goals yet! :(</b>
+                            {% endif %}
+                        </div> <!-- end #proposal_goals -->
+
+                        <div id='proposal_tiers'  data-section-title="tiers">
+                            {% if proposal.tiers %}
+                            <div id="proposal-tiers-accordion" class='css-accordion widget'>
+                                {% for tier in tiers %}
+                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                    <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
+                                        <p>{{ tier.description|safe }}</p>
+                                    </div>
+                                {% endfor %}
+                             </div>
+
+                            {% else %}
+                                <b>no proposal tiers yet! :(</b>
+                            {% endif %}
+                        </div>
+
+                    {% endblock right %}
+                </section> <!-- end #quickinfo -->
+
+                <hr class="hr-inset most"></span>
+
+                <section id='backers'>
+                    <div id='backproposal'>
+                        <button id='back'><span id="back-text">Back this proposal</span></button>
+                    </div> <!-- end #backproposal -->
+                    <div id='backer_summary'>
+                        backerz
+                    </div> <!-- end #backer_summary -->
+
+                    {% block freeform %}
+                        <div {{ {
+
+                            'id': 'proposal_freeform',
+                            'data-keyname': 'proposal_freeform' if security.current_user.key in proposal.owners else none,
+                            'data-namespace': encrypt(proposal.key.urlsafe()) if security.current_user.key in proposal.owners else none,
+                            'class': 'dynamic mini-editable' if security.current_user.key in proposal.owners else 'dynamic'
+
+                        }|xmlattr }}>
+
+                            {% content 'proposal_freeform', proposal.key.urlsafe() %}
+                                <b>Default content! I am overridden when you edit!</b>
+                            {% endcontent %}
+
+                        </div>
+                    {% endblock freeform %}
+
+                </section> <!-- end #backers -->
+
+                <div id='owners' >
+                    <b>proposal owners:</b>
+                    <ul class='naked'>
+                        {% for owner in owners %}
+                            <li>
+                                <div class='ownercard'>
+
+                                    {% if owner.public or security.permissions.admin %}
+                                        {% if owner.has_custom_url() %}
+                                            <a {{ {
+
+                                                'href': owner.get_custom_url(),
+                                                'target': 'blank',
+                                                'title': ' '.join([owner.firstname, owner.lastname])
+
+                                            }|xmlattr }}>
+                                        {% else %}
+                                            <a {{ {
+
+                                                    'href': owner.get_custom_url(),
+                                                    'target': 'blank',
+                                                    'title': ' '.join([owner.firstname, owner.lastname])
+
+                                                }|xmlattr }}>
+                                        {% endif %}
+                                    {% endif %}
+                                    <img {{ {
+
+                                        'src': owner.has_avatar() and owner.get_avatar_url('jpg', '32') or gravatarify(owner.email[0].id(), 'jpg', '32'),
+                                        'width': 32,
+                                        'height': 32,
+                                        'alt': ' '.join([owner.firstname, owner.lastname, '(%s)' % owner.username])
+
+                                    }|xmlattr }} />
+
+                                    <div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
+                                        {%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- endif -%}
+                                        {%- if owner.location -%}
+                                            <span class='location byline'>{{ owner.location }}</span>
+                                        {%- endif -%}
+                                    </div>
+
+                                    {% if owner.public or security.permissions.admin %}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div> <!-- end #owners -->
+            </div> <!-- end #sidebar -->
+
+            <div id='welcomebox'>
+                {% block media %}
+                    {% if video %}
+                        {% if video.provider == 'vimeo' %}
+                        <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
+                            {% if video.ext_id %}
+                                <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% else %}
+                                <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                            {% if video.provider == 'youtube' %}
+                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
+                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            {% else %}
+                                <img src="http://placehold.it/640x360/222222&text=video" />
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <img src="http://placehold.it/640x360/222222&text=video" />
+                    {% endif %}
+                {% endblock media %}
+            </div>
+
+            <article id='deets'>
+
+                <!-- proposal title -->
+                <div id='proposaltitle'>
+                    <h1 data-href="#proposal" class="target-link" id="proposal-title-header" data-options='{"bundle":"rich"}'>{{ proposal.name }}</h1>
+                    <div id='deetactions'>
+                        <div class='buttongroup' data-action="Share This">
+                            <button id='fbshare' class='zocial facebook sharebutton icon'></button>
+                            <button id='twshare' class='zocial twitter sharebutton icon'></button>
+                            <button id='g+share' class='zocial googleplus sharebutton icon'></button>
+                        </div> <!-- end .buttongroup -->
+                    </div> <!-- end #deetactions -->
+                </div> <!-- end #proposaltitle -->
+
+                <!-- proposal info tabset -->
+                <div id='proposal-tabset' class='pre-tabs relative tabset'>
+                    <a href='#details-tab' class='tab-rounded'>proposal<br>details</a>
+                    <a href='#members-tab' class='tab-rounded'>proposal<br>members</a>
+                    <a href='#openfire-tab' class='tab-rounded'>social<br>reach</a>
+
+                    <!-- details-tab -->
+                    <div id='details-tab' class="tab" style="opacity: 0">
+                        <section class='prsection'>
+                            {% block description %}
+                                <h3>Summary</h3>
+                                <p>{{ proposal.summary }}</p>
+                                <h3>Pitch</h3>
+                                <p>{{ proposal.pitch }}</p>
+                                <h3>Specifics</h3>
+                                <ul class='naked'>
+                                    <li>Category: {{ proposal.category }}</li>
+                                    <li>Technology: {{ proposal.tech }}</li>
+                                    <li>Keywords: {{ proposal.keywords }}</li>
+                                </ul>
+                            {% endblock description %}
+                        </section>
+                    </div><!-- end #details-tab -->
+
+                    <!-- members-tab-->
+                    <div id="members-tab" class="tab" style="opacity: 0">
+                        <section class='prsection'>
+                            <p>This proposal has team members and an owner.</p>
+                            <p>It was made possible by {{ proposal.backers }} generous backers, who have donated {{ currency(proposal.money) }} to date, placing this proposal {{ proposal.progress }}% of the way to its next support goal!</p>
+                        </section>
+                    </div><!-- end #members-tab-->
+
+                    <!-- team -->
+                    <div id="openfire-tab" class="tab" style="opacity: 0">
+                        <section class='prsection'>
+                            <p>TEAM</p>
+                        </section>
+                    </div><!-- end #team -->
+
+            </article><!-- end #proposal -->
+        </div><!-- end #content -->
     </div>
-{% endblock %}
+
+
+{% endblock main %}
+
+
+
+
+{% block presouth %}
+    <script>
+
+      // openfire proposal init
+      window._cp = {
+        ke: '{{ encrypt(proposal.key.urlsafe()) }}',
+        {%- if util.config.debug -%}
+        kd: '{{ proposal.key.urlsafe() }}',
+        {%- endif -%}
+        i: {{ proposal.key.id() }},
+        {%- if proposal.current_user_following -%}
+        f: true,
+        {%- else -%}
+        f: false,
+        {%- endif -%}
+        {%- if proposal.current_user_backed -%}
+        b: true,
+        {%- else -%}
+        b: false,
+        {%- endif -%}
+        {%- if security.current_user.key in proposal.owners -%}
+        o: true,
+        {%- else -%}
+        o: false,
+        {%- endif -%}
+        {%- if security.current_user.key in proposal.viewers -%}
+        v: true
+        {%- else -%}
+        v: false
+        {%- endif -%}
+      };
+
+    </script>
+{% endblock presouth %}
+

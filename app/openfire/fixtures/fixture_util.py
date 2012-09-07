@@ -7,7 +7,7 @@ from webapp2_extras import security as wsec
 
 from openfire.models.user import User, EmailAddress, Permissions, Topic
 from openfire.models.contribution import ContributionType
-from openfire.models.project import Proposal, Project, Category, Tier, Goal
+from openfire.models.project import Proposal, Project, Category, Tier, Goal, NextStep, FutureGoal
 from openfire.models.assets import Asset, Avatar, Video, Image, CustomURL
 from openfire.models.indexer import index
 
@@ -228,21 +228,27 @@ def create_category(slug='test', name='Test Category', description='some txt', k
 
 
 def create_goal(parent_key=None, contribution_type_id='fake', amount=1, description='DESCRIPTION',
-        backer_count=0, progress=50, met=False):
+        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE', slug='SLUG'):
 
     ''' Create a new funding goal. If parent is None, do not put the object (for proposals).'''
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     goal = Goal(contribution_type=contribution_type, amount=amount, description=description,
-            backer_count=backer_count, progress=progress, met=met, parent=parent_key)
+            backer_count=backer_count, progress=progress, met=met, parent=parent_key,
+            deliverable_description=deliverable_description)
     parent_obj = None
     if parent_key:
         goal.parent = parent_key
         goal.put()
         parent_obj = parent_key.get()
         if parent_obj:
-            parent_obj.goals.append(goal.key)
+            parent_obj.active_goal = goal.key
             parent_obj.put()
+    if tiers:
+        tier_list = []
+        for tier in tiers:
+            tier_list.append(create_tier(**tier))
+        goal.tiers = tier_list
     return goal
 
 
@@ -253,9 +259,11 @@ def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amoun
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     tier = Tier(name=name, contribution_type=contribution_type, amount=amount, description=description,
-            delivery=delivery, backer_count=backer_count, backer_limit=backer_limit, parent=parent_key)
+            delivery=delivery, backer_count=backer_count, backer_limit=backer_limit)
     parent_obj = None
     if parent_key:
+        if hasattr(parent_key, 'key'):
+            parent_key = parent_key.key
         tier.parent = parent_key
         tier.put()
         parent_obj = parent_key.get()
@@ -265,24 +273,64 @@ def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amoun
     return tier
 
 
+def create_next_step(parent_key=None, summary='SUMMARY', description='DESCRIPTION', votes=0):
+
+    ''' Create a new goal next step. If parent is None, do not put the object (for proposals).'''
+
+    next_step = NextStep(summary=summary, description=description, votes=votes)
+    parent_obj = None
+    if parent_key:
+        if hasattr(parent_key, 'key'):
+            parent_key = parent_key.key
+        next_step.parent = parent_key
+        next_step.put()
+        parent_obj = parent_key.get()
+        if parent_obj:
+            parent_obj.next_steps.append(next_step.key)
+            parent_obj.put()
+    return next_step
+
+
+def create_future_goal(parent_key=None, summary='SUMMARY', description='DESCRIPTION'):
+
+    ''' Create a new future goal. If parent is None, do not put the object (for proposals).'''
+
+    future_goal = FutureGoal(summary=summary, description=description)
+    parent_obj = None
+    if parent_key:
+        if hasattr(parent_key, 'key'):
+            parent_key = parent_key.key
+        future_goal.parent = parent_key
+        future_goal.put()
+        parent_obj = parent_key.get()
+        if parent_obj:
+            parent_obj.future_goal = future_goal.key
+            parent_obj.put()
+    return future_goal
+
+
 def create_proposal(name='Test Proposal', status='s', public=True,
             summary='SUMMARY', pitch='PITCH', tech='TECH', keywords=['KEYWORDS'],
             category_key=ndb.Key('Category', 'test_category_key'),
             creator_key=ndb.Key('User', 'test_user_key'),
-            owners_keys=[], viewers_keys=[], goals=[], tiers=[]):
+            initial_goal=None, future_goal=None, tiers=[],
+            owners_keys=[], viewers_keys=[]):
 
     ''' Create a proposal. '''
 
-    goal_list = []
-    for goal in goals:
-        goal_list.append(create_goal(**goal))
+    initial_goal_obj = None
+    if initial_goal:
+        initial_goal_obj = create_goal(**initial_goal)
+    future_goal_obj = None
+    if future_goal:
+        future_goal_obj = create_future_goal(**future_goal)
     tier_list = []
     for tier in tiers:
         tier_list.append(create_tier(**tier))
     return Proposal(name=name, status=status, public=public,
-                    summary=summary, pitch=pitch, tech=tech, keywords=keywords,
-                    category=category_key, creator=creator_key, goals=goal_list, tiers=tier_list,
-                    viewers=viewers_keys, owners=owners_keys).put()
+                    summary=summary, pitch=pitch, tech=tech, keywords=keywords, tiers=tier_list,
+                    category=category_key, creator=creator_key, initial_goal=initial_goal_obj,
+                    future_goal=future_goal_obj, viewers=viewers_keys, owners=owners_keys).put()
 
 
 def create_project(name='Test Project', status='o', public=True, summary='SUMMARY', pitch='PITCH',
@@ -324,6 +372,9 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
             # Try to fetch the file from a url.
             blob_key = fetch_url_to_blobstore(blob_file)
         except:
+            pass
+
+        if not blob_key:
             # Fall back to loading from a local copy.
             local_file = os.path.join(os.path.dirname(__file__), '..', 'fixtures', 'img_links', name)
             blob_key = upload_local_file_to_blobstore(local_file, mime_type)

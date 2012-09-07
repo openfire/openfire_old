@@ -43,7 +43,6 @@ rules = [
         ## === Propose URLs === ##
         HandlerPrefixRoute('propose.', [
             Route('/propose', name='propose/landing', handler='ProposeLanding'),
-            Route('/apply', name='apply', handler='Apply'),
             Route('/proposal/<key>', name='proposal/home', handler='ProposalHome'),
         ]),
 
@@ -96,6 +95,14 @@ rules = [
                 Route('/get/<asset_key>', name='get-asset', handler='MediaStorage'),
                 Route('/blob/<action>/<asset_key>', name='serve-asset', handler='AssetServer'),
                 Route('/blob/<action>/<asset_key>/<filename>', name='serve-asset-filename', handler='AssetServer'),
+            ])
+        ]),
+
+        ## === Payment URLs === ##
+        HandlerPrefixRoute('payment.', [
+            PathPrefixRoute('/_payment', [
+                Route('/handler', name='payment-handler', handler='PaymentHandler'),
+                Route('/ipn', name='payment-ipn-handler', handler='WePayIPNHandler'),
             ])
         ]),
 

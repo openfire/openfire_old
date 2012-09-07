@@ -37,7 +37,7 @@ class ProjectHome(WebHandler):
 
     should_log = True       # activate handler-specific logging
     should_cache = False    # activate fullpage caching
-    should_preload = False  # whether to activate preloading    
+    should_preload = False  # whether to activate preloading
     cache_timeout = 1200    # memcache fullpage caching timeout
     template = 'projects/project_home.html'
 
@@ -84,8 +84,7 @@ class ProjectHome(WebHandler):
             if project is None:
                 return self.error(404)
 
-            # pull avatar, tiers and goals
-            tiers, goals = p.Tier.query(ancestor=project.key).order(p.Tier.amount), p.Goal.query(ancestor=project.key).order(p.Goal.amount)
+            # pull avatar
             avatar = a.Avatar.query(ancestor=project.key).filter(a.Avatar.active == True).filter(a.Avatar.active == True).order(-a.Avatar.modified)
             avatar = avatar.get(options=_avatars_q)
             if avatar is not None:
@@ -93,9 +92,15 @@ class ProjectHome(WebHandler):
                 avatar = avatar.to_dict()
                 avatar['asset'] = asset
 
-            # 404 if project not found
-            if project is None:
-                return self.error(404)
+            # pull goals and tiers
+            active_goal = project.active_goal and project.active_goal.get() or None
+            tiers = []
+            next_steps = []
+            if active_goal:
+                tiers = ndb.get_multi(active_goal.tiers)
+                next_steps = ndb.get_multi(active_goal.next_steps)
+            completed_goals = ndb.get_multi(project.completed_goals)
+            future_goal = project.future_goal.get()
 
             allowed_viewers = ndb.get_multi(project.owners + project.viewers)
 
@@ -126,8 +131,11 @@ class ProjectHome(WebHandler):
                     owners=owners,
                     viewers=viewers,
                     avatar=avatar,
-                    goals=ndb.get_multi(goals.fetch(options=_keys_only)),
-                    tiers=ndb.get_multi(tiers.fetch(options=_keys_only)),
+                    active_goal=active_goal,
+                    completed_goals=completed_goals,
+                    future_goal=future_goal,
+                    tiers=tiers,
+                    next_steps=next_steps,
                     flush=False
             )
 

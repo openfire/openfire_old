@@ -1,47 +1,51 @@
 [
     {
+        "slug": "fatcatmap",
         "parent_key": "project__fat cat map",
-        "amount": 1000
+        "amount": 5000,
+        "description": "We'll build a website to visualize contributions.",
+        "deliverable_description": "A website that will visualize all money in politics. Built on apptools."
     },
     {
-        "parent_key": "project__fat cat map",
-        "amount": 10000
-    },
-    {
-        "parent_key": "project__fat cat map",
-        "amount": 100000
-    },
-    {
-        "parent_key": "project__fat cat map",
-        "amount": 500000
-    },
-    {
-        "parent_key": "project__fat cat map",
-        "amount": 1000000
-    },
-    {
+        "slug": "seasteading",
         "parent_key": "project__SeaSteading",
         "amount":  1000000,
-        "description": "We'll buy a boat!"
+        "description": "We'll buy a boat!",
+        "deliverable_description": "A boat to start this off."
     },
     {
+        "slug": "urbsly",
         "parent_key": "project__urbsly",
         "amount":  1000000,
-        "description": "We'll start shipping seeds to anyone who requests them!"
+        "description": "We'll start shipping seeds to anyone who requests them!",
+        "deliverable_description": "A website to request seeds."
     },
     {
+        "slug": "blueseed",
         "parent_key": "project__BlueSeed",
-        "amount":  1000000,
-        "description": "We'll buy a boat!"
+        "amount":  100000,
+        "description": "We'll get a small boat.",
+        "deliverable_description": "A small boat with a desk and wifi.."
     },
     {
+        "slug": "carrotmob",
         "parent_key": "project__Carrotmob",
         "amount":  1000000,
-        "description": "We'll buy a lot of carrots!"
+        "description": "We'll buy a lot of carrots!",
+        "deliverable_description": "Carrots for everyone!"
     },
     {
+        "slug": "ose",
         "parent_key": "project__Open Source Ecology",
         "amount":  1000000,
-        "description": "We'll plant a whole lot of stuff!"
+        "description": "We'll plant a whole lot of stuff!",
+        "deliverable_description": "Lots of tools for a small village."
+    },
+    {
+        "slug": "savetheeverything",
+        "parent_key": "project__Save the Everything",
+        "amount":  5000,
+        "description": "We'll start a website that can be a place to discuss how best to save certain species.",
+        "deliverable_description": "A website to get the discussion."
     }
 ]

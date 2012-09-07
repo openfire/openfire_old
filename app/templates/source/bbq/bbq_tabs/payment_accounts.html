@@ -1,0 +1,102 @@
+
+<h2>User WePay Accounts</h2>
+<div class="content">
+    <table id="bbq-user-payment-account-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>User Key</th>
+                <th>WePay User ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in wepay_accounts %}
+            <tr>
+                <td>{{ account.user }}</td>
+                <td>{{ account.wepay_user_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<br />
+<br />
+
+<h2>Project Payment Accounts</h2>
+<div class="content">
+    <table id="bbq-project-payment-account-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>User Payment Account</th>
+                <th>Project</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Balance</th>
+                <th>Current Transactions</th>
+                <th>All Transactions</th>
+                <th>WePay Account ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in project_accounts %}
+            <tr>
+                <td>{{ account.payment_account }}</td>
+                <td>{{ account.project }}</td>
+                <td>{{ account.name }}</td>
+                <td>{{ account.description }}</td>
+                <td>{{ account.balance }}</td>
+                <td>
+                    {% for transaction in account.current_transactions %}
+                        {{ transaction }},&nbsp;
+                    {% else %}
+                        No current transactions.
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for transaction in account.all_transactions %}
+                        {{ transaction }},&nbsp;
+                    {% else %}
+                        No transactions.
+                    {% endfor %}
+                </td>
+                <td>{{ account.wepay_account_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<h2>openfire saved credit card accounts</h2>
+<div class="content">
+    <table id="bbq-cc-account-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Owner</th>
+                <th>Description</th>
+                <th>ID</th>
+                <th>Save for Re-Use</th>
+                <th>Created</th>
+                <th>First Use</th>
+                <th>Last Use</th>
+                <th>Authorized</th>
+                <th>State</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for credit_card in credit_cards %}
+            <tr>
+                <td>{{ credit_card.owner }}</td>
+                <td>{{ credit_card.description }}</td>
+                <td>{{ credit_card.wepay_cc_id }}</td>
+                <td>{{ credit_card.save_for_reuse }}</td>
+                <td>{{ credit_card.created }}</td>
+                <td>{{ credit_card.first_use }}</td>
+                <td>{{ credit_card.last_use }}</td>
+                <td>{{ credit_card.wepay_cc_authorized }}</td>
+                <td>{{ credit_card.wepay_cc_state }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

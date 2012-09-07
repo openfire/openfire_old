@@ -1,7 +1,35 @@
 {% extends "layout/about.html" %}
 
+{% block postnorth %}
+    <link rel="stylesheet" type="text/css" href="/assets/style/static/compiled/wizard_vertical.css">
+{% endblock postnorth %}
+
+
 {% block main %}
+
     <div>
-        <p>How to apply, with a <a>link</a>...</p>
+        <p>Here are the steps to submit a proposal on openfire...</p>
+        <ol>
+            <li>Fill out the wizard on this page and submit.</li>
+            <li>You will be redirected to a your private custom proposal page where you can review and edit your proposal.</li>
+            <li>When you are satisfied with your proposal, submit it for review.</li>
+            <li>The openfire review board will review and potentially comment on your proposal or request you to iterate on it.</li>
+            <li>Once your proposal is approved, you will be given a full project page to finalize and go live!</li>
+            <li>Profit!</li>
+        </ol>
     </div>
+
+    <div>
+        <a id="a-proposal-wizard-dialog" href="#start-proposal-dialog">Start Your Proposal Now!</a>
+        <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"ratio":{"x":0.7,"y":0.45}}'>
+            {% include "propose/proposal_wizard.html" %}
+        </div>
+    </div>
+
+
 {% endblock %}
+
+
+{% block postsouth %}
+    <script type="text/javascript" src="/assets/js/static/core/jquery/jquery.smartWizard-2.0.js"></script>
+{% endblock postsouth %}

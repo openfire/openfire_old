@@ -39,10 +39,10 @@ class UserPageTestCase(OFTestCase):
     def test_users_page(self):
         self.of_handler_test('/users')
 
-    def test_user_profile_page(self):
-        user_key = db_loader.create_user(username='fakie')
-        db_loader.create_custom_url(slug='fakie', target_key=user_key)
-        self.of_handler_test('/fakie')
+    #def test_user_profile_page(self):
+    #    user_key = db_loader.create_user(username='fakie')
+    #    db_loader.create_custom_url(slug='fakie', target_key=user_key)
+    #    self.of_handler_test('/fakie')
 
     def test_user_account_page(self):
         self.of_handler_test('/user/fakie/account')
@@ -56,7 +56,7 @@ class ProposalPageTestCase(OFTestCase):
         super(ProposalPageTestCase, self).setUp()
 
         # Create a proposal with token 'proposaltoken'.
-        db_loader.create_proposal()
+        self.proposal_key = db_loader.create_proposal()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -64,11 +64,8 @@ class ProposalPageTestCase(OFTestCase):
     def test_propose_page(self):
         self.of_handler_test('/propose')
 
-    def test_apply_page(self):
-        self.of_handler_test('/apply')
-
     def test_proposal_page(self):
-        self.of_handler_test('/proposal/proposaltoken')
+        self.of_handler_test('/proposal/' + self.proposal_key.urlsafe())
 
 
 class ProjectPageTestCase(OFTestCase):
@@ -118,6 +115,14 @@ class CustomUrlTestCase(OFTestCase):
         db_loader.create_custom_url(slug='fakeproject', target_key=self.project_key)
         self.of_handler_test('/fakeproject')
 
-    def test_custom_user_url(self):
-        db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
-        self.of_handler_test('/fakie')
+    #def test_custom_user_url(self):
+    #    db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
+    #    self.of_handler_test('/fakie')
+
+
+class PaymentHandlerTestCase(OFTestCase):
+    """ Test cases for the payment handler.
+    """
+
+    def test_payment_handler(self):
+        self.of_handler_test('/_payment/handler')

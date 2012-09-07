@@ -36,7 +36,7 @@ config['apptools.project.output'] = {
 
     # Output Configuration
 
-    'minify': False,      # whether to minify page output or not
+    'minify': True,      # whether to minify page output or not
     'optimize': True,     # whether to use the async script loader or not
     'standalone': False,  # whether to render only the current template, or the whole context (ignores "extends")
 
