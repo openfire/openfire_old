@@ -242,7 +242,6 @@ class CoreWePayAPI(object):
 
         return wepay_cc
 
-
     def execute_payment(self, payment):
 
         ''' Execute one payment using WePay. '''
@@ -372,6 +371,9 @@ class CoreWePayAPI(object):
             for payment in payments:
                 payment.status = self._checkout_to_payment_status(new_state)
                 payment.put()
+
+            # Update the account that the payment is going to.
+            self.update_account_balance(payment.to_account.get())
 
         return transaction
 

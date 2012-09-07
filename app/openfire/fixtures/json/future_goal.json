@@ -1,0 +1,37 @@
+[
+    {
+        "parent_key": "project__fat cat map",
+        "summary": "Show where all the money has gone.",
+        "description": "Show the world where every dollar has ever gone for all of politics."
+    },
+    {
+        "parent_key": "project__SeaSteading",
+        "summary": "Build a better life on the water.",
+        "description": "We'll build a boat that is a self-sustained county all by itself."
+    },
+    {
+        "parent_key": "project__urbsly",
+        "summary": "Take down monsanto.",
+        "description": "Develop the world's best seed database."
+    },
+    {
+        "parent_key": "project__BlueSeed",
+        "summary": "Allow anyone to work on anything anywhere",
+        "description": "Let anyone work on any business from anywhere."
+    },
+    {
+        "parent_key": "project__Carrotmob",
+        "summary": "Make companies respect the environment.",
+        "description": "Make companies respect the environment"
+    },
+    {
+        "parent_key": "project__Open Source Ecology",
+        "summary": "Ship free tools to places in need.",
+        "description": "Set up a world-wide grant system where towns can apply for free tools."
+    },
+    {
+        "parent_key": "project__Save the Everything",
+        "summary": "Save every species of animal on the planet.",
+        "description": "Create comfortable habitats for every species on the planet."
+    }
+]

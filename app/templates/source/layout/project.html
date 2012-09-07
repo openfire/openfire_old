@@ -43,22 +43,20 @@
                         </div><!-- end #global_progress -->
 
                         <div id='project_goals' data-section-title="goals">
-                            {% if project.goals %}
+                            {% if active_goal %}
                             <div id="project-goals-accordion" class='css-accordion widget'>
-                                {% for goal in goals %}
-                                    <a id="a-{{ encrypt(goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(goal.key.urlsafe()) }}" class="target-link{% if goal.amount < project.money %} reached{% endif %}">{{ currency(goal.amount) }}</a>
-                                    <div id="{{ encrypt(goal.key.urlsafe()) }}" class="fold">
-                                        <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
-                                    </div>
-                                {% endfor %}
+                                <a id="a-{{ encrypt(active_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(active_goal.key.urlsafe()) }}" class="target-link{% if active_goal.amount < project.money %} reached{% endif %}">{{ currency(active_goal.amount) }}</a>
+                                <div id="{{ encrypt(active_goal.key.urlsafe()) }}" class="fold">
+                                    <p>{% if active_goal.description != none %}{{ active_goal.description }}{% else %}  {% endif %}</p>
+                                </div>
                             </div>
                             {% else %}
-                                <b>no project goals yet! :(</b>
+                                <b>no active project goal! :(</b>
                             {% endif %}
                         </div> <!-- end #project_goals -->
 
                         <div id='project_tiers'  data-section-title="tiers">
-                            {% if project.tiers %}
+                            {% if tiers %}
                             <div id="project-tiers-accordion" class='css-accordion widget'>
                                 {% for tier in tiers %}
                                     <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>

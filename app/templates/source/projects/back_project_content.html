@@ -9,6 +9,16 @@
     </select>
 </p>
 <p>
+    <label for="back-project-next-step-input">Next Step:</label>
+    <select id="back-project-next-step-input" name="tier">
+    {% for step in next_steps %}
+        <option value="{{ encrypt(step.key.urlsafe()) }}">{{ step.summary }}</option>
+    {% else %}
+        <option value="">no next steps to vote for yet!</option>
+    {% endfor %}
+    </select>
+</p>
+<p>
     <label for="back-project-amount-input">Amount:</label>
     <input type="text" id="back-project-amount-input">
 </p>
