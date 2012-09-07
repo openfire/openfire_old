@@ -18,7 +18,7 @@ GAE_PATH    Path to the Google App Engine SDK installation
 APP_DIR     Path to your 'app' directory"""
 
 
-PATTERN = 'test*'
+PATTERN = 'login_test*'
 
 
 def main(gae_path, app_path):
@@ -26,8 +26,12 @@ def main(gae_path, app_path):
     sys.path.insert(0, gae_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
-    sys.path.insert(0, "./lib/dist/")
-    sys.path.insert(0, "./lib/")
+    if os.name == 'nt':
+        sys.path.insert(0, ".\\lib\\dist\\")
+        sys.path.insert(0, ".\\lib")
+    else:
+        sys.path.insert(0, "./lib/dist/")
+        sys.path.insert(0, "./lib/")
     suite = unittest2.loader.TestLoader().discover(app_path, pattern=PATTERN)
     unittest2.TextTestRunner(verbosity=2).run(suite)
 
@@ -39,7 +43,7 @@ if __name__ == '__main__':
         parser.print_help()
         APP_DIR = "."
         if os.name == 'nt':
-            GAE_PATH = "../var/parts/google_appengine"
+            GAE_PATH = "..\\var\\parts\\google_appengine"
         else:
             GAE_PATH = "/usr/local/google_appengine/"
         print "GAE and APP paths not specified. Using default:"

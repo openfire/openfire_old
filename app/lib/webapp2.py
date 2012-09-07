@@ -1053,6 +1053,7 @@ class WebappHandlerAdapter(BaseHandlerAdapter):
     """
 
     def __call__(self, request, response):
+        import pdb; pdb.set_trace()
         handler = self.handler()
         handler.initialize(request, response)
         method_name = _normalize_handler_method(request.method)
@@ -1078,6 +1079,7 @@ class Webapp2HandlerAdapter(BaseHandlerAdapter):
     """
 
     def __call__(self, request, response):
+        import pdb; pdb.set_trace()
         handler = self.handler(request, response)
         return handler.dispatch()
 
@@ -1154,6 +1156,7 @@ class Router(object):
             A function that receives ``(router, request, response)``
             and returns the value returned by the dispatched handler.
         """
+        import pdb; pdb.set_trace()
         self.dispatch = func.__get__(self, self.__class__)
 
     def set_adapter(self, func):
@@ -1179,6 +1182,7 @@ class Router(object):
             ``exc.HTTPMethodNotAllowed`` if a route matched but the HTTP
             method was not allowed.
         """
+        import pdb; pdb.set_trace()
         method_not_allowed = False
         for route in self.match_routes:
             try:
@@ -1229,6 +1233,7 @@ class Router(object):
         return route.build(request, args, kwargs)
 
     def default_dispatcher(self, request, response):
+
         """Dispatches a handler.
 
         :param request:
@@ -1272,6 +1277,7 @@ class Router(object):
         :returns:
             A wrapped handler callable.
         """
+        import pdb; pdb.set_trace()
         if inspect.isclass(handler):
             if _webapp and issubclass(handler, _webapp.RequestHandler):
                 # Compatible with webapp.RequestHandler.

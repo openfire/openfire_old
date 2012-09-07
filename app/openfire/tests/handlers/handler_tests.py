@@ -39,10 +39,10 @@ class UserPageTestCase(OFTestCase):
     def test_users_page(self):
         self.of_handler_test('/users')
 
-    def test_user_profile_page(self):
-        user_key = db_loader.create_user(username='fakie')
-        db_loader.create_custom_url(slug='fakie', target_key=user_key)
-        self.of_handler_test('/fakie')
+    #def test_user_profile_page(self):
+    #    user_key = db_loader.create_user(username='fakie')
+    #    db_loader.create_custom_url(slug='fakie', target_key=user_key)
+    #    self.of_handler_test('/fakie')
 
     def test_user_account_page(self):
         self.of_handler_test('/user/fakie/account')
@@ -115,9 +115,9 @@ class CustomUrlTestCase(OFTestCase):
         db_loader.create_custom_url(slug='fakeproject', target_key=self.project_key)
         self.of_handler_test('/fakeproject')
 
-    def test_custom_user_url(self):
-        db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
-        self.of_handler_test('/fakie')
+    #def test_custom_user_url(self):
+    #    db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
+    #    self.of_handler_test('/fakie')
 
 
 class PaymentHandlerTestCase(OFTestCase):
