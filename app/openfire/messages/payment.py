@@ -158,13 +158,10 @@ class WithdrawalRequest(messages.Message):
     account = messages.StringField(1)
     amount = messages.StringField(2)
     note = messages.StringField(3)
-
-
-class WithdrawalResponse(messages.Message):
-
-    ''' Response allowing a user to withdraw funds from the provided url. '''
-
-    url = messages.StringField(1)
+    created = messages.StringField(4)
+    wepay_withdrawal_id = messages.IntegerField(5)
+    wepay_withdrawal_uri = messages.StringField(6)
+    wepay_withdrawal_status = messages.StringField(7)
 
 
 class WithdrawalHistory(messages.Message):

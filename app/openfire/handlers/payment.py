@@ -23,9 +23,9 @@ class PaymentHandler(WebHandler):
         if not user:
             self.logging.error('Failed to decode and find user key for state "%s" during wepay oauth.' % state)
 
-        account = PaymentAPI.create_user_payment_account(user, code)
-        if not account:
-            self.logging.error('Failed to wepay user payment account in oauth callback handler.')
+        response = PaymentAPI.create_user_payment_account(user, code)
+        if not response.success:
+            self.logging.error('[WePay Callback Handler] Failed to create WePay user payment account: ' + response.error_message)
 
         return self.redirect('/me')
 
@@ -38,11 +38,14 @@ class WePayIPNHandler(WebHandler):
 
         ''' Common method to process the checkout or withdrawal id. '''
 
+        response = None
         if checkout_id:
-            return PaymentAPI.payment_updated(int(checkout_id))
+            response = PaymentAPI.payment_updated(int(checkout_id))
         if withdrawal_id:
-            return PaymentAPI.withdrawal_updated(int(withdrawal_id))
-        return None
+            response = PaymentAPI.withdrawal_updated(int(withdrawal_id))
+        if not response.success:
+            self.logging.error('[WePay IPN Callback] Failure: ' + response.error_message)
+        return response
 
     def post(self):
 

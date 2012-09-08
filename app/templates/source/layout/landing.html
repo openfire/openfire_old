@@ -48,7 +48,7 @@
                                     {% endif %}
                                 </div>
                             </a>
-                            <div class='project-progress' style='width: {{ util.random.randint(1, 100) }}%'>
+                            <div class='project-progress' style='width: {{ project.progress if project.progress < 100 else 100 }}%'>
                             </div>
                         </div> <!-- end project card for {{ project.slug }} -->
                     {% endfor %}

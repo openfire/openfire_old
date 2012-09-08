@@ -122,8 +122,11 @@ class ProposalService(RemoteService):
             accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == owner_key).fetch()
             if accounts and len(accounts):
                 # Create a collection account for this project owner only.
-                PaymentAPI.create_project_payment_account(new_project.key, new_project.name,
+                account_response = PaymentAPI.create_project_payment_account(
+                        new_project.key, new_project.name,
                         'Collection account for ' + new_project.name, accounts[0])
+                if not account_response.success:
+                    pass # TODO: Log an error here or do something!
                 break
 
         # Accept the proposal

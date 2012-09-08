@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 from openfire.core.payment.wepay import WePayAPI
-from openfire.models.payment import Payment, ProjectAccount, WePayProjectAccount
+from openfire.core.payment.common import CorePaymentResponse, OFPaymentError
+from openfire.models.payment import Payment, WePayProjectAccount
 
 class CorePaymentAPI(object):
 
@@ -31,6 +32,8 @@ class CorePaymentAPI(object):
 
         ''' Adds a payment to a project and updates progress. This will tip the project if appropriate. '''
 
+        response = CorePaymentResponse()
+
         # Link the payment and update the backer count.
         project.payments.append(payment.key)
         project.backers = project.backers + 1
@@ -51,12 +54,21 @@ class CorePaymentAPI(object):
 
         if goal.met:
             # If the goal has already been met, charge the payment right now.
-            self.charge_payments([payment])
+            charge_response = self.charge_payments([payment])
+            if charge_response[0].success:
+                response.response = charge_response[0].response
+                response.success = True
+            else:
+                response.error_code = OFPaymentError.OF_FAILED_IMMEDIATE_CHARGE
+                response.error_message = 'Payment recorded but failed to charge the payment.'
 
         else:
             # If the active goal was just met, tip the goal.
+            response.success = True
             if project.money >= goal.amount:
                 self._tip_project_goal(project, goal)
+
+        return response
 
     def _remove_payment_from_project(self, project, payment):
 
@@ -89,8 +101,9 @@ class CorePaymentAPI(object):
         goal.put()
 
         payments = ndb.get_multi(goal.igniting_payments)
-        transactions = self.charge_payments(payments)
-        # TODO: Use charged here? It is an array of transactions for each payment.
+        responses = self.charge_payments(payments)
+        # TODO: Use charged here? It is an array of responses with transactions for each payment.
+        #       Should probably use it to log errors.
         return True
 
     def generate_auth_url(self, user):
@@ -108,19 +121,21 @@ class CorePaymentAPI(object):
     def create_project_payment_account(self, project_key, name, description, wepay_account):
 
         ''' Create a sub account for a user to use to collect payments for a project. '''
+        response = WePayAPI.create_payment_account(name, description, wepay_account.wepay_user_id)
+        if response.success:
+            wepay_account_id = response.response
+            account_key = ndb.Key(WePayProjectAccount, project_key.urlsafe())
+            new_account = WePayProjectAccount(key=account_key, project=project_key, payment_account=wepay_account.key,
+                    name=name, description=description, wepay_account_id=wepay_account_id)
+            new_account.put()
+            response.response = new_account
+        return response
 
-        wepay_account_id = WePayAPI.create_payment_account(name, description, wepay_account.wepay_user_id)
-        account_key = ndb.Key(WePayProjectAccount, project_key.urlsafe())
-        new_account = WePayProjectAccount(key=account_key, project=project_key, payment_account=wepay_account.key,
-                name=name, description=description, wepay_account_id=wepay_account_id)
-        new_account.put()
-        return new_account
-
-    def account_for_project(self, project):
+    def account_for_project(self, project_key):
 
         ''' Return the payment account for the given project key, or none. '''
 
-        account_key = ndb.Key(WePayProjectAccount, project.key.urlsafe())
+        account_key = ndb.Key(WePayProjectAccount, project_key.urlsafe())
         return account_key.get()
 
     def update_account_balance(self, account):
@@ -139,6 +154,7 @@ class CorePaymentAPI(object):
 
         ''' Create a payment that records the contribution amount that will be charged if the project ignites. '''
 
+        response = CorePaymentResponse()
         description = 'Contribution to %s' % project.name
         payment = Payment(
             amount=amount,
@@ -148,16 +164,22 @@ class CorePaymentAPI(object):
             from_user=money_source.owner,
             from_money_source=money_source.key,
             to_project=project.key,
-            to_account=self.account_for_project(project).key,
+            to_account=self.account_for_project(project.key).key,
             to_project_goal=goal_key,
             to_project_tier=tier_key,
         )
         payment.put()
+        response.response = payment
 
         # Link the payment to the project and update progress.
-        self._add_payment_to_project(project, payment)
+        add_response = self._add_payment_to_project(project, payment)
+        if add_response.success:
+            response.success = True
+        else:
+            response.error_code = add_response.error_code
+            response.error_message = add_response.error_message
 
-        return payment
+        return response
 
     def charge_payments(self, payments):
 
@@ -172,38 +194,57 @@ class CorePaymentAPI(object):
 
         ''' Cancel a single payment. '''
 
+        response = CorePaymentResponse()
         if payment.current_transaction:
             transaction = payment.current_transaction.get()
-            if not transaction:
-                return False
-            canceled = WePayAPI.cancel_payment(transaction, reason)
-            if not canceled:
-                return False
+            if transaction:
+                cancel_response = WePayAPI.cancel_payment(transaction, reason)
+                if cancel_response.success:
+                    response.success = True
+                else:
+                    response.error_code = cancel_response.error_code
+                    response.error_message = cancel_response.error_message
+            else:
+                response.error_code = OFPaymentError.OF_BAD_CURRENT_TRANSACTION_KEY
+                response.error_message = 'Current transaction key exists on payment but points to nothing.'
+        else:
+            response.success = True
 
-        payment.status = 'c'
-        payment.put()
+        if response.success:
+            payment.status = 'c'
+            payment.put()
 
-        # Un-link the payment from the project and update progress.
-        self._remove_payment_from_project(payment.to_project.get(), payment)
+            # Un-link the payment from the project and update progress.
+            self._remove_payment_from_project(payment.to_project.get(), payment)
 
-        return True
+        return response
 
     def refund_payment(self, payment, reason, amount=None):
 
         ''' Refund a single payment. '''
 
-        if not payment.current_transaction:
-            return False
-        transaction = payment.current_transaction.get()
-        if not transaction:
+        response = CorePaymentResponse()
+        if payment.current_transaction:
+            transaction = payment.current_transaction.get()
+            if transaction:
+                refund_response = WePayAPI.refund_payment(transaction, reason, amount)
+                if refund_response.success:
+                    response.success = True
+                    response.response = refund_response.response
+            else:
+                response.error_code = OFPaymentError.NO_BAD_TRANSACTION_KEY
+                response.error_message = 'Bad current transaction key exists for this payment.'
+        else:
+            response.error_code = OFPaymentError.NO_TRANSACTION_FOR_REFUND
+            response.error_message = 'No transaction exists for this payment.'
+
             return False
 
-        refunded = WePayAPI.refund_payment(transaction, reason, amount)
-
-        if refunded:
+        if response.success:
             # Un-link the payment from the project and update progress.
             self._remove_payment_from_project(payment.to_project.get(), payment)
-        return refunded
+
+        return response
 
     def payment_updated(self, payment_id):
 
@@ -221,10 +262,7 @@ class CorePaymentAPI(object):
 
         ''' Generate a url where a user can withdraw money from a project payment account. '''
 
-        withdrawal = WePayAPI.generate_withdrawal(user, account, amount, note)
-        if not withdrawal:
-            return None
-        return withdrawal.wepay_withdrawal_uri
+        return WePayAPI.generate_withdrawal(user, account, amount, note)
 
 
 # Payment API singleton.

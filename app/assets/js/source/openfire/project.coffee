@@ -735,7 +735,7 @@ class ProjectController extends OpenfireController
                     document.getElementById('back-text').innerHTML = 'you rock.'
                     document.getElementById('back').classList.add('backed')
                 failure: (error) =>
-                    alert("Failure! " + error.message)
+                    alert("Failure! " + error)
 
 
         @back = () =>
