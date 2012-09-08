@@ -42,3 +42,5 @@ class Update extends ActivityItem
 
 ## media
 class Asset extends Model
+
+@__openfire_preinit.abstract_base_classes.push Follow, Asset

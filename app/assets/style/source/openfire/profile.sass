@@ -1,4 +1,151 @@
+@import "../_core/mediaqueries"
+
+// Smartphones
+@media only screen and (min-width: 320px) and (max-width: 480px)
+    +smartphone
+    #profiletop
+        position: fixed
+        width: 100%
+        top: 120px
+
+    #avatar
+        margin-left: auto
+        margin-right: auto
+
+    #topbanner
+        position: relative
+        top: 0
+        left: 0
+
+    #name
+        text-align: center
+        width: 100%
+        display: block
+        line-height: 56pt
+
+    #topics
+        display: block
+        margin-right: auto
+        margin-left: auto
+        text-align: center
+
+    #profilemain
+        margin-top: 283px
+        position: relative
+
+    #contentpane
+        position: relative
+
+
+// Smartphone landscape
+@media only screen and (min-width: 321px)
+    +smartphone-landscape
+
+// Smartphone portrait
+@media only screen and (max-width: 320px)
+    +smartphone-portrait
+
+// iPad
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px)
+    +ipad
+
+// iPad landscape
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
+    +ipad-landscape
+
+// iPad portrait
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)
+    +ipad-portrait
+
+// Other tablet / intermediate screen
+@media only screen and (min-width: 480px) and (max-width: 768px)
+    +tablet
+    #profile
+        width: 70%
+        margin-left: 13%
+    #topics
+        display: block
+        position: fixed
+        max-width: 150px
+        right: -40px
+        top: 150px
+
+        span
+            margin-right: 50px
+
+    #rightbar
+        display: none
+
+// Other tablet landscape
+@media only screen and (min-width: 481px)
+    +tablet-landscape
+    #profiletop
+        position: relative
+        width: 98%
+        margin-right: 2%
+
+    #avatar
+        float: left
+        margin-right: 15px
+        margin-left: -30px
+
+    #topbanner
+        position: absolute
+        top: -60px
+        left: 160px
+
+    #name
+        text-align: left
+        width: auto
+        display: inline
+        line-height: 60pt
+
+    #topics
+        position: absolute
+        text-align: left
+
+    #profilemain
+        min-height: 400px
+
+    #contentpane
+        position: absolute
+        top: 115px
+        left: 2%
+        bottom: 2%
+        right: 2%
+        min-height: 420px
+
+
+// Other tablet portrait
+@media only screen and (max-width: 620px)
+    +tablet-portrait
+
+// Fullscreen desktop/laptop
+@media only screen and (min-width: 768px) and (max-width: 1140px)
+    +fullscreen
+
+@media only screen and (min-width: 768px)
+    #profile
+        width: 60%
+        margin-left: 18%
+    #topics
+        max-width: 200px
+        right: -210px
+        top: 15px
+
+        span
+            margin-right: 0
+
+// Widescreen
+@media only screen and (min-width: 1140px)
+    +widescreen
+
+// iPhone 4
+@media only screen and (min-device-pixel-ratio: 1.5)
+    +iphone
+
 @import "../main"
+
 h1, h2, h3
     display: inline
 
@@ -15,16 +162,25 @@ h4, h5, h6
 .tag
     border: none
     border-radius: 4px
-    font-family: "Karla"
-    font-size: 11px
-    font-weight: 700
+    font:
+        family: "Karla"
+        size: 11px
+        weight: 700
     text-transform: uppercase
     padding: 3px
-    margin-right: 5px
-    margin-left: 5px
+    margin:
+        right: 3px
+        left: 3px
     cursor: pointer
+    color: #dfdfdf
+    background-color: #999
 
-    &.topic
+    &:hover
+        color: white
+        background-color: #777
+
+    &.topic,
+    &.topic-edit
         background-color: #ffb246
         color: white
 
@@ -48,8 +204,6 @@ h4, h5, h6
         color: #f57720
 
     &.add
-        color: #dfdfdf
-        background-color: #999
         text-align: right
         line-height: 11px
         &::before
@@ -66,10 +220,6 @@ h4, h5, h6
             &::before
                 margin: 0 !important
 
-        &:hover
-            color: white
-            background-color: #777
-
         &:active
             &::before
                 color: #ffb246
@@ -79,7 +229,6 @@ body
 
 .profile
     &.section
-        margin-top: 10px
         padding: 5px
         min-height: 50px
 
@@ -97,188 +246,221 @@ body
     min-height: 600px
     display: inline
 
-    #profile
-        width: 50%
-        margin-left: 20%
-        background: white
-        border: 1px solid #d4d4d4
-        border-top: none
+#profile
+    background: white
+    border: 1px solid #d4d4d4
+    border-top: none
 
-        #profiletop
-            z-index: 502
+#profiletop
+    z-index: 502
+
+#avatar
+    width: 175px
+    height: 175px
+    margin-top: -70px
+    z-index: 503
+
+#avatar_edit_overlay
+    position: relative
+    top: -32px
+    height: 32px
+    background: #222
+    opacity: 0.4
+    line-height: 32px
+    -webkit-transition-property: opacity
+
+    a
+        display: block
+        height: 100%
+        width: 100%
+        color: whitesmoke
+        text-decoration: none
+
+        span.momentron,
+        span.change_avatar_label
+            line-height: 32px
+            vertical-align: middle
+            color: white
             position: relative
-            width: 98%
-            margin-top: -70px
-            margin-right: 2%
+            margin-left: 5px
 
-            #avatar
-                margin-right: 15px
-                margin-left: -30px
-                width: 175px
-                height: 175px
-                z-index: 503
+    &:hover
+        opacity: 0.85
 
-                #avatar_edit_overlay
-                    position: relative
-                    top: -32px
-                    height: 32px
-                    background: #222
-                    opacity: 0.4
-                    line-height: 32px
-                    -webkit-transition-property: opacity
+        a
+            color: white !important
 
-                    a
-                        display: block
-                        height: 100%
-                        width: 100%
-                        color: whitesmoke
-                        text-decoration: none
+#topbanner
+    width: auto
+    white-space: nowrap
 
-                        span.momentron,
-                        span.change_avatar_label
-                            line-height: 32px
-                            vertical-align: middle
-                            color: white
-                            position: relative
-                            margin-left: 5px
+    span
+        white-space: normal
 
-                    &:hover
-                        opacity: 0.85
+#topics
+    font: 12pt "Source Sans Pro", sans-serif
+    line-height: 16pt
 
-                        a
-                            color: white !important
+#byline
+    overflow: hidden
+    padding-top: 10px
 
-            #byline
-                overflow: hidden
+#userinfo
+    background-color: whitesmoke
+    span
+        margin-right: 10px
+        &:last-child
+            margin-right: 0
 
-                #topbanner
+#userbio
+    -webkit-transition-property: max-height
+    position: relative
+    overflow: hidden
+    text-overflow: ellipsis
+    max-height: 55px
+    width: 98%
+    background-color: rgba(255,255,255,0.4)
+    padding-bottom: 20px
 
-                    #topics
+    &.active
+        max-height: 275px !important
+        #userbio-toggle
+            &::after
+                content: "see less"
 
+    p
+        display: inline
 
-                #userinfo
-                    background-color: whitesmoke
-                    span
-                        margin-right: 10px
-                        &:last-child
-                            margin-right: 0
+#userbio-toggle
+    position: absolute
+    bottom: 0
+    left: 0
+    right: 0
+    padding: 0
+    margin: 0
+    cursor: pointer
+    background-color: whitesmoke
+    text-align: center
+    border:
+        top: 1px solid #AAA
+        bottom: 1px solid #aaa
 
-                #userbio
-                    -webkit-transition-property: max-height
-                    position: relative
-                    overflow: hidden
-                    text-overflow: ellipsis
-                    max-height: 55px
-                    width: 98%
-                    background-color: rgba(255,255,255,0.4)
-                    padding-bottom: 20px
+    &::after
+        display: block
+        content: "see more"
+        text-transform: uppercase
+        font:
+            family: "Karla"
+            size: 8pt
+        color: #333
+        vertical-align: middle
+        line-height: 11px
+        padding: 2px
+        margin: 0 auto
 
-                    p
-                        display: inline
+    &:hover
+        background-color: #dedede
+        &::after
+            color: black
 
-                    #userbio-toggle
-                        position: absolute
-                        bottom: 0
-                        left: 0
-                        right: 0
-                        padding: 0
-                        margin: 0
-                        cursor: pointer
-                        background-color: whitesmoke
-                        text-align: center
-                        border:
-                            top: 1px solid #AAA
-                            bottom: 1px solid #aaa
-
-                        &::after
-                            display: block
-                            content: "see more"
-                            text-transform: uppercase
-                            font:
-                                family: "Karla"
-                                size: 8pt
-                            color: #333
-                            vertical-align: middle
-                            line-height: 11px
-                            padding: 2px
-                            margin: 0 auto
-
-                        &:hover
-                            background-color: #dedede
-                            &::after
-                                color: black
+#profilemain
+    position: relative
 
 
-                    &.active
-                        max-height: 275px !important
-                        #userbio-toggle
-                            &::after
-                                content: "see less"
+#leftbar
+    width: 140px
+    margin-left: 10px
 
+#social_profiles
+    position: absolute
+    left: -33px
+    top: 110px
+    width: 33px
+    text-align: center
+    font-size: 8px
 
+    div
+        margin-top: 5px
 
-        #profilemain
-            min-height: 400px
-            position: relative
+#rightbar
+    width: 140px
+    margin-right: 10px
 
+#userstats
+    position: absolute
+    right: -180px
+    width: 170px
+    text-align: center
+    div
+        margin-top: 10px
+        background-color: #bada55
 
-            #leftbar
-                width: 140px
-                margin-left: 10px
+#contentpane
+    z-index: 498
 
-                #social_profiles
-                    position: absolute
-                    left: -33px
-                    top: 110px
-                    width: 33px
-                    text-align: center
-                    font-size: 8px
+    h4
+        color: #777
+        font-size: 13px
+        width: 100
+        background: #ccc
+        display: block
+        padding: 5px
+        text-transform: uppercase
+        letter-spacing: 2px
 
-                    div
-                        margin-top: 5px
+.topics-existing,
+.topics-new
+    text-align: center
 
-            #rightbar
-                width: 140px
-                margin-right: 10px
+    h4
+        display: block
+        color: #444
 
-                #userstats
-                    position: absolute
-                    right: -180px
-                    width: 170px
-                    text-align: center
-                    div
-                        margin-top: 10px
-                        background-color: #bada55
+.topics-existing
+    left: 7px
+    top: 7px
+    background-color: #aaa
+    width: 60%
+    padding: 1px
+    overflow-y: auto
+    padding-bottom: 22px
 
-            #contentpane
-                z-index: 498
-                position: absolute
-                top: 115px
-                left: 2%
-                bottom: 2%
-                right: 2%
-                min-height: 420px
+.topics-new
+    top: 7px
+    width: 40%
 
-                h4
-                    color: #777
-                    font-size: 13px
-                    width: 100
-                    background: #ccc
-                    display: block
-                    padding: 5px
-                    text-transform: uppercase
-                    letter-spacing: 2px
+    div.control
+        bottom: 20px
 
-.topic-edit
+.topic-edit,
+.topic-edit .right
     font:
         family: "Karla"
-        size: 16px
+        size: 26px
         weight: bold
-    display: block
-    width: 100%
     text-align: center
-    padding: 0 20px
+    padding: 0
     line-height: 56px
     vertical-align: middle
+
+.topic-edit
+    text-transform: uppercase
+    display: block
+    width: 100%
     background-color: #dedede
     color: #444
+    border-bottom: 2px solid #cdcdcd
+    border-top: 2px solid #efefef
+
+    .right
+        span
+            margin: 0 7px
+            cursor: pointer
+            font-family: "momentron" !important
+
+        .promote:hover
+            color: green
+        .demote:hover
+            color: #777
+        .remove:hover
+            color: red

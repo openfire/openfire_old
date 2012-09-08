@@ -13,12 +13,19 @@ class CorePaymentAPI(object):
         # TODO: Calculate our commission. For now just take $1.
         return 1
 
+    def _calculate_goal_progress(self, goal):
+
+        ''' Calculate the progress percentage for a goal. '''
+
+        return int(goal.amount_pledged / goal.amount * 100)
+
     def _calculate_project_progress(self, project):
 
         ''' Calculate the progress percentage for a project. '''
 
-        # TODO: How to do this? We currently use the highest goal.
-        return int(project.money / project.goals[-1].get().amount * 100)
+        if not project.active_goal:
+            return 0
+        return self._calculate_goal_progress(project.active_goal.get())
 
     def _add_payment_to_project(self, project, payment):
 
@@ -28,16 +35,28 @@ class CorePaymentAPI(object):
         project.payments.append(payment.key)
         project.backers = project.backers + 1
 
-        # Calculate the new money total and progress.
+        # Calculate the new money total and progress for goal first, then the project.
+        goal = project.active_goal.get()
+        goal.amount_pledged = goal.amount_pledged + payment.amount
+        goal.progress = self._calculate_goal_progress(goal)
+        if goal.met:
+            goal.extra_payments.append(payment.key)
+        else:
+            goal.igniting_payments.append(payment.key)
+        goal.put()
+
         project.money = project.money + payment.amount
         project.progress = self._calculate_project_progress(project)
         project.put()
 
-        # If the current goal was just met, tip it.
-        # TODO: How to do this? We currently use the highest goal.
-        goal = project.goals[-1].get()
-        if not goal.met and project.money >= goal.amount:
-            self._tip_project_goal(project, goal)
+        if goal.met:
+            # If the goal has already been met, charge the payment right now.
+            self.charge_payments([payment])
+
+        else:
+            # If the active goal was just met, tip the goal.
+            if project.money >= goal.amount:
+                self._tip_project_goal(project, goal)
 
     def _remove_payment_from_project(self, project, payment):
 
@@ -54,19 +73,23 @@ class CorePaymentAPI(object):
         project.progress = self._calculate_project_progress(project)
         project.put()
 
+        if project.active_goal:
+            # If there is an active goal, remove from that as well.
+            goal = project.active_goal.get()
+            goal.amount_pledged = goal.amount_pledged - payment.amount
+            goal.progress = self._calculate_goal_progress(goal)
+            goal.put()
+
     def _tip_project_goal(self, project, goal):
 
         ''' Tips a project goal, setting it to 'met' and charging all the payments. '''
 
-        # TODO: For now, since we just use the top goal, set all the goals as met and charge all payments!
-        goals = ndb.get_multi(project.goals)
-        for goal in goals:
-            goal.met = True
-            goal.progress = 100
-            goal.put()
+        goal.met = True
+        goal.progress = 100
+        goal.put()
 
-        payments = ndb.get_multi(project.payments)
-        charged = self.charge_payments(payments)
+        payments = ndb.get_multi(goal.igniting_payments)
+        transactions = self.charge_payments(payments)
         # TODO: Use charged here? It is an array of transactions for each payment.
         return True
 
@@ -112,7 +135,7 @@ class CorePaymentAPI(object):
 
         return WePayAPI.save_cc_for_user(user, cc_info)
 
-    def back_project(self, project, tier_key, amount, money_source):
+    def back_project(self, project, goal_key, tier_key, amount, money_source):
 
         ''' Create a payment that records the contribution amount that will be charged if the project ignites. '''
 
@@ -126,16 +149,13 @@ class CorePaymentAPI(object):
             from_money_source=money_source.key,
             to_project=project.key,
             to_account=self.account_for_project(project).key,
+            to_project_goal=goal_key,
+            to_project_tier=tier_key,
         )
         payment.put()
 
         # Link the payment to the project and update progress.
         self._add_payment_to_project(project, payment)
-
-        # If the goal has already been met, charge the payment right now.
-        if project.goals[-1].get().met:
-            success = self.charge_payments([payment])
-            # TODO: Use success here.
 
         return payment
 
@@ -177,7 +197,13 @@ class CorePaymentAPI(object):
         transaction = payment.current_transaction.get()
         if not transaction:
             return False
-        return WePayAPI.refund_payment(transaction, reason, amount)
+
+        refunded = WePayAPI.refund_payment(transaction, reason, amount)
+
+        if refunded:
+            # Un-link the payment from the project and update progress.
+            self._remove_payment_from_project(payment.to_project.get(), payment)
+        return refunded
 
     def payment_updated(self, payment_id):
 

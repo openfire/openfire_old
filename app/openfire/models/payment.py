@@ -95,6 +95,7 @@ class Payment(AppModel):
 
     to_project = ndb.KeyProperty('tp', indexed=True, required=True)
     to_account = ndb.KeyProperty('ta', indexed=True, required=True)
+    to_project_goal = ndb.KeyProperty('tg', indexed=True, required=False)
     to_project_tier = ndb.KeyProperty('tt', indexed=True, required=False)
 
     created = ndb.DateTimeProperty('c', indexed=True, auto_now_add=True)

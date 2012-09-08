@@ -40,15 +40,24 @@ class UserService(RemoteService):
         return response
 
 
-    @remote.method(user_messages.SetTopics, Echo)
+    @remote.method(user_messages.SetTopics, message_types.VoidMessage)
     def set_topics(self, request):
 
         ''' Set topics for a user to display. '''
 
-        user_key = ndb.Key('User', request.user)
-        user = user_key.get()
-        if not user:
-            return user_messages.Echo(message='Failed to find user to set topics.')
+        try:
+            try:
+                ## try pulling by key first
+                user_key = ndb.Key(urlsafe=request.user)
+            except:
+                ## if not, then pull by username
+                user_key = ndb.Key('User', request.user)
+
+            finally:
+                user = user_key.get(use_cache=True, use_memcache=True, use_datastore=True)
+                assert user is not None
+        except AssertionError, e:
+            raise self.exceptions.ApplicationError('User not found.')
 
         if not request.topics or len(request.topics) < 1:
             user.topics = []
@@ -57,10 +66,10 @@ class UserService(RemoteService):
             topic_keys = [ndb.Key(urlsafe=topic) for topic in request.topics]
             all_topics = ndb.get_multi(topic_keys)
             if None in all_topics:
-                return Echo(message='Failed to find all topics')
+                raise self.exceptions.ApplicationError('Failed to find one or more input topics.')
             user.topics = topic_keys
         user.put()
-        return Echo(message='Success')
+        return message_types.VoidMessage()
 
 
     @remote.method(user_messages.AccountRequest, user_messages.Account)

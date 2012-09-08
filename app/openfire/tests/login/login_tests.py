@@ -21,8 +21,6 @@ class BasicLoginTestCase(OFTestCase):
 
         """ Does not currently work. See OF-155 for more details. """
 
-        import pdb; pdb.set_trace()
-
         # Run the fixtures.
         fixture_response = self.of_handler_test('/_dev/data', desired_response_code=302, expect_response_content=False,
                 error='Failed to load the fixture data at /_dev/data.')

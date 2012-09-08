@@ -72,7 +72,7 @@ _config['webapp2_extras.jinja2'] = {
         'autoescape': True,    # Global Autoescape. BE CAREFUL WITH THIS.
         'trim_blocks': False,  # trim trailing \n's from blocks (default: False)
         'auto_reload': True,   # auto reload every template every time (recommended only in dev)
-        'extensions': ['jinja2.ext.autoescape']
+        'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.loopcontrols']
     }
 
 }

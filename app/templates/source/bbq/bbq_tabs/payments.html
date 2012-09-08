@@ -5,6 +5,7 @@
             <tr>
                 <th>From User</th>
                 <th>To Project</th>
+                <th>Project Goal</th>
                 <th>Project Tier</th>
                 <th>Amount</th>
                 <th>Commission</th>
@@ -23,6 +24,7 @@
             <tr>
                 <td>{{ payment.from_user }}</td>
                 <td>{{ payment.to_project.get().name }}</td>
+                <td>{{ payment.to_project_goal }}</td>
                 <td>{{ payment.to_project_tier }}</td>
                 <td>{{ payment.amount }}</td>
                 <td>{{ payment.commission }}</td>

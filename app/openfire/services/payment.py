@@ -117,7 +117,7 @@ class PaymentService(RemoteService):
             return Echo(message='No money source provided.')
 
         # Make a record of the payment amount to be charged if the projects ignites.
-        payment = PaymentAPI.back_project(project, request.tier, float(request.amount), money_source)
+        payment = PaymentAPI.back_project(project, project.active_goal, ndb.Key(urlsafe=request.tier), float(request.amount), money_source)
         if not payment:
             # TODO: What to do on error?
             return Echo(message='There was an error...try again?')

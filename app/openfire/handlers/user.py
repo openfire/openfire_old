@@ -145,10 +145,13 @@ class UserProfile(WebHandler):
                             # user has a private profile
                             return self.error(404)
 
+        topics = ndb.get_multi(self.subject.topics)
+
         context = {
             'user': self.subject,
             'edit_privs': self.has_edit_privs,
-            'is_current_user': self.is_current_user
+            'is_current_user': self.is_current_user,
+            'topics': topics
         }
 
         ## all routing logic complete - build a user's profile objects and render

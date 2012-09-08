@@ -1,3 +1,305 @@
+@import "../_core/mediaqueries"
+
+// Smartphones
+@media only screen and (min-width: 320px) and (max-width: 480px)
+    +smartphone
+    #project
+        top: -200px
+
+        &.active
+            top: 0px
+
+    #promote
+        margin: 0 auto
+
+        &::before
+            margin-top: -11px
+            margin-left: 5px
+
+        button
+            font-size: 8pt
+            padding: 0 3px
+            margin: 3px 3px 3px 0
+            border-radius: 3px
+            background-color: #eee
+            border: none
+            clear: both
+
+    #welcomebox
+        position: relative
+        width: 100%
+        left: 0
+        padding-top: 20px
+        background-color: #ddd
+
+    #mainvideo
+        min-height: 200px
+
+    #sidebar
+        div,
+        section
+            display: none
+
+        #quickinfo,
+        #global_progress,
+        #global_progress div,
+        header,
+        header div
+            display: block
+
+            div, section
+                display: block
+
+
+    #sidebuttons
+        right: 5px
+        top: 5px
+        width: auto
+        text-align: right
+
+    #progress
+        width: 100%
+        left: 0
+        margin-top: 10px
+
+        &::before,
+        &::after
+            display: none
+
+    #deets
+        .prsection
+            p
+                font-size: 9pt
+
+            h3
+                font-size: 15pt
+
+    #project-title
+        margin-top: 0
+
+        h1,
+        a h1
+            font-size: 24pt
+            line-height: 37pt
+
+    #deet-actions
+        .zocial
+            &::before
+                font: 110%/1.45 "zocial"
+
+            &.icon
+                max-width: 2em
+                max-height: 1.792em
+
+                &::before
+                    width: 1.667em
+                    height: 1.667em
+
+    #project-tabset
+        .tab-rounded,
+        .tab-link
+            font-size: 14px
+            line-height: 16px
+
+
+// Smartphone landscape
+@media only screen and (min-width: 321px)
+    +smartphone-landscape
+
+// Smartphone portrait
+@media only screen and (max-width: 320px)
+    +smartphone-portrait
+
+// iPad
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px)
+    +ipad
+
+// iPad landscape
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
+    +ipad-landscape
+
+// iPad portrait
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)
+    +ipad-portrait
+
+// Other tablet / intermediate screen
+@media only screen and (min-width: 480px) and (max-width: 768px)
+    +tablet
+
+    #promote
+        &::before
+            margin-top: -11px
+            margin-left: 5px
+
+    #mainvideo
+        min-height: 300px
+
+    #sidebuttons
+        right: 20px
+        top: 25px
+        width: 70px
+        text-align: center
+
+    #deets
+        margin-bottom: 100px
+
+        .prsection
+            p
+                font-size: 10pt
+            h3
+                font-size: 14pt
+
+    #projecttitle
+        h1,
+        a h1
+            font-size: 32pt
+            line-height: 44pt
+
+    #project-tabset
+        .tab-rounded,
+        .tab-link
+            font-size: 16px
+            line-height: 18px
+
+// Other tablet landscape
+@media only screen and (min-width: 481px)
+    +tablet-landscape
+
+// Other tablet portrait
+@media only screen and (max-width: 620px)
+    +tablet-portrait
+    #project
+        overflow: hidden
+        margin: 0 auto
+        width: 100%
+        top: -200px
+
+        &.active
+            top: 0px
+
+    #promote
+        display: none
+        position: relative
+        width: 100%
+        top: 0
+        height: auto
+
+    #welcomebox
+        position: relative
+        width: 100%
+        left: 0
+        padding-top: 20px
+        background-color: #ddd
+
+    #mainvideo
+        width: 90%
+        margin: 0 auto
+        height: auto
+
+        // hide embed until IR works!
+        iframe
+            display: none
+
+    #sidebar
+        position: fixed
+        bottom: 0px
+        left: 0px
+        right: 0px
+        top: 88%
+        padding-top: 10px
+        min-height: 56px
+
+        &.active
+            top: 40%
+            overflow-y: auto
+
+    #progress
+        width: 100%
+        left: 0
+
+        &::before,
+        &::after
+            display: none
+            content: none
+
+    #project_goals,
+    #project-tiers
+        &::before
+            display: none
+            content: none
+
+    #deets
+        width: 100%
+        margin: 0 auto
+        height: auto
+        background-color: #999
+
+    #project-tabset
+        margin-bottom: 0px
+
+        .tab-rounded,
+        .tab-link
+            margin: 0 auto
+            font-weight: 700
+            padding: 10px
+
+        .tab
+            position: relative
+            bottom: 0px
+
+    #footer-container
+        display: none
+
+// Fullscreen desktop/laptop
+@media only screen and (min-width: 768px) and (max-width: 1140px)
+    +fullscreen
+
+    #project
+        margin: 0 auto
+
+    #promote
+        margin: 20px auto
+
+    #sidebar
+        display: block
+        float: right
+        width: 300px
+
+        section
+            width: 95%
+            margin: 2.5%
+
+    #progress
+        width: 320px
+        left: -17px
+
+        &::before,
+        &::after
+            display: block
+
+    #mainvideo
+        height: auto
+        width: auto
+
+    #deets
+        min-width: 460px
+
+// Widescreen
+@media only screen and (min-width: 1140px)
+    +widescreen
+    #sidebar
+        display: block
+        float: right
+        width: 300px
+
+        section
+            width: 95%
+            margin: 2.5%
+
+// iPhone 4
+@media only screen and (min-device-pixel-ratio: 1.5)
+    +iphone
+
 @import "../main"
 
 #main
@@ -170,24 +472,24 @@
                 top: 30px
                 width: 9px
                 height: 9px
-                background-color: transparent
+                background-color: rgba(0,0,0,0)
 
             &::before
                 left: 1px
-                +background(linear-gradient(top right, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
+                +background(linear-gradient(top right, #bada55 0%, #bada55 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%))
                 clip: rect(0px 10px 8px 2px)
                 box-shadow: inset -2px 3px 11px -5px rgba(0,0,0, 0.75)
 
             &::after
                 right: 1px
-                +background(linear-gradient(top left, white 0%, white 50%, transparent 50%, transparent 100%))
+                +background(linear-gradient(top left, white 0%, white 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%))
                 clip: rect(0px 8px 8px 0px)
                 box-shadow: inset 2px 3px 11px -5px rgba(0,0,0, 0.75)
 
             &.done
                 &::after
                     background: none
-                    +background(linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
+                    +background(linear-gradient(top left, #bada55 0%, #bada55 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%))
 
 
             #progress-inner
@@ -555,3 +857,4 @@
             font-weight: 700
             text-transform: uppercase
             border-radius: 5px
+

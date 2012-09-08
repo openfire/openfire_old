@@ -1,446 +1,56 @@
-
-@media all and (max-width: 480px)
+// Smartphones
+=smartphone
   p
     margin: 8px 0
     padding: 3px 0
-  #main
-    #masthead
-      height: 225px
 
-      #oflogo
-        max-width: 92%
-        height: auto
-        left: 4%
-        bottom: 55px
-      #title
-        text-align: right
-        font: 21pt "Satisfy",cursive
-        line-height: 18pt
-        opacity: 0
-        bottom: 4%
-        right: 4%
+  #masthead
+    height: 225px
+
+  #oflogo
+    max-width: 92%
+    height: auto
+    left: 4%
+    bottom: 55px
+
+  #title
+    opacity: 0
+    bottom: 4%
+    right: 4%
+
+=smartphone-landscape
+
+=smartphone-portrait
+
+// iPhone 4
+=iphone
+
+// iPad
+=ipad
+// iPad landscape
+=ipad-landscape
+// iPad portrait
+=ipad-portrait
+
+// Other tablet / intermediate screen
+=tablet
+  #oflogo
+    left: 4%
+    bottom: 30%
+
+  #title
+    opacity: 1
+    width: 44%
+    min-width: 200px
+    max-width: 240px
+    bottom: 4%
+    font-size: 21pt
+
+// Other tablet landscape
+=tablet-landscape
+  #masthead
+    height: 225px
 
-      // landing
-      #how-it-works-button
-        height: 50px
-        width: 95%
-        bottom: 5%
-        left: 2.5%
-        border-radius: 5px
-
-        a
-          margin: 13px 3px 0 0
-          font-size: 24px
-
-    #content
-      // landing
-      section
-        width: 100%
-        height: auto
-        margin: 0
-        .project-card
-          width: 100px
-          img
-            width: 100px
-            height: 88px
-          .project-icon::after
-            height: 15px
-            line-height: 15px
-            font-size: 15px
-        .activity-table
-          height: auto
-          .activity-row
-            height: 100
-            .activity-cell
-              width: 100
-              height: 90
-
-      #project
-        top: -200px
-
-        &.active
-          top: 0px
-
-        #promote
-          margin: 0 auto
-          button
-            font-size: 8pt
-            padding: 0 3px
-            margin: 3px 3px 3px 0
-            border-radius: 3px
-            background-color: #eee
-            border: none
-            clear: both
-
-          &::before
-            margin-top: -11px
-            margin-left: 5px
-
-        #welcomebox
-          position: relative
-          width: 100%
-          left: 0
-          padding-top: 20px
-          background-color: #ddd
-
-          #mainvideo
-            //display: none
-            min-height: 200px
-
-        #sidebar
-          //display: none
-          div,
-          section
-            display: none
-
-          #quickinfo,
-          #global_progress,
-          #global_progress div,
-          header,
-          header div
-            display: block !important
-
-            div,
-            section
-              display: block !important
-
-          section
-            margin: 0
-
-
-          #sidebuttons
-            right: 5px
-            top: 5px
-            width: auto
-            text-align: right
-
-          #owners
-            display: none !important
-          hr
-            display: none !important
-
-          #quickinfo
-            display: none
-            #progress
-              width: 100%
-              left: 0
-              margin-top: 10px
-              &::before,
-              &::after
-                display: none
-
-        #deets
-          .prsection
-            p
-              font-size: 9pt
-
-            h3
-              font-size: 15pt
-
-          #projecttitle
-            margin-top: 0
-            h1,
-            a h1
-              font-size: 24pt
-              line-height: 37pt
-
-            #deetactions
-              .buttongroup
-                .zocial
-                  &::before
-                    font: 110%/1.45 zocial
-
-                  &.icon
-                    max-width: 2em
-                    max-height: 1.792em
-
-                    &::before
-                      width: 1.667em
-                      height: 1.667em
-
-          #project-tabset
-            &.tabset
-              .tab-rounded,
-              .tab-link
-                font-size: 14px
-                line-height: 16px
-
-@media all and (min-width: 480px)
-  #main
-    #masthead
-      border-radius: none
-      height: 300px
-      #oflogo
-        max-width: 92%
-        height: auto
-        left: 4%
-        bottom: 30%
-
-      #title
-        opacity: 1
-        font: 21pt "Satisfy",cursive
-        line-height: 18pt
-        width: 44%
-        height: auto
-        min-width: 200px
-        max-width: 240px
-        text-align: right
-        bottom: 4%
-
-
-      #how-it-works-button
-        border-top: none
-        height: 80px
-        width: 44%
-        min-width: 200px
-        left: 52%
-        bottom: 4%
-        border-radius: 9px
-        a
-          margin: 26px 3px 0 0
-          font-size: 23px
-
-        &::before
-          display: none
-          content: none
-
-    #content
-
-      section
-        width: 100%
-        height: auto
-
-        &:last
-          margin-bottom: 20px
-
-        .project-card
-          width: 140px
-          img
-            width: 140px
-            height: 120px
-          .project-icon::after
-            height: 18px
-            line-height: 18px
-            font-size: 18px
-        .activity-table
-          height: auto
-          .activity-row
-            height: 100
-            .activity-cell
-              width: 100
-              height: 90
-
-              .graph
-                width: 252px
-                height: 140px
-
-      #project
-        #promote
-          &::before
-            margin-top: -11px
-            margin-left: 5px
-
-        #welcomebox
-          #mainvideo
-            min-height: 300px
-
-        #sidebar
-          #owners,
-          #sidetitle,
-          hr
-            display: block
-
-          #sidebuttons
-            right: 20px
-            top: 25px
-            width: 70px
-            text-align: center
-
-        #deets
-          margin-bottom: 100px
-
-          .prsection
-            p
-              font-size: 10pt
-
-            h3
-              font-size: 14pt
-
-          #projecttitle
-
-            h1,
-            a h1
-              font-size: 32pt
-              line-height: 44pt
-
-          #project-tabset
-            &.tabset
-              .tab-rounded,
-              .tab-link
-                font-size: 16px
-                line-height: 18px
-
-
-@media all and (max-width: 768px)
-  p
-    margin: 12px 0
-  #main
-    &.wrapper
-      width: 100%
-      margin: 0
-
-    #masthead
-      #title
-        bottom: 10%
-        left: 13%
-
-    #content
-      section
-        width: 100%
-        .section-wrap
-          overflow: hidden
-          padding-bottom: 10px
-          #project-cards
-            width: 1000px
-
-      #project
-        overflow: hidden
-        margin: 0 auto
-        width: 100%
-        top: -200px
-        &.active
-          top: 0px
-
-        #promote
-          display: none
-          position: relative
-          width: 100%
-          top: 0
-          height: auto
-
-        #welcomebox
-          position: relative
-          width: 100%
-          left: 0
-          padding-top: 20px
-          background-color: #ddd
-
-          #mainvideo
-            width: 90%
-            margin: 0 auto
-            height: auto
-            background-color: blue
-
-            iframe
-              display: none
-
-        #sidebar
-          z-index: 9999
-          position: fixed !important
-          bottom: 0px
-          left: 0px
-          right: 0px
-          top: 88%
-          border-top-left-radius: 7px
-          border-top-right-radius: 7px
-          padding-top: 10px
-          width: 100%
-          min-height: 56px
-          &.active
-            top: 40%
-            overflow-y: auto
-          #quickinfo
-            #progress
-              width: 100%
-              left: 0
-              &::before,
-              &::after
-                display: none
-            #project_goals,
-            #project_tiers
-              &::before
-                display: none
-
-        #deets
-          width: 100%
-          margin: 0 auto
-          height: auto
-          background-color: #999
-
-          #project-tabset
-            margin-bottom: 0px
-            &.tabset
-              .tab-rounded,
-              .tab-link
-                margin: 0 auto
-                font-weight: 700
-                padding: 10px
-
-              .tab
-                position: relative
-                bottom: 0px
-
-  #footer-container
-    display: none
-
-@media all and (min-width: 768px)
-  #main
-    &.wrapper
-      width: 100%
-      margin: 50px auto
-      #masthead
-        #oflogo
-          left: 4%
-        #title
-          font: 28pt "Satisfy", cursive
-        #how-it-works-button
-          border-radius: 9px
-    #content
-      section
-        width: 45%
-        margin: 0px 2.5% 60px
-        .section-wrap
-          margin-left: auto
-          margin-right: auto
-          #project-cards
-            width: auto
-      #project
-        margin: 0 auto
-        #promote
-          margin: 20px auto
-        #sidebar
-          display: block
-          float: right
-          width: 300px
-          section
-            width: 95%
-            margin: 2.5%
-          #quickinfo
-            #progress
-              width: 320px
-              left: -17px
-              &::before,
-              &::after
-                display: block
-        #welcomebox
-          #mainvideo
-            height: auto
-            width: auto
-
-        #deets
-          min-width: 460px
-
-
-
-@media all and (min-width: 1140px)
-  #main #masthead
-    #oflogo
-      bottom: 25%
-      left: 5%
-    #title
-      font: 32pt "Satisfy", cursive
-
-@media only screen and (min-width: 480px)
   nav
     a
       margin-bottom: 0
@@ -454,32 +64,56 @@
   .oldie a
     margin: 0 0.7%
 
-@media only screen and (min-width: 768px)
+// Other tablet portrait
+=tablet-portrait
+  p
+    margin: 12px 0
+
+  #main.wrapper
+    margin: 0
+
   #title
-    float: left
-  nav
-    float: left
-    margin-left: 1%
+    bottom: 10%
+    left: 13%
+    font-size: 21pt
+
+// Fullscreen desktop/laptop
+=fullscreen
   #main
-    #masthead
-      #title
-        bottom: 5%
-        max-width: none
-
-      #how-it-works-button
-        left: 65%
-        max-width: 280px
-        bottom: 30%
-        padding-right: 10px
-
     article
       float: left
       width: 57%
+
     aside
       float: right
       width: 28%
 
-@media only screen and (min-width: 1140px)
-  .wrapper
-    width: 100%
+    &.wrapper
+      margin: 50px auto
+
+  #oflogo
+    left: 4%
+
+  #title
+    float: left
+    bottom: 5%
+    max-width: none
+    font-size: 28pt
+
+  nav
+    float: left
+    margin-left: 1%
+
+// Widescreen
+=widescreen
+
+  #main.wrapper
     margin: 0 auto
+
+  #oflogo
+    bottom: 25%
+    left: 5%
+
+  #title
+    font-size: 32pt
+    bottom: 5%

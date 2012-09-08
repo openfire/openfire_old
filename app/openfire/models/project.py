@@ -42,7 +42,7 @@ class Category(AppModel):
     backer_count = ndb.IntegerProperty('bc', indexed=True, default=0)
 
 
-## Contribution Goals
+## Project Contribution Goals
 class Goal(AppModel):
 
     ''' Represents a contribution goal for an openfire project. '''
@@ -50,13 +50,64 @@ class Goal(AppModel):
     _message_class = common.Goal
     _pipeline_class = pipelines.GoalPipeline
 
+    slug = ndb.StringProperty('sl', indexed=True)
     target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
-    amount = ndb.FloatProperty('a', indexed=True, required=True)
+
+    # Description and stats.
     description = ndb.TextProperty('d', indexed=False)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
     progress = ndb.IntegerProperty('pg', indexed=True, default=0)
     met = ndb.BooleanProperty('m', indexed=True, default=False)
+
+    # The target amount.
+    amount = ndb.FloatProperty('a', indexed=True, required=True)
+
+    # Pledged and processed amounts.
+    amount_pledged = ndb.FloatProperty('ar', indexed=True, default=0.0)
+    amount_processed = ndb.FloatProperty('ap', indexed=True, default=0.0)
+
+    # Funding and deliverable deadlines.
+    funding_deadline = ndb.DateTimeProperty('fd', indexed=True)
+    deliverable_description = ndb.TextProperty('ds', indexed=True)
+    deliverable_date = ndb.DateTimeProperty('dt', indexed=True)
+
+    # Donation tiers for this goal and potential next steps.
+    tiers = ndb.KeyProperty('tr', repeated=True)
+    next_steps = ndb.KeyProperty('ns', repeated=True)
+
+    # Payment tracking lists.
+    igniting_payments = ndb.KeyProperty('ip', repeated=True)
+    extra_payments = ndb.KeyProperty('ep', repeated=True)
+    successful_payments = ndb.KeyProperty('sp', repeated=True)
+
+
+## Goal Next Step
+class NextStep(AppModel):
+
+    '''
+    Represents a potential next step for a project after completing the active goal.
+    Child object of a goal.
+    '''
+
+    _message_class = common.NextStep
+    _pipeline_class = pipelines.NextStepPipeline
+
+    summary = ndb.StringProperty('s', indexed=True)
+    description = ndb.TextProperty('d', indexed=False)
+    votes = ndb.IntegerProperty('v', indexed=True, default=0)
+
+
+## Ambitious Future Goal
+class FutureGoal(AppModel):
+
+    ''' Represents a big ambitious future goal. '''
+
+    _message_class = common.FutureGoal
+    _pipeline_class = pipelines.FutureGoalPipeline
+
+    summary = ndb.StringProperty('s', indexed=True)
+    description = ndb.TextProperty('d', indexed=False)
 
 
 ## Contribution Tiers
@@ -73,6 +124,7 @@ class Tier(AppModel):
     amount = ndb.FloatProperty('a', indexed=True, required=True)
     description = ndb.TextProperty('pd', indexed=False)
     delivery = ndb.StringProperty('d', indexed=False)
+    next_step_votes = ndb.IntegerProperty('v', indexed=True, default=1)
     backer_count = ndb.IntegerProperty('b', indexed=True, default=0)
     backer_limit = ndb.IntegerProperty('l', indexed=True, default=0)
 
@@ -104,9 +156,10 @@ class Proposal(AppModel):
     public = ndb.BooleanProperty('pp', indexed=True, default=False)
     viewers = ndb.KeyProperty('pv', indexed=True, repeated=True)
 
-    # Tiers + Goals
-    tiers = ndb.LocalStructuredProperty(Tier, 'tr', repeated=True, compressed=True)
-    goals = ndb.LocalStructuredProperty(Goal, 'gl', repeated=True, compressed=True)
+    # Goals + Tiers
+    initial_goal = ndb.LocalStructuredProperty(Goal, 'ig', compressed=True)
+    tiers = ndb.LocalStructuredProperty(Tier, 'ts', compressed=True, repeated=True)
+    future_goal = ndb.LocalStructuredProperty(FutureGoal, 'fg', compressed=True)
 
     # Avatar + Video
     avatar = ndb.LocalStructuredProperty(Avatar, 'av')
@@ -148,9 +201,10 @@ class Project(AppModel):
     money = ndb.FloatProperty('mn', default=0.0)
     progress = ndb.IntegerProperty('pro', default=0)
 
-    # Tiers + Goals
-    tiers = ndb.KeyProperty('tr', repeated=True)
-    goals = ndb.KeyProperty('gl', repeated=True)
+    # Goals
+    active_goal = ndb.KeyProperty('ag', indexed=True)
+    completed_goals = ndb.KeyProperty('cg', repeated=True)
+    future_goal = ndb.KeyProperty('fg', indexed=True)
 
     # Payments
     payments = ndb.KeyProperty('pm', repeated=True)

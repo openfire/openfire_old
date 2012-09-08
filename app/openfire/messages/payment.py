@@ -74,10 +74,11 @@ class Payment(messages.Message):
     from_money_source = messages.MessageField(MoneySource, 11)
     to_user = messages.StringField(12)
     to_account = messages.MessageField(UserPaymentAccount, 13)
-    to_project_tier = messages.StringField(14)
-    created = messages.StringField(15)
-    updated = messages.StringField(16)
-    archived = messages.StringField(17)
+    to_project_goal = messages.StringField(14)
+    to_project_tier = messages.StringField(15)
+    created = messages.StringField(16)
+    updated = messages.StringField(17)
+    archived = messages.StringField(18)
 
 
 class PaymentHistory(messages.Message):

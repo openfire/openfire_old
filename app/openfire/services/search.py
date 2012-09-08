@@ -46,7 +46,7 @@ class SearchService(RemoteService):
 
         topics = []
         query = IndexEntry.query(IndexEntry.substrings == request.query, ancestor = ndb.Key(Index, 'topic'))
-        topic_keys = [ndb.Key(Topic, k.id()) for k in query.iter(keys_only=True)]
+        topic_keys = [ndb.Key(Topic, k.id()) for k in query.fetch(25, keys_only=True)]
         for topic in ndb.get_multi(topic_keys):
             topics.append(topic.to_message())
         return common.Topics(topics=topics)

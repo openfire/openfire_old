@@ -1,3 +1,166 @@
+@import "../_core/mediaqueries"
+
+// Smartphones
+@media only screen and (min-width: 320px) and (max-width: 480px)
+  +smartphone
+  #how-it-works-button
+    height: 50px
+    width: 90%
+    bottom: 5%
+    left: 2.5%
+    border-radius: 5px
+
+    a
+      margin: 13px 3px 0 0
+      font-size: 24px
+
+  #content
+    section
+      width: 100%
+      height: auto
+      margin: 0
+
+  .project-card
+    width: 100px
+
+    &::after
+      height: 15px
+      line-height: 15px
+      font-size: 15px
+
+    img
+      width: 100px
+      height: 88px
+
+  .activity-table
+    height: auto
+    .activity-row
+      height: 100
+      .activity-cell
+        width: 100
+        height: 90
+
+
+// Smartphone landscape
+@media only screen and (min-width: 321px)
+  +smartphone-landscape
+
+// Smartphone portrait
+@media only screen and (max-width: 320px)
+  +smartphone-portrait
+
+// iPad
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px)
+  +ipad
+
+// iPad landscape
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
+  +ipad-landscape
+
+// iPad portrait
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)
+  +ipad-portrait
+
+// Other tablet / intermediate screen
+@media only screen and (min-width: 480px) and (max-width: 768px)
+  +tablet
+  #how-it-works-button
+    border-top: none
+    height: 80px
+    width: 44%
+    min-width: 200px
+    left: 52%
+    bottom: 4%
+    border-radius: 9px
+    a
+      margin: 26px 3px 0 0
+      font-size: 23px
+
+  #content
+    section
+      width: 100%
+      height: auto
+
+      &:last-child
+        margin-bottom: 20px
+
+  .project-card
+    width: 140px
+
+    &::after
+      height: 18px
+      line-height: 18px
+      font-size: 18px
+
+    img
+      width: 140px
+      height: 120px
+
+  .activity-table
+    height: auto
+    .activity-row
+      height: 100
+      .activity-cell
+        width: 100
+        height: 90
+        .graph
+          width: 252px
+          height: 140px
+
+// Other tablet landscape
+@media only screen and (min-width: 481px)
+  +tablet-landscape
+
+
+// Other tablet portrait
+@media only screen and (max-width: 620px)
+  +tablet-portrait
+  #content
+    section
+      width: 100%
+
+    .section-wrap
+      overflow: hidden
+      padding-bottom: 10px
+
+  #project-cards
+    overflow-x: auto
+    width: 98%
+    white-space: nowrap
+
+  .project-card
+    white-space: normal
+
+// Fullscreen desktop/laptop
+@media only screen and (min-width: 768px) and (max-width: 1140px)
+  +fullscreen
+  #how-it-works-button
+    left: 65%
+    max-width: 280px
+    bottom: 30%
+    padding-right: 10px
+    border-radius: 9px
+
+  #content
+    section
+      width: 45%
+      margin: 0px 2.5% 620px
+
+    .section-wrap
+      margin-left: auto
+      margin-right: auto
+
+  #project-cards
+    width: auto
+
+// Widescreen
+@media only screen and (min-width: 1140px)
+  +widescreen
+
+// iPhone 4
+@media only screen and (min-device-pixel-ratio: 1.5)
+  +iphone
+
 @import "../main"
 
 .ohnoes
