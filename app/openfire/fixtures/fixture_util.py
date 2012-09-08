@@ -228,14 +228,15 @@ def create_category(slug='test', name='Test Category', description='some txt', k
 
 
 def create_goal(parent_key=None, contribution_type_id='fake', amount=1, description='DESCRIPTION',
-        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE', slug='SLUG'):
+        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE', slug='SLUG',
+        funding_open=True):
 
     ''' Create a new funding goal. If parent is None, do not put the object (for proposals).'''
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     goal = Goal(contribution_type=contribution_type, amount=amount, description=description,
             backer_count=backer_count, progress=progress, met=met, parent=parent_key,
-            deliverable_description=deliverable_description)
+            deliverable_description=deliverable_description, funding_open=funding_open)
     parent_obj = None
     if parent_key:
         goal.parent = parent_key
@@ -253,13 +254,15 @@ def create_goal(parent_key=None, contribution_type_id='fake', amount=1, descript
 
 
 def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amount=1,
-        description='DESCRIPTION', delivery="tomorrow", backer_count=0, backer_limit=100):
+        description='DESCRIPTION', delivery="tomorrow", backer_count=0, backer_limit=100,
+        next_step_votes=1):
 
     ''' Create a new contribution tier. If parent is None, do not put the object (for proposals).'''
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     tier = Tier(name=name, contribution_type=contribution_type, amount=amount, description=description,
-            delivery=delivery, backer_count=backer_count, backer_limit=backer_limit)
+            delivery=delivery, backer_count=backer_count, backer_limit=backer_limit,
+            next_step_votes=next_step_votes)
     parent_obj = None
     if parent_key:
         if hasattr(parent_key, 'key'):

@@ -506,7 +506,7 @@ class CoreWePayAPI(object):
                 action='w',
                 account=account.key,
                 note=note,
-                user=user,
+                user=user.key,
                 wepay_withdrawal_id=withdrawal_response['withdrawal_id'],
                 wepay_withdrawal_uri=withdrawal_response['withdrawal_uri'],
             )

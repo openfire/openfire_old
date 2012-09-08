@@ -21,9 +21,17 @@ class UserAccountController extends OpenfireController
             for btn in cancelPaymentBtns
                 btn.addEventListener('click', @cancelPayment, false)
 
+            refundPaymentBtns = document.getElementsByClassName('refund-payment')
+            for btn in refundPaymentBtns
+                btn.addEventListener('click', @refundPayment, false)
+
             updateAccountBalanceBtns = document.getElementsByClassName('update-account-balance')
             for btn in updateAccountBalanceBtns
                 btn.addEventListener('click', @updateAccountBalance, false)
+
+            startWithdrawalBtns = document.getElementsByClassName('start-withdrawal')
+            for btn in startWithdrawalBtns
+                btn.addEventListener('click', @generateWithdrawal, false)
 
 
 
@@ -67,6 +75,16 @@ class UserAccountController extends OpenfireController
                 failure: (error) =>
                     alert("failure!")
 
+        @refundPayment= () ->
+            $.apptools.api.payment.refund_payment(
+                "payment": this.id
+            ).fulfill
+                success: (response) =>
+                    alert("Success! Reloading page...")
+                    window.location.reload()
+                failure: (error) =>
+                    alert("failure!")
+
         @updateAccountBalance = () ->
             $.apptools.api.payment.update_account_balance(
                 "key": this.id
@@ -74,6 +92,19 @@ class UserAccountController extends OpenfireController
                 success: (response) =>
                     alert("Success! Reloading page...")
                     window.location.reload()
+                failure: (error) =>
+                    alert("failure!")
+
+        @generateWithdrawal = () ->
+            accountID = this.id
+            $.apptools.api.payment.withdraw_funds(
+                "account": accountID
+            ).fulfill
+                success: (response) =>
+                    $("#account-" + accountID).show()
+                    $("#account-" + accountID).html(response.wepay_withdrawal_uri)
+                    $("#account-" + accountID).attr('href', response.wepay_withdrawal_uri)
+
                 failure: (error) =>
                     alert("failure!")
 

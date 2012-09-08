@@ -1,4 +1,5 @@
 from protorpc import messages
+from openfire.messages.common import NextStepVote
 
 class AuthURL(messages.Message):
 
@@ -117,6 +118,7 @@ class BackProject(messages.Message):
     amount = messages.StringField(4)
     money_source = messages.StringField(5)
     new_cc = messages.MessageField(CreditCard, 6)
+    next_step_votes = messages.MessageField(NextStepVote, 7, repeated=True)
 
 
 class MoneySources(messages.Message):

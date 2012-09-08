@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 from openfire.core.payment.wepay import WePayAPI
-from openfire.core.payment.common import CorePaymentResponse, OFPaymentError
+from openfire.core.payment.common import CorePaymentResponse, OFPaymentError, OFPaymentFees
 from openfire.models.payment import Payment, WePayProjectAccount
 
 class CorePaymentAPI(object):
@@ -11,8 +11,13 @@ class CorePaymentAPI(object):
 
         ''' Calculate how much commission openfire should take from a particular pledge. '''
 
-        # TODO: Calculate our commission. For now just take $1.
-        return 1
+        # The total cut from the payment never goes below the TOTAL_CUT.
+        commission = (amount * OFPaymentFees['WEPAY_PERCENT']) + .3
+        total_cut = amount * OFPaymentFees['TOTAL_CUT']
+        if commission > total_cut:
+            # The commission is already above 4.75%, so don't take any more for right now.
+            return 0.0
+        return total_cut - commission
 
     def _calculate_goal_progress(self, goal):
 
@@ -150,11 +155,24 @@ class CorePaymentAPI(object):
 
         return WePayAPI.save_cc_for_user(user, cc_info)
 
-    def back_project(self, project, goal_key, tier_key, amount, money_source):
+    def back_project(self, project, goal, tier_key, amount, money_source):
 
         ''' Create a payment that records the contribution amount that will be charged if the project ignites. '''
 
         response = CorePaymentResponse()
+
+        # Make sure that the goal is open.
+        if not goal.funding_open:
+            response.error_code = OFPaymentError.OF_NO_ACTIVE_PROJECT_GOAL
+            response.error_message = 'This project does not have an active goal to contribute to.'
+            return response
+
+        account = self.account_for_project(project.key)
+        if not account:
+            response.error_code = OFPaymentError.OF_NO_PROJECT_COLLECTION_ACCOUNT
+            response.error_message = 'This project does not have a collection account set up to collect money.'
+            return response
+
         description = 'Contribution to %s' % project.name
         payment = Payment(
             amount=amount,
@@ -165,7 +183,7 @@ class CorePaymentAPI(object):
             from_money_source=money_source.key,
             to_project=project.key,
             to_account=self.account_for_project(project.key).key,
-            to_project_goal=goal_key,
+            to_project_goal=goal.key,
             to_project_tier=tier_key,
         )
         payment.put()

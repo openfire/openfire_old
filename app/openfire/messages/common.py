@@ -170,6 +170,14 @@ class NextSteps(messages.Message):
     steps = messages.MessageField(NextStep, 1, repeated=True)
 
 
+class NextStepVote(messages.Message):
+
+    ''' A nubmer of next step votes for a single next step. '''
+
+    key = messages.StringField(1)
+    num_votes = messages.IntegerField(2)
+
+
 class FutureGoal(messages.Message):
 
     ''' A big future goal. '''

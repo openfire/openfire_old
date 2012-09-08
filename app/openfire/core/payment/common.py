@@ -1,5 +1,12 @@
 from openfire.core import construct_enum
 
+
+OFPaymentFees = {
+    'TOTAL_CUT': .0475,             # openfire takes 4.75%
+    'WEPAY_PERCENT': .029,          # wepay takes 2.9%
+    'WEPAY_ADDITIONAL_CHARGE': .3,  # wepay also takes .30 cents.
+}
+
 OFPaymentError = construct_enum(
     'NONE',
     'UNKNOWN',
@@ -14,6 +21,8 @@ OFPaymentError = construct_enum(
     'WEPAY_CHECKOUT_CANCEL',
     'WEPAY_WITHDRAWAL_CREATE',
     'OF_FAILED_IMMEDIATE_CHARGE',
+    'OF_NO_ACTIVE_PROJECT_GOAL',
+    'OF_NO_PROJECT_COLLECTION_ACCOUNT',
 )
 
 

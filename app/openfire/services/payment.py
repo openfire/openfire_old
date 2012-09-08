@@ -123,6 +123,12 @@ class PaymentService(RemoteService):
         if not project:
             raise self.exceptions.ApplicationError('No project found.')
 
+        if not project.active_goal:
+            raise self.exceptions.ApplicationError('No active goal set for this project.')
+        goal = project.active_goal.get()
+        if not goal:
+            raise self.exceptions.ApplicationError('No active goal found for this project.')
+
         # If no money source is given, save the cc info as a money source first.
         if not request.money_source and request.new_cc:
             save_cc_response = PaymentAPI.save_user_cc(self.user, request.new_cc)
@@ -134,12 +140,30 @@ class PaymentService(RemoteService):
         else:
             raise self.exceptions.ApplicationError('No money source provided.')
 
-        # Make a record of the payment amount to be charged if the projects ignites.
-        payment_response = PaymentAPI.back_project(project, project.active_goal,
-                ndb.Key(urlsafe=request.tier), float(request.amount), money_source)
-        if not payment_response.success:
-            raise self.exceptions.ApplicationError('There was an error: ' + payment_response.error_message)
-        return Echo(message='Thanks for contributing!')
+        # Call the core API to back the project.
+        try:
+            payment_response = PaymentAPI.back_project(project, goal,
+                    ndb.Key(urlsafe=request.tier), float(request.amount), money_source)
+            if not payment_response.success:
+                raise self.exceptions.ApplicationError('There was an error: ' + payment_response.error_message)
+        except Exception as e:
+            # TODO: Let's have a catch all for now that we can email to ourselves
+            #       in case anything goes wrong while backing a project. So, remove this
+            #       from what the user sees and log/email the error.
+            raise self.exceptions.ApplicationError('Failed to donate to project. Please again. ADMIN: ' + e.message)
+
+        # Save the next step votes if there are any.
+        all_votes_recorded= True
+        if request.next_step_votes:
+            for vote in request.next_step_votes:
+                step = ndb.Key(urlsafe=vote.key).get()
+                if not step:
+                    all_votes_recorded = False
+                elif vote.num_votes > 0:
+                    step.votes = step.votes + vote.num_votes
+                    step.put()
+
+        return Echo(message='Thanks for contributing! (all votes recorded? %s)' % all_votes_recorded)
 
     @remote.method(payment_messages.MoneySources, payment_messages.MoneySources)
     def money_sources(self, request):

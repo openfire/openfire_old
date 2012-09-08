@@ -14,6 +14,8 @@ from openfire.models.assets import Avatar, Video
 # Pipeline Classes
 from openfire.pipelines.model import project as pipelines
 
+import datetime
+
 
 _default_contribution_type = ndb.Key('ContributionType', 'money')
 
@@ -67,10 +69,17 @@ class Goal(AppModel):
     amount_pledged = ndb.FloatProperty('ar', indexed=True, default=0.0)
     amount_processed = ndb.FloatProperty('ap', indexed=True, default=0.0)
 
-    # Funding and deliverable deadlines.
+    # Funding status, limits, and exact times.
+    funding_open = ndb.BooleanProperty('fo', indexed=True, default=False)
+    funding_day_limit = ndb.IntegerProperty('fl', indexed=True, choices=range(15, 101))
     funding_deadline = ndb.DateTimeProperty('fd', indexed=True)
+    funding_start = ndb.DateTimeProperty('fs', indexed=True, required=False)
+    funding_end = ndb.DateTimeProperty('fe', indexed=True, required=False)
+
+    # Deliverable and deadline.
     deliverable_description = ndb.TextProperty('ds', indexed=True)
     deliverable_date = ndb.DateTimeProperty('dt', indexed=True)
+    deliverable_complete = ndb.BooleanProperty('dc', indexed=True, default=False)
 
     # Donation tiers for this goal and potential next steps.
     tiers = ndb.KeyProperty('tr', repeated=True)
@@ -80,6 +89,27 @@ class Goal(AppModel):
     igniting_payments = ndb.KeyProperty('ip', repeated=True)
     extra_payments = ndb.KeyProperty('ep', repeated=True)
     successful_payments = ndb.KeyProperty('sp', repeated=True)
+
+    def open_goal(self):
+
+        ''' Set the funding start to now and set the funding deadline
+        to funding limit days from now, then open the goal.
+        '''
+
+        now = datetime.datetime.now()
+        self.funding_start = now
+        self.funding_deadline = now + datetime.timedelta(days=self.funding_day_limit)
+        self.funding_open = True
+        self.put()
+
+    def close_goal(self):
+
+        ''' Set the goal to closed and note the time. '''
+
+        now = datetime.datetime.now()
+        self.funding_end = now
+        self.funding_open = False
+        self.put()
 
 
 ## Goal Next Step

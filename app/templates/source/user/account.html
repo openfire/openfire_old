@@ -22,6 +22,8 @@
                             <span class="wepay-account-name">{{ account_dict['account'].name }}</span>
                             <span class="wepay-account-balance">${{ account_dict['account'].balance }}</span>
                             <button id="{{ account_dict['account'].key.urlsafe() }}" class="update-account-balance">update</button>
+                            <button id="{{ account_dict['account'].key.urlsafe() }}" class="start-withdrawal">withdraw</button>
+                            <span><a href="" id="account-{{ account_dict['account'].key.urlsafe() }}"></a></span>
                             <div>
                                 <h4>{{ account_dict['account'].name }} payment history</h4>
                                 <table border="1">
@@ -39,6 +41,7 @@
                                             <td>{{ payment.status }}</td>
                                             <td>
                                                 <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
+                                                <button id="{{ payment.key.urlsafe() }}" class="refund-payment">Refund</button>
                                             </td>
                                         </tr>
                                         {% else %}
