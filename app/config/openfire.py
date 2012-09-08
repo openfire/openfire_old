@@ -374,3 +374,9 @@ config['openfire.wepay'] = {
     },
 
 }
+
+config['openfire.services.BetaService'] = {
+
+    'debug': True
+
+}
