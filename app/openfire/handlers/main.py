@@ -14,13 +14,19 @@ from webapp2_extras.security import generate_random_string
 
 class Placeholder(WebHandler):
 
-	''' openfire placeholder! '''
+    ''' openfire placeholder! '''
 
-	def get(self):
+    def _make_services_object(self, services):
 
-		''' Return a rendered submission form. '''
+        ''' Return only the beta signup method/service. '''
 
-		return self.render('main/placeholder.html', token=generate_random_string(32))
+        return [['beta', ['signup'], {'caching': False}]]
+
+    def get(self):
+
+        ''' Return a rendered submission form. '''
+
+        return self.render('main/placeholder.html', token=generate_random_string(32))
 
 
 class Landing(WebHandler):

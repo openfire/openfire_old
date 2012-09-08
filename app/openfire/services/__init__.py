@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# protorpc/webapp2
+import webapp2
+from protorpc import remote
+
 # apptools imports
 from apptools import BaseService
-from apptools.util import debug
+from apptools.util import debug, datastructures
 
 # sdk imports
 from google.appengine.ext import ndb
@@ -20,6 +24,12 @@ from openfire.core.data.namespacing import NamespaceBridge
 class RemoteService(BaseService, SessionsBridge, ContentBridge, NamespaceBridge):
 
     ''' Abstract parent for all openfire services. '''
+
+    exceptions = datastructures.DictProxy({
+
+        'ApplicationError': remote.ApplicationError
+
+    })
 
     def initialize(self):
 
