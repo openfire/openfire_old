@@ -317,3 +317,19 @@
 
       p
         display: block !important
+
+span
+  &.loading
+    &.spinner
+      line-height: 20px
+      display: inline-block
+      vertical-align: middle
+      margin: 10px
+      padding: 0
+      height: 21px
+      width: 18px
+      -webkit-animation:
+        name: rotate
+        duration: 0.5s
+        timing-function: linear
+        iteration-count: infinite

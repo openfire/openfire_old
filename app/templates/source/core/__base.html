@@ -138,7 +138,7 @@
 {% block pageready %}
 <script id='js-deferred' type='text/javascript' data-role='pageready'>
 {%- block pre_pageready -%}{% endblock pre_pageready %}
-_.ready(function (window) {
+(function () { return _.ready(function (window) {
 	var _gaq = _gaq || [], _gat = _gat || {}, _cfgst = 'js-config', _dfrst = 'js-deferred', _dfeln = 'script', _dfelt = 'text/javascript',
 		_ofjscfg = document.getElementById(_cfgst), _ofdfrd = document.getElementById(_dfrst), _ofinject = document.createDocumentFragment(),
 		{%- block pageready_js -%}
@@ -153,7 +153,7 @@ _.ready(function (window) {
 		undefined = _ofdfrd.parentElement.appendChild(_ofinject);
 		{%- endblock jsinject -%}
 		{%- block post_jsready -%}{% endblock post_jsready %}{% endblock pageready_js %}
-});
+})}).call(this);
 {% block post_pageready %}{%- endblock post_pageready -%}
 </script>
 {% endblock pageready %}

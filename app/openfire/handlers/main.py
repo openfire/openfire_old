@@ -33,7 +33,7 @@ class Landing(WebHandler):
 
     ''' openfire landing page. '''
 
-    template = 'main/landing.html'
+    #template = 'main/landing.html'
     projects_per_page = 6
     activity_per_page = 10
 
@@ -41,7 +41,7 @@ class Landing(WebHandler):
 
         ''' Render landing.html or landing_noauth.html. '''
 
-        if config.get('openfire').get('disabled') == True:
+        if config.get('openfire.placeholder').get('enabled') == True:
              return Placeholder(self.request, self.response).get()
 
         ## fully cached page context
