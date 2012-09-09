@@ -1,9 +1,10 @@
 @import "compass/utilities/sprites/sprite-img"
 @import "compass/css3/images"
 
+@import _core/_base
 @import _core/config
-@import _core/_fonts.sass
-@import _partials/social.sass
+@import _core/_fonts
+@import _partials/social
 
 a
   color: #15C !important
@@ -88,7 +89,7 @@ h4
 
 #placeholder
   background-color: #fff
-  height: 255px
+  height: 200px
   width: 715px
   text-align: center
   margin-top: -175px
@@ -105,6 +106,61 @@ h4
     background: transparent url('https://d2ipw8y1masjpy.cloudfront.net/static/branding/openfire_transparent_optimized.png') no-repeat 50% 0%
     height: 173px
     z-index: 100
+
+  .notification
+    opacity: 0
+    -webkit-transition-property: opacity, height
+    -webkit-transition-duration: 0.4s
+    font-family: 'Karla'
+    text-transform: uppercase
+    position: absolute
+    top: 0
+    right: 0
+    left: 0
+    border-top-left-radius: 5px
+    border-top-right-radius: 5px
+    height: 0
+    line-height: 30px
+    overflow: hidden
+
+    &.active
+      opacity: 1
+      height: 30px
+
+  #emailform
+    position: absolute
+    top: 85px
+    left: 0
+    right: 0
+
+    form
+
+      input[type="text"], input[type="email"]
+        -webkit-transition-property: background, opacity
+        height: 35px
+        width: 225px
+        font-size: 14px
+        text-transform: uppercase
+        font-family: 'Karla', Verdana, Arial, sans-serif
+        padding-left: 10px
+        padding-right: 10px
+        margin-left: 5px
+        margin-right: 5px
+
+      #putsignup
+        height: 40px
+        border: none
+        padding: 10px
+        border-radius: 5px
+        font-family: 'momentron'
+        text-transform: uppercase
+        position: relative
+        top: -2px
+        -webkit-transition-property: background-color
+
+        &.active
+          font-family: 'Karla', Verdana, Arial, sans-serif
+          background-color: #FBB041
 
 .logobox
   margin-top: 10%

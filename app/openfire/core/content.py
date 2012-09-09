@@ -821,7 +821,7 @@ class ContentBridge(object):
             filters = {
                 'currency': lambda x: self._format_as_currency(x, False),
                 'percentage': lambda x: self._format_as_currency(x, True),
-                'json': json.dumps
+                'json': self.AppToolsJSONEncoder().encode
             }
 
             # generate environment

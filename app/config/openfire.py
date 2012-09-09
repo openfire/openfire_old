@@ -11,7 +11,46 @@ config = {}
 config['openfire'] = {
 
     'version': '0.2-alpha',
-    'disabled': True
+
+}
+
+config['openfire.placeholder'] = {
+
+    'enabled': True,  # show placeholder instead of landing
+    'force': True,  # show placeholder for logged in users, too
+
+    'signup': {
+
+        'debug': True,  # enable logging for triggered pipelines
+
+        'mailchimp': {
+            'enabled': True,  # enable mailchimp integration,
+            'apikey': '',  # mailchimp apikey
+            'listid': ''  # list id to sign beta users up to
+        }
+
+    }
+
+}
+
+config['openfire.notifications'] = {
+
+    'transports': {
+
+        'email': {
+            'enable': True,
+            'sender': 'welcomekitty@openfi.re'
+        }
+
+    },
+
+    'index': {
+
+        'beta_welcome': {
+            'subject': 'Thanks for signing up for updates!'
+        }
+
+    }
 
 }
 
@@ -378,5 +417,11 @@ config['openfire.wepay'] = {
 config['openfire.services.BetaService'] = {
 
     'debug': True
+
+}
+
+config['openfire.pipelines.integration.mailchimp.MailChimpEmailEntry'] = {
+
+    'debug': True,
 
 }

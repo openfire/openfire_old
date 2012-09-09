@@ -5,18 +5,41 @@
 	{% block loginsplash %}
 	<div id='placeholder' class="rounded-big center-all">
 
+		<!-- placeholder success/error cues -->
+		<div id='placeholder-error' class='error notification'>Oh noes! Something went wrong! Please reload the page and try again.</div>
+		<div id='placeholder-success' class='yay notification'>Thanks! Your signup has been received. Check your email!</div>
+
+		<!-- placeholder email/name submission -->
 		<div id="emailform">
-			<form action="{{ link('landing') }}" method='post'>
-				<input id='email' type='email' placeholder='email address' />
-				<input id='name' type='text' placeholder='your name' />
-                {#
+			<form id='placeholder-form' action="{{ link('landing') }}" method='post'>
+				<input required id='name' type='text' placeholder='your name' />
+				<input required id='email' type='email' placeholder='email address' />
 				<input id='token' type='hidden' value='{{ util.converters.base64.b64encode(token) }}' />
-                #}
-				<input id='putsignup' type='submit' value='Sign up!' />
-			</form>
+				<button id='putsignup' class='active'>
+					<span class='karlabold' id='submittext'>Sign up!</span>
+				</button><!-- end #putsignup -->
+			</form><!-- end #placeholder-form -->
 		</div><!-- end #login_wrapper -->
 
 	</div><!-- end #splash -->
 	{% endblock %}
 
 {% endblock %}
+
+{% block jsready %}
+		ofpl_id = 'placeholder', ofpl = document.getElementById([ofpl_id, 'form'].join('-')), ofnm = ofpl.firstChild.nextSibling,
+		ofem = ofnm.nextElementSibling, oftk = ofnm.nextElementSibling, ofsb = oftk.nextElementSibling, of_pl_cb = {},
+		oferr = document.getElementById([ofpl_id, 'error'].join('-')), ofyay = oferr.nextSibling, of_pl_success = of_pl_cb.success =
+		function (response) { ofyay = document.getElementById('placeholder-success'); ofyay.classList.add('active');
+		ofsb.innerHTML = "&#xf0012;"; console.log('Signup successful.', response); }, of_pl_failure = of_pl_cb.failure =
+		function (response) { oferr = document.getElementById('placeholder-error'); if (response.error_message) {
+		oferr.innerHTML = response.error_message; } ofsb.removeAttribute('disabled'); ofsb.innerHTML = "&#xf0013;";
+		oferr.classList.add('active'); ofem.removeAttribute('disabled'); ofnm.removeAttribute('disabled'); setTimeout(function () {
+		ofsb.removeAttribute('disabled'); ofsb.className = 'active'; ofsb.innerHTML = "Try again!"; ofsb.removeAttribute('disabled');
+		}, 800); }, ofpl_sb = ofpl.onsubmit = ofsb.onclick = function (event) { event.preventDefault(); event.stopPropagation();
+		if (!ofem.value || !ofnm.value) { oferr.innerHTML = "There was some missing information. Please try again!";
+		oferr.classList.add('active'); } else { ofsb.classList.remove('active'); ofsb.innerHTML = "&#xf0043;";
+		ofsb.className = [ofsb.className, 'momentron', 'loading', 'spinner'].join(' '); ofsb.setAttribute('disabled', 'disabled');
+		ofem.setAttribute('disabled', 'disabled'); ofnm.setAttribute('disabled', 'disabled');
+		$.apptools.api.beta.signup({email: ofem.value, name: ofnm.value, token: oftk.value}).fulfill(of_pl_cb); } },
+{%- endblock jsready -%}
