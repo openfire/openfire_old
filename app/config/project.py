@@ -20,7 +20,7 @@ config['apptools.project'] = {
         'major': 0,
         'minor': 2,
         'micro': 0,
-        'build': 20120712,
+        'build': 20120911,
         'release': 'ALPHA'
     }
 
@@ -51,8 +51,8 @@ config['apptools.project.output'] = {
         },
         'webclient':{
             'dev': 'https://ssl.google-analytics.com/u/ga_debug.js',
-            'http': 'http://www.google-analytics.com/ga.js',
-            'https': 'https://ssl.google-analytics.com/ga.js'
+            'http': 'https://deliver.openfi.re/analytics/ga.js',
+            'https': 'https://deliver.openfi.re/analytics/ga.js'
         }
     },
 
@@ -62,7 +62,7 @@ config['apptools.project.output'] = {
     },
 
     'assets': {  # Asset API
-        'minified': False,        # whether to switch to minified assets or not
+        'minified': True,        # whether to switch to minified assets or not
         'serving_mode': 'local',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
         'cdn_prefix': ['d2d3v83fgqizie.cloudfront.net']          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
     },
@@ -70,7 +70,7 @@ config['apptools.project.output'] = {
     'headers': {  # Default Headers (only supported headers are shown)
         'Cache-Control': 'no-cache',  # default to not caching dynamic content
         'X-UA-Compatible': 'IE=edge,chrome=1',  # http://code.google.com/chrome/chromeframe/
-        'Access-Control-Allow-Origin': '*'      # allow crossdomain access from anywhere
+        'Access-Control-Allow-Origin': '*.openfi.re *.lyr9.net beta.openfi.re staging.openfi.re'      # allow crossdomain access from anywhere
     }
 
 }

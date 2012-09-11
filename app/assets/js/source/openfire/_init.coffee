@@ -177,11 +177,11 @@ window.Openfire = Openfire
 window.openfire = new Openfire(window)
 
 # if jQuery's around, extend it with openfire
-if $?
+if window.jQuery?
     $.extend openfire: window.openfire
 
 # otherwise, we got this on lock.
 else
-
-    window.$ = (id) -> if window.Util? then window._.get(id) else document.getElementById(id)
+    if not window.$?
+        window.$ = {}
     window.$.openfire = window.openfire

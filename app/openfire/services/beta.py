@@ -65,6 +65,7 @@ class BetaService(RemoteService):
             if any(map(lambda x: x in frozenset([None, False, '']) and True or False, [request.name, request.email])):
                 raise BetaService.MissingDataException('One or more required fields were left empty.')
             else:
+                request.email = str(request.email).lower()
                 if self.api.mail.is_email_valid(request.email):
                     b64_email = base64.b64encode(hashlib.sha256(request.email).hexdigest())
                 else:
@@ -72,17 +73,17 @@ class BetaService(RemoteService):
 
                 # Generate signup token
                 signup_token = security.generate_random_string(32)
-                b64_encoded_token = base64.b64encode(hashlib.sha512(signup_token).hexdigest())
+                b64_encoded_token = base64.b64encode(hashlib.sha256(signup_token).hexdigest())
 
                 existing = models.Signup.get_by_id(b64_email)
                 if existing is None:
 
                     # Calculate name
-                    namesplit = request.name.split(' ')[0]
-                    if request.name.split(' ') > 1:
-                        firstname, lastname = namesplit[0], namesplit[1]
+                    if ' ' in request.name:
+                        namesplit = request.name.split(' ')
+                        firstname, lastname = str(namesplit[0]).capitalize(), str(namesplit[1]).capitalize()
                     else:
-                        firstname, lastname = namesplit[0], None
+                        firstname, lastname = str(request.name).capitalize(), None
 
                     # Generate signup key to avoid 2-step datastore commit
                     signup_key = ndb.Key(models.Signup, b64_email)
