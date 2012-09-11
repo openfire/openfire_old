@@ -26,7 +26,8 @@ _compiled_config = None
 
 ## Check if we're running the app server, set strict mode
 strict = False
-debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
+#debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
+debug = False
 
 
 """

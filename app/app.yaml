@@ -1,4 +1,4 @@
-application: open-fire
+application: open-fire-staging
 version: placeholder
 runtime: python27
 api_version: 1
