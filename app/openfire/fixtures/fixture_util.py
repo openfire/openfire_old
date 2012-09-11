@@ -228,22 +228,26 @@ def create_category(slug='test', name='Test Category', description='some txt', k
 
 
 def create_goal(parent_key=None, contribution_type_id='fake', amount=1, description='DESCRIPTION',
-        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE', slug='SLUG',
-        funding_open=True):
+        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE',
+        slug='SLUG', funding_open=True, approved=True, rejected=False):
 
     ''' Create a new funding goal. If parent is None, do not put the object (for proposals).'''
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     goal = Goal(contribution_type=contribution_type, amount=amount, description=description,
             backer_count=backer_count, progress=progress, met=met, parent=parent_key,
-            deliverable_description=deliverable_description, funding_open=funding_open)
+            deliverable_description=deliverable_description, funding_open=funding_open,
+            approved=approved, rejected=rejected)
     parent_obj = None
     if parent_key:
         goal.parent = parent_key
         goal.put()
         parent_obj = parent_key.get()
         if parent_obj:
-            parent_obj.active_goal = goal.key
+            if met:
+                parent_obj.completed_goals.append(goal.key)
+            else:
+                parent_obj.active_goal = goal.key
             parent_obj.put()
     if tiers:
         tier_list = []
@@ -270,7 +274,7 @@ def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amoun
         tier.parent = parent_key
         tier.put()
         parent_obj = parent_key.get()
-        if parent_obj:
+        if parent_obj and hasattr(parent_obj, 'tiers'):
             parent_obj.tiers.append(tier.key)
             parent_obj.put()
     return tier

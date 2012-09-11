@@ -6,6 +6,7 @@ import config
 import webapp2
 import datetime
 import os
+import re
 
 # AppTools Imports
 from apptools.util import debug
@@ -266,12 +267,17 @@ class MessageConverterMixin(ModelMixin):
                             continue
 
                 except:
-                    # TODO: Handle other errors here?
                     try:
-                        key = ndb.key.Key(urlsafe=getattr(message, k))
-                        setattr(self, str(k), key)
-                    except TypeError:
-                        continue
+                        # Is it an iso-formatted date?
+                        date = datetime.datetime(*map(int, re.split('[^\d]', getattr(message, k))[:-1]))
+                        setattr(self, str(k), date)
+                    except (TypeError, ValueError):
+                        # TODO: Handle other errors here?
+                        try:
+                            key = ndb.key.Key(urlsafe=getattr(message, k))
+                            setattr(self, str(k), key)
+                        except TypeError:
+                            continue
                 else:
                     continue
         return self

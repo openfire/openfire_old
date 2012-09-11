@@ -6,7 +6,7 @@ from openfire.services import RemoteService
 from openfire.messages import project as project_messages
 from openfire.messages import common as common_messages
 from openfire.messages import media as media_messages
-from openfire.models.project import Project, Tier, Goal
+from openfire.models.project import Project, Tier, Goal, NextStep
 from openfire.core.matcher import CoreMatcherAPI
 
 
@@ -230,11 +230,25 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Could not find goal.')
         return goal.to_message()
 
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def active_goal(self, request):
+
+        ''' Return the active goal for a project. '''
+
+        project_key = ndb.Key(urlsafe=self.decrypt(request.project))
+        project = project_key.get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to get active goal for.')
+
+        if not project.active_goal:
+            raise remote.ApplicationError('No active goal has been set for this project.')
+
+        return project.active_goal.get().to_message()
 
     @remote.method(common_messages.GoalRequest, common_messages.Goals)
-    def list_goals(self, request):
+    def completed_goals(self, request):
 
-        ''' List all goals for a project. '''
+        ''' List all completed goals for a project. '''
 
         project_key = ndb.Key(urlsafe=self.decrypt(request.project))
         project = project_key.get()
@@ -242,12 +256,27 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Failed to find project to list goals for.')
 
         messages = []
-        for goal in project.goals:
+        for goal in project.completed_goals:
             goal_obj = goal.get()
             if goal_obj:
                 messages.append(goal_obj.to_message())
         return common_messages.Goals(goals=messages)
 
+    @remote.method(common_messages.GoalRequest, common_messages.FutureGoal)
+    def future_goal(self, request):
+
+        ''' Return the future goal for a project. '''
+
+        project_key = ndb.Key(urlsafe=self.decrypt(request.project))
+        project = project_key.get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to get future goal for.')
+
+        future_goal_key = project.future_goal
+        if not future_goal_key:
+            raise remote.ApplicationError('No future goal has been set for this project.')
+
+        return future_goal_key.get().to_message()
 
     @remote.method(common_messages.Goal, common_messages.Goal)
     def put_goal(self, request):
@@ -273,11 +302,27 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Failed to create goal or find goal to edit.')
 
         # Update the goal.
+        # TODO: Exclude some fields so users can't update things like status and amount.
         goal.mutate_from_message(request)
         goal.put()
-
         return goal.to_message()
 
+    @remote.method(common_messages.FutureGoal, common_messages.FutureGoal)
+    def put_future_goal(self, request):
+
+        ''' Edit the future goal for a project. '''
+
+        if not request.key:
+            raise remote.ApplicationError('Provided no future goal key.')
+
+        future_goal_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        future_goal = future_goal_key.get()
+        if not future_goal:
+            raise remote.ApplicationError('Provided bad future goal key.')
+
+        future_goal.mutate_from_message(request)
+        future_goal.put()
+        return future_goal.to_message()
 
     @remote.method(common_messages.GoalRequest, Echo)
     def delete_goal(self, request):
@@ -288,9 +333,82 @@ class ProjectService(RemoteService):
         goal_key.delete()
         return Echo(message='OK')
 
+    @remote.method(common_messages.ProposeGoal, common_messages.Goal)
+    def propose_goal(self, request):
+
+        ''' Propose a new goal for a project. '''
+
+        if not request.project:
+            raise remote.ApplicationError('No project to propose goal for.')
+        project = ndb.Key(urlsafe=request.project).get()
+        if not project:
+            raise remote.ApplicationError('Could not find project to propose goal for.')
+
+        goal = Goal(parent=project.key, approved=False)
+        goal.mutate_from_message(request)
+        goal.put()
+        return goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goals)
+    def proposed_goals(self, request):
+
+        ''' List all proposed goals for a project. '''
+
+        project_key = ndb.Key(urlsafe=self.decrypt(request.project))
+        project = project_key.get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to list proposed goals for.')
+
+        messages = []
+        goals = Goal.query(Goal.approved == False, ancestor=project_key).fetch()
+        for goal in goals:
+            messages.append(goal.to_message())
+        return common_messages.Goals(goals=messages)
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def approve_goal(self, request):
+
+        ''' Approve a goal and set it as the active goal. '''
+
+        if not request.key:
+            raise remote.ApplicationError('No goal to approve.')
+        new_goal = ndb.Key(urlsafe=request.key).get()
+        project = new_goal.parent.get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to approve goal for.')
+
+        if project.active_goal:
+            # If there was an active goal, make sure it is closed and move it to completed.
+            active_goal = project.active_goal.get()
+            if not active_goal:
+                raise remote.ApplicationError('Internal error: bad active goal key.')
+
+            if active_goal.funding_open:
+                active_goal.close_goal()
+            project.completed_goals.append(project.active_goal)
+
+        new_goal.approved = True
+        new_goal.put()
+        project.active_goal = new_goal.key
+        project.put()
+        return new_goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def reject_goal(self, request):
+
+        ''' Reject a request for a new goal. '''
+
+        if not request.key:
+            raise remote.ApplicationError('No goal to reject.')
+        goal = ndb.Key(urlsafe=request.key).get()
+        goal.approved = False
+        goal.rejected = True
+        goal.put()
+        return goal.to_message()
+
 
     #############################################
-    # Project Tiers
+    # Project Goal Tiers
     #############################################
 
     @remote.method(common_messages.TierRequest, common_messages.Tier)
@@ -304,29 +422,28 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Could not find tier.')
         return tier.to_message()
 
-
     @remote.method(common_messages.TierRequest, common_messages.Tiers)
     def list_tiers(self, request):
 
-        ''' List all tiers for a project. '''
+        ''' List all tiers for a project goal. '''
 
-        project_key = ndb.Key(urlsafe=self.decrypt(request.project))
-        project = project_key.get()
-        if not project:
-            raise remote.ApplicationError('Failed to find project to list tiers for.')
+        if not request.goal:
+            raise remote.ApplicationError('No goal provided to list tiers for.')
+        goal = ndb.Key(urlsafe=self.decrypt(request.goal)).get()
+        if not goal:
+            raise remote.ApplicationError('Failed to find goal to list tiers for.')
 
         messages = []
-        for tier in project.tiers:
+        for tier in goal.tiers:
             tier_obj = tier.get()
             if tier_obj:
                 messages.append(tier_obj.to_message())
         return common_messages.Tiers(tiers=messages)
 
-
     @remote.method(common_messages.Tier, common_messages.Tier)
     def put_tier(self, request):
 
-        ''' Create or edit a project tier. '''
+        ''' Create or edit a project goal tier. '''
 
         if not request.target:
             raise remote.ApplicationError('No target to attach tier to.')
@@ -352,12 +469,91 @@ class ProjectService(RemoteService):
 
         return tier.to_message()
 
-
     @remote.method(common_messages.TierRequest, Echo)
     def delete_tier(self, request):
 
-        ''' Delete a project tier. '''
+        ''' Delete a project goal tier. '''
 
         tier_key = ndb.Key(urlsafe=self.decrypt(request.key))
         tier_key.delete()
         return Echo(message='OK')
+
+
+    #############################################
+    # Project Goal Next Steps
+    #############################################
+
+    @remote.method(common_messages.NextStep, common_messages.NextStep)
+    def get_next_step(self, request):
+
+        ''' Get a project next step. '''
+
+        next_step_key = ndb.Key(urlsafe=self.decrypt(request.key))
+        next_step = next_step_key.get()
+        if not next_step:
+            raise remote.ApplicationError('Could not find next step.')
+        return next_step.to_message()
+
+    @remote.method(common_messages.NextSteps, common_messages.NextSteps)
+    def list_next_steps(self, request):
+
+        ''' List all next steps for a project goal. '''
+
+        if not request.goal:
+            raise remote.ApplicationError('No goal provided to list next steps for.')
+        goal = ndb.Key(urlsafe=self.decrypt(request.goal)).get()
+        if not goal:
+            raise remote.ApplicationError('Failed to find goal to list next steps for.')
+
+        messages = []
+        for next_step in goal.next_steps:
+            next_step_obj = next_step.get()
+            if next_step_obj:
+                messages.append(next_step_obj.to_message())
+        return common_messages.NextSteps(next_steps=messages)
+
+    @remote.method(common_messages.NextStep, common_messages.NextStep)
+    def put_next_step(self, request):
+
+        '''
+        Create or edit a project next step.
+        Accepts either a next step key for edit, or a goal key for add.
+        '''
+
+        if not request.key:
+            raise remote.ApplicationError('No goal or key for next step to.')
+        next_step = None
+        goal = None
+        key = ndb.Key(urlsafe=request.key)
+        if key.kind() == 'NextStep':
+            next_step = key.get()
+            if not next_step:
+                raise remote.ApplicationError('Bad next step key.')
+
+        elif key.kind() == 'Goal':
+            goal = key.get()
+            if not goal:
+                raise remote.ApplicationError('Bad goal for next step.')
+
+        else:
+            raise remote.ApplicationError('Invalid key.')
+
+        if not next_step:
+            next_step = NextStep(parent=goal.key)
+
+        if not next_step:
+            raise remote.ApplicationError('Failed to create next step or find next step to edit.')
+
+        # Update the next_step and return it.
+        next_step.mutate_from_message(request)
+        next_step.put()
+        return next_step.to_message()
+
+    @remote.method(common_messages.NextStep, Echo)
+    def delete_next_step(self, request):
+
+        ''' Delete a project next_step. '''
+
+        next_step_key = ndb.Key(urlsafe=request.key)
+        next_step_key.delete()
+        return Echo(message='Success')

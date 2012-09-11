@@ -55,6 +55,8 @@ class Goal(AppModel):
     slug = ndb.StringProperty('sl', indexed=True)
     target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
+    approved = ndb.BooleanProperty('aa', default=False)
+    rejected = ndb.BooleanProperty('rj', default=False)
 
     # Description and stats.
     description = ndb.TextProperty('d', indexed=False)
@@ -72,7 +74,7 @@ class Goal(AppModel):
     # Funding status, limits, and exact times.
     funding_open = ndb.BooleanProperty('fo', indexed=True, default=False)
     funding_day_limit = ndb.IntegerProperty('fl', indexed=True, choices=range(15, 101))
-    funding_deadline = ndb.DateTimeProperty('fd', indexed=True)
+    funding_deadline = ndb.DateTimeProperty('fd', indexed=True, required=False)
     funding_start = ndb.DateTimeProperty('fs', indexed=True, required=False)
     funding_end = ndb.DateTimeProperty('fe', indexed=True, required=False)
 

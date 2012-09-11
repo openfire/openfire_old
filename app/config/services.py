@@ -209,7 +209,12 @@ config['apptools.project.services'] = {
         'project': {
             'enabled': True,
             'service': 'openfire.services.project.ProjectService',
-            'methods': ['get', 'list', 'put', 'go_live', 'delete', 'comment', 'comments', 'post', 'posts', 'media', 'follow', 'followers', 'backers', 'suspend', 'shutdown', 'get_tier', 'list_tiers', 'put_tier', 'delete_tier', 'get_goal', 'list_goals', 'put_goal', 'delete_goal'],
+            'methods': ['get', 'list', 'put', 'go_live', 'delete', 'comment', 'comments',
+                        'post', 'posts', 'media', 'follow', 'followers', 'backers', 'suspend',
+                        'shutdown', 'get_tier', 'list_tiers', 'put_tier', 'delete_tier', 'get_goal',
+                        'active_goal', 'completed_goals', 'future_goal', 'put_goal', 'put_future_goal',
+                        'delete_goal', 'propose_goal', 'proposed_goals', 'approve_goal', 'reject_goal',
+                        'get_next_step', 'list_next_steps', 'put_next_step', 'delete_next_step'],
 
             'config': {
                 'caching': 'none',

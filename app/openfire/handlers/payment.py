@@ -43,7 +43,9 @@ class WePayIPNHandler(WebHandler):
             response = PaymentAPI.payment_updated(int(checkout_id))
         if withdrawal_id:
             response = PaymentAPI.withdrawal_updated(int(withdrawal_id))
-        if not response.success:
+        if not response:
+            self.logging.warning('[WePay IPN Callback] No checout id or withdrawal ID given to IPN callback.')
+        elif not response.success:
             self.logging.error('[WePay IPN Callback] Failure: ' + response.error_message)
         return response
 
