@@ -400,6 +400,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
         ''' Return available methods '''
 
+        for k, v in self.baseHeaders.items():
+            self.response.headers[k] = v
         return self.response.write(','.join([i for i in frozenset(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']) if hasattr(self, i.lower())]))
 
 

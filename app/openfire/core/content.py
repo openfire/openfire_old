@@ -607,6 +607,7 @@ class CoreContentAPI(CoreAPI):
     def render(self, template, context):
 
         ''' Render a template, given context '''
+
         if template is None:
             raise ValueError('Must pass in a template object or path to template source or an iterable of those.')
         else:
@@ -877,9 +878,8 @@ class ContentBridge(object):
                 self.context = context
 
             # Build response headers
-            response_headers = {}
             for key, value in self.baseHeaders.items():
-                response_headers[key] = value
+                self.response.headers[key] = value
 
             # Consider kwargs
             if len(kwargs) > 0:
