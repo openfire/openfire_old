@@ -14,9 +14,9 @@ config['layer9.appfactory'] = {
 	'logging': False,
 
 	'control': {
-	 	'endpoint': {},
-	 	'beacon': {}
-	}	
+		'endpoint': {},
+		'beacon': {}
+	}
 
 }
 

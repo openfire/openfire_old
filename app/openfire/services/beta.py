@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 # base imports
-import base64, config, webapp2
-from apptools.util import debug
+import base64, config, webapp2, hashlib
 from openfire.services import RemoteService
+from apptools.util import debug
+from webapp2_extras import security
 
 # protorpc imports
 from protorpc import remote, message_types
@@ -61,10 +62,18 @@ class BetaService(RemoteService):
 
         try:
 
-            if any(map(lambda x: x in frozenset([None, False, '']) and True or False, [request.name, request.email, request.token])):
+            if any(map(lambda x: x in frozenset([None, False, '']) and True or False, [request.name, request.email])):
                 raise BetaService.MissingDataException('One or more required fields were left empty.')
             else:
-                b64_email = base64.b64encode(request.email)
+                if self.api.mail.is_email_valid(request.email):
+                    b64_email = base64.b64encode(hashlib.sha256(request.email).hexdigest())
+                else:
+                    raise self.exceptions.InvalidEmailException("The email you provided isn't valid for some reason!")
+
+                # Generate signup token
+                signup_token = security.generate_random_string(32)
+                b64_encoded_token = base64.b64encode(hashlib.sha512(signup_token).hexdigest())
+
                 existing = models.Signup.get_by_id(b64_email)
                 if existing is None:
 
@@ -75,20 +84,33 @@ class BetaService(RemoteService):
                     else:
                         firstname, lastname = namesplit[0], None
 
+                    # Generate signup key to avoid 2-step datastore commit
+                    signup_key = ndb.Key(models.Signup, b64_email)
+
                     # Store signup
                     b = models.Signup(**{
 
-                        'key': ndb.Key(models.Signup, b64_email),
+                        'key': signup_key,
                         'firstname': firstname,
                         'lastname': lastname,
                         'email': request.email,
-                        'token': request.token,
-                        'message': request.message
+                        'token': ndb.Key(models.InviteToken, b64_encoded_token, parent=signup_key),
 
                     }).put(use_datastore=True, use_cache=True, use_memcache=True)
 
+                    # Store token
+                    i = models.InviteToken(**{
+
+                        'key': ndb.Key(models.InviteToken, b64_encoded_token, parent=b),
+                        'token': b64_encoded_token,
+                        'signup': b,
+                        'used': False,
+                        'sent': False
+
+                    }).put(use_datastore=True, use_cache=False, use_memcache=False)
+
                     if isinstance(b, ndb.Key):
-                        return messages.BetaSignupResponse(key=b.urlsafe(), token=request.token)
+                        return messages.BetaSignupResponse(token=b64_encoded_token)
                     else:
                         raise BetaService.StorageFailureException("Woops, something went wrong storing your signup! Please try again.")
                 else:

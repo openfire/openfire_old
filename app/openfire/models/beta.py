@@ -18,7 +18,18 @@ class Signup(AppModel):
     firstname = ndb.StringProperty('f', required=True, indexed=True)
     lastname = ndb.StringProperty('l', default=None, indexed=True)
     email = ndb.StringProperty('e', required=True, indexed=True)
-    token = ndb.StringProperty('t', required=True, indexed=False)
+    token = ndb.KeyProperty('t', required=True, indexed=True)
     modified = ndb.DateTimeProperty('m', auto_now=True, indexed=False)
     created = ndb.DateTimeProperty('c', auto_now_add=True, indexed=True)
-    message = ndb.TextProperty('o', required=False, indexed=False)
+
+
+class InviteToken(AppModel):
+
+	''' An invite, generated for a Signup or manually. '''
+
+	token = ndb.StringProperty('t', required=True, indexed=True)
+	signup = ndb.KeyProperty('s', default=None, indexed=True)
+	used = ndb.BooleanProperty('u', default=False)
+	sent = ndb.BooleanProperty('e', default=False)
+	modified = ndb.DateTimeProperty('m', auto_now=True, indexed=False)
+	created = ndb.DateTimeProperty('c', auto_now_add=True, indexed=True)
