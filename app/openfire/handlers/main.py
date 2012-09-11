@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import webapp2
 import config as cfg
 from config import config
+from apptools.util import debug
 from openfire.models import user
 from openfire.models import assets
 from openfire.models import project as p
@@ -16,6 +18,23 @@ class Placeholder(WebHandler):
 
     ''' openfire placeholder! '''
 
+    template = 'main/placeholder.html'
+    should_cache = True
+
+    @webapp2.cached_property
+    def config(self):
+
+        ''' Named config pipe. '''
+
+        return config.get('openfire.placeholder')
+
+    @webapp2.cached_property
+    def logging(self):
+
+        ''' Named logging pipe. '''
+
+        return debug.AppToolsLogger(path='openfire.handlers.main', name='Placeholder')._setcondition(self.config.get('debug', True))
+
     def _make_services_object(self, services):
 
         ''' Return only the beta signup method/service. '''
@@ -26,14 +45,25 @@ class Placeholder(WebHandler):
 
         ''' Return a rendered submission form. '''
 
-        return self.render('main/placeholder.html')
+        if self.should_cache:
+            cache_key = '::'.join(['of', 'pagecache', 'placeholder'])
+            self.logging.info('Pagecache enabled. Looking for placeholder content in cache key "%s".' % cache_key)
+
+            cached = self.api.memcache.get(cache_key)
+            if cached is None:
+                self.logging.info('No cached copy found. Rendering.')
+                rendered = self.render('main/placeholder.html')
+                self.api.memcache.set(cache_key, rendered)
+                return rendered
+            self.logging.info('Cached copy found. Returning cached page.')
+        return cached
 
 
 class Landing(WebHandler):
 
     ''' openfire landing page. '''
 
-    #template = 'main/landing.html'
+    template = 'main/landing.html'
     projects_per_page = 6
     activity_per_page = 10
 
@@ -41,8 +71,12 @@ class Landing(WebHandler):
 
         ''' Render landing.html or landing_noauth.html. '''
 
+        ## consider placeholder
         if config.get('openfire.placeholder').get('enabled') == True:
-             return Placeholder(self.request, self.response).get()
+
+            ## consider placeholder `force` flag
+            if (self.user is None and self.permissions is None) or (self.user is not None and config.get('openfire.placeholder').get('force') == True):
+                return Placeholder(self.request, self.response).get()
 
         ## fully cached page context
         context = self.api.memcache.get('landing_page_context')

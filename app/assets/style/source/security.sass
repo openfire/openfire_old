@@ -6,6 +6,9 @@
 @import _core/_fonts
 @import _partials/social
 
+div.snapall
+  -webkit-transform: translateZ(0)
+
 a
   color: #15C !important
   text-decoration: none
@@ -110,7 +113,7 @@ h4
   .notification
     opacity: 0
     -webkit-transition-property: opacity, height
-    -webkit-transition-duration: 0.4s
+    -webkit-transition-duration: 0.6s
     font-family: 'Karla'
     text-transform: uppercase
     position: absolute
@@ -145,6 +148,7 @@ h4
 
       .plformfield
         -webkit-transition-property: background, opacity
+        -webkit-transition-duration: 0.4s
         height: 35px
         width: 225px
         font-size: 14px
@@ -156,7 +160,6 @@ h4
         margin-right: 5px
 
       #putsignup
-        height: 40px
         border: none
         padding: 10px
         border-radius: 5px
@@ -165,18 +168,27 @@ h4
         position: relative
         display: inline-block
         -webkit-transition-property: background-color, opacity
+        -webkit-transition-duration: 0.4s
         background-color: transparent
         opacity: 0.6
         width: 95px
+        top: -1px
 
         #submittext
           vertical-align: inherit !important
           font-size: 16px !important
           -webkit-transition-property: opacity
+          -webkit-transition-duration: 0.4s
           width: 90px !important
           text-align: center
           margin: none !important
           padding: none !important
+          opacity: 1
+
+          &.error, &.yay
+            position: relative
+            left: 6px
+            opacity: 0.9
 
         &.active
           font-family: 'Karla', Verdana, Arial, sans-serif

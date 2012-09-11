@@ -133,7 +133,36 @@
 {% endblock body %}
 
 {% block presouth %}{% endblock presouth %}
-{% include "core/__south.html" with context %}
+{% block south %}
+	{% block jscore %}
+	<!-- Core Scripts -->
+	<script src="{{ asset.script('jquery-full', 'core') }}"></script>
+	<script src="{{ asset.script('d3', 'core') }}"></script>
+	<script src="{{ asset.script('jacked', 'core') }}"></script>
+	{% endblock jscore %}
+
+	{% block jsbase %}
+	<!-- Base Scripts -->
+	{% if security.permissions.admin %}
+	<script src="{{ asset.script('admin', 'apptools') }}"></script>
+	<script src="{{ asset.script('admin', 'openfire') }}"></script>
+	{% else %}
+	<script src="{{ asset.script('base', 'apptools') }}"></script>
+	<script src="{{ asset.script('app', 'openfire') }}"></script>
+	{%- endif -%}
+	{% endblock jsbase %}
+
+	{% block jsext %}
+	{# <!-- Ext Scripts --> #}
+	{% if transport.realtime.enabled %}
+	{%- if transport.services.secure -%}
+	<script async src="https://{{ transport.services.endpoint }}/_ah/channel/jsapi"></script>
+	{%- else -%}
+	<script async src="http://{{ transport.services.endpoint }}/_ah/channel/jsapi"></script>
+	{%- endif -%}
+	{% endif %}
+	{% endblock jsext %}
+{% endblock south %}
 
 {% block pageready %}
 <script id='js-deferred' type='text/javascript' data-role='pageready'>

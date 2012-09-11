@@ -39,86 +39,45 @@
 
 {% endblock %}
 
+{# zero out platform scripts #}
+{%- block jscore -%}{%- endblock jscore -%}
+{% block jsbase %}
+<!-- Base Scripts -->
+{% if security.permissions.admin %}
+<script src="{{ asset.script('admin', 'apptools') }}"></script>
+{% else %}
+<script src="{{ asset.script('base', 'apptools') }}"></script>
+{%- endif -%}
+{% endblock jsbase %}
+{%- block jsext -%}{%- endblock jsext -%}
+
 {% block jsready %}
-        _g = function (i) { return document.getElementById(i); },
-        _opr = 'placeholder',
-        _of_pls = {check: "&#xf000a;", error: "&#xf000b;", spinner: "&#xf0043;"},
-        _of_pl = {symbols: _of_pls, prefix: _opr, el: {
-            wrap: _g([_opr, 'form'].join('-')),
-            error: _g([_opr, 'error'].join('-')),
-            success: _g([_opr, 'success'].join('-')),
-            name: _g('name'),
-            email: _g('email'),
-            submit: _g('putsignup'),
-            slabel: _g('submittext'),
-            intro: _g([_opr, 'intro'].join('-')),
-        },
-            callbacks: {
-                rpc: {
-                    success: function (r) {
-                        setTimeout(function () {
-                            $.apptools.dev.log('OF:BetaSignup', 'Beta signup successful.', r, _of_pl);
-
-                            _of_pl.el.success.classList.add('active');
-
-                            _of_pl.el.submit.className = 'yay';
-                            _of_pl.el.slabel.className = 'momentron';
-                            _of_pl.el.slabel.innerHTML = _of_pl.symbols.check;
-
-                            setTimeout(function () {
-                                _of_pl.el.success.classList.remove('active');
-                                _of_pl.el.name.removeAttribute('disabled');
-                                _of_pl.el.email.removeAttribute('disabled');
-                                _of_pl.el.submit.className = "active";
-                                _of_pl.el.slabel.className = 'karlabold active';
-                                _of_pl.el.slabel.innerHTML = "Sign up!";
-                            }, 1600);
-                        }, 2000);
-                    },
-
-                    failure: function (r) {
-                        setTimeout(function () {
-                            $.apptools.dev.error('OF:BetaSignup', 'Beta signup failure.', r, _of_pl);
-
-                            _of_pl.el.success.classList.remove('active');
-                            _of_pl.el.slabel.className = 'momentron error';
-
-                            if (r.error_message) {
-                                _of_pl.el.error.innerHTML = r.error_message;
-                            }
-                            _of_pl.el.slabel.innerHTML = _of_pl.symbols.error;
-                            _of_pl.el.error.classList.add('active');
-                            setTimeout(function () {
-                                _of_pl.el.error.classList.remove('active');
-                                _of_pl.el.submit.className = 'active';
-                                _of_pl.el.slabel.className = 'karlabold';
-                                _of_pl.el.slabel.innerHTML = "Again!";
-                                _of_pl.el.name.removeAttribute('disabled');
-                                _of_pl.el.email.removeAttribute('disabled');
-                            }, 1600);
-                        }, 2000);
-                    }
-                },
-
-                submit: function (event) {
-
-                    event.preventDefault(); event.stopPropagation();
-                    _of_pl.el.error.classList.remove('active');
-                    _of_pl.el.success.classList.remove('active');
-                    if (!_of_pl.el.name.value || !_of_pl.el.email.value) {
-                        _of_pl.el.error.innerHTML = "There was some missing information. Please try again!";
-                        _of_pl.el.error.classList.add('active');
-                    } else {
-                        _of_pl.el.submit.classList.remove('active');
-                        _of_pl.el.slabel.className = ['momentron', 'loading', 'spinner'].join(' ');
-                        _of_pl.el.slabel.innerHTML = _of_pl.symbols.spinner;
-
-                        _of_pl.el.name.setAttribute('disabled', 'disabled');
-                        _of_pl.el.email.setAttribute('disabled', 'disabled');
-                        $.apptools.api.beta.signup({name: _of_pl.el.name.value, email: _of_pl.el.email.value}).fulfill(_of_pl.callbacks.rpc);
-                    }
-                }
-            }
-        },
-        ofpl_sb = _of_pl.el.wrap.onsubmit = _of_pl.el.submit.onclick = _of_pl.callbacks.submit,
+                _g = function (i) { return document.getElementById(i); }, _opr = 'placeholder', _of_pls = {check: "&#xf000a;",
+                error: "&#xf000b;", spinner: "&#xf0043;"}, _of_pl = {symbols: _of_pls, prefix: _opr, el: {
+                wrap: _g([_opr, 'form'].join('-')), error: _g([_opr, 'error'].join('-')), success: _g([_opr, 'success'].join('-')),
+                name: _g('name'), email: _g('email'), submit: _g('putsignup'), slabel: _g('submittext'),
+                intro: _g([_opr, 'intro'].join('-'))}, callbacks: { rpc: { success: function (r) {
+                $.apptools.dev.log('OF:BetaSignup', 'Beta signup successful.', r, _of_pl);
+                _of_pl.el.success.classList.add('active'); _of_pl.el.slabel.className = 'momentron yay';
+                _of_pl.el.slabel.innerHTML = _of_pl.symbols.check; setTimeout(function () {
+                _of_pl.el.success.classList.remove('active'); _of_pl.el.name.removeAttribute('disabled');
+                _of_pl.el.email.removeAttribute('disabled'); _of_pl.el.submit.className = "active";
+                _of_pl.el.slabel.className = 'karlabold active'; _of_pl.el.slabel.innerHTML = "Sign up!"; }, 1600);},
+                failure: function (r) { $.apptools.dev.error('OF:BetaSignup', 'Beta signup failure.', r, _of_pl);
+                _of_pl.el.success.classList.remove('active'); _of_pl.el.slabel.className = 'momentron error';
+                if (r.error_message) { _of_pl.el.error.innerHTML = r.error_message; }
+                _of_pl.el.slabel.innerHTML = _of_pl.symbols.error; _of_pl.el.error.classList.add('active');
+                setTimeout(function () { _of_pl.el.error.classList.remove('active'); _of_pl.el.submit.className = 'active';
+                _of_pl.el.slabel.className = 'karlabold'; _of_pl.el.slabel.innerHTML = "Again!";
+                _of_pl.el.name.removeAttribute('disabled'); _of_pl.el.email.removeAttribute('disabled'); }, 1600);
+                } }, submit: function (event) { event.preventDefault(); event.stopPropagation();
+                _of_pl.el.error.classList.remove('active'); _of_pl.el.success.classList.remove('active');
+                if (!_of_pl.el.name.value || !_of_pl.el.email.value) {
+                _of_pl.el.error.innerHTML = "There was some missing information. Please try again!";
+                _of_pl.el.error.classList.add('active'); } else { _of_pl.el.submit.classList.remove('active');
+                _of_pl.el.slabel.className = ['momentron', 'loading', 'spinner'].join(' ');
+                _of_pl.el.slabel.innerHTML = _of_pl.symbols.spinner; _of_pl.el.name.setAttribute('disabled', 'disabled');
+                _of_pl.el.email.setAttribute('disabled', 'disabled'); setTimeout(function () {
+                $.apptools.api.beta.signup({name: _of_pl.el.name.value, email: _of_pl.el.email.value}).fulfill(_of_pl.callbacks.rpc);
+                }, 250); } } } }, ofpl_sb = _of_pl.el.wrap.onsubmit = _of_pl.el.submit.onclick = _of_pl.callbacks.submit,
 {%- endblock jsready -%}

@@ -902,10 +902,10 @@ class ContentBridge(object):
 
             if flush:
                 # Output rendered template
-                return self.response.write(rendered)
+                return self.response.write(self.minify(rendered))
             else:
                 # Return rendered template
-                return rendered
+                return self.minify(rendered)
 
     def fulfill_content(self, keyname, namespace, caller, blocktype):
 
