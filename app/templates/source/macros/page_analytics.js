@@ -12,7 +12,7 @@
 	{%- if 'staging' in util.request.host -%}
 		{%- set __ = account_ids.update({'openfire': config.account_id.staging}) -%}
 	{%- else -%}
-		{%- set __ = account_ids.update({'openfire': config.account_ids.production}) -%}
+		{%- set __ = account_ids.update({'openfire': config.account_id.production}) -%}
 	{%- endif -%}
 {% endif %}
 		_gac = {multitrack: {% if multitrack %}true{%- else -%}false{%- endif -%}, anonymize: {% if anonymize %}true{%- else -%}false{%- endif -%}, account_ids: {{ util.converters.json.dumps(account_ids)|safe }}},
@@ -36,7 +36,7 @@
 		{%- if 'staging' in util.request.host -%}
 			{%- set __ = account_ids.update({'openfire': config.account_id.staging}) -%}
 		{%- else -%}
-			{%- set __ = account_ids.update({'openfire': config.account_ids.production}) -%}
+			{%- set __ = account_ids.update({'openfire': config.account_id.production}) -%}
 		{%- endif -%}
 	{%- endif -%}
 

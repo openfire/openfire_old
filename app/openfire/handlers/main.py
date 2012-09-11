@@ -26,7 +26,7 @@ class Placeholder(WebHandler):
 
         ''' Return a rendered submission form. '''
 
-        return self.render('main/placeholder.html', token=generate_random_string(32))
+        return self.render('main/placeholder.html')
 
 
 class Landing(WebHandler):
