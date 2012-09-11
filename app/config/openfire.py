@@ -25,8 +25,8 @@ config['openfire.placeholder'] = {
 
         'mailchimp': {
             'enabled': True,  # enable mailchimp integration,
-            'apikey': '',  # mailchimp apikey
-            'listid': ''  # list id to sign beta users up to
+            'apikey': 'dcf2e23bd1ac2f2d05592821adb6bfd9-us5',  # mailchimp apikey
+            'listid': '66589'  # list id to sign beta users up to
         }
 
     }
