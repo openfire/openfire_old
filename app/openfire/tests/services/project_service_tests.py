@@ -66,6 +66,50 @@ class ProjectServiceTestCase(OFTestCase):
         self.assertEqual(response['response']['content']['pitch'], pitch_2,
             'Project put failed to change the description.')
 
+    def test_project_go_live_method(self):
+
+        ''' Add a project to the database then make it go live. '''
+
+        project_key = db_loader.create_project(status='p')
+        response = self.of_service_test('project', 'go_live', params={'key':project_key.urlsafe()})
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Project go live service method failed.')
+        self.assertEqual(project_key.get().status, 'o',
+            'Project go live method did not set the project as live.')
+
+    def test_project_suspend_method(self):
+
+        ''' Add a project to the database then make it suspend. '''
+
+        project_key = db_loader.create_project(status='o')
+        response = self.of_service_test('project', 'suspend', params={'key':project_key.urlsafe()})
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Project suspend service method failed.')
+        self.assertEqual(project_key.get().status, 's',
+            'Project suspend method did not set the project as suspended.')
+
+    def test_project_shutdown_method(self):
+
+        ''' Add a project to the database then make it shutdown. '''
+
+        project_key = db_loader.create_project(status='o')
+        response = self.of_service_test('project', 'shutdown', params={'key':project_key.urlsafe()})
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Project shutdown service method failed.')
+        self.assertEqual(project_key.get().status, 'c',
+            'Project shutdown method did not set the project as shut down.')
+
+    def test_project_cancel_method(self):
+
+        ''' Add a project to the database then make it cancel. '''
+
+        project_key = db_loader.create_project(status='o')
+        response = self.of_service_test('project', 'cancel', params={'key':project_key.urlsafe()})
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Project cancel service method failed.')
+        self.assertEqual(project_key.get().status, 'x',
+            'Project cancel method did not set the project as canceled.')
+
 
 
     """
@@ -96,18 +140,6 @@ class ProjectServiceTestCase(OFTestCase):
         self.assertEqual(response['response']['type'], '',
             'Project  service method failed.')
 
-    def test_project_media_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'media', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_add_media_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'add_medai', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
     def test_project_follow_method(self):
         ''' Test something. '''
         response = self.of_service_test('project', 'follow', params={})
@@ -123,24 +155,6 @@ class ProjectServiceTestCase(OFTestCase):
     def test_project_backers_method(self):
         ''' Test something. '''
         response = self.of_service_test('project', 'backers', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_back_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'back', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_suspend_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'suspend', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_shutdown_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'shutdown', params={})
         self.assertEqual(response['response']['type'], '',
             'Project  service method failed.')
     """
@@ -571,3 +585,36 @@ class ProjectServiceTestCase(OFTestCase):
         self.assertEqual(response['response']['type'], 'Echo',
             'System project delete next step service method failed.')
         self.assertFalse(next_step.key.get(), 'Failed to delete project goal next step.')
+
+
+    #############################################
+    # Project Add/Remove Viewer Tests.
+    #############################################
+
+    def test_project_add_viewer_method(self):
+
+        ''' Add one project to the database then add a viewer to it. '''
+
+        project_key = db_loader.create_project(status='o')
+        user_key = db_loader.create_user()
+        params = {'user': user_key.urlsafe(), 'target': project_key.urlsafe()}
+        response = self.of_service_test('project', 'add_viewer', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Project add viewer service method failed.')
+        self.assertEqual(len(project_key.get().viewers), 1,
+            'Project add viewer method did not add one viewer.')
+        self.assertEqual(project_key.get().viewers[0], user_key,
+            'Project add viewer method did not add correct viewer.')
+
+    def test_project_remove_viewer_method(self):
+
+        ''' Add one project to the database with a viewer then remove the viewer. '''
+
+        user_key = db_loader.create_user()
+        project_key = db_loader.create_project(status='p', viewers_keys=[user_key])
+        params = {'user': user_key.urlsafe(), 'target': project_key.urlsafe()}
+        response = self.of_service_test('project', 'remove_viewer', params=params)
+        self.assertEqual(response['response']['type'], 'Echo',
+            'Project remove viewer service method failed.')
+        self.assertEqual(len(project_key.get().viewers), 0,
+            'Project remove viewer method did not remove one viewer.')

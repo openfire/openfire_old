@@ -1,12 +1,12 @@
 from protorpc import messages
-from openfire.messages.common import Goal, Tier
+from openfire.messages.common import Goal, FutureGoal
 
 
 class Backer(messages.Message):
 
     ''' Represents a single backer. '''
 
-    pass
+    user = messages.StringField(1)
 
 
 class Project(messages.Message):
@@ -17,14 +17,22 @@ class Project(messages.Message):
     name = messages.StringField(2)
     status = messages.StringField(3)
     category = messages.StringField(4)
-    summary = messages.StringField(5)
-    pitch = messages.StringField(6)
-    tech = messages.StringField(7)
-    keywords = messages.StringField(8, repeated=True)
-    creator = messages.StringField(9)
-    owners = messages.StringField(10, repeated=True)
-    goals = messages.MessageField(Goal, 11, repeated=True)
-    tiers = messages.MessageField(Tier, 12, repeated=True)
+    customurl = messages.StringField(5)
+    summary = messages.StringField(6)
+    pitch = messages.StringField(7)
+    tech = messages.StringField(8)
+    keywords = messages.StringField(9, repeated=True)
+    creator = messages.StringField(10)
+    owners = messages.StringField(11, repeated=True)
+    public = messages.BooleanField(12)
+    viewers = messages.StringField(13, repeated=True)
+    backers = messages.IntegerField(14)
+    followers = messages.IntegerField(15)
+    money = messages.FloatField(16)
+    progress = messages.IntegerField(17)
+    active_goal = messages.StringField(18)
+    completed_goals= messages.StringField(19, repeated=True)
+    future_goal = messages.StringField(20)
 
 
 class Projects(messages.Message):
@@ -39,6 +47,7 @@ class ProjectRequest(messages.Message):
     ''' Request a project by key. '''
 
     key = messages.StringField(1)
+    comment = messages.StringField(2)
 
 
 class Backers(messages.Message):
@@ -56,18 +65,9 @@ class BackProject(messages.Message):
     project = messages.StringField(2)
     contribution = messages.StringField(3)
 
+class CancelProjectRequest(messages.Message):
 
-class ShutdownProject(messages.Message):
-
-    ''' Shutdown a project. '''
-
-    key = messages.StringField(1)
-    reason = messages.StringField(2)
-
-
-class SuspendProject(messages.Message):
-
-    ''' Suspend a project. '''
+    ''' Request to cancel a project by key, with option to refund all charges.. '''
 
     key = messages.StringField(1)
-    reason = messages.StringField(2)
+    refund_all = messages.BooleanField(2)

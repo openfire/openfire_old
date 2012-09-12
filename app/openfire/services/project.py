@@ -46,7 +46,6 @@ class ProjectService(RemoteService):
         is_owner = False
         is_admin = True
 
-
         try:
             project_key = ndb.Key(urlsafe=self.decrypt(request.key))
         except:
@@ -66,46 +65,34 @@ class ProjectService(RemoteService):
     @remote.method(project_messages.Project, project_messages.Project)
     def put(self, request):
 
-        ''' Edit a project. Projects are created when proposals are promoted. '''
+        ''' Edit an existing project. Projects are created only when proposals are promoted. '''
 
+        # TODO: Permissions.
         if not request.key:
-            # Cannot create a project through this service.
-            # TODO: How to return error?
-            return project_messages.Project()
+            raise remote.ApplicationError('Failed to find project')
 
-        try:
-            project_key = ndb.Key(urlsafe=self.decrypt(request.key))
-        except:
-            project_key = ndb.Key(urlsafe=request.key)
-        project = project_key.get()
-
+        project = ndb.Key(urlsafe=self.decrypt(request.key)).get()
         if not project:
             raise remote.ApplicationError('Failed to find project')
 
         # Update the project.
         project.mutate_from_message(request)
-        project.slug = "TODO: Remove me! (OF-64)"
         project.put()
 
         return project.to_message()
-
 
     @remote.method(project_messages.ProjectRequest, Echo)
     def go_live(self, request):
 
         ''' Enable a project to be shown to the general public. '''
 
+        # TODO: Permissions.
         if not request.key:
-            # Cannot create a project through this service.
-            # TODO: How to return error?
-            return project_messages.Project()
+            raise remote.ApplicationError('Failed to find project')
 
-        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
-        project = project_key.get()
-
+        project = ndb.Key(urlsafe=self.decrypt(request.key)).get()
         if not project:
-            # Project not found.
-            raise remote.ApplicationError('Project not found')
+            raise remote.ApplicationError('Failed to find project')
 
         # Update the project to open.
         project.status = 'o'
@@ -119,6 +106,7 @@ class ProjectService(RemoteService):
 
         ''' Remove a category. '''
 
+        # TODO: Permissions.
         project_key = ndb.Key(urlsafe=self.decrypt(request.key))
         project_key.delete()
         return Echo(message='Project removed')
@@ -180,39 +168,62 @@ class ProjectService(RemoteService):
 
         return project_messages.Backers()
 
-    @remote.method(project_messages.SuspendProject, Echo)
+    @remote.method(project_messages.ProjectRequest, Echo)
     def suspend(self, request):
 
         ''' Suspend a project. '''
 
-        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
-        project = project_key.get()
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('Failed to find project')
 
+        project = ndb.Key(urlsafe=self.decrypt(request.key)).get()
         if not project:
-            # Project not found.
-            raise remote.ApplicationError('Project not found')
+            raise remote.ApplicationError('Failed to find project')
 
-        project.status = 'p'
+        # Set the status to suspended.
+        project.status = 's'
         project.put()
 
         return Echo(message='Project suspended')
 
-    @remote.method(project_messages.ShutdownProject, Echo)
+    @remote.method(project_messages.ProjectRequest, Echo)
     def shutdown(self, request):
 
         ''' Shut down a project. '''
 
-        project_key = ndb.Key(urlsafe=self.decrypt(request.key))
-        project = project_key.get()
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('Failed to find project')
 
+        project = ndb.Key(urlsafe=self.decrypt(request.key)).get()
         if not project:
-            # Project not found.
-            raise remote.ApplicationError('Project not found')
+            raise remote.ApplicationError('Failed to find project')
 
         project.status = 'c'
         project.put()
 
         return Echo(message='Project shut down')
+
+    @remote.method(project_messages.ProjectRequest, Echo)
+    def cancel(self, request):
+
+        ''' Cancel a project and potentially refund all charges. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('Failed to find project')
+
+        project = ndb.Key(urlsafe=self.decrypt(request.key)).get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project')
+
+        project.status = 'x'
+        project.put()
+
+        # TODO: Cancel all pending payments.
+
+        return Echo(message='Project canceled')
 
 
     #############################################
@@ -224,6 +235,7 @@ class ProjectService(RemoteService):
 
         ''' Get a project goal. '''
 
+        # TODO: Permissions.
         goal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         goal = goal_key.get()
         if not goal:
@@ -235,6 +247,7 @@ class ProjectService(RemoteService):
 
         ''' Return the active goal for a project. '''
 
+        # TODO: Permissions.
         project_key = ndb.Key(urlsafe=self.decrypt(request.project))
         project = project_key.get()
         if not project:
@@ -250,6 +263,7 @@ class ProjectService(RemoteService):
 
         ''' List all completed goals for a project. '''
 
+        # TODO: Permissions.
         project_key = ndb.Key(urlsafe=self.decrypt(request.project))
         project = project_key.get()
         if not project:
@@ -267,6 +281,7 @@ class ProjectService(RemoteService):
 
         ''' Return the future goal for a project. '''
 
+        # TODO: Permissions.
         project_key = ndb.Key(urlsafe=self.decrypt(request.project))
         project = project_key.get()
         if not project:
@@ -283,6 +298,7 @@ class ProjectService(RemoteService):
 
         ''' Create or edit a project goal. '''
 
+        # TODO: Permissions.
         if not request.target:
             raise remote.ApplicationError('No target to attach goal to.')
         target_key = ndb.Key(urlsafe=request.target)
@@ -312,6 +328,7 @@ class ProjectService(RemoteService):
 
         ''' Edit the future goal for a project. '''
 
+        # TODO: Permissions.
         if not request.key:
             raise remote.ApplicationError('Provided no future goal key.')
 
@@ -329,6 +346,7 @@ class ProjectService(RemoteService):
 
         ''' Create or edit a project goal. '''
 
+        # TODO: Permissions.
         goal_key = ndb.Key(urlsafe=self.decrypt(request.key))
         goal_key.delete()
         return Echo(message='OK')
@@ -338,6 +356,7 @@ class ProjectService(RemoteService):
 
         ''' Propose a new goal for a project. '''
 
+        # TODO: Permissions.
         if not request.project:
             raise remote.ApplicationError('No project to propose goal for.')
         project = ndb.Key(urlsafe=request.project).get()
@@ -354,6 +373,7 @@ class ProjectService(RemoteService):
 
         ''' List all proposed goals for a project. '''
 
+        # TODO: Permissions.
         project_key = ndb.Key(urlsafe=self.decrypt(request.project))
         project = project_key.get()
         if not project:
@@ -370,6 +390,7 @@ class ProjectService(RemoteService):
 
         ''' Approve a goal and set it as the active goal. '''
 
+        # TODO: Permissions.
         if not request.key:
             raise remote.ApplicationError('No goal to approve.')
         new_goal = ndb.Key(urlsafe=request.key).get()
@@ -398,6 +419,7 @@ class ProjectService(RemoteService):
 
         ''' Reject a request for a new goal. '''
 
+        # TODO: Permissions.
         if not request.key:
             raise remote.ApplicationError('No goal to reject.')
         goal = ndb.Key(urlsafe=request.key).get()
@@ -416,6 +438,7 @@ class ProjectService(RemoteService):
 
         ''' Get a project tier. '''
 
+        # TODO: Permissions.
         tier_key = ndb.Key(urlsafe=self.decrypt(request.key))
         tier = tier_key.get()
         if not tier:
@@ -427,6 +450,7 @@ class ProjectService(RemoteService):
 
         ''' List all tiers for a project goal. '''
 
+        # TODO: Permissions.
         if not request.goal:
             raise remote.ApplicationError('No goal provided to list tiers for.')
         goal = ndb.Key(urlsafe=self.decrypt(request.goal)).get()
@@ -445,6 +469,7 @@ class ProjectService(RemoteService):
 
         ''' Create or edit a project goal tier. '''
 
+        # TODO: Permissions.
         if not request.target:
             raise remote.ApplicationError('No target to attach tier to.')
         target_key = ndb.Key(urlsafe=request.target)
@@ -474,6 +499,7 @@ class ProjectService(RemoteService):
 
         ''' Delete a project goal tier. '''
 
+        # TODO: Permissions.
         tier_key = ndb.Key(urlsafe=self.decrypt(request.key))
         tier_key.delete()
         return Echo(message='OK')
@@ -488,6 +514,7 @@ class ProjectService(RemoteService):
 
         ''' Get a project next step. '''
 
+        # TODO: Permissions.
         next_step_key = ndb.Key(urlsafe=self.decrypt(request.key))
         next_step = next_step_key.get()
         if not next_step:
@@ -499,6 +526,7 @@ class ProjectService(RemoteService):
 
         ''' List all next steps for a project goal. '''
 
+        # TODO: Permissions.
         if not request.goal:
             raise remote.ApplicationError('No goal provided to list next steps for.')
         goal = ndb.Key(urlsafe=self.decrypt(request.goal)).get()
@@ -520,6 +548,7 @@ class ProjectService(RemoteService):
         Accepts either a next step key for edit, or a goal key for add.
         '''
 
+        # TODO: Permissions.
         if not request.key:
             raise remote.ApplicationError('No goal or key for next step to.')
         next_step = None
@@ -554,6 +583,64 @@ class ProjectService(RemoteService):
 
         ''' Delete a project next_step. '''
 
+        # TODO: Permissions.
         next_step_key = ndb.Key(urlsafe=request.key)
         next_step_key.delete()
         return Echo(message='Success')
+
+
+    #############################################
+    # Add and remove viewers.
+    #############################################
+
+    @remote.method(common_messages.ViewerRequest, Echo)
+    def add_viewer(self, request):
+
+        ''' Add a viewer to a project. '''
+
+        # TODO: Permissions.
+        if not request.target:
+            raise remote.ApplicationError('No project provided.')
+        if not request.user:
+            raise remote.ApplicationError('No user provided.')
+
+        project = ndb.Key(urlsafe=self.decrypt(request.target)).get()
+        if not project:
+            raise remote.ApplicationError('Project not found.')
+
+        user = ndb.Key(urlsafe=self.decrypt(request.user)).get()
+        if not project:
+            raise remote.ApplicationError('User not found.')
+
+        if user.key in project.viewers:
+            raise remote.ApplicationError('User is already a viewer.')
+
+        project.viewers.append(user.key)
+        project.put()
+        return Echo(message='User added')
+
+    @remote.method(common_messages.ViewerRequest, Echo)
+    def remove_viewer(self, request):
+
+        ''' Remove a viewer from a project. '''
+
+        # TODO: Permissions.
+        if not request.target:
+            raise remote.ApplicationError('No project provided.')
+        if not request.user:
+            raise remote.ApplicationError('No user provided.')
+
+        project = ndb.Key(urlsafe=self.decrypt(request.target)).get()
+        if not project:
+            raise remote.ApplicationError('Project not found.')
+
+        user = ndb.Key(urlsafe=self.decrypt(request.user)).get()
+        if not project:
+            raise remote.ApplicationError('User not found.')
+
+        if not user.key in project.viewers:
+            raise remote.ApplicationError('User is not a viewer.')
+
+        project.viewers.remove(user.key)
+        project.put()
+        return Echo(message='User removed')

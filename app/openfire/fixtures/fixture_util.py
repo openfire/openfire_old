@@ -320,7 +320,7 @@ def create_proposal(name='Test Proposal', status='s', public=True,
             summary='SUMMARY', pitch='PITCH', tech='TECH', keywords=['KEYWORDS'],
             category_key=ndb.Key('Category', 'test_category_key'),
             creator_key=ndb.Key('User', 'test_user_key'),
-            initial_goal=None, future_goal=None, tiers=[],
+            initial_goal=None, future_goal=None, initial_tiers=[], initial_next_steps=[],
             owners_keys=[], viewers_keys=[]):
 
     ''' Create a proposal. '''
@@ -332,12 +332,16 @@ def create_proposal(name='Test Proposal', status='s', public=True,
     if future_goal:
         future_goal_obj = create_future_goal(**future_goal)
     tier_list = []
-    for tier in tiers:
+    for tier in initial_tiers:
         tier_list.append(create_tier(**tier))
+    next_step_list = []
+    for next_step in initial_next_steps:
+        next_step_list.append(create_next_step(**next_step))
     return Proposal(name=name, status=status, public=public,
-                    summary=summary, pitch=pitch, tech=tech, keywords=keywords, tiers=tier_list,
+                    summary=summary, pitch=pitch, tech=tech, keywords=keywords, initial_tiers=tier_list,
                     category=category_key, creator=creator_key, initial_goal=initial_goal_obj,
-                    future_goal=future_goal_obj, viewers=viewers_keys, owners=owners_keys).put()
+                    future_goal=future_goal_obj, viewers=viewers_keys, owners=owners_keys,
+                    initial_next_steps=next_step_list).put()
 
 
 def create_project(name='Test Project', status='o', public=True, summary='SUMMARY', pitch='PITCH',
@@ -374,12 +378,13 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
     blob_key = None
     serving_url = url
     if blob_file:
-        # Upload the file to the blobstore.
-        try:
-            # Try to fetch the file from a url.
-            blob_key = fetch_url_to_blobstore(blob_file)
-        except:
-            pass
+        # Upload the file to the blobstore if not running tests.
+        if os.environ.get('RUNNING_TESTS', None) != 'TESTING':
+            try:
+                # Try to fetch the file from a url.
+                blob_key = fetch_url_to_blobstore(blob_file)
+            except:
+                pass
 
         if not blob_key:
             # Fall back to loading from a local copy.

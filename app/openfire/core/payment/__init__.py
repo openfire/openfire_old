@@ -1,7 +1,7 @@
 from google.appengine.ext import ndb
 from openfire.core.payment.wepay import WePayAPI
 from openfire.core.payment.common import CorePaymentResponse, OFPaymentError, OFPaymentFees
-from openfire.models.payment import Payment, WePayProjectAccount
+from openfire.models.payment import Payment, WePayProjectAccount, WePayUserPaymentAccount
 
 class CorePaymentAPI(object):
 
@@ -126,6 +126,7 @@ class CorePaymentAPI(object):
     def create_project_payment_account(self, project_key, name, description, wepay_account):
 
         ''' Create a sub account for a user to use to collect payments for a project. '''
+
         response = WePayAPI.create_payment_account(name, description, wepay_account.wepay_user_id)
         if response.success:
             wepay_account_id = response.response
@@ -134,6 +135,35 @@ class CorePaymentAPI(object):
                     name=name, description=description, wepay_account_id=wepay_account_id)
             new_account.put()
             response.response = new_account
+        return response
+
+    def set_up_project_payment_account(self, project):
+
+        '''
+        Set up the sub account for a user to use to collect payments for a project.
+        If the creator or any of the owners has a payment account linked, create a
+        WePay collection account for this project.
+        '''
+
+        response = CorePaymentResponse()
+        keys = [project.creator]
+        keys.extend(project.owners)
+        for owner_key in keys:
+            accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == owner_key).fetch()
+            if accounts and len(accounts):
+                # Create a collection account for this project owner only.
+                account_response = PaymentAPI.create_project_payment_account(
+                        project.key, project.name,
+                        'Collection account for ' + project.name, accounts[0])
+                if not account_response.success:
+                    pass # TODO: Log an error here or do something!
+                response = account_response
+                break
+        if not response.success:
+            if not response.error_code:
+                response.error_code = OFPaymentError.OF_NO_PROJECT_OWNERS_WITH_ACCOUNT
+            if not response.error_message:
+                response.error_message = 'Failed to create a payment account because no owner has linked a WePay account.'
         return response
 
     def account_for_project(self, project_key):

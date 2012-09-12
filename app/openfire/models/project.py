@@ -171,7 +171,7 @@ class Proposal(AppModel):
 
     # Naming/Status
     name = ndb.StringProperty('n', indexed=True, required=True)
-    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a'])  # draft, submitted, review, denied, accepted
+    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a', 'p'])  # draft, submitted, review, denied, accepted, suspended
     category = ndb.KeyProperty('ct', indexed=True, required=True)
 
     # Content
@@ -190,7 +190,8 @@ class Proposal(AppModel):
 
     # Goals + Tiers
     initial_goal = ndb.LocalStructuredProperty(Goal, 'ig', compressed=True)
-    tiers = ndb.LocalStructuredProperty(Tier, 'ts', compressed=True, repeated=True)
+    initial_tiers = ndb.LocalStructuredProperty(Tier, 'ts', compressed=True, repeated=True)
+    initial_next_steps = ndb.LocalStructuredProperty(NextStep, 'ns', compressed=True, repeated=True)
     future_goal = ndb.LocalStructuredProperty(FutureGoal, 'fg', compressed=True)
 
     # Avatar + Video
@@ -208,7 +209,7 @@ class Project(AppModel):
 
     # Naming/Status/Ancestry
     name = ndb.StringProperty('n', indexed=True, required=True)
-    status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c'])  # private, featured, open, closed
+    status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c', 'x', 's'], default='p')  # private, featured, open, closed, canceled, suspended
     proposal = ndb.KeyProperty('pr', indexed=True, required=True)
     category = ndb.KeyProperty('ct', indexed=True, required=True)
     customurl = ndb.KeyProperty('url', indexed=True, default=None)

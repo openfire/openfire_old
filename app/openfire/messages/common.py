@@ -78,6 +78,35 @@ class CustomUrlCheck(messages.Message):
     suggestions = messages.StringField(3, repeated=True)
 
 
+class Tier(messages.Message):
+
+    '''
+    Common to proposals and projects, defines a contribution tier.
+    Required: (key, target)
+    '''
+
+    key = messages.StringField(1)
+    target = messages.StringField(2)
+    name = messages.StringField(3)
+    contribution_type = messages.StringField(4)
+    amount = messages.FloatField(5)
+    description = messages.StringField(6)
+    delivery = messages.StringField(7)
+    next_step_votes = messages.IntegerField(8)
+    backer_count = messages.IntegerField(9)
+    backer_limit = messages.IntegerField(10)
+
+
+class NextStep(messages.Message):
+
+    ''' A next step for a goal. '''
+
+    key = messages.StringField(1)
+    summary = messages.StringField(2)
+    description = messages.StringField(3)
+    votes = messages.IntegerField(4)
+
+
 class Goal(messages.Message):
 
     '''
@@ -103,6 +132,8 @@ class Goal(messages.Message):
     funding_deadline = messages.StringField(16)
     deliverable_description = messages.StringField(17)
     deliverable_date = messages.StringField(18)
+    tiers = messages.MessageField(Tier, 19, repeated=True)
+    next_steps = messages.MessageField(NextStep, 20, repeated=True)
 
 
 class Goals(messages.Message):
@@ -133,25 +164,6 @@ class ProposeGoal(messages.Message):
     deliverable_date = messages.StringField(6)
 
 
-class Tier(messages.Message):
-
-    '''
-    Common to proposals and projects, defines a contribution tier.
-    Required: (key, target)
-    '''
-
-    key = messages.StringField(1)
-    target = messages.StringField(2)
-    name = messages.StringField(3)
-    contribution_type = messages.StringField(4)
-    amount = messages.FloatField(5)
-    description = messages.StringField(6)
-    delivery = messages.StringField(7)
-    next_step_votes = messages.IntegerField(8)
-    backer_count = messages.IntegerField(9)
-    backer_limit = messages.IntegerField(10)
-
-
 class Tiers(messages.Message):
 
     ''' A list of project tiers. '''
@@ -166,16 +178,6 @@ class TierRequest(messages.Message):
 
     key = messages.StringField(1)
     goal = messages.StringField(2)
-
-
-class NextStep(messages.Message):
-
-    ''' A next step for a goal. '''
-
-    key = messages.StringField(1)
-    summary = messages.StringField(2)
-    description = messages.StringField(3)
-    votes = messages.IntegerField(4)
 
 
 class NextSteps(messages.Message):
@@ -259,3 +261,11 @@ class FollowersResponse(messages.Message):
     ''' Response containing a list of follower usernames. '''
 
     profiles = messages.StringField(1, repeated=True)
+
+
+class ViewerRequest(messages.Message):
+
+    ''' Used to add and remove viewers from projects and proposals. '''
+
+    user = messages.StringField(1)
+    target = messages.StringField(2)
