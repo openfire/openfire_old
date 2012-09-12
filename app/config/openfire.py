@@ -261,7 +261,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'profile'
+    'namespace': 'placeholder'
 }
 
 config['openfire.output'] = {
@@ -367,18 +367,9 @@ config['openfire.sessions'] = {
 
         'datastore': {
             'ttl': '2400',
-            'enabled': True
+            'enabled': False
         }
 
-    }
-
-}
-
-config['openfire.datamodel'] = {
-
-    'namespacing': {
-        'enabled': False,
-        'mode': 'appversion'
     }
 
 }
@@ -387,7 +378,7 @@ config['openfire.datamodel.integration.pipelines'] = {
 
     'enable': True,  # enable/disable pipelines integration
     'logging': False,  # enable/disable logging
-    'autostart': True,  # automatically kick off bound pipelines
+    'autostart': False,  # automatically kick off bound pipelines
     'trigger_queue': 'trigger'  # task queue to send pipelines to
 
 }

@@ -4,7 +4,7 @@ runtime: python27
 api_version: 1
 threadsafe: yes
 
-default_expiration: "1m"
+default_expiration: "364d"
 
 
 #### ===== Files to Skip
@@ -104,22 +104,22 @@ pagespeed:
 
 
 #### ===== Custom Admin Pages
-admin_console:
-  pages:
-  - name: L9 Dashboard
-    url: /go/admin/dashboard
-  - name: JIRA
-    url: /go/admin/jira
-  - name: Confluence
-    url: /go/admin/wiki
-  - name: Crowd (SSO)
-    url: /go/admin/sso
-  - name: Watchdog
-    url: /go/admin/watchdog
-  - name: AppStats
-    url: /_ah/stats
-  - name: AWS
-    url: /go/admin/aws
+#admin_console:
+#  pages:
+#  - name: L9 Dashboard
+#    url: /go/admin/dashboard
+#  - name: JIRA
+#    url: /go/admin/jira
+#  - name: Confluence
+#    url: /go/admin/wiki
+#  - name: Crowd (SSO)
+#    url: /go/admin/sso
+#  - name: Watchdog
+#    url: /go/admin/watchdog
+#  - name: AppStats
+#    url: /_ah/stats
+#  - name: AWS
+#    url: /go/admin/aws
 
 
 #### ===== Error Handlers
@@ -193,24 +193,35 @@ handlers:
 # Images (Static)
 - url: /assets/img/static
   static_dir: assets/img/static
-  expiration: "1m"
+  expiration: "364d"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: :"beta.openfi.re staging.openfi.re"
 
 # Style (Static)
 - url: /assets/style/static
   static_dir: assets/style/static
   mime_type: text/css
-  expiration: "1m"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: :"beta.openfi.re staging.openfi.re"
 
 # Scripts (Static)
 - url: /assets/js/static
   static_dir: assets/js/static
   mime_type: text/javascript
-  expiration: "1m"
+  expiration: "364d"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: :"beta.openfi.re staging.openfi.re"
 
 # Generic (Static)
 - url: /assets/ext/static
   static_dir: assets/ext/static
   expiration: "364d"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: :"beta.openfi.re staging.openfi.re"
 
 # Dynamic Assets
 - url: /assets/.*

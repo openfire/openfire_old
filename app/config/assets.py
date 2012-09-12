@@ -132,34 +132,34 @@ config['apptools.project.assets'] = {
             'assets': {
 
                 ## Core
-                'base': {'name': '_base.sass', 'module': '_core', 'version': 0.1},
-                'h5bp': {'name': '_h5bp.sass', 'module': '_core', 'version': 0.1},
-                'init': {'name': '_initializer.sass', 'module': '_core', 'version': 0.1},
-                'config': {'name': '_config.sass', 'module': '_core', 'version': 0.1},
-                'fonts': {'name': '_fonts.sass', 'module': '_core', 'version': 0.1},
-                'media': {'name': '_mediaqueries.sass', 'module': '_core', 'version': 0.1},
-                'print': {'name': '_print.sass', 'module': '_core', 'version': 0.1},
+                'base': {'name': '_base.sass', 'module': '_core', 'version': 0.2},
+                'h5bp': {'name': '_h5bp.sass', 'module': '_core', 'version': 0.2},
+                'init': {'name': '_initializer.sass', 'module': '_core', 'version': 0.3},
+                'config': {'name': '_config.sass', 'module': '_core', 'version': 0.2},
+                'fonts': {'name': '_fonts.sass', 'module': '_core', 'version': 0.2},
+                'media': {'name': '_mediaqueries.sass', 'module': '_core', 'version': 0.2},
+                'print': {'name': '_print.sass', 'module': '_core', 'version': 0.2},
 
                 ## Partials
-                'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.1},
-                'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.1},
-                'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.1},
-                'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.1},
+                'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.2},
+                'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.2},
+                'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.2},
+                'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.2},
 
                 ## Openfire
-                'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.1},
-                'landing': {'name': 'landing.sass', 'module': 'openfire', 'version': 0.1},
-                'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.1},
-                'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.1},
+                'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.2},
+                'landing': {'name': 'landing.sass', 'module': 'openfire', 'version': 0.2},
+                'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.2},
+                'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.2},
 
                 ## Main
-                'ie': {'name': 'ie.sass', 'version': 0.1},
-                'bbq': {'name': 'bbq.sass', 'version': 0.1},
-                'main': {'name': 'main.sass', 'version': 0.1},
-                'admin': {'name': 'admin.sass', 'version': 0.1},
-                'mobile': {'name': 'mobile.sass', 'version': 0.1},
-                'jasmine': {'name': 'jasmine.sass', 'version': 0.1},
-                'security': {'name': 'security.sass', 'version': 0.1},
+                'ie': {'name': 'ie.sass', 'version': 0.2},
+                'bbq': {'name': 'bbq.sass', 'version': 0.2},
+                'main': {'name': 'main.sass', 'version': 0.2},
+                'admin': {'name': 'admin.sass', 'version': 0.2},
+                'mobile': {'name': 'mobile.sass', 'version': 0.2},
+                'jasmine': {'name': 'jasmine.sass', 'version': 0.2},
+                'security': {'name': 'security.sass', 'version': 0.2},
 
             }
 
@@ -174,11 +174,11 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'main': {'version': 0.3},  # reset, main, layout, forms
-                'ie': {'version': 0.3},    # fixes for internet explorer (grrr...)
-                'print': {'version': 0.3},  # proper format for printing
-                'admin': {'version': 0.3},   # admin
-                'security': {'version': 0.2}  # login/register/etc
+                'main': {'version': 0.4},  # reset, main, layout, forms
+                'ie': {'version': 0.4},    # fixes for internet explorer (grrr...)
+                'print': {'version': 0.4},  # proper format for printing
+                'admin': {'version': 0.4},   # admin
+                'security': {'version': 0.3}  # login/register/etc
             }
 
         },
@@ -192,10 +192,10 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'landing': {'version': 0.4},  # styles for the landing
-                'proposal': {'version': 0.1},  # styles for the proposal page
-                'project': {'version': 0.3},  # styles for the project page
-                'profile': {'version': 0.2}   # styles for the profile page
+                'landing': {'version': 0.5},  # styles for the landing
+                'proposal': {'version': 0.2},  # styles for the proposal page
+                'project': {'version': 0.4},  # styles for the project page
+                'profile': {'version': 0.3}   # styles for the profile page
             }
 
         },
