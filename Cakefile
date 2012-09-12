@@ -835,7 +835,7 @@ task 'minify:coffee', 'minify js codebase', (options) ->
 	for file in files_to_minify
 		total_ops = total_ops + 1
 		out.say 'uglifyjs', 'Minifying '+file[0]+'...'
-		out.spawn 'uglify', 'node', [fixpath(__dirname, 'node_modules', 'uglify-js', 'bin', 'uglifyjs'), '-nm', '-b', '-nc', '-nmf', '-o', file[1], file[2]], minify_done, minify_data, minify_err
+		out.spawn 'uglify', 'node', [fixpath(__dirname, 'node_modules', 'uglify-js', 'bin', 'uglifyjs'), '-nm', '-nc', '-nmf', '-o', file[1], file[2]], minify_done, minify_data, minify_err
 
 
 ######## =======  Templates  ========== ########

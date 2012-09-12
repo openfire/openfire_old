@@ -41,14 +41,6 @@
 
 {# zero out platform scripts #}
 {%- block jscore -%}{%- endblock jscore -%}
-{% block jsbase %}
-<!-- Base Scripts -->
-{% if security.permissions.admin %}
-<script src="{{ asset.script('admin', 'apptools') }}"></script>
-{% else %}
-<script src="{{ asset.script('base', 'apptools') }}"></script>
-{%- endif -%}
-{% endblock jsbase %}
 {%- block jsext -%}{%- endblock jsext -%}
 
 {% block jsready %}

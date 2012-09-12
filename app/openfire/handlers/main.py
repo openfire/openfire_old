@@ -20,6 +20,11 @@ class Placeholder(WebHandler):
 
     template = 'main/placeholder.html'
     should_cache = True
+    transport = {
+        'secure': True,
+        'endpoint': 'beta.openfi.re',
+        'consumer': 'ofplaceholder'
+    }
 
     @webapp2.cached_property
     def config(self):
@@ -44,6 +49,9 @@ class Placeholder(WebHandler):
     def get(self):
 
         ''' Return a rendered submission form. '''
+
+        self.force_hostname = "beta.openfi.re"
+        self.force_https_assets = True
 
         if self.should_cache:
             cache_key = '::'.join(['of', 'pagecache', 'placeholder'])

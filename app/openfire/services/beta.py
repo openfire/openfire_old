@@ -67,13 +67,13 @@ class BetaService(RemoteService):
             else:
                 request.email = str(request.email).lower()
                 if self.api.mail.is_email_valid(request.email):
-                    b64_email = base64.b64encode(hashlib.sha256(request.email).hexdigest())
+                    b64_email = hashlib.sha256(base64.b64encode(request.email)).hexdigest()
                 else:
                     raise self.exceptions.InvalidEmailException("The email you provided isn't valid for some reason!")
 
                 # Generate signup token
                 signup_token = security.generate_random_string(32)
-                b64_encoded_token = base64.b64encode(hashlib.sha256(signup_token).hexdigest())
+                b64_encoded_token = hashlib.sha256(base64.b64encode(signup_token)).hexdigest()
 
                 existing = models.Signup.get_by_id(b64_email)
                 if existing is None:
