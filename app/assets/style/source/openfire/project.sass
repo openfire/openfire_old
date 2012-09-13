@@ -164,13 +164,14 @@
 // Other tablet landscape
 @media only screen and (min-width: 481px)
     +tablet-landscape
+    #project
+        margin: 0 auto
 
 // Other tablet portrait
 @media only screen and (max-width: 620px)
     +tablet-portrait
     #project
         overflow: hidden
-        margin: 0 auto
         width: 100%
         top: -200px
 
@@ -250,12 +251,16 @@
     #footer-container
         display: none
 
+@media only screen and (min-width: 768px)
+    #welcomebox, #deets
+        margin-right: 320px
+
+    #welcomebox
+        text-align: center
+
 // Fullscreen desktop/laptop
 @media only screen and (min-width: 768px) and (max-width: 1140px)
     +fullscreen
-
-    #project
-        margin: 0 auto
 
     #promote
         margin: 20px auto
@@ -303,13 +308,18 @@
 @import "../main"
 
 #main
+    padding-top: 50px
     #content::before
         display: none !important
 
 #welcomebox
     z-index: 800
+    text-align: center
+    margin-top: 10px
+    margin-bottom: 10px
 
 #promote
+    margin: 20px auto
     text-align: right
     background-color: #ccc
     border-top-right-radius: 3px
