@@ -20,6 +20,7 @@
     overflow: hidden
     clear: right
     height: 300px
+
     div.content
       display: block
       position: absolute
@@ -38,6 +39,7 @@
       -moz-border-radius: 5px
       width: 520px
       clear: both
+
   div.action-bar
     display: block
     position: relative
@@ -53,6 +55,7 @@
     z-index: 88
     -webkit-border-radius: 5px
     -moz-border-radius: 5px
+
   .step-container .step-title
     display: block
     position: relative
@@ -67,6 +70,7 @@
     z-index: 88
     -webkit-border-radius: 5px
     -moz-border-radius: 5px
+
   ul.anchor
     position: relative
     display: block
@@ -76,6 +80,7 @@
     margin: 5px 10px 0 0
     border: 0px solid #CCCCCC
     background: transparent
+
     li
       position: relative
       display: block
@@ -86,6 +91,7 @@
       border: 0px solid #E0E0E0
       float: left
       clear: both
+
       a
         display: block
         position: relative
@@ -99,6 +105,7 @@
         -moz-border-radius: 5px
         -webkit-border-radius: 5px
         z-index: 99
+
         .step-number
           position: relative
           float: left
@@ -107,6 +114,9 @@
           padding: 5px
           padding-top: 0
           font: bold 45px Verdana, Arial, Helvetica, sans-serif
+          margin: 3px
+          min-width: 0px
+
         .step-desc
           position: relative
           display: block
@@ -114,9 +124,12 @@
           text-align: left
           padding: 5px
           width: 70%
+          color: #333333
           font: bold 20px Verdana, Arial, Helvetica, sans-serif
+
           small
             font: normal 12px Verdana, Arial, Helvetica, sans-serif
+
         &.selected
           color: #F8F8F8
           background: #EA8511
@@ -125,33 +138,41 @@
           -moz-box-shadow: 1px 5px 10px #888
           -webkit-box-shadow: 1px 5px 10px #888
           box-shadow: 1px 5px 10px #888
+
           &:hover
             color: #F8F8F8
             background: #EA8511
+
         &.done
           position: relative
           color: #FFF
           background: #8CC63F
           border: 1px solid #8CC63F
           z-index: 99
+
           &:hover
             color: #5A5655
             background: #8CC63F
             border: 1px solid #5A5655
+
         &.disabled
           color: #CCCCCC
           background: #F8F8F8
           border: 1px solid #CCC
           cursor: text
+
           &:hover
             color: #CCCCCC
             background: #F8F8F8
+
         &.error
           color: #6c6c6c !important
           background: #f08f75 !important
           border: 1px solid #fb3500 !important
+
           &:hover
             color: #000 !important
+
   .button-next
     display: block
     float: right
@@ -167,11 +188,13 @@
     border: 1px solid #5A5655
     -moz-border-radius: 5px
     -webkit-border-radius: 5px
+
   .button-disabled
     color: #F8F8F8  !important
     background-color: #CCCCCC !important
     border: 1px solid #CCCCCC  !important
     cursor: text
+
   .button-previous
     display: block
     float: right
@@ -187,6 +210,7 @@
     border: 1px solid #5A5655
     -moz-border-radius: 5px
     -webkit-border-radius: 5px
+
   .button-finish
     display: block
     float: right
@@ -209,10 +233,12 @@
   font: 13px Verdana,Arial,Helvetica,sans-serif
   padding: 2px
   width: 430px
+
   &:focus
     border: 1px solid #EA8511
 
 .sw-main
+
   .loader
     position: relative
     display: none
@@ -226,6 +252,7 @@
     -moz-border-radius: 5px
     -webkit-border-radius: 5px
     z-index: 998
+
   .msg-box
     position: relative
     display: none
@@ -240,10 +267,12 @@
     -webkit-border-radius: 5px
     z-index: 999
     min-width: 200px
+
     .content
       font: normal 12px Verdana,Arial,Helvetica,sans-serif
       padding: 0px
       float: left
+
     .close
       border: 1px solid #CCC
       border-radius: 3px
@@ -256,6 +285,7 @@
       position: relative
       text-align: center
       text-decoration: none
+
       &:hover
         color: #EA8511
         border: 1px solid #EA8511

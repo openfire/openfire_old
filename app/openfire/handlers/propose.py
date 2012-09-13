@@ -5,6 +5,7 @@ import logging
 from google.appengine.ext import ndb
 
 from openfire.handlers import WebHandler
+from openfire.models.project import Category
 
 
 class ProposeLanding(WebHandler):
@@ -15,7 +16,10 @@ class ProposeLanding(WebHandler):
 
         ''' Render propose_landing.html. '''
 
-        self.render('propose/proposal_landing.html')
+        context = {
+            'categories': Category.query().fetch(),
+        }
+        self.render('propose/proposal_landing.html', **context)
         return
 
 

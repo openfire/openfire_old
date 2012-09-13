@@ -96,6 +96,7 @@ class ProjectService(RemoteService):
 
         # Update the project to open.
         project.status = 'o'
+        project.public = True
         project.put()
 
         return Echo(message='Opened project')
@@ -183,6 +184,7 @@ class ProjectService(RemoteService):
 
         # Set the status to suspended.
         project.status = 's'
+        project.public = False
         project.put()
 
         return Echo(message='Project suspended')
@@ -201,6 +203,7 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Failed to find project')
 
         project.status = 'c'
+        project.public = False
         project.put()
 
         return Echo(message='Project shut down')
@@ -219,6 +222,7 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Failed to find project')
 
         project.status = 'x'
+        project.public = False
         project.put()
 
         # TODO: Cancel all pending payments.

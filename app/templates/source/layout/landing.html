@@ -33,7 +33,7 @@
                     {% for project in projects %}
                         <!-- project card for {{ project.slug }} -->
                         <div class='project-card' data-project='{{ project.slug }}'>
-                            <a href="{{ link('custom_url', customurl=project.slug) }}">
+                            <a href="{% if project.slug %}{{ link('custom_url', customurl=project.slug) }}{% else %}{{ link('project/home', key=project['key'].urlsafe()) }}{% endif %}">
                                 <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
                                     {% if project.avatar %}
                                         {% if project.avatar.location %}

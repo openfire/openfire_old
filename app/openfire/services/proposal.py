@@ -1,13 +1,15 @@
 from google.appengine.ext import ndb
 from apptools.services.builtin import Echo
 from protorpc import messages, message_types, remote
+
 from openfire.services import RemoteService
 from openfire.messages import proposal as proposal_messages
 from openfire.messages import project as project_messages
 from openfire.messages import common as common_messages
-from openfire.models.project import Proposal, Project, Goal, FutureGoal, Tier, NextStep
-from openfire.models.payment import WePayUserPaymentAccount
+
 from openfire.core.payment import PaymentAPI
+from openfire.models.assets import CustomURL
+from openfire.models.project import Proposal, Project, Goal, FutureGoal, Tier, NextStep
 
 class ProposalService(RemoteService):
 
@@ -79,12 +81,13 @@ class ProposalService(RemoteService):
             proposal.owners = owner_keys
 
         # Update the proposal.
-        proposal.mutate_from_message(request, exclude=['key', 'status', 'creator', 'owners'])
+        proposal.mutate_from_message(request, exclude=['key', 'status', 'creator', 'owners',
+                'initial_goal', 'future_goal', 'initial_tiers', 'initial_next_steps'])
 
         # Set the goals, tiers, and next steps since mutate_from_message does not handle those.
         if isinstance(request.initial_goal, messages.Message):
             goal = Goal().mutate_from_message(request.initial_goal)
-            if goal:
+            if goal and goal.amount:
                 proposal.initial_goal = goal
 
         # Future Goal
@@ -98,7 +101,7 @@ class ProposalService(RemoteService):
             tiers = []
             for tier_message in request.initial_tiers:
                 tier = Tier().mutate_from_message(tier_message)
-                if tier:
+                if tier and tier.amount:
                     tiers.append(tier)
             proposal.initial_tiers = tiers
 
@@ -208,6 +211,16 @@ class ProposalService(RemoteService):
             future_goal.put()
             new_project.future_goal = future_goal.key
             project_needs_put = True
+
+        # Set up the custom URL if it is available.
+        custom_url = None
+        if proposal.desired_url:
+            url_key = ndb.Key(CustomURL, proposal.desired_url)
+            if not url_key.get():
+                custom_url = CustomURL(key=url_key, slug=proposal.desired_url, target=new_project.key)
+                custom_url.put()
+                new_project.customurl = custom_url.key
+                project_needs_put = True
 
         # Save the project again if anything just changed.
         if project_needs_put:

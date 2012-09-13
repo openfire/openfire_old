@@ -73,7 +73,7 @@ class Goal(AppModel):
 
     # Funding status, limits, and exact times.
     funding_open = ndb.BooleanProperty('fo', indexed=True, default=False)
-    funding_day_limit = ndb.IntegerProperty('fl', indexed=True, choices=range(15, 101))
+    funding_day_limit = ndb.IntegerProperty('fl', indexed=True, choices=range(7, 101))
     funding_deadline = ndb.DateTimeProperty('fd', indexed=True, required=False)
     funding_start = ndb.DateTimeProperty('fs', indexed=True, required=False)
     funding_end = ndb.DateTimeProperty('fe', indexed=True, required=False)
@@ -171,13 +171,15 @@ class Proposal(AppModel):
 
     # Naming/Status
     name = ndb.StringProperty('n', indexed=True, required=True)
-    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a', 'p'])  # draft, submitted, review, denied, accepted, suspended
+    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a', 'p'], default='f')  # draft, submitted, review, denied, accepted, suspended
     category = ndb.KeyProperty('ct', indexed=True, required=True)
+    desired_url = ndb.StringProperty('u', indexed=True, required=False)
 
     # Content
     summary = ndb.StringProperty('m', indexed=True)
     pitch = ndb.TextProperty('p', indexed=False)
     tech = ndb.TextProperty('t', indexed=False)
+    team = ndb.TextProperty('te', indexed=False)
     keywords = ndb.StringProperty('k', indexed=True, repeated=True)
 
     # Users

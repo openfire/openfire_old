@@ -14,6 +14,7 @@ from apptools.util import debug
 # External Imports
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import eventloop
+from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 from protorpc.messages import MessageField
 
 # Openfire Imports
@@ -276,7 +277,7 @@ class MessageConverterMixin(ModelMixin):
                         try:
                             key = ndb.key.Key(urlsafe=getattr(message, k))
                             setattr(self, str(k), key)
-                        except TypeError:
+                        except (TypeError, ProtocolBufferDecodeError):
                             continue
                 else:
                     continue
