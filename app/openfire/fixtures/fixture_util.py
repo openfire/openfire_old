@@ -432,7 +432,7 @@ def create_image(parent_key=None, url='', name='', mime='', pending=False,
     parent.put()
 
 
-def create_video(parent_key=None, url='', name='', mime='', provider='', pending=False, approved=True, featured=True):
+def create_video(parent_key=None, url='', name='', mime='', provider='', sources={}, pending=False, approved=True, featured=True):
 
     ''' Create an video and assign it to a project. '''
 
@@ -446,7 +446,7 @@ def create_video(parent_key=None, url='', name='', mime='', provider='', pending
 
     asset_key = Asset(url=url, name=name, mime=mime, pending=pending, kind='v').put()
     video_key = Video(key=ndb.Key(Video, 'mainvideo', parent=parent_key),
-            provider=provider, url=url, asset=asset_key, approved=approved, featured=featured).put()
+            provider=provider, url=url, asset=asset_key, sources=sources, approved=approved, featured=featured).put()
     parent.video = video_key
     parent.put()
 
