@@ -1,0 +1,43 @@
+form
+    font-size: 80%
+
+input, label
+    margin: 10px
+    min-width: 100px
+    width: auto
+    font:
+        family: "Karla"
+        weight: 400
+    line-height: 20pt
+    vertical-align: middle
+    color: #444
+    font-size: 14pt
+    padding: 0px 10px
+
+    &:focus
+        outline: none
+
+input
+    border: 1px solid #ccc
+    border-radius: 4px
+
+input[type="text"], input[type="password"]
+    box-shadow: inset 1px 1px 2px 1px rgba(0,0,0,0.1)
+    &:focus
+        border-color: #999
+
+button, input[type="button"], input[type="submit"], input[type="reset"]
+    background-color: whitesmoke
+
+    &:hover
+        box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.1)
+        border-color: #999
+
+    &:active
+        box-shadow: inset 1px 1px 2px 1px rgba(0,0,0,0.1)
+
+input[type="radio"]
+    min-width: 10px
+
+input[type="file"]
+    opacity: 0

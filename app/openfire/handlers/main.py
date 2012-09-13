@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import base64
 import webapp2
+import hashlib
 import config as cfg
 from config import config
 from apptools.util import debug
@@ -46,25 +48,96 @@ class Placeholder(WebHandler):
 
         return [['beta', ['signup'], {'caching': False}]]
 
-    def get(self):
+    def get(self, **kwargs):
 
         ''' Return a rendered submission form. '''
 
         self.force_hostname = "beta.openfi.re"
         self.force_https_assets = True
 
+        args = {
+            'state': self.request.GET.get('st'),
+            'reason': self.request.GET.get('r'),
+            'exception': self.request.GET.get('xc')
+        }
+
+        args.update(kwargs)
+
         if self.should_cache:
-            cache_key = '::'.join(['of', 'pagecache', 'placeholder'])
+            cache_key = '::'.join(['of', 'pagecache', 'placeholder'] + [','.join([':'.join([str(k), str(v)]) for k, v in args.items() if v != None])])
             self.logging.info('Pagecache enabled. Looking for placeholder content in cache key "%s".' % cache_key)
 
             cached = self.api.memcache.get(cache_key)
             if cached is None:
                 self.logging.info('No cached copy found. Rendering.')
-                rendered = self.render('main/placeholder.html')
+                rendered = self.render('main/placeholder.html', flags=args, csrf=base64.b64encode(hashlib.sha512(generate_random_string(32)).hexdigest()))
                 self.api.memcache.set(cache_key, rendered)
                 return rendered
             self.logging.info('Cached copy found. Returning cached page.')
         return cached
+
+    def post(self):
+
+        ''' Handle a signup, when the JS mechanism for registering either fails or is not supported by the client. '''
+
+        #import pdb; pdb.set_trace()
+
+        ## check for the appropriate action
+        if self.request.POST.get('action', False) == 'of.beta.placeholder.registerSignup':
+            self.logging.info('Received POSTed beta signup form.')
+
+            ## check for our fakie CSRF token
+            if self.request.POST.get('csrf', None) not in ['', None]:
+
+                self.logging.info('Batch CSRF present: "%s".' % self.request.POST.get('csrf'))
+
+                ## import service + request message
+                from openfire.messages.beta import BetaSignup
+                from openfire.services.beta import BetaService
+
+                ## invoke remote method, taking care to handle exceptions
+                try:
+                    self.logging.info('Submitting signup with name "%s" and email "%s".' % (self.request.POST.get('name'), self.request.POST.get('email')))
+                    r = BetaService().signup(BetaSignup(**{
+                        'name': self.request.POST.get('name'),
+                        'email': self.request.POST.get('email')
+                    }))
+
+                    self.logging.info('Signup result: "%s".' % str(r))
+
+                except BetaService.BetaServiceException, e:
+
+                    ## render with specific error message
+                    # return self.redirect_to('landing', st='error', xc=e.__class__, ms=str(e))
+
+                    self.logging.error('Encountered known BetaServiceException.')
+                    self.logging.error('Exception class: "%s".' % str(e.__class__))
+                    self.logging.error('Exception str: "%s".' % str(e))
+                    self.logging.info('Rendering known error.')
+                    return self.get(state='error', reason=str(e), exception=e.__class__)
+
+                except Exception, e:
+
+                    ## redirect to generic error message
+                    # return self.redirect_to('landing', st='error', r='generic')
+
+                    self.logging.error('Encountered unknown exception.')
+                    self.logging.error('Exception class: "%s".' % str(e.__class__))
+                    self.logging.error('Exception str: "%s".' % str(e))
+                    self.logging.info('Rendering generic error.')
+                    return self.get(state='error', r='generic')
+
+                else:
+
+                    ## redirect to success
+                    # return self.redirect_to('landing', st='success')
+                    self.logging.info('Signup success! Rendering generic success.')
+                    return self.get(state='success')
+
+        ## render to generic error
+        # return self.redirect_to('landing', st='error', r='generic')
+        self.logging.error('Unknown POST form action encountered: "%s". Rendering generic error. ' % self.request.POST.get('action'))
+        return self.get(state='error', reason='generic')
 
 
 class Landing(WebHandler):
@@ -188,6 +261,13 @@ class Landing(WebHandler):
                 self.api.memcache.set('landing_page_context', context)
 
         return self.render('main/landing.html', **context)
+
+    def post(self):
+
+        ''' Redirect to the landing placeholder, if enabled. '''
+
+        if 'placeholder' in self.request.POST.get('action', 'nope'):
+            return Placeholder(self.request, self.response).post()
 
 
 class VerifyURL(WebHandler):

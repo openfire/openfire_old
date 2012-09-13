@@ -6,7 +6,7 @@
     <div id='placeholder' class="rounded-big center-all">
 
         <!-- placeholder success/error cues -->
-        <div id='placeholder-error' class='error notification'>Oh noes! Something went wrong! Please reload the page and try again.</div>
+        <div id='placeholder-error' class='error notification'>{%- if flags.reason != 'generic' -%}{{ flags.reason }}{%- else -%}Oh noes! Something went wrong! Please reload the page and try again.{%- endif -%}</div>
         <div id='placeholder-success' class='yay notification'>Thanks! Your signup has been received. Check your email!</div>
 
         <!-- placeholder intro text -->
@@ -26,10 +26,12 @@
         <!-- placeholder email/name submission -->
         <div id="emailform">
             <form id='placeholder-form' action="{{ link('landing') }}" method='post'>
-                <input id='name' type='text' required class='plformfield' placeholder='your name' />
-                <input id='email' type='email' required class='plformfield' placeholder='email address' />
+                <input id='name' type='text' name='name' required class='plformfield' placeholder='your name' />
+                <input id='email' type='email' name='email' required class='plformfield' placeholder='email address' />
+                <input id='csrf' type='hidden' name='csrf' value='{{ csrf }}' />
+                <input id='action' type='hidden' name='action' value='of.beta.placeholder.registerSignup' />
                 <button id='putsignup' class='active'>
-                    <span id='submittext' class='karlabold'>Sign up!</span>
+                    <span id='submittext' class='karlabold'>{%- if flags.state == 'error' -%}Again!{%- elif flags.state == 'success' -%}Yay!{%- else -%}Sign up!{%- endif -%}</span>
                 </button><!-- end #putsignup -->
             </form><!-- end #placeholder-form -->
         </div><!-- end #login_wrapper -->
@@ -73,3 +75,26 @@
                 $.apptools.api.beta.signup({name: _of_pl.el.name.value, email: _of_pl.el.email.value}).fulfill(_of_pl.callbacks.rpc);
                 }, 250); } } } }, ofpl_sb = _of_pl.el.wrap.onsubmit = _of_pl.el.submit.onclick = _of_pl.callbacks.submit,
 {%- endblock jsready -%}
+
+
+{# trigger an error/success notification if we have args, meaning the user submitted the form via POST #}
+
+{% block postsouth %}
+{%- if flags.state != none -%}
+<script type='text/javascript'>
+(function () { return _.ready(function () {
+    var pln = _.get('placeholder-{{ flags.state }}');
+    setTimeout(function () {
+        pln.classList.add('active');
+        setTimeout(function () {
+            {% if flags.state == 'success' %}
+            var btn = _.get('submittext').innerHTML = "Sign up!";
+            {%- endif -%}
+            pln.classList.remove('active');
+        }, 2300);
+    }, 350);
+
+})}).call(this);
+</script>
+{%- endif -%}
+{% endblock %}
