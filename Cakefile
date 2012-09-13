@@ -724,7 +724,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									#fixpath(js_prefix, 'source', 'apptools', 'admin', 'blog.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'admin', 'page.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'admin', 'site.coffee'),
-									fixpath(js_prefix, 'source', 'apptools', 'admin', 'content.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'admin', 'content.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 
