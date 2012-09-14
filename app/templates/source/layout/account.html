@@ -1,11 +1,26 @@
 {% extends "layout/layout_base.html" %}
 
+{% block stylesheets %}
+    <link rel='stylesheet' href='{{ asset.style('account', 'openfire') }}'>
+    <link rel="stylesheet" href="/assets/style/static/compiled/jquery.dataTables.css">
+{% endblock stylesheets %}
+
 {% block main %}
 
-    {% block account %}
-        <div>
-          <h1>User account</h1>
-        </div>
-    {% endblock %}
+    <div id="masthead"></div>
 
+    <div id="content">
+
+        {% block account %}
+            <div>
+              <h1>User account</h1>
+            </div>
+        {% endblock %}
+
+    </div>
+
+{% endblock %}
+
+{% block postsouth %}
+    <script type="text/javascript" language="javascript" src="/assets/js/static/core/jquery/jquery.dataTables.min.js"></script>
 {% endblock %}

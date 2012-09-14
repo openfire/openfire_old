@@ -761,7 +761,9 @@ class ProjectController extends OpenfireController
                         for source in response.sources
                             options += "<option value='" + source.key + "'>" + source.description + "</option>"
                     selector.innerHTML = options
-                    $.apptools.widgets.modal.get("back-project-dialog").open()
+                    # TODO: Does 'get' not work anymore?
+                    #$.apptools.widgets.modal.get("back-project-dialog").open()
+                    $.apptools.widgets.modal._state.modals[0].open()
                 failure: (error) =>
                     alert("Failed to start donation. Are you logged in?")
             return
