@@ -6,11 +6,19 @@
         "mime": "external/video",
         "provider": "vimeo",
         "sources": {
-            "hidef": "https://player.vimeo.com/external/49350448.hd.mp4?s=993a8a9dd84f687285cc312247e709bc",
-            "sdef": "https://player.vimeo.com/external/49350448.sd.mp4?s=7dda0b6b48a485227c69759b5b7052c9",
-            "mobile": "https://player.vimeo.com/external/49350448.mobile.mp4?s=99dd217a1f1e6141e7f86e5f3aba577f",
-            "live": "https://player.vimeo.com/external/49350448.m3u8?p=high,standard,mobile&s=ad6bb6bbe730390bb5f9bcf8de9e2d18"
-        }
+            "raw": {
+                "hidef": "https://player.vimeo.com/external/49350448.hd.mp4?s=993a8a9dd84f687285cc312247e709bc",
+                "sdef": "https://player.vimeo.com/external/49350448.sd.mp4?s=7dda0b6b48a485227c69759b5b7052c9",
+                "mobile": "https://player.vimeo.com/external/49350448.mobile.mp4?s=99dd217a1f1e6141e7f86e5f3aba577f",
+                "live": "https://player.vimeo.com/external/49350448.m3u8?p=high,standard,mobile&s=ad6bb6bbe730390bb5f9bcf8de9e2d18"
+            },
+            "thumbnails": {
+                "1280": "http://b.vimeocdn.com/ts/340/486/340486746_1280.jpg",
+                "640": "http://b.vimeocdn.com/ts/340/486/340486746_640.jpg",
+                "200": "http://b.vimeocdn.com/ts/340/486/340486746_200.jpg",
+                "100": "http://b.vimeocdn.com/ts/340/486/340486746_100.jpg"
+            }
+        },
     },
     {
         "parent_key": "project__Carrotmob",
@@ -19,10 +27,18 @@
         "mime": "external/video",
         "provider": "vimeo",
         "sources": {
-            "hidef": "https://player.vimeo.com/external/49369264.hd.mp4?s=cc2f05928b109c7b05250c87f39c4ea7",
-            "sdef": "https://player.vimeo.com/external/49369264.sd.mp4?s=a1b11ba0a3c8579afbc14999a7d7bb9b",
-            "mobile": "https://player.vimeo.com/external/49369264.mobile.mp4?s=6cc788fed8db28c5439f4dd170f48ffd",
-            "live": "https://player.vimeo.com/external/49369264.m3u8?p=high,standard,mobile&s=ce427cc3979262055f01fda599a4d430"
+            "raw": {
+                "hidef": "https://player.vimeo.com/external/49369264.hd.mp4?s=cc2f05928b109c7b05250c87f39c4ea7",
+                "sdef": "https://player.vimeo.com/external/49369264.sd.mp4?s=a1b11ba0a3c8579afbc14999a7d7bb9b",
+                "mobile": "https://player.vimeo.com/external/49369264.mobile.mp4?s=6cc788fed8db28c5439f4dd170f48ffd",
+                "live": "https://player.vimeo.com/external/49369264.m3u8?p=high,standard,mobile&s=ce427cc3979262055f01fda599a4d430"
+            },
+            "thumbnails": {
+                "1280": "http://b.vimeocdn.com/ts/340/605/340605300_1280.jpg",
+                "640": "http://b.vimeocdn.com/ts/340/605/340605300_640.jpg",
+                "200": "http://b.vimeocdn.com/ts/340/605/340605300_200.jpg",
+                "100": "http://b.vimeocdn.com/ts/340/605/340605300_100.jpg"
+            }
         }
     },
     {

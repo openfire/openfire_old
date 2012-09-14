@@ -16,7 +16,7 @@ config['openfire'] = {
 
 config['openfire.placeholder'] = {
 
-    'enabled': True,  # show placeholder instead of landing
+    'enabled': False,  # show placeholder instead of landing
     'force': True,  # show placeholder for logged in users, too
     'debug': True,  # enable debug logging for the placeholder handler
 

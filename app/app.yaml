@@ -194,23 +194,34 @@ handlers:
 - url: /assets/img/static
   static_dir: assets/img/static
   expiration: "1m"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: "beta.openfi.re staging.openfi.re"
 
 # Style (Static)
 - url: /assets/style/static
   static_dir: assets/style/static
   mime_type: text/css
   expiration: "1m"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: "beta.openfi.re staging.openfi.re"
 
 # Scripts (Static)
 - url: /assets/js/static
   static_dir: assets/js/static
   mime_type: text/javascript
   expiration: "1m"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: "beta.openfi.re staging.openfi.re"
 
 # Generic (Static)
 - url: /assets/ext/static
   static_dir: assets/ext/static
-  expiration: "364d"
+  http_headers:
+    Vary: "Accept-Encoding"
+    Access-Control-Allow-Origin: "beta.openfi.re staging.openfi.re"
 
 # Dynamic Assets
 - url: /assets/.*
