@@ -121,7 +121,7 @@
                                         {% if owner.has_custom_url() %}
                                             <a {{ {
 
-                                                'href': owner.get_custom_url(),
+                                                'href': link('custom_url', customurl=owner.get_custom_url()),
                                                 'target': 'blank',
                                                 'title': ' '.join([owner.firstname, owner.lastname])
 
@@ -129,7 +129,7 @@
                                         {% else %}
                                             <a {{ {
 
-                                                    'href': owner.get_custom_url(),
+                                                    'href': link('custom_url', customurl=encrypt(owner.key.urlsafe())),
                                                     'target': 'blank',
                                                     'title': ' '.join([owner.firstname, owner.lastname])
 
@@ -143,11 +143,13 @@
                                         'height': 32,
                                         'alt': ' '.join([owner.firstname, owner.lastname, '(%s)' % owner.username])
 
-                                    }|xmlattr }} />
+                                    }|xmlattr }} /></a>
 
                                     <div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
-                                        {%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
-                                        {%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- if owner.has_custom_url() -%}
+                                            <a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- else -%}
+                                            <a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
                                         {%- endif -%}
                                         {%- if owner.location -%}
                                             <span class='location byline'>{{ owner.location }}</span>
@@ -247,6 +249,7 @@
                     <h1 data-href="#project" class="target-link" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
                     <div id='deetactions'>
                         <div class='buttongroup' data-action="Share This">
+                            <div id="fblike" class="fb-like" data-send="false" data-width="250" data-show-faces="false" data-font="trebuchet ms"></div>
 							<div id='plusone' class="g-plusone" data-size="small" data-annotation="inline" data-width="250"></div>
                         </div> <!-- end .buttongroup -->
                     </div> <!-- end #deetactions -->

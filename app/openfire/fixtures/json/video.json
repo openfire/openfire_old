@@ -13,10 +13,10 @@
                 "live": "https://player.vimeo.com/external/49350448.m3u8?p=high,standard,mobile&s=ad6bb6bbe730390bb5f9bcf8de9e2d18"
             },
             "thumbnails": {
-                "1280": "http://b.vimeocdn.com/ts/340/486/340486746_1280.jpg",
-                "640": "http://b.vimeocdn.com/ts/340/486/340486746_640.jpg",
-                "200": "http://b.vimeocdn.com/ts/340/486/340486746_200.jpg",
-                "100": "http://b.vimeocdn.com/ts/340/486/340486746_100.jpg"
+                "1280": "https://deliver.openfi.re/ts/340/486/340486746_1280.jpg",
+                "640": "https://deliver.openfi.re/ts/340/486/340486746_640.jpg",
+                "200": "https://deliver.openfi.re/ts/340/486/340486746_200.jpg",
+                "100": "https://deliver.openfi.re/ts/340/486/340486746_100.jpg"
             }
         }
     },
@@ -34,10 +34,10 @@
                 "live": "https://player.vimeo.com/external/49369264.m3u8?p=high,standard,mobile&s=ce427cc3979262055f01fda599a4d430"
             },
             "thumbnails": {
-                "1280": "http://b.vimeocdn.com/ts/340/605/340605300_1280.jpg",
-                "640": "http://b.vimeocdn.com/ts/340/605/340605300_640.jpg",
-                "200": "http://b.vimeocdn.com/ts/340/605/340605300_200.jpg",
-                "100": "http://b.vimeocdn.com/ts/340/605/340605300_100.jpg"
+                "1280": "https://deliver.openfi.re/ts/340/605/340605300_1280.jpg",
+                "640": "https://deliver.openfi.re/ts/340/605/340605300_640.jpg",
+                "200": "https://deliver.openfi.re/ts/340/605/340605300_200.jpg",
+                "100": "https://deliver.openfi.re/ts/340/605/340605300_100.jpg"
             }
         }
     },
