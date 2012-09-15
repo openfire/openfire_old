@@ -14,6 +14,28 @@ config['openfire'] = {
 
 }
 
+config['openfire.video'] = {
+
+    'debug': False,  # show log messages about video serving ops
+
+    'providers': {
+        'vimeo': {
+            'default': 'flash'
+        }
+    },
+
+    'flash': {
+        'enable': True,
+        'force': False
+    },
+
+    'html5': {
+        'enable': True,
+        'force': False
+    }
+
+}
+
 config['openfire.placeholder'] = {
 
     'enabled': False,  # show placeholder instead of landing
