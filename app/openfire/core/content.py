@@ -607,6 +607,7 @@ class CoreContentAPI(CoreAPI):
     def render(self, template, context):
 
         ''' Render a template, given context '''
+
         if template is None:
             raise ValueError('Must pass in a template object or path to template source or an iterable of those.')
         else:
@@ -821,7 +822,7 @@ class ContentBridge(object):
             filters = {
                 'currency': lambda x: self._format_as_currency(x, False),
                 'percentage': lambda x: self._format_as_currency(x, True),
-                'json': json.dumps
+                'json': self.AppToolsJSONEncoder().encode
             }
 
             # generate environment
@@ -877,9 +878,8 @@ class ContentBridge(object):
                 self.context = context
 
             # Build response headers
-            response_headers = {}
             for key, value in self.baseHeaders.items():
-                response_headers[key] = value
+                self.response.headers[key] = value
 
             # Consider kwargs
             if len(kwargs) > 0:
@@ -902,10 +902,10 @@ class ContentBridge(object):
 
             if flush:
                 # Output rendered template
-                return self.response.write(rendered)
+                return self.response.write(self.minify(rendered))
             else:
                 # Return rendered template
-                return rendered
+                return self.minify(rendered)
 
     def fulfill_content(self, keyname, namespace, caller, blocktype):
 

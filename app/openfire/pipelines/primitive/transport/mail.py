@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import mail
 
 from openfire.models.transport import mail as models
-from openfire.pipelines.primitive import TransportPipeline
+from openfire.pipelines.primitive.transport import TransportPipeline
 
 
 ## MailPipeline - abstract parent for all Mail API-related pipelines

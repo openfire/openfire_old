@@ -1,5 +1,38 @@
 @import "../_core/mediaqueries"
 
+
+#mainvideo
+    position: relative
+
+#voverlay
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+
+    img
+        display: inline
+        position: absolute
+        right: 3.5em
+        bottom: 4em
+
+#project
+    #deets
+        max-width: 716px
+        margin-left: 4em
+        margin-right: auto
+
+#welcomebox
+    margin-left: 4em
+    max-width: 716px
+
+#global_progress
+    width: 320px
+    position: relative
+    left: -17px
+
+
 // Smartphones
 @media only screen and (min-width: 320px) and (max-width: 480px)
     +smartphone
@@ -34,6 +67,9 @@
 
     #mainvideo
         min-height: 200px
+
+        video
+            width: 340px
 
     #sidebar
         div,
@@ -134,6 +170,9 @@
     #mainvideo
         min-height: 300px
 
+        video
+            width: 718px
+
     #sidebuttons
         right: 20px
         top: 25px
@@ -200,6 +239,9 @@
         // hide embed until IR works!
         iframe
             display: none
+
+        video
+            width: 340px
 
     #sidebar
         position: fixed
@@ -829,7 +871,7 @@
         background-color: #ddd
         padding-bottom: 10px
 
-        .amount, 
+        .amount,
         .description
             color: #666
 

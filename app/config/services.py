@@ -97,6 +97,19 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Beta service for signing up placeholder users
+        'beta': {
+            'enabled': True,
+            'service': 'openfire.services.beta.BetaService',
+            'methods': ['signup'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## BBQ API - admin stuff (shhh!)
         'bbq': {
             'enabled': False,

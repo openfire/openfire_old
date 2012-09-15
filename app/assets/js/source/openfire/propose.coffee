@@ -35,13 +35,15 @@ class ProposeController
                 @collectProposeForm()
                 @createProposal()
 
-            $(document).ready ->
-                if $("#propose-wizard").smartWizard
-                    $("#propose-wizard").smartWizard
-                        labelFinish: 'Start Proposal'
-                        onShowStep: onShowStepCb
-                        onLeaveStep: onLeaveStepCb
-                        onFinish: onFinishCb
+            _.ready(() ->
+                if window.jQuery? and jQuery.fn?.smartWizard?
+                    if $("#propose-wizard").smartWizard
+                        $("#propose-wizard").smartWizard
+                            labelFinish: 'Create proposal'
+                            onShowStep: onShowStepCb
+                            onLeaveStep: onLeaveStepCb
+                            onFinish: onFinishCb
+            )
 
         @convertProp = (name, val) =>
             try

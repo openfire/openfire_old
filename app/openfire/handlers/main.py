@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+import base64
+import webapp2
+import hashlib
 import config as cfg
 from config import config
+from apptools.util import debug
 from openfire.models import user
 from openfire.models import assets
 from openfire.models import project as p
@@ -12,17 +16,132 @@ from openfire.handlers.user import UserProfile
 from webapp2_extras.security import generate_random_string
 
 
+## Placeholder - landing page for pre-beta, with a simple name/email signup page for requesting a beta invite.
 class Placeholder(WebHandler):
 
-	''' openfire placeholder! '''
+    ''' openfire placeholder! '''
 
-	def get(self):
+    template = 'main/placeholder.html'
+    should_cache = True
+    transport = {
+        'secure': True,
+        'endpoint': 'beta.openfi.re',
+        'consumer': 'ofplaceholder'
+    }
 
-		''' Return a rendered submission form. '''
+    @webapp2.cached_property
+    def config(self):
 
-		return self.render('main/placeholder.html', token=generate_random_string(32))
+        ''' Named config pipe. '''
+
+        return config.get('openfire.placeholder')
+
+    @webapp2.cached_property
+    def logging(self):
+
+        ''' Named logging pipe. '''
+
+        return debug.AppToolsLogger(path='openfire.handlers.main', name='Placeholder')._setcondition(self.config.get('debug', True))
+
+    def _make_services_object(self, services):
+
+        ''' Make an object describing services that should be exposed to the page. '''
+
+        return [['beta', ['signup'], {'caching': False}]]
+
+    def get(self, **kwargs):
+
+        ''' Return a rendered submission form. '''
+
+        ## force HTTPS assets on beta.openfi.re
+        self.force_https_assets = True
+        self.force_hostname = "beta.openfi.re"
+
+        ## pull URL args if we somehow got redirected here
+        args = {
+            'state': self.request.GET.get('st'),
+            'reason': self.request.GET.get('r'),
+            'exception': self.request.GET.get('xc')
+        }
+
+        ## we also accept args from kwargs
+        args.update(kwargs)
+        if self.should_cache:
+
+            ## generate cache key
+            cache_key = '::'.join(['of', 'pagecache', 'placeholder'] + [','.join([':'.join([str(k), str(v)]) for k, v in args.items() if v != None])])
+            self.logging.info('Pagecache enabled. Looking for placeholder content in cache key "%s".' % cache_key)
+
+            cached = self.api.memcache.get(cache_key)
+            if cached is not None:
+                self.logging.info('Cached copy found. Returning cached page.')
+                return cached
+            else:
+                self.logging.info('No cached copy found. Rendering.')
+
+        ## render with flags and new CSRF
+        rendered = self.render('main/placeholder.html', flags=args, csrf=base64.b64encode(hashlib.sha512(generate_random_string(32)).hexdigest()))
+
+        ## gotta set it if caching is enabled
+        if self.should_cache:
+            self.api.memcache.set(cache_key, rendered)
+
+        return rendered
 
 
+    def post(self):
+
+        ''' Handle a signup, when the JS mechanism for registering either fails or is not supported by the client. '''
+
+        ## check for the appropriate action
+        if self.request.POST.get('action', False) == 'of.beta.placeholder.registerSignup':
+            self.logging.info('Received POSTed beta signup form.')
+
+            ## check for our fakie CSRF token
+            if self.request.POST.get('csrf', None) not in ['', None]:
+
+                self.logging.info('Batch CSRF present: "%s".' % self.request.POST.get('csrf'))
+
+                ## import service + request message
+                from openfire.messages.beta import BetaSignup
+                from openfire.services.beta import BetaService
+
+                ## invoke remote method, taking care to handle exceptions
+                try:
+                    self.logging.info('Submitting signup with name "%s" and email "%s".' % (self.request.POST.get('name'), self.request.POST.get('email')))
+                    r = BetaService().signup(BetaSignup(**{
+                        'name': self.request.POST.get('name'),
+                        'email': self.request.POST.get('email')
+                    }))
+
+                    self.logging.info('Signup result: "%s".' % str(r))
+
+                except BetaService.BetaServiceException, e:
+
+                    ## render with specific error message
+                    self.logging.error('Encountered known BetaServiceException.')
+                    self.logging.error('Exception class: "%s".' % str(e.__class__))
+                    return self.get(state='error', reason=str(e), exception=e.__class__)
+
+                except Exception, e:
+
+                    ## render with generic error message
+                    self.logging.error('Encountered unknown exception.')
+                    self.logging.error('Exception class: "%s".' % str(e.__class__))
+                    return self.get(state='error', r='generic')
+
+                else:
+
+                    ## render with success
+                    self.logging.info('Signup success! Rendering generic success.')
+                    return self.get(state='success')
+
+        ## render to generic error
+        self.logging.error('Unknown POST form action encountered: "%s". Rendering generic error. ' % self.request.POST.get('action'))
+        return self.get(state='error', reason='generic')
+
+
+## Landing - prepare and serve openfire's landing page :)
 class Landing(WebHandler):
 
     ''' openfire landing page. '''
@@ -35,8 +154,12 @@ class Landing(WebHandler):
 
         ''' Render landing.html or landing_noauth.html. '''
 
-        if config.get('openfire').get('disabled') == True:
-             return Placeholder(self.request, self.response).get()
+        ## consider placeholder
+        if config.get('openfire.placeholder').get('enabled') == True:
+
+            ## consider placeholder `force` flag
+            if (self.user is None and self.permissions is None) or (self.user is not None and config.get('openfire.placeholder').get('force') == True):
+                return Placeholder(self.request, self.response).get()
 
         ## fully cached page context
         context = self.api.memcache.get('landing_page_context')
@@ -142,6 +265,13 @@ class Landing(WebHandler):
 
         return self.render('main/landing.html', **context)
 
+    def post(self):
+
+        ''' Redirect to the landing placeholder, if enabled. '''
+
+        if 'placeholder' in self.request.POST.get('action', 'nope'):
+            return Placeholder(self.request, self.response).post()
+
 
 class VerifyURL(WebHandler):
 
@@ -175,6 +305,7 @@ class CustomUrlHandler(WebHandler):
         kind = url_object.target.kind()
         context = {}
         handler = None
+
         if kind not in ('Project', 'User'):
             return self.error(404)  # Invalid kind
 
@@ -192,6 +323,7 @@ class CustomUrlHandler(WebHandler):
 
         # Initialize the new handler with the current request and response.
         #handler.initialize(self.request, self.response)  # commented out by sam and moved to handler construction
+        handler.uagent = self.uagent
 
         # Copy over session, user, permissions
         handler.session = self.session

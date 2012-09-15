@@ -48,6 +48,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
     # Session Properties
     session = {}
+    transport = {}
     sessions = True
     force_session = True
     apply_redirect = True
@@ -135,6 +136,19 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         ''' Return a new environment, because if we're already here it's not cached. '''
 
         return self.jinja2
+
+    @webapp2.cached_property
+    def baseTransport(self):
+
+        ''' Return a clean set of transport base settings. '''
+
+        return {
+            'secure': False,
+            'endpoint': self.request.environ.get('HTTP_HOST') if not self.force_hostname else self.force_hostname,
+            'consumer': 'ofapp',
+            'scope': 'readonly',
+            'make_object': lambda x: self._make_services_object(x)
+        }
 
     ## ++ Internal Methods ++ ##
     def __init__(self, request=None, response=None, preload=False):
@@ -333,6 +347,10 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
         ''' Bind in the session '''
 
+        transport = dict(self.baseTransport.items()[:])
+        if hasattr(self, 'transport'):
+            transport.update(self.transport)
+
         context.update({
 
             # head meta config
@@ -369,13 +387,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
             'transport': {
 
                 # services config
-                'services': {
-                    'secure': False,
-                    'endpoint': self.request.environ.get('HTTP_HOST'),
-                    'consumer': 'ofapp',
-                    'scope': 'readonly',
-                    'make_object': lambda x: self._make_services_object(x)
-                },
+                'services': transport,
 
                 # realtime/push config
                 'realtime': {
@@ -400,6 +412,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
         ''' Return available methods '''
 
+        for k, v in self.baseHeaders.items():
+            self.response.headers[k] = v
         return self.response.write(','.join([i for i in frozenset(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']) if hasattr(self, i.lower())]))
 
 

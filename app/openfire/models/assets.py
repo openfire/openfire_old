@@ -85,6 +85,7 @@ class Video(Media):
     featured = ndb.BooleanProperty('f', indexed=True, default=False)
     ext_id = ndb.StringProperty('pid', indexed=True)
     provider = ndb.StringProperty('p', indexed=True, choices=['youtube', 'vimeo'])
+    sources = ndb.JsonProperty('s')
 
 
 ######## ======== Custom URLs ======== ########

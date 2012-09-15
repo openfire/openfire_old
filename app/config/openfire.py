@@ -11,7 +11,69 @@ config = {}
 config['openfire'] = {
 
     'version': '0.2-alpha',
-    'disabled': False
+
+}
+
+config['openfire.video'] = {
+
+    'debug': False,  # show log messages about video serving ops
+
+    'providers': {
+        'vimeo': {
+            'default': 'flash'
+        }
+    },
+
+    'flash': {
+        'enable': True,
+        'force': False
+    },
+
+    'html5': {
+        'enable': True,
+        'force': False
+    }
+
+}
+
+config['openfire.placeholder'] = {
+
+    'enabled': False,  # show placeholder instead of landing
+    'force': True,  # show placeholder for logged in users, too
+    'debug': True,  # enable debug logging for the placeholder handler
+
+    'signup': {
+
+        'debug': True,  # enable logging for triggered pipelines
+
+        'mailchimp': {
+            'enabled': True,  # enable mailchimp integration,
+            'apikey': 'dcf2e23bd1ac2f2d05592821adb6bfd9-us5',  # mailchimp apikey
+            'listid': '66589'  # list id to sign beta users up to
+        }
+
+    }
+
+}
+
+config['openfire.notifications'] = {
+
+    'transports': {
+
+        'email': {
+            'enable': True,
+            'sender': 'welcomekitty@openfi.re'
+        }
+
+    },
+
+    'index': {
+
+        'beta_welcome': {
+            'subject': 'Thanks for signing up for updates!'
+        }
+
+    }
 
 }
 
@@ -372,5 +434,17 @@ config['openfire.wepay'] = {
         'access_token': '590b005d46dbbd3610e488898e778ac1f43b100dcf3ef2b6930ecd46a640cda4',
         'account_id': '240546',
     },
+
+}
+
+config['openfire.services.BetaService'] = {
+
+    'debug': True
+
+}
+
+config['openfire.pipelines.integration.mailchimp.MailChimpEmailEntry'] = {
+
+    'debug': True,
 
 }
