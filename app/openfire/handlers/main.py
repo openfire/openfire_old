@@ -72,6 +72,7 @@ class Landing(WebHandler):
 
                     # create the project context entry
                     projects[key.id()] = entity.to_dict()
+                    projects[key.id()]['key'] = entity.key
                     projects[key.id()]['model'] = entity
                     projects[key.id()]['slug'] = entity.get_custom_url()
 

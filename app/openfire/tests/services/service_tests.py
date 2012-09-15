@@ -9,7 +9,7 @@ from google.appengine.ext import testbed, ndb, blobstore
 from openfire.tests import OFTestCase, LoggedInTestCase
 from openfire.models.user import Topic
 from openfire.models.assets import CustomURL
-from openfire.models.project import Category, Goal, Tier
+from openfire.models.project import Category
 import openfire.fixtures.fixture_util as db_loader
 
 
@@ -32,430 +32,6 @@ class SystemServiceTestCase(OFTestCase):
 
         response = self.of_service_test('system', 'hello')
         self.assertTrue(response['response']['content']['message'].startswith('Hello'), 'System hello service failed.')
-
-
-class ProjectServiceTestCase(OFTestCase):
-
-    ''' Test cases for the project service. '''
-
-    def test_project_list_method(self):
-
-        ''' Add one private and one public project to the database then query. '''
-
-        db_loader.create_project(status='p')
-        project_key = db_loader.create_project()
-        db_loader.create_tier(parent_key=project_key, name='test name')
-        db_loader.create_goal(parent_key=project_key, amount=100)
-        response = self.of_service_test('project', 'list')
-        self.assertEqual(response['response']['type'], 'Projects',
-            'System project list service method failed.')
-        self.assertEqual(len(response['response']['content']['projects']), 1,
-            'Failed to return the correct number of projects.')
-
-    def test_project_get_method(self):
-
-        ''' Add one private and one public project to the database then query. '''
-
-        project_key = db_loader.create_project()
-        key = project_key.urlsafe()
-        response = self.of_service_test('project', 'get', params={'key':key})
-        self.assertEqual(response['response']['type'], 'Project',
-            'Project get service method failed.')
-        self.assertEqual(response['response']['content']['key'], key,
-            'Project get method returned the wrong project.')
-
-    def test_project_put_method(self):
-
-        ''' Add a project (not through api) and then update it. '''
-
-        user_key = db_loader.create_user()
-        proposal_key = ndb.Key('Proposal', 'fake')
-        category_key = ndb.Key('Category', 'everything')
-        creator_key = user_key
-        name_1 = 'Save the Everything!'
-        pitch_1 = 'Save all the animals!'
-        name_2 = 'Save everything!!'
-        pitch_2 = 'Yeah, save all those things.'
-
-        project_key = db_loader.create_project(name=name_1, pitch=pitch_1,
-                    proposal_key=proposal_key, category_key=category_key, creator_key=creator_key)
-
-        params = {
-            'key': project_key.urlsafe(),
-            'name': name_2,
-            'pitch': pitch_2,
-        }
-
-        response = self.of_service_test('project', 'put', params=params)
-        self.assertEqual(response['response']['type'], 'Project',
-            'Project put service method failed.')
-        self.assertEqual(response['response']['content']['name'], name_2,
-            'Project put failed to change the name.')
-        self.assertEqual(response['response']['content']['pitch'], pitch_2,
-            'Project put failed to change the description.')
-
-
-
-    """
-    " We will fill in these tests as the service methods are implemented.
-    "
-
-    def test_project_comment_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'comment', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_comments_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'comments', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_post_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'post', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_posts_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'posts', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_media_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'media', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_add_media_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'add_medai', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_follow_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'follow', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_followers_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'followers', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_backers_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'backers', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_back_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'back', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_suspend_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'suspend', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-
-    def test_project_shutdown_method(self):
-        ''' Test something. '''
-        response = self.of_service_test('project', 'shutdown', params={})
-        self.assertEqual(response['response']['type'], '',
-            'Project  service method failed.')
-    """
-
-
-    #############################################
-    # Project Goal Tests.
-    #############################################
-
-    def test_project_get_goal_method(self):
-
-        ''' Add a project and a goal then query for it. '''
-
-        project_key = db_loader.create_project()
-        goal_key = db_loader.create_goal(parent_key=project_key).key
-        params = {'key': self.encrypt(goal_key.urlsafe())}
-        response = self.of_service_test('project', 'get_goal', params=params)
-        self.assertEqual(response['response']['type'], 'Goal',
-            'System project get goal service method failed.')
-        self.assertEqual(response['response']['content']['key'], goal_key.urlsafe(),
-            'Failed to return the correct project goal.')
-
-    def test_project_list_goals_method(self):
-
-        ''' Add a project and a few goals then query for them. '''
-
-        project_key = db_loader.create_project()
-        db_loader.create_goal(parent_key=project_key)
-        db_loader.create_goal(parent_key=project_key)
-        db_loader.create_goal(parent_key=project_key)
-        params = {'project': self.encrypt(project_key.urlsafe())}
-        response = self.of_service_test('project', 'list_goals', params=params)
-        self.assertEqual(response['response']['type'], 'Goals',
-            'Project list goals service method failed.')
-        self.assertEqual(len(response['response']['content']['goals']), 3,
-            'Project list goals returned the wrong number of goals.')
-
-    def test_project_put_goal_method(self):
-
-        ''' Add a project through the api and then edit it. '''
-
-        description_1 = 'TEST DESCRIPTION'
-        description_2 = 'SOMETHING NEW'
-
-        project_key = db_loader.create_project()
-        contribution_type_key = db_loader.create_contribution_type()
-        goal_dict = {
-            'target': project_key.urlsafe(),
-            'contribution_type': contribution_type_key.urlsafe(),
-            'amount': 1000,
-            'description': description_1,
-            'backer_count': 0,
-            'progress': 23,
-            'met': False,
-        }
-
-        self.assertEqual(len(Goal.query().fetch()), 0, 'Goals existed before put test.')
-
-        response = self.of_service_test('project', 'put_goal', params=goal_dict)
-
-        self.assertEqual(response['response']['type'], 'Goal', 'Project list goals service method failed.')
-        goals = Goal.query().fetch()
-        self.assertEqual(len(goals), 1, 'Failed to actually put goal.')
-        self.assertEqual(goals[0].description, description_1, 'Failed to save goal description.')
-
-        goal_key = response['response']['content']['key']
-        goal_dict['key'] = goal_key
-        goal_dict['description'] = description_2
-
-        change_dict = {
-            'key': goal_key,
-            'target': project_key.urlsafe(),
-            'description': description_2,
-        }
-
-        response = self.of_service_test('project', 'put_goal', params=change_dict)
-
-        self.assertEqual(response['response']['type'], 'Goal', 'Project list goals service method failed.')
-        goals = Goal.query().fetch()
-        self.assertEqual(len(goals), 1, 'Failure. Put another goal instead of editing existing one.')
-        self.assertEqual(goals[0].description, description_2, 'Failed to update goal description.')
-
-
-    def test_project_delete_goal_method(self):
-
-        ''' Add a project and a goal then delete it. '''
-
-        project_key = db_loader.create_project()
-        goal = db_loader.create_goal(parent_key=project_key)
-        self.assertTrue(goal, 'Failed to init project goal object for delete test.')
-
-        params = {'key': self.encrypt(goal.key.urlsafe())}
-        response = self.of_service_test('project', 'delete_goal', params=params)
-        self.assertEqual(response['response']['type'], 'Echo',
-            'System project get goal service method failed.')
-        goal = goal.key.get()
-        self.assertFalse(goal, 'Failed to delete project goal.')
-
-
-    #############################################
-    # Project Tier Tests.
-    #############################################
-
-    def test_project_get_tier_method(self):
-
-        ''' Add a project and a tier then query for it. '''
-
-        project_key = db_loader.create_project()
-        tier_key = db_loader.create_tier(parent_key=project_key).key
-        params = {'key': self.encrypt(tier_key.urlsafe())}
-        response = self.of_service_test('project', 'get_tier', params=params)
-        self.assertEqual(response['response']['type'], 'Tier',
-            'System project get tier service method failed.')
-        self.assertEqual(response['response']['content']['key'], tier_key.urlsafe(),
-            'Failed to return the correct project tier.')
-
-    def test_project_list_tiers_method(self):
-
-        ''' Add a project and a few tiers then query for them. '''
-
-        project_key = db_loader.create_project()
-        db_loader.create_tier(parent_key=project_key)
-        db_loader.create_tier(parent_key=project_key)
-        db_loader.create_tier(parent_key=project_key)
-        params = {'project': self.encrypt(project_key.urlsafe())}
-        response = self.of_service_test('project', 'list_tiers', params=params)
-        self.assertEqual(response['response']['type'], 'Tiers',
-            'Project list tiers service method failed.')
-        self.assertEqual(len(response['response']['content']['tiers']), 3,
-            'Project list tiers returned the wrong number of tiers.')
-
-    def test_project_put_tier_method(self):
-
-        ''' Add a project through the api and then edit it. '''
-
-        description_1 = 'TEST DESCRIPTION'
-        description_2 = 'SOMETHING NEW'
-
-        project_key = db_loader.create_project()
-        contribution_type_key = db_loader.create_contribution_type()
-        tier_dict = {
-            'target': project_key.urlsafe(),
-            'name': 'NAME',
-            'contribution_type': contribution_type_key.urlsafe(),
-            'amount': 1000,
-            'description': description_1,
-            'delivery': '02-12-2013',
-            'backer_count': 23,
-            'backer_limit': 100,
-        }
-
-        self.assertEqual(len(Tier.query().fetch()), 0, 'Tiers existed before put test.')
-
-        response = self.of_service_test('project', 'put_tier', params=tier_dict)
-
-        self.assertEqual(response['response']['type'], 'Tier', 'Project list tiers service method failed.')
-        tiers = Tier.query().fetch()
-        self.assertEqual(len(tiers), 1, 'Failed to actually put tier.')
-        self.assertEqual(tiers[0].description, description_1, 'Failed to save tier description.')
-
-        tier_key = response['response']['content']['key']
-
-        change_dict = {
-            'key': tier_key,
-            'target': project_key.urlsafe(),
-            'description': description_2,
-            'delivery': 'YESTERDAY',
-        }
-
-        response = self.of_service_test('project', 'put_tier', params=change_dict)
-
-        self.assertEqual(response['response']['type'], 'Tier', 'Project list tiers service method failed.')
-        tiers = Tier.query().fetch()
-        self.assertEqual(len(tiers), 1, 'Failure. Put another tier instead of editing existing one.')
-        self.assertEqual(tiers[0].description, description_2, 'Failed to update tier description.')
-        self.assertEqual(tiers[0].delivery, 'YESTERDAY', 'Failed to update tier delivery.')
-
-    def test_project_delete_tier_method(self):
-
-        ''' Add a project and a tier then delete it. '''
-
-        project_key = db_loader.create_project()
-        tier_key = db_loader.create_tier(parent_key=project_key).key
-        self.assertTrue(tier_key.get(), 'Failed to init project tier object for delete test.')
-
-        params = {'key': self.encrypt(tier_key.urlsafe())}
-        response = self.of_service_test('project', 'delete_tier', params=params)
-        self.assertEqual(response['response']['type'], 'Echo',
-            'System project get tier service method failed.')
-        self.assertFalse(tier_key.get(), 'Failed to delete project tier.')
-
-
-class ProposalServiceTestCase(OFTestCase):
-
-    ''' Test cases for the proposal service. '''
-
-    def test_proposal_list_method(self):
-
-        ''' Add a proposal to the database then query. '''
-
-        # Add a blank proposal and make sure it exists.
-        db_loader.create_proposal()
-        response = self.of_service_test('proposal', 'list')
-        self.assertEqual(response['response']['type'], 'Proposals',
-            'System proposal list service method failed.')
-        self.assertEqual(len(response['response']['content']['proposals']), 1,
-            'Failed to return the correct number of proposals.')
-
-        # Add a proposal with a goal and make sure it still works.
-        db_loader.create_proposal(goals=[{'amount':100}])
-        response = self.of_service_test('proposal', 'list')
-        self.assertEqual(response['response']['type'], 'Proposals',
-            'System proposal list service method failed when adding a goal.')
-        self.assertEqual(len(response['response']['content']['proposals']), 2,
-            'Failed to return the correct number of proposals when adding a goal.')
-
-        # Add a proposal with a tier and make sure it still works.
-        db_loader.create_proposal(tiers=[{'name':'some tier'}])
-        response = self.of_service_test('proposal', 'list')
-        self.assertEqual(response['response']['type'], 'Proposals',
-            'System proposal list service method failed when adding a tier.')
-        self.assertEqual(len(response['response']['content']['proposals']), 3,
-            'Failed to return the correct number of proposals when adding a tier.')
-
-
-    def test_proposal_get_method(self):
-
-        ''' Add one private and one public proposal to the database then query. '''
-
-        proposal_key = db_loader.create_proposal()
-        key = proposal_key.urlsafe()
-        response = self.of_service_test('proposal', 'get', params={'key':self.encrypt(key)})
-        self.assertEqual(response['response']['type'], 'Proposal',
-            'Proposal get service method failed.')
-        self.assertEqual(response['response']['content']['key'], key,
-            'Proposal get method returned the wrong proposal.')
-
-
-    @unittest.expectedFailure # Need to learn how to log in. See OF-155 for more details.
-    def test_proposal_put_method(self):
-
-        ''' Add a proposal through the api and then update it. '''
-
-        user_key = db_loader.create_user()
-
-        '''
-        ' Need to learn how to log in during tests.
-        login_dict = {
-            'username': 'fakie',
-            'password': 'fakieiscool'
-        }
-        self.of_handler_test('/login', is_post=True, post_data=login_dict)
-        '''
-
-        name_1 = 'Save the Everything!'
-        pitch_1 = 'Save all the animals!'
-        name_2 = 'Save everything!!'
-        pitch_2 = 'Yeah, save all those things.'
-
-        params = {
-            'name': name_1,
-            'pitch': pitch_1,
-            'category': ndb.Key('Category', 'everything').urlsafe(),
-            'creator': user_key.urlsafe(),
-        }
-
-        response = self.of_service_test('proposal', 'put', params=params)
-        self.assertEqual(response['response']['type'], 'Proposal',
-            'Proposal put service method failed to create a new proposal.')
-        self.assertTrue(response['response']['content'].get('name', False),
-            'Proposal put failed to set the name value.')
-        self.assertEqual(response['response']['content']['name'], name_1,
-            'Proposal put failed to set the name.')
-        self.assertEqual(response['response']['content']['pitch'], pitch_1,
-            'Proposal put failed to set the description.')
-
-        params['name'] = name_2
-        params['pitch'] = pitch_2
-        params['key'] = self.encrypt(response['response']['content']['key'])
-
-        response = self.of_service_test('proposal', 'put', params=params)
-        self.assertEqual(response['response']['type'], 'Proposal',
-            'Proposal put service method failed.')
-        self.assertEqual(response['response']['content']['name'], name_2,
-            'Proposal put failed to change the name.')
-        self.assertEqual(response['response']['content']['pitch'], pitch_2,
-            'Proposal put failed to change the description.')
 
 
 class CategoryServiceTestCase(OFTestCase):
@@ -829,8 +405,8 @@ class UserServiceTestCase(OFTestCase):
         # Test setting a single topic.
         params['topics'] = [topic1_key.urlsafe()]
         response = self.of_service_test('user', 'set_topics', params=params)
-        self.assertEqual(response['response']['type'], 'Echo',
-                'Failed to return echo response from user set_topics service.')
+        self.assertEqual(response['response']['type'], 'VoidMessage',
+                'Failed to return void response from user set_topics service.')
 
         # Make sure the topic was set.
         user = user_key.get()
@@ -842,8 +418,8 @@ class UserServiceTestCase(OFTestCase):
         # Test setting multiple topics.
         params['topics'] = [topic1_key.urlsafe(), topic2_key.urlsafe(), topic3_key.urlsafe()]
         response = self.of_service_test('user', 'set_topics', params=params)
-        self.assertEqual(response['response']['type'], 'Echo',
-                'Failed to return echo response from user set_topics service.')
+        self.assertEqual(response['response']['type'], 'VoidMessage',
+                'Failed to return void response from user set_topics service.')
 
         # Make sure the topics were set in order.
         user = user_key.get()
@@ -859,8 +435,8 @@ class UserServiceTestCase(OFTestCase):
         # Test setting topics to none.
         params['topics'] = None
         response = self.of_service_test('user', 'set_topics', params=params)
-        self.assertEqual(response['response']['type'], 'Echo',
-                'Failed to return echo response from user set_topics service.')
+        self.assertEqual(response['response']['type'], 'VoidMessage',
+                'Failed to return void response from user set_topics service.')
 
         # Make sure the topics were reset.
         user = user_key.get()
@@ -870,8 +446,8 @@ class UserServiceTestCase(OFTestCase):
         # Test setting multiple topics to test order.
         params['topics'] = [topic3_key.urlsafe(), topic2_key.urlsafe(), topic1_key.urlsafe()]
         response = self.of_service_test('user', 'set_topics', params=params)
-        self.assertEqual(response['response']['type'], 'Echo',
-                'Failed to return echo response from user set_topics service.')
+        self.assertEqual(response['response']['type'], 'VoidMessage',
+                'Failed to return void response from user set_topics service.')
 
         # Make sure the topics were set in order.
         user = user_key.get()
@@ -934,6 +510,7 @@ class PaymentServiceTestCase(LoggedInTestCase):
 
     ''' Test cases for the payment service. '''
 
+    @unittest.expectedFailure # Need to learn how to log in. See OF-155 for more details.
     def test_payment_create_user_payment_account(self):
 
         ''' Test the payment create_user_payment_account service method. '''
@@ -1062,7 +639,7 @@ class PaymentServiceTestCase(LoggedInTestCase):
 
         params = {}
         response = self.of_service_test('payment', 'withdraw_funds', params=params)
-        self.assertEqual(response['response']['type'], 'WithdrawalResponse',
+        self.assertEqual(response['response']['type'], 'WithdrawalRequest',
             'Failed to return correct response type from payment withdraw_funds service.')
         content = response['response']['content']
         #self.assetTrue(content, 'Failed to return content from the payment withdraw_funds service.')

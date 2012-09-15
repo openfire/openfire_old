@@ -3,6 +3,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Friend",
         "amount": 10,
+        "next_step_votes": 1,
         "description": "We'll give you an invite to the private beta!",
         "delivery": "9/1/2012"
     },
@@ -10,6 +11,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Supporter",
         "amount": 35,
+        "next_step_votes": 2,
         "description": "Get an FCM <i>Transparency Warrior</i> mug, and an invite to the private beta!",
         "delivery": "9/1/2012"
     },
@@ -17,6 +19,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Backer",
         "amount": 50,
+        "next_step_votes": 3,
         "description": "Get an FCM <i>Transparency Warrior</i> tote bag, and an invite to the private beta!",
         "delivery": "9/1/2012"
     },
@@ -24,6 +27,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Sponsor",
         "amount": 100,
+        "next_step_votes": 4,
         "description": "Get both the <i>Transparency Warrior</i> mug and tote bag, and an invite to the private alpha, a <b>full month</b> before our beta release! We'll also list you publicly on our supporters page!",
         "delivery": "9/1/2012"
     },
@@ -31,6 +35,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Investor",
         "amount": 300,
+        "next_step_votes": 5,
         "description": "Get the mug, tote bag, 5 early alpha invites, and a public listing on our supporters page!",
         "delivery": "9/1/2012"
     },
@@ -38,6 +43,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Inner Circle",
         "amount": 500,
+        "next_step_votes": 7,
         "description": "Wow, you're passionate about transparency! Get all the swag, 10 early alpha invites, public listing on our supporters page, and the ability to give direct feedback that helps shape fatcatmap!",
         "delivery": "9/1/2012"
     },
@@ -45,6 +51,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Transparency Warrior",
         "amount": 1000,
+        "next_step_votes": 9,
         "description": "As a critical supporter of the movement, you want to be involved as early and often as possible. Get 50 early alpha invites, public listing, 2x all the swag, and the ability to give direct feedbat that helps shape fatcatmap!",
         "delivery": "7/15/2012"
     },
@@ -52,6 +59,7 @@
         "parent_key": "goal__fatcatmap",
         "name": "Fat Cat",
         "amount": 10000,
+        "next_step_votes": 10,
         "description": "Get any bill you want passed in Congress. Ha ha, just kidding! You're the kind of supporter that <i>makes transparency possible</i>. Because of supporters like you, the fight for sunlight in Washington has hope. You'll get a free lunch with the development team, all of the above, and as many early alpha/beta invites as you can eat!",
         "delivery": "7/10/2012"
     },
@@ -59,6 +67,7 @@
         "parent_key": "goal__seasteading",
         "name": "Mate",
         "amount": 10000,
+        "next_step_votes": 1,
         "description": "We'll have you on board!",
         "delivery": "10/1/2012"
     },
@@ -66,6 +75,7 @@
         "parent_key": "goal__urbsly",
         "name": "Green Thumb",
         "amount": 10,
+        "next_step_votes": 1,
         "description": "You get a thumbs up!",
         "delivery": "10/1/2012"
     },
@@ -73,6 +83,7 @@
         "parent_key": "goal__blueseed",
         "name": "Lookout",
         "amount": 10,
+        "next_step_votes": 1,
         "description": "You get a picture of us on the sunfish.",
         "delivery": "1/1/2013"
     },
@@ -80,6 +91,7 @@
         "parent_key": "goal__blueseed",
         "name": "Deck Hand",
         "amount": 100,
+        "next_step_votes": 1,
         "description": "You get a picture of us on the Tayana.",
         "delivery": "3/1/2013"
     },
@@ -87,6 +99,7 @@
         "parent_key": "goal__blueseed",
         "name": "First Mate",
         "amount": 1000,
+        "next_step_votes": 1,
         "description": "You get a ride on the Tayana.",
         "delivery": "3/1/2013"
     },
@@ -94,6 +107,7 @@
         "parent_key": "goal__blueseed",
         "name": "Captain",
         "amount": 10000,
+        "next_step_votes": 1,
         "description": "One week of cube space rental on the real boat.",
         "delivery": "6/1/2013"
     },
@@ -101,6 +115,7 @@
         "parent_key": "goal__carrotmob",
         "name": "Carrot",
         "amount": 100,
+        "next_step_votes": 1,
         "description": "One free item at the next carrot mob.",
         "delivery": "10/1/2012"
     },
@@ -108,6 +123,7 @@
         "parent_key": "goal__ose",
         "name": "User",
         "amount": 10,
+        "next_step_votes": 1,
         "description": "Early access to our online database.",
         "delivery": "10/1/2012"
     },
@@ -115,6 +131,7 @@
         "parent_key": "goal__savetheeverything",
         "name": "Nice Person",
         "amount": 10,
+        "next_step_votes": 1,
         "description": "Early access to the website.",
         "delivery": "12/1/2012"
     },
@@ -122,6 +139,7 @@
         "parent_key": "goal__savetheeverything",
         "name": "Nicer Person",
         "amount": 100,
+        "next_step_votes": 2,
         "description": "Your name on the front page of the website for the first month (small text).",
         "delivery": "12/1/2012"
     },
@@ -129,6 +147,7 @@
         "parent_key": "goal__savetheeverything",
         "name": "Really a Very Nice Person",
         "amount": 1000,
+        "next_step_votes": 3,
         "description": "A hat.",
         "delivery": "12/1/2012"
     },
@@ -136,6 +155,7 @@
         "parent_key": "goal__savetheeverything",
         "name": "Wow, Such a Nice Person, and Good Looking as Well!",
         "amount": 5000,
+        "next_step_votes": 5,
         "description": "You can pet on animal of your choosing.",
         "delivery": "12/1/2012"
     }

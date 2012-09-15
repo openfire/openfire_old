@@ -96,8 +96,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'app': {'min': True, 'version': 0.3},  # openfire app base
-                'admin': {'name': 'app.admin', 'min': True, 'version': 0.3}  # openfire app base for admins
+                'app': {'min': False, 'version': 0.3},  # openfire app base
+                'admin': {'name': 'app.admin', 'min': False, 'version': 0.3}  # openfire app base for admins
             }
 
         },
@@ -169,7 +169,7 @@ config['apptools.project.assets'] = {
         ('compiled', 'compiled'): {
 
             'config': {
-                'min': True,
+                'min': False,
                 'version_mode': 'getvar'
             },
 
@@ -187,13 +187,14 @@ config['apptools.project.assets'] = {
         ('openfire', 'compiled/openfire'): {
 
             'config': {
-                'min': True,
+                'min': False,
                 'version_mode': 'getvar'
             },
 
             'assets': {
                 'landing': {'version': 0.4},  # styles for the landing
                 'proposal': {'version': 0.1},  # styles for the proposal page
+                'proposal_wizard': {'version': 0.1},  # styles for the proposal wizard
                 'project': {'version': 0.3},  # styles for the project page
                 'profile': {'version': 0.2}   # styles for the profile page
             }

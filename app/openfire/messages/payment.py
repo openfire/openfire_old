@@ -1,4 +1,5 @@
 from protorpc import messages
+from openfire.messages.common import NextStepVote
 
 class AuthURL(messages.Message):
 
@@ -117,6 +118,7 @@ class BackProject(messages.Message):
     amount = messages.StringField(4)
     money_source = messages.StringField(5)
     new_cc = messages.MessageField(CreditCard, 6)
+    next_step_votes = messages.MessageField(NextStepVote, 7, repeated=True)
 
 
 class MoneySources(messages.Message):
@@ -158,13 +160,10 @@ class WithdrawalRequest(messages.Message):
     account = messages.StringField(1)
     amount = messages.StringField(2)
     note = messages.StringField(3)
-
-
-class WithdrawalResponse(messages.Message):
-
-    ''' Response allowing a user to withdraw funds from the provided url. '''
-
-    url = messages.StringField(1)
+    created = messages.StringField(4)
+    wepay_withdrawal_id = messages.IntegerField(5)
+    wepay_withdrawal_uri = messages.StringField(6)
+    wepay_withdrawal_status = messages.StringField(7)
 
 
 class WithdrawalHistory(messages.Message):

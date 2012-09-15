@@ -11,7 +11,7 @@ config = {}
 config['openfire'] = {
 
     'version': '0.2-alpha',
-    'disabled': True
+    'disabled': False
 
 }
 

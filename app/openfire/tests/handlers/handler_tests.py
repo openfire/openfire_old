@@ -2,7 +2,7 @@
 """
 Route tests.
 """
-
+import unittest
 from openfire.tests import OFTestCase
 import openfire.fixtures.fixture_util as db_loader
 
@@ -39,12 +39,15 @@ class UserPageTestCase(OFTestCase):
     def test_users_page(self):
         self.of_handler_test('/users')
 
-    #def test_user_profile_page(self):
-    #    user_key = db_loader.create_user(username='fakie')
-    #    db_loader.create_custom_url(slug='fakie', target_key=user_key)
-    #    self.of_handler_test('/fakie')
+    def test_user_profile_page(self):
+        user_key = db_loader.create_user(username='fakie')
+        db_loader.create_custom_url(slug='fakie', target_key=user_key)
+        self.of_handler_test('/fakie')
 
+    @unittest.expectedFailure # Need to learn how to log in. See OF-155 for more details.
     def test_user_account_page(self):
+        user_key = db_loader.create_user(username='fakie')
+        db_loader.create_custom_url(slug='fakie', target_key=user_key)
         self.of_handler_test('/user/fakie/account')
 
 
@@ -86,6 +89,7 @@ class ProjectPageTestCase(OFTestCase):
 
     def test_project_page(self):
         # Visit the project at its key page.
+        db_loader.create_future_goal(parent_key=self.project_key)
         self.of_handler_test('/project/' + self.project_key.urlsafe(), error='Failed to display project page.')
 
 
@@ -113,16 +117,18 @@ class CustomUrlTestCase(OFTestCase):
 
     def test_custom_project_url(self):
         db_loader.create_custom_url(slug='fakeproject', target_key=self.project_key)
+        db_loader.create_future_goal(parent_key=self.project_key)
         self.of_handler_test('/fakeproject')
 
-    #def test_custom_user_url(self):
-    #    db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
-    #    self.of_handler_test('/fakie')
+    def test_custom_user_url(self):
+        db_loader.create_custom_url(slug='fakie', target_key=self.user_key)
+        self.of_handler_test('/fakie')
 
 
-class PaymentHandlerTestCase(OFTestCase):
+class PaymentIPNHandlerTestCase(OFTestCase):
     """ Test cases for the payment handler.
     """
 
+    @unittest.expectedFailure # Need to learn how to properly test full payment cycle.
     def test_payment_handler(self):
-        self.of_handler_test('/_payment/handler')
+        self.of_handler_test('/_payment/ipn')

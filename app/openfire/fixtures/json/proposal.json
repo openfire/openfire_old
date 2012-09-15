@@ -18,7 +18,7 @@
         "initial_goal": {
             "amount": 5000
         },
-        "tiers": [
+        "initial_tiers": [
             {
                 "name": "Friend",
                 "amount": 10,
