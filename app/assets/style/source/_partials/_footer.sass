@@ -1,0 +1,59 @@
+#footer-content-wrap
+    margin: 20px auto
+    text-align: center
+
+.content-card
+    -webkit-transition-property: opacity
+    -webkit-transition-duration: 0.2s
+    float: left
+    border-radius: 7px
+    box-shadow: 1px 1px 3px 2px (0,0,0,0.1)
+    background-color: #ccc
+    width: 30%
+    height: 300px
+    margin-left: 2.5%
+    opacity: 0
+
+    &.active
+        opacity: 1
+
+    h1
+        font:
+            family: "Karla"
+            weight: 700
+            size: 21pt
+        text-transform: uppercase
+        color: #555
+        line-height: 24pt
+        vertical-align: middle
+        text-align: right
+        letter-spacing: 3px
+        padding-right: 10px
+        display: block
+        width: 97%
+        margin: 5px auto
+        border-bottom: 1px solid #ddd
+        position: relative
+
+        &::after
+            display: block
+            content: ''
+            height: 1px
+            width: 99%
+            margin: 0 0.5%
+            position: absolute
+            bottom: 0px
+            background-color: #bbb
+
+    p
+        font:
+            size: 13pt
+            weight: 400
+        color: #777
+        padding: 0 2%
+        text-align: left
+
+#footer-map
+    width: 200px
+    height: 200px
+    margin: 10px auto

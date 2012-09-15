@@ -32,6 +32,9 @@
       width: 100px
       height: 88px
 
+    .project-icon::after
+      font-size: 12pt
+
   .activity-table
     height: auto
     .activity-row
@@ -84,9 +87,6 @@
       &:last-child
         margin-bottom: 20px
 
-  .project-card
-    width: 140px
-
     &::after
       height: 18px
       line-height: 18px
@@ -111,6 +111,11 @@
 @media only screen and (min-width: 481px)
   +tablet-landscape
 
+  .project-card
+    width: 140px
+
+    .project-icon::after
+      font-size: 10pt
 
 // Other tablet portrait
 @media only screen and (max-width: 620px)
@@ -131,6 +136,16 @@
   .project-card
     white-space: normal
 
+@media only screen and (min-width: 768px)
+  #content
+    section
+      width: 45%
+      margin: 0px 2.5% 620px
+
+    .section-wrap
+      margin-left: auto
+      margin-right: auto
+
 // Fullscreen desktop/laptop
 @media only screen and (min-width: 768px) and (max-width: 1140px)
   +fullscreen
@@ -140,15 +155,6 @@
     bottom: 30%
     padding-right: 10px
     border-radius: 9px
-
-  #content
-    section
-      width: 45%
-      margin: 0px 2.5% 620px
-
-    .section-wrap
-      margin-left: auto
-      margin-right: auto
 
   #project-cards
     width: auto
