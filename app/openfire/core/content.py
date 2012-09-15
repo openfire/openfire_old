@@ -885,7 +885,6 @@ class ContentBridge(object):
             if len(kwargs) > 0:
                 self.context.update(kwargs)
 
-            import pdb; pdb.set_trace()
             # Bind runtime-level template context
             self.context = self._bindRuntimeTemplateContext(self.context)
 

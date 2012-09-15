@@ -672,7 +672,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'model.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'events.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'agent.coffee'),
-									fixpath(js_prefix, 'source', 'apptools', 'dispatch.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'dispatch.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'storage', '_core.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'storage', 'dom.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'storage', 'indexed.coffee'),
@@ -690,6 +690,11 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'editor.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'uploader.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'widgets', 'sticky.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'integrations', '_core.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'modernizr.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'jacked.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'd3.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'analytics', 'google_analytics.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling AppTools JS for admins...'
@@ -702,7 +707,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'apptools', 'model.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'events.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'agent.coffee'),
-									fixpath(js_prefix, 'source', 'apptools', 'dispatch.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'dispatch.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'storage', '_core.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'storage', 'dom.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'storage', 'indexed.coffee'),
@@ -725,6 +730,11 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									#fixpath(js_prefix, 'source', 'apptools', 'admin', 'page.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'admin', 'site.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'admin', 'content.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'integrations', '_core.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'modernizr.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'jacked.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'd3.coffee'),
+									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'analytics', 'google_analytics.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 

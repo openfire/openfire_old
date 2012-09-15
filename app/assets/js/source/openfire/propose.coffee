@@ -28,7 +28,7 @@ class ProposeController
                 @createProposal()
 
             _.ready(() ->
-                if window.jQuery?
+                if window.jQuery? and jQuery.fn?.smartWizard?
                     if $("#propose-wizard").smartWizard
                         $("#propose-wizard").smartWizard
                             labelFinish: 'Create proposal'
