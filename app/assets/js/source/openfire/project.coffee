@@ -1605,7 +1605,7 @@ class ProjectController extends OpenfireController
 
         @_init = () =>
 
-            if window._cp
+            if window._cp and _.get('#project')?
 
                 # setup project method proxies
                 ((m) =>
