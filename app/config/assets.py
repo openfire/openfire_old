@@ -68,6 +68,7 @@ config['apptools.project.assets'] = {
                 'jquery-full': {'min': True, 'version': '1.8.0', 'name': 'jquery.full'},
                 'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},   # D3 - Visualizations
                 'jacked': {'min': True, 'version': '1.0'},                  # Jacked - tweening animation engine
+                'datepickr': {'min': False, 'version': '1.0'},              # datepickr - Picking dates
             }
 
         },
@@ -145,6 +146,7 @@ config['apptools.project.assets'] = {
                 'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.1},
                 'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.1},
                 'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.1},
+                'datepickr': {'name': '_datepickr.sass', 'module': '_partials', 'version': 0.1},
 
                 ## Openfire
                 'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.1},

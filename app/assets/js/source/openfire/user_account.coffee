@@ -35,7 +35,8 @@ class UserAccountController extends OpenfireController
 
             # Use jquery and datatables.
             $(document).ready ->
-                $(".payment-table").dataTable()
+                if $(".payment-table").length
+                    $(".payment-table").dataTable()
 
 
         @linkWePayAccount = () =>
