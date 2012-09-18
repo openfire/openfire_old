@@ -82,7 +82,7 @@
 
                         {# TODO: How to open a modal without requiring the 'trigger' link. #}
                         <a id="a-back-project-dialog" href="#back-project-dialog" style="display: none;">Back This Project</a>
-                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0; overflow-y: scroll;">
+                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":650,"height":430}}'>
                             {% include "snippets/back_project.html" with context %}
                         </div>
 
