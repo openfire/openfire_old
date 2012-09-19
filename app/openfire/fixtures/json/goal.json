@@ -8,6 +8,14 @@
         "deliverable_description": "A website that will visualize all money in politics. Built on apptools."
     },
     {
+        "slug": "apptools",
+        "parent_key": "project__AppTools",
+        "amount": 1000,
+        "description": "We'll clean up and release the library, and build a sweet documentation site for devs just like you!",
+        "funding_open": true,
+        "deliverable_description": "A website that will visualize all money in politics. Built on apptools."
+    },
+    {
         "slug": "seasteading",
         "parent_key": "project__SeaSteading",
         "amount":  1000000,
