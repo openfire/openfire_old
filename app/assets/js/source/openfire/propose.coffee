@@ -14,6 +14,7 @@ class ProposeController
 
     @export = 'private'
     @events = []
+    @datepickr = undefined
 
     constructor: (openfire, window) ->
 
@@ -24,6 +25,10 @@ class ProposeController
 
                 if stepnumber == '4'
                     @collectProposeForm()
+
+                if stepnumber == '2'
+                    if not @datepickr and datepickr? and document.getElementById('proposal-initial-goal-deliverable_date')
+                        @datepickr = new datepickr('proposal-initial-goal-deliverable_date', { dateFormat: 'm-d-Y' })
 
                 return true
 
