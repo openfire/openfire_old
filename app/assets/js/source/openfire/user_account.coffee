@@ -33,7 +33,10 @@ class UserAccountController extends OpenfireController
             for btn in startWithdrawalBtns
                 btn.addEventListener('click', @generateWithdrawal, false)
 
-
+            # Use jquery and datatables.
+            $(document).ready ->
+                if $(".payment-table").length
+                    $(".payment-table").dataTable()
 
         @linkWePayAccount = () =>
             $.apptools.api.payment.get_auth_url().fulfill

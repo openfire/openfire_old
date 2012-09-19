@@ -205,7 +205,12 @@ class Autocomplete extends CoreWidget
 
                         failure: (err) =>
                             @_state.cache = @_state.results
-                            @_state.results = []
+                            @_state.results = [{
+                                slug: 'error'
+                                name: ''
+                                none: true
+                                description: ''
+                            }]
                             console.log('Autocomplete API error:', err)
                             return @render()
 

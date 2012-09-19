@@ -68,6 +68,7 @@ config['apptools.project.assets'] = {
                 'jquery-full': {'version': '1.8', 'min': True, 'name': 'jquery.full'},  # jQuery Full (nothing compiled out)
                 'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},               # D3 - Visualizations
                 'jacked': {'min': True, 'version': '1.0'},                              # Jacked - tweening animation engine
+                'datepickr': {'min': False, 'version': '1.0'},                          # datepickr - Picking dates
             }
 
         },
@@ -145,6 +146,7 @@ config['apptools.project.assets'] = {
                 'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.1},
                 'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.1},
                 'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.1},
+                'datepickr': {'name': '_datepickr.sass', 'module': '_partials', 'version': 0.1},
 
                 ## Openfire
                 'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.1},
@@ -194,9 +196,10 @@ config['apptools.project.assets'] = {
             'assets': {
                 'landing': {'version': 0.4},  # styles for the landing
                 'proposal': {'version': 0.1},  # styles for the proposal page
-                'proposal_wizard': {'version': 0.1},  # styles for the proposal wizard
+                'propose': {'version': 0.1},  # styles for the propose page & wizard
                 'project': {'version': 0.3},  # styles for the project page
-                'profile': {'version': 0.2}   # styles for the profile page
+                'profile': {'version': 0.2},   # styles for the profile page
+                'account': {'version': 0.1},   # styles for the user account page
             }
 
         },

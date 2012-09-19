@@ -31,6 +31,8 @@ tools/bin/remote_api_shell
 tools/bin/remote_api_shell*
 app/templates/compiled/*.py
 app/templates/compiled/*/*.py
+app/templates/compiled/*/*/*.py
 var/*
 node_modules/*
 .installed.cfg
+nohup.out
