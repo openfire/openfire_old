@@ -79,7 +79,7 @@
                 <section id='backers'>
                     <div id='backproject'>
                         <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
-                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-title="Backing {{ project.name }}...">
+                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":750,"height":400}}' data-title="Backing {{ project.name }}...">
                             {% include "snippets/back_project.html" with context %}
                         </div>
 
@@ -335,3 +335,7 @@
 
 </script>
 {% endblock %}
+
+{% block postsouth %}
+    <script type="text/javascript" src="/assets/js/static/core/jquery/jquery.smartWizard-2.0.js"></script>
+{% endblock postsouth %}

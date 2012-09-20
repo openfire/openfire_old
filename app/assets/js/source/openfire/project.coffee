@@ -1652,8 +1652,12 @@ class ProjectController extends OpenfireController
                 document.getElementById('back').addEventListener('click', @back, false)
 
                 # Event listeners in the back project dialog.
-                document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
-                document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
+                #document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
+                #document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
+
+                _.ready () ->
+                    $("#donate-wizard").smartWizard()
+
                 for node in document.getElementsByName('tier')
                     node.addEventListener('change', @change_backing_tier, false)
                 document.getElementById('back-project-cc-num-input').onkeyup = @detect_cc_type
