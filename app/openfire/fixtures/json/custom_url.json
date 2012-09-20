@@ -42,5 +42,9 @@
     {
         "slug": "savetheeverything",
         "target_key": "project__Save the Everything"
+    },
+    {
+        "slug": "apptools",
+        "target_key": "project__AppTools"
     }
 ]

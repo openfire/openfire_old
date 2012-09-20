@@ -78,19 +78,17 @@
 
                 <section id='backers'>
                     <div id='backproject'>
-                        <button id='back'><span id="back-text">Back this project</span></button>
-
-                        {# TODO: How to open a modal without requiring the 'trigger' link. #}
-                        <a id="a-back-project-dialog" href="#back-project-dialog" style="display: none;">Back This Project</a>
-                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":650,"height":430}}'>
+                        <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
+                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-title="Backing {{ project.name }}...">
                             {% include "snippets/back_project.html" with context %}
                         </div>
 
                     </div> <!-- end #backproject -->
-                    <div id='backer_summary'>
+                    <!--<div id='backer_summary'>
                         backerz
-                    </div> <!-- end #backer_summary -->
+                    </div>--> <!-- end #backer_summary -->
 
+                    <!--
                     {% block freeform %}
                         <div {{ {
 
@@ -107,12 +105,13 @@
 
                         </div>
                     {% endblock freeform %}
+                    -->
 
                 </section> <!-- end #backers -->
 
                 <div id='owners' >
-                    <b>project owners:</b>
                     <ul class='naked'>
+                        <h4>project owners</h4>
                         {% for owner in owners %}
                             <li>
                                 <div class='ownercard'>
@@ -121,7 +120,7 @@
                                         {% if owner.has_custom_url() %}
                                             <a {{ {
 
-                                                'href': owner.get_custom_url(),
+                                                'href': link('custom_url', customurl=owner.get_custom_url()),
                                                 'target': 'blank',
                                                 'title': ' '.join([owner.firstname, owner.lastname])
 
@@ -129,7 +128,7 @@
                                         {% else %}
                                             <a {{ {
 
-                                                    'href': owner.get_custom_url(),
+                                                    'href': link('custom_url', customurl=encrypt(owner.key.urlsafe())),
                                                     'target': 'blank',
                                                     'title': ' '.join([owner.firstname, owner.lastname])
 
@@ -143,14 +142,16 @@
                                         'height': 32,
                                         'alt': ' '.join([owner.firstname, owner.lastname, '(%s)' % owner.username])
 
-                                    }|xmlattr }} />
+                                    }|xmlattr }} /></a>
 
                                     <div class='nametag' data-owner-key="{{ owner.key.urlsafe() }}" data-owner-firstname="{{ owner.firstname }}" data-owner-lastname="{{ owner.lastname }}">
-                                        {%- if owner.customurl -%}<a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
-                                        {%- else -%}<a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- if owner.has_custom_url() -%}
+                                            <a href="{{ link('custom_url', customurl=owner.customurl.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                        {%- else -%}
+                                            <a href="{{ link('user/profile', username=owner.key.id()) }}">{{ owner.firstname }} {{ owner.lastname }}</a>
                                         {%- endif -%}
                                         {%- if owner.location -%}
-                                            <span class='location byline'>{{ owner.location }}</span>
+                                            <span class='location quiet'>{{ owner.location }}</span>
                                         {%- endif -%}
                                     </div>
 
@@ -244,9 +245,10 @@
 
                 <!-- project title -->
                 <div id='projecttitle'>
-                    <h1 data-href="#project" class="target-link" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
+                    <h1 data-href="#project" class="target-link{% if security.current_user.key in project.owners %} mini-editable{% endif %}" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
                     <div id='deetactions'>
                         <div class='buttongroup' data-action="Share This">
+                            <div id="fblike" class="fb-like" data-send="false" data-width="250" data-show-faces="false" data-font="trebuchet ms"></div>
 							<div id='plusone' class="g-plusone" data-size="small" data-annotation="inline" data-width="250"></div>
                         </div> <!-- end .buttongroup -->
                     </div> <!-- end #deetactions -->
@@ -256,10 +258,10 @@
                 <div id='project-tabset' class='pre-tabs relative tabset'>
                     <a href='#details-tab' class='tab-rounded'>project<br>details</a>
                     <a href='#members-tab' class='tab-rounded'>project<br>members</a>
-                    <a href='#openfire-tab' class='tab-rounded'>social<br>reach</a>
+                    <a href='#team-tab' class='clear tab-rounded'>social<br>reach</a>
 
                     <!-- details-tab -->
-                    <div id='details-tab' class="tab" style="opacity: 0">
+                    <div id='details-tab' class="tab" style="opacity: 0; display: none;">
                         <section class='prsection'>
                             {% block description %}
                                 <h3>Summary</h3>
@@ -268,29 +270,31 @@
                                 <p>{{ project.pitch }}</p>
                                 <h3>Specifics</h3>
                                 <ul class='naked'>
-                                    <li>Category: {{ project.category }}</li>
+                                    <li>Category: {{ project.category.get().name }}</li>
                                     <li>Technology: {{ project.tech }}</li>
-                                    <li>Keywords: {{ project.keywords }}</li>
+                                    <li>Keywords: {% for key in project.keywords %}{{ key }}{%- if not loop.last -%}, {% endif %}{% endfor %}</li>
                                 </ul>
                             {% endblock description %}
                         </section>
                     </div><!-- end #details-tab -->
 
                     <!-- members-tab-->
-                    <div id="members-tab" class="tab" style="opacity: 0">
+                    <div id="members-tab" class="tab" style="opacity: 0; display: none;">
                         <section class='prsection'>
                             <p>This project has team members and an owner.</p>
                             <p>It was made possible by {{ project.backers }} generous backers, who have donated {{ currency(project.money) }} to date, placing this project {{ project.progress }}% of the way to its next support goal!</p>
                         </section>
                     </div><!-- end #members-tab-->
 
-                    <!-- team -->
-                    <div id="openfire-tab" class="tab" style="opacity: 0">
+                    <!-- team-tab -->
+                    <div id="team-tab" class="tab" style="opacity: 0; display: none;">
                         <section class='prsection'>
                             <p>TEAM</p>
                         </section>
                     </div><!-- end #team -->
 
+                </div><!-- end #project-tabset -->
+                <div style="height: 300px">&nbsp;</div>
             </article><!-- end #project -->
         </div><!-- end #content -->
     </div>

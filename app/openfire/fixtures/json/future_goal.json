@@ -5,6 +5,11 @@
         "description": "Show the world where every dollar has ever gone for all of politics."
     },
     {
+        "parent_key": "project__AppTools",
+        "summary": "Create a fully integrated and unified metaprogramming language for the web.",
+        "description": "We'll create a language for web developers, by web developers, from the ground up."
+    },
+    {
         "parent_key": "project__SeaSteading",
         "summary": "Build a better life on the water.",
         "description": "We'll build a boat that is a self-sustained county all by itself."

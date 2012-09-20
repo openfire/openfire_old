@@ -147,7 +147,7 @@ class Landing(WebHandler):
     ''' openfire landing page. '''
 
     template = 'main/landing.html'
-    projects_per_page = 6
+    projects_per_page = 8
     activity_per_page = 10
 
     def get(self):

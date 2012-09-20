@@ -38,7 +38,6 @@ class UserAccountController extends OpenfireController
                 if $(".payment-table").length
                     $(".payment-table").dataTable()
 
-
         @linkWePayAccount = () =>
             $.apptools.api.payment.get_auth_url().fulfill
                 success: (response) =>

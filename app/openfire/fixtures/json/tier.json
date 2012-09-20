@@ -158,5 +158,37 @@
         "next_step_votes": 5,
         "description": "You can pet on animal of your choosing.",
         "delivery": "12/1/2012"
+    },
+    {
+        "parent_key": "goal__apptools",
+        "name": "Script Kiddie",
+        "amount": 10,
+        "next_step_votes": 1,
+        "description": "You're an interested or aspiring developer, who is inspired by our work. Get a vote and have your say about AppTools!",
+        "delivery": "12/1/2012"
+    },
+    {
+        "parent_key": "goal__apptools",
+        "name": "Aspiring Developer",
+        "amount": 50,
+        "next_step_votes": 6,
+        "description": "Programming is AWESOME, RIGHT?? And you know this, and that's why you want to be a part of the AppTools effort.",
+        "delivery": "1/10/2013"
+    },
+    {
+        "parent_key": "goal__apptools",
+        "name": "Senior Engineer",
+        "amount": 200,
+        "next_step_votes": 20,
+        "description": "You've seen it all. Except AppTools of course! You are a true follower of the Tao of Programming. You have risen above the code. You have already resolved that jQuery must be killed for perfect harmony in the universe.",
+        "delivery": "2/10/2013"
+    },
+    {
+        "parent_key": "goal__apptools",
+        "name": "Sensei",
+        "amount": 1000,
+        "next_step_votes": 100,
+        "description": "You have risen above the Tao, for you understand the true nature of the universe, and the evils of jQuery. You see plugins as the worst thing to happen to the human race, since Karate Kid."
     }
+
 ]
