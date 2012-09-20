@@ -1,0 +1,163 @@
+<div id="propose-wizard" class="sw-main">
+    <ul>
+        <li>
+            <a href="#step-1">
+                <label class="step-number">1</label>
+                <span class="step-desc">General Info</span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-2">
+                <label class="step-number">2</label>
+                <span class="step-desc">Goal Details</span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-3">
+                <label class="step-number">3</label>
+                <span class="step-desc">Team and Tech</span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-4">
+                <label class="step-number">4</label>
+                <span class="step-desc">Summary</span>
+            </a>
+        </li>
+    </ul>
+
+    <div id="step-1">
+        <h2 class="step-title">Required Information About Your Project Idea</h2>
+        <p class="explain-text">
+            These items are required to start your proposal page.
+        </p>
+        <p>
+            <label>Proposed Project Name:</label>
+            <input type="text" id="proposal-name" />
+        </p>
+        <p>
+            <label>Desired Project URL:</label>
+            <span>openfi.re/<input type="text" id="proposal-desired_url" /></span>
+        </p>
+        <p>
+            <label class="short-input-label">Project Category:</label>
+            <select id="proposal-category">
+                <option value="">----------</option>
+                {% for category in categories %}
+                <option value="{{ category.key.urlsafe() }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <label>Quick Summary of the Project Idea (250 chars max):</label>
+            <textarea id="proposal-summary"></textarea>
+        </p>
+        <p>
+            <label>Idea Pitch (1000 chars max):</label>
+            <textarea id="proposal-pitch"></textarea>
+        </p>
+    </div>
+
+    <div id="step-2">
+        <h2 class="step-title">More Details About Your Initial Goal</h2>
+        <p class="explain-text">
+            You will be able to fill in more details about your goals and donation tiers on your proposal page once you complete this wizard.
+        </p>
+        <p>
+            <label class="short-input-label">Initial Funding Goal: $</label>
+            <span><input type="text" id="proposal-initial-goal-amount" class="short-input" /></span>
+        </p>
+        <p>
+            <label class="short-input-label">Funding Day Limit (7-100 days):</label>
+            <input type="text" id="proposal-initial-goal-funding_day_limit" class="short-input" />
+        </p>
+        <p>
+            <label class="date-input-label">Goal Deliverable Date:</label>
+            <input type="text" id="proposal-initial-goal-deliverable_date" class="date-input"/>
+        </p>
+        <p>
+            <label>Initial Goal Description:</label>
+            <textarea id="proposal-initial-goal-description"></textarea>
+        </p>
+        <p>
+            <label>Goal Deliverable Description:</label>
+            <textarea id="proposal-initial-goal-deliverable_description"></textarea>
+        </p>
+        <p>
+            <label>Ambitious Future Goal Summary (150 chars max):</label>
+            <textarea id="proposal-future-goal-summary"></textarea>
+        </p>
+        <p>
+            <label>Ambitious Future Goal Description (1000 chars max):</label>
+            <textarea id="proposal-future-goal-description"></textarea>
+        </p>
+    </div>
+
+    <div id="step-3">
+        <h2 class="step-title">More Details About Your Project Team and Tech</h2>
+        <p class="explain-text">
+            You will be able to add specific team members and viewers on your proposal page after you create it.
+        </p>
+        <p>
+            <label>Tech</label>
+            <textarea id="proposal-tech"></textarea>
+        </p>
+        <p>
+            <label>Team</label>
+            <textarea id="proposal-team"></textarea>
+        </p>
+    </div>
+
+    <div id="step-4">
+        <h2 class="step-title">Summary</h2>
+
+        <p>
+            <label class="summary-label">Name:</label><span class="summary-item" id="name-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">URL:</label><span class="summary-item" id="desired_url-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Category:</label><span class="summary-item" id="category-summary-display"></span><span class="summary-item" id="category-summary" style="display: none;"></span>
+        </p>
+        <p>
+            <label class="summary-label">Summary:</label><span class="summary-item" id="summary-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Pitch:</label><span class="summary-item" id="pitch-summary"></span>
+        </p>
+
+        <p>
+            <label class="summary-label">Initial Funding Goal:</label><span class="summary-item" id="initial-goal-amount-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Funding Day Limit:</label><span class="summary-item" id="initial-goal-funding_day_limit-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Deliverable Date:</label><span class="summary-item" id="initial-goal-deliverable_date-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Goal Description:</label><span class="summary-item" id="initial-goal-description-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Goal Deliverable Description:</label><span class="summary-item" id="initial-goal-deliverable_description-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Future Goal Summary:</label><span class="summary-item" id="future-goal-summary-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Future Goal Description:</label><span class="summary-item" id="future-goal-description-summary"></span>
+        </p>
+
+        <p>
+            <label class="summary-label">Tech:</label><span class="summary-item" id="tech-summary"></span>
+        </p>
+        <p>
+            <label class="summary-label">Team:</label><span class="summary-item" id="team-summary"></span>
+        </p>
+
+        <p>
+            You will be able to set your project avatar, video, images, goal donation tiers, next steps, and more, on the proposal page that you will be redirected to after completing this form. You will have time to edit and review your proposal as much as you'd like before submitting it for approval.
+        </p>
+    </div>
+</div>

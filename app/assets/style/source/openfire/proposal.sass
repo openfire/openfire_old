@@ -167,24 +167,24 @@
                 top: 30px
                 width: 9px
                 height: 9px
-                background-color: transparent
+                background-color: rgba(0,0,0,0)
 
             &::before
                 left: 1px
-                +background(linear-gradient(top right, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
+                +background(linear-gradient(top right, #bada55 0%, #bada55 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%))
                 clip: rect(0px 10px 8px 2px)
                 box-shadow: inset -2px 3px 11px -5px rgba(0,0,0, 0.75)
 
             &::after
                 right: 1px
-                +background(linear-gradient(top left, white 0%, white 50%, transparent 50%, transparent 100%))
+                +background(linear-gradient(top left, white 0%, white 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%))
                 clip: rect(0px 8px 8px 0px)
                 box-shadow: inset 2px 3px 11px -5px rgba(0,0,0, 0.75)
 
             &.done
                 &::after
                     background: none
-                    +background(linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
+                    +background(linear-gradient(top left, #bada55 0%, #bada55 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%))
 
 
             #progress-inner

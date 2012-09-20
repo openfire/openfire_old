@@ -14,9 +14,31 @@ config['openfire'] = {
 
 }
 
+config['openfire.video'] = {
+
+    'debug': False,  # show log messages about video serving ops
+
+    'providers': {
+        'vimeo': {
+            'default': 'flash'
+        }
+    },
+
+    'flash': {
+        'enable': True,
+        'force': False
+    },
+
+    'html5': {
+        'enable': True,
+        'force': False
+    }
+
+}
+
 config['openfire.placeholder'] = {
 
-    'enabled': True,  # show placeholder instead of landing
+    'enabled': False,  # show placeholder instead of landing
     'force': True,  # show placeholder for logged in users, too
     'debug': True,  # enable debug logging for the placeholder handler
 
@@ -261,7 +283,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'placeholder'
+    'namespace': 'demo'
 }
 
 config['openfire.output'] = {

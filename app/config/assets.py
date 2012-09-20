@@ -63,11 +63,12 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'modernizr': {'min': False, 'version': '2.0.6-c'},          # Modernizr - browser polyfill + compatibility testing
-                'jquery': {'min': True, 'version': '1.8.0'},                # jQuery: Write Less, Do More!
-                'jquery-full': {'min': True, 'version': '1.8.0', 'name': 'jquery.full'},
-                'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},   # D3 - Visualizations
-                'jacked': {'min': True, 'version': '1.0'},                  # Jacked - tweening animation engine
+                'modernizr': {'min': False, 'version': '2.0.6-c'},                      # Modernizr - browser polyfill + compatibility testing
+                'jquery': {'min': True, 'version': '1.8.0'},                            # jQuery: Write Less, Do More!
+                'jquery-full': {'version': '1.8', 'min': True, 'name': 'jquery.full'},  # jQuery Full (nothing compiled out)
+                'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},               # D3 - Visualizations
+                'jacked': {'min': True, 'version': '1.0'},                              # Jacked - tweening animation engine
+                'datepickr': {'min': False, 'version': '1.0'},                          # datepickr - Picking dates
             }
 
         },
@@ -96,8 +97,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'app': {'min': True, 'version': 0.3},  # openfire app base
-                'admin': {'name': 'app.admin', 'min': True, 'version': 0.3}  # openfire app base for admins
+                'app': {'min': False, 'version': 0.3},  # openfire app base
+                'admin': {'name': 'app.admin', 'min': False, 'version': 0.3}  # openfire app base for admins
             }
 
         },
@@ -145,6 +146,7 @@ config['apptools.project.assets'] = {
                 'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.2},
                 'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.2},
                 'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.2},
+                'datepickr': {'name': '_datepickr.sass', 'module': '_partials', 'version': 0.1},
 
                 ## Openfire
                 'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.2},
@@ -169,7 +171,7 @@ config['apptools.project.assets'] = {
         ('compiled', 'compiled'): {
 
             'config': {
-                'min': True,
+                'min': False,
                 'version_mode': 'getvar'
             },
 
@@ -187,15 +189,19 @@ config['apptools.project.assets'] = {
         ('openfire', 'compiled/openfire'): {
 
             'config': {
-                'min': True,
+                'min': False,
                 'version_mode': 'getvar'
             },
 
             'assets': {
+
                 'landing': {'version': 0.5},  # styles for the landing
                 'proposal': {'version': 0.2},  # styles for the proposal page
                 'project': {'version': 0.4},  # styles for the project page
-                'profile': {'version': 0.3}   # styles for the profile page
+                'profile': {'version': 0.3},   # styles for the profile page
+                'propose': {'version': 0.1},  # styles for the propose page & wizard
+                'account': {'version': 0.1}   # styles for the user account page
+
             }
 
         },

@@ -2,21 +2,27 @@
     <label for="back-project-tier-input">Tier:</label>
     <select id="back-project-tier-input" name="tier">
     {% for tier in tiers %}
-        <option value="{{ encrypt(tier.key.urlsafe()) }}">{{ tier.name }} - {{ currency(tier.amount) }}</option>
+        <option value="{{ encrypt(tier.key.urlsafe()) }}">{{ tier.name }} -- ${{ tier.amount }} -- (votes: {{ tier.next_step_votes }})</option>
     {% else %}
         <option value="">no project tiers to donate to yet!</option>
     {% endfor %}
     </select>
 </p>
 <p>
-    <label for="back-project-next-step-input">Next Step:</label>
-    <select id="back-project-next-step-input" name="tier">
+    <label for="back-project-remaining-votes">Total Votes Allowed:</label>
+    <input type="text" readonly="readonly" disabled="disabled" id="back-project-remaining-votes" value="0">
+</p>
+<p>
+    <ul>
     {% for step in next_steps %}
-        <option value="{{ encrypt(step.key.urlsafe()) }}">{{ step.summary }}</option>
-    {% else %}
-        <option value="">no next steps to vote for yet!</option>
+        <li>
+            <label>Option #{{ loop.index }}:</label>
+            <span>Votes: {{ step.votes }}</span>
+            <span>{{ step.summary }}</span>
+            <input id="{{ encrypt(step.key.urlsafe()) }}" value="0" class="back-project-next-step-input" style="width: 30px;"/>
+        </li>
     {% endfor %}
-    </select>
+    </ul>
 </p>
 <p>
     <label for="back-project-amount-input">Amount:</label>

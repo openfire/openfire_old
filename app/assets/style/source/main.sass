@@ -30,7 +30,8 @@ h1
 
 #title
   span
-    font: 32pt "Satisfy", cursive
+    margin-right: 1%
+    font-family: "Satisfy", cursive
 
 p
   margin: 15px 0
@@ -87,6 +88,7 @@ p
         family: "Satisfy", cursive
       line-height: 18pt
       text-align: right
+      left: 12%
 
 #mainvideo
   -webkit-transition-property: height, min-height
@@ -190,7 +192,11 @@ p
 .section-wrap
   background: #eee
   width: auto
-  padding-bottom: 5px
+  padding-bottom: 20px
+
+#project-cards
+  text-align: center
+  padding-left: 10px
 
 .project-card
   img,
@@ -198,11 +204,10 @@ p
     -webkit-transition-property: width, height
 
   -webkit-transition-property: width, height, margin
-
   border-radius: 5px
   background-color: #fff
   padding: 10px
-  margin: 10px 0 0 10px
+  margin: 30px 15px 0 0
   display: inline-table
   box-shadow: 2px 2px 2px #cdcdcd
   &:hover
@@ -231,9 +236,10 @@ p
       color: #999
       font-family: "Karla",sans-serif
       font-weight: 400
-      font-style: italic
       text-transform: uppercase
       overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
       text-decoration: none
     &:hover
       cursor: pointer

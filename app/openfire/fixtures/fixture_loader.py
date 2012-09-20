@@ -77,6 +77,7 @@ def load_fixtures():
     loaded_data = {}
     for name, create_func, unique_slug in FIXTURE_FILES:
         filename = os.path.join(os.path.dirname(__file__), 'json', name + '.json')
+
         with open(filename) as fixture:
             fixture_data = json.loads(fixture.read())
 

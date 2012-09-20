@@ -1,28 +1,27 @@
 {% extends "layout/about.html" %}
 
 {% block postnorth %}
-    <link rel="stylesheet" type="text/css" href="/assets/style/static/compiled/wizard_vertical.css">
+    <link rel="stylesheet" href="{{ asset.style('propose', 'openfire') }}">
 {% endblock postnorth %}
 
 
 {% block main %}
 
     <div>
-        <p>Here are the steps to submit a proposal on openfire...</p>
-        <ol>
-            <li>Fill out the wizard on this page and submit.</li>
-            <li>You will be redirected to a your private custom proposal page where you can review and edit your proposal.</li>
-            <li>When you are satisfied with your proposal, submit it for review.</li>
-            <li>The openfire review board will review and potentially comment on your proposal or request you to iterate on it.</li>
-            <li>Once your proposal is approved, you will be given a full project page to finalize and go live!</li>
-            <li>Profit!</li>
-        </ol>
+        <h2>Have an idea for change that really needs to happen?</h2>
+        <p>Submit an idea for a project on openfi.re!</p>
+        <ul>
+            <li>We'll ask you a few questions first about what kind of project you want to propose.</li>
+            <li>Once that's finished, you'll be taken to your private custom proposal page where you can continue to review & edit your proposal until you're satisfied - then submit it!</li>
+            <li>The openfire review team will take a look at your proposal - we may request iteration on items in your proposal to fully understand your project's scope and vision.</li>
+            <li>Once it's been approved, you will be notified with a link to your preliminary project page, which is private until you've finalized your campaign...then it's time to go live!</li>
+        </ul>
     </div>
 
     <div>
-        <a id="a-proposal-wizard-dialog" href="#start-proposal-dialog">Start Your Proposal Now!</a>
-        <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"ratio":{"x":0.7,"y":0.45}}'>
-            {% include "propose/proposal_wizard.html" %}
+        <a id="a-proposal-wizard-dialog" href="#start-proposal-dialog">start your proposal!</a>
+        <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":750,"height":370}}'>
+            {% include "snippets/proposal_wizard.html" with context %}
         </div>
     </div>
 

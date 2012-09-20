@@ -48,6 +48,13 @@ class ProjectHome(WebHandler):
 
         return super(ProjectHome, self).logging.extend(name='ProjectHome')._setcondition(self.should_log)
 
+    @webapp2.cached_property
+    def videoConfig(self):
+
+        ''' Named access to video configuration. '''
+
+        return config.config.get('openfire.video')
+
     def get(self, key):
 
         ''' Render project_home.html. '''
@@ -136,6 +143,7 @@ class ProjectHome(WebHandler):
                     future_goal=future_goal,
                     tiers=tiers,
                     next_steps=next_steps,
+                    video_config=self.videoConfig,
                     flush=False
             )
 

@@ -705,13 +705,24 @@ class ProjectController extends OpenfireController
         @close_back_dialog = () =>
             $.apptools.widgets.modal.get("back-project-dialog").close()
 
+        @change_backing_tier = () ->
+            values = @[@.selectedIndex].innerHTML.match(/[\s\S\w+]+ -- [\\$]([\d+]+).[\d+]+ -- \(votes: ([\d+]+)\)/)
+            document.getElementById("back-project-amount-input").value = values[1]
+            document.getElementById("back-project-remaining-votes").value = values[2]
+
         @submit_payment = () =>
             # Simple way to submit a back project request with a new credit card for now.
+            votes = []
+            for el in document.getElementsByClassName("back-project-next-step-input")
+                votes.push
+                    key: el.id
+                    num_votes: parseInt(el.value)
             params =
                 user: null # TODO: Get user so that we can double check with the session? Should we do that?
                 project: @project_key
                 tier: document.getElementById("back-project-tier-input").value
                 amount: document.getElementById("back-project-amount-input").value
+                next_step_votes: votes
                 money_source: document.getElementById("back-project-money-source-input").value
                 new_cc:
                     cc_num: document.getElementById("back-project-cc-num-input").value
@@ -734,8 +745,9 @@ class ProjectController extends OpenfireController
                     alert("Success! " + response.message)
                     document.getElementById('back-text').innerHTML = 'you rock.'
                     document.getElementById('back').classList.add('backed')
-                failure: (error) =>
-                    alert("Failure! " + error.message)
+                failure: (error, status, xhr) =>
+                    msg = JSON.parse(xhr.responseText)?.response?.content?.error_message
+                    alert("Failure! " + msg)
 
 
         @back = () =>
@@ -749,7 +761,9 @@ class ProjectController extends OpenfireController
                         for source in response.sources
                             options += "<option value='" + source.key + "'>" + source.description + "</option>"
                     selector.innerHTML = options
-                    $.apptools.widgets.modal.get("back-project-dialog").open()
+                    # TODO: Does 'get' not work anymore?
+                    #$.apptools.widgets.modal.get("back-project-dialog").open()
+                    $.apptools.widgets.modal._state.modals[0].open()
                 failure: (error) =>
                     alert("Failed to start donation. Are you logged in?")
             return
@@ -1593,7 +1607,7 @@ class ProjectController extends OpenfireController
 
         @_init = () =>
 
-            if window._cp
+            if window._cp and _.get('#project')?
 
                 # setup project method proxies
                 ((m) =>
@@ -1608,6 +1622,7 @@ class ProjectController extends OpenfireController
                 # Event listeners in the back project dialog.
                 document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
                 document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
+                document.getElementById('back-project-tier-input').addEventListener('change', @change_backing_tier, false)
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)
