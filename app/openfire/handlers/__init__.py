@@ -13,6 +13,7 @@ logic / request handling stuff across your entire app, by putting it here.
 '''
 
 ## General Imports
+import os
 import config
 import hashlib
 
@@ -178,6 +179,10 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         # Preload second
         if self.should_preload:
             self.preload()
+
+        # TODO: This is required for logged in testing to work. See [OF-155] for details.
+        #if os.environ.get("RUNNING_TESTS", None) == "TESTING":
+        #    self.dispatch()
 
 
     def preload(self):
