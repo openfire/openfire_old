@@ -104,6 +104,11 @@
 
 		<title>{% block title %}openfire! - momentum for positive disruption - crowdfunding, built from the ground up for disruptive innovation{% endblock title %}</title>
 
+		<script id='js-clock' type='text/javascript' data-role='appclock'>
+			var __pn = window.performance.now ? function () { return window.performance.now.call(window.performance); } : window.performance.webkitNow ? function () { return window.performance.webkitNow.call(window.performance) } : function () {
+				return +new Date(); }, __clock = {ts: [__pn()], clockpoint: function (n) { this.ts.push([n, window.__pn()]); } };
+		</script>
+
 		{% block page_services %}
 		{% if page.services %}
 		<script id='js-config' type='application/json' data-role='pageconfig'>

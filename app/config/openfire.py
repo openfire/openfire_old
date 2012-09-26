@@ -84,7 +84,7 @@ config['openfire.meta'] = {
     'author': 'a collaboration between labor lapsus L3C + momentum labs',
     'publisher': 'openfire!',
     'copyright': 'openfire, (c) 2012',
-    'robots': 'index,follow',
+    'robots': 'noindex,nofollow',  #'index,follow',
     'revisit': '7 days',
 
     'description': 'openfire brings technologists, investors, developers and crowdfunders together around one thing: putting momentum behind disruptive innovation.',
