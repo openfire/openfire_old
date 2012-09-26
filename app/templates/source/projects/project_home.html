@@ -7,18 +7,14 @@
 {# Description, URL #}
 {% block meta_description %}{{ project.summary }}{% endblock meta_description %}
 {% block og_description %}{{ project.summary }}{% endblock og_description %}
-{% block og_url %}https://openfi.re/{{ project.get_custom_url() }}{% endblock og_url %}
+{% block og_url %}https://staging.openfi.re/{{ project.get_custom_url() }}{% endblock og_url %}
 
 {# Image, Video #}
-{% block og_image %}{% endblock og_image %}
-{% block og_image_height %}{% endblock og_image_height %}
-{% block og_image_width %}{% endblock og_image_width %}
+{% block og_image %}{{ project.avatar.url }}{% endblock og_image %}
+{% block og_image_height %}140{% endblock og_image_height %}
+{% block og_image_width %}120{% endblock og_image_width %}
 {% block og_extra %}
 		<meta property="og:video" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}{{ video.sources.raw.hidef }}{%- else -%}{{ video.url }}{%- endif -%}" />
-		<meta property="video:release_date" content="null" />
-		<meta property="video:duration" content="null" />
-		<meta property="video:actor" content="null" />
-		<meta property="video:tag" content="null" />
 {% endblock og_extra %}
 
 
