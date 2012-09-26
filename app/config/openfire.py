@@ -10,7 +10,7 @@ config = {}
 
 config['openfire'] = {
 
-    'version': '0.2-alpha',
+    'version': '0.3-alpha',
 
 }
 
