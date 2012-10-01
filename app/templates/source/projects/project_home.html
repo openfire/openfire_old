@@ -15,6 +15,15 @@
 {% block og_image_width %}120{% endblock og_image_width %}
 {% block og_extra %}
 		<meta property="og:video" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}{{ video.sources.raw.hidef }}{%- else -%}{{ video.url }}{%- endif -%}" />
+		<meta property="og:video:type" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}video/mp4{%- else -%}text/html{%- endif -%}">
+		<meta property="og:video:width" content="720">
+		<meta property="og:video:height" content="400">
+		{%- if video.provider == 'vimeo' -%}
+		{% if video_config.html5.enable %}
+		<meta property="og:video" content="{{ video.url }}">
+		<meta property="og:video:type" content="text/html">
+		{% endif %}
+		{%- endif -%}
 {% endblock og_extra %}
 
 
