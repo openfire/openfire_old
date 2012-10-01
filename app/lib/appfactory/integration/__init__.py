@@ -1,0 +1,4 @@
+# Import layer controllers
+from appfactory.integration.upstream import IntegrationBridge as UpstreamIntegrationBus
+from appfactory.integration.frontline import IntegrationBridge as FrontlineIntegrationBus
+from appfactory.integration.controller import IntegrationBridge as ControllerIntegrationBus
