@@ -6,7 +6,7 @@ from apptools.util import datastructures
 
 from appfactory.integration.abstract import CommandBus
 
-
+## Headers - frozen set of possible frontline-provided headers
 _FRONTLINE_HEADERS = frozenset(['Frontline',
 								'Agent',
 								'Hostname',
@@ -16,14 +16,18 @@ _FRONTLINE_HEADERS = frozenset(['Frontline',
 								'Entrypoint',
 								'Flags'])
 
-_FRONTLINE_FLAGS = frozenset(['ap', 'opt'])
+
+## Flags - frozen set of reserved flags that can appear in the "Flags" header
+_FRONTLINE_FLAGS = frozenset(['ap', 'opt', 'spdy', 'ps'])
 
 
+## FrontlineBus
+## Parses headers added by the AppFactory frontline, in order to facilitate triggering/changing behaviour in the codebase based on the hosting scheme being used.
 class FrontlineBus(CommandBus):
 
 	''' AppFactory Frontline management and integration code. '''
 
-	## == ##
+	## == Internal Methods == ##
 	@webapp2.cached_property
 	def config(self):
 
@@ -38,15 +42,101 @@ class FrontlineBus(CommandBus):
 
 		return debug.AppToolsLogger(path='appfactory.integration.frontline', name='FrontlineBus')._setcondition(self.config.get('debug', False))
 
-	## == ##
-	def __flags(self, handler, value): self.logging.critical("FLAGS!!!!!! %s" % value)
-	def __agent(self, handler, value): self.logging.critical("AGENT!!!!!! %s" % value)
-	def __broker(self, handler, value): self.logging.critical("BROKER!!!!!! %s" % value)
-	def __version(self, handler, value): self.logging.critical("VERSION!!!!!! %s" % value)
-	def __protocol(self, handler, value): self.logging.critical("PROTOCOL!!!!!! %s" % value)
-	def __hostname(self, handler, value): self.logging.critical("HOSTNAME!!!!!! %s" % value)
-	def __frontline(self, handler, value): self.logging.critical("FRONTLINE!!!!!! %s" % value)
-	def __entrypoint(self, handler, value): self.logging.critical("ENTRYPOINT!!!!!! %s" % value)
+	## == Meta Header Triggers == ##
+	def __flags(self, handler, value):
+
+		''' Set reserved flags. '''
+
+		directive_i = value.split(',')
+		if len(directive_i) > 0:
+			for directive in directive_i:
+				try:
+					di_r = directive.split('=')
+					if len(di_r) > 1:
+						k, v = tuple(di_r)
+					else:
+						k, v = tuple(di_r, None)
+					k = k.lower().lstrip().rstrip()
+					if k in _FRONTLINE_FLAGS:
+						handler.flags[k.upper()] = v
+					else:
+						self.logging.warning('Rogue frontline reserved option encountered, at key "%s". Register or meet your peril!' % k)
+						continue
+				except Exception, e:
+					self.logging.error('Error encountered processing reserved flags at key "%s" with exception "%s". Continuing.' % (k, e))
+					continue
+		return
+
+	def __agent(self, handler, value):
+
+		''' Parse the user agent string, as provided by the Frontline in an alternate header. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			try:
+				# Pass through httpagentparser
+				handler.uagent = handler.util.httpagentparser(value)
+			except Exception, e:
+				self.logging.warning('Unable to parse AppFactory UserAgent header with value "%s". Exception: "%s".' % (e ,uagent))
+				return
+
+	def __broker(self, handler, value):
+
+		''' Store the broker for this connection, which is the frontline instance handling the request/response cycle. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			handler.broker = value
+		return
+
+	def __version(self, handler, value):
+
+		''' Set the system version. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			try:
+				sv, pv = tuple([float(i.split('=')[1]) for i in value.split(',')])
+			except ValueError, e:
+				self.logging.warning('Invalid AppFactory system version provided ("%s") of type "%s".' % (value, type(value)))
+				return
+			else:
+				if not isinstance(handler._appfactory_version, tuple):
+					handler._appfactory_version = tuple([0, 0])
+				handler._appfactory_version = sv, pv
+		return
+
+	def __protocol(self, handler, value):
+
+		''' Set the protocol version. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			if value.lower().lstrip().rstrip() == 'https':
+				handler.force_https_assets = True
+				handler.force_absolute_assets = True
+		return
+
+	def __hostname(self, handler, value):
+
+		''' Set the proxied hostname, for redirection/assets/links. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			handler.force_hostname = value
+			handler.force_absoltue_assets = True
+		return
+
+	def __frontline(self, handler, value):
+
+		''' Set the frontline cluster that this request entered Layer9 through. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			handler.frontline = value
+		return
+
+	def __entrypoint(self, handler, value):
+
+		''' Set the app/host that this request entered Layer9 through. '''
+
+		if isinstance(value, basestring) and len(value) > 0:
+			handler.entrypoint = value
+		return
 
 	trigger = datastructures.DictProxy({
 
@@ -61,7 +151,7 @@ class FrontlineBus(CommandBus):
 
 	})
 
-	## == ##
+	## == Dispatch + Exports == ##
 	def _dispatch(self, handler, header, value):
 
 		''' Dispatch internal functions to change aspects of the environment or request based on a sniffed header. '''
@@ -87,8 +177,6 @@ class FrontlineBus(CommandBus):
 		''' Sniff a request for headers that were added by the AppFactory upstream servers. '''
 
 		self.logging.info('Sniffing request for AppFactory frontline headers.')
-		self.logging.info('REQUEST DUMP:')
-		self.logging.info(str(handler.request))
 
 		if self._l9config.get('headers', {}).get('use_compact', False):
 			prefix = self._l9config.get('headers', {}).get('full_prefix', 'X-AppFactory')
@@ -98,14 +186,13 @@ class FrontlineBus(CommandBus):
 		sniffed = []
 		for i in _FRONTLINE_HEADERS:
 			header_i = '-'.join([prefix, i])
-			self.logging.info('--Looking for header "%s".' % header_i)
+			self.logging.debug('--Looking for header "%s".' % header_i)
 
 			if header_i in handler.request.headers:
-				self.logging.info('-----Found!')
+				self.logging.debug('-----Found!')
 				sniffed.append((i, handler.request.headers[header_i]))
 
 		for header_s, value in sniffed:
-			self.logging.info('Dispatching sniffed header action for header "%s".' % header_s)
 			try:
 				self._dispatch(handler, header_s, value)
 			except:
@@ -113,11 +200,11 @@ class FrontlineBus(CommandBus):
 
 		return sniffed
 
-	def dump(self, handler):
+	def dump(self, handler, result):
 
 		''' Dump the upstream state to memcache, so stats and realtime operations can be introspected and displayed. '''
 
-		pass
+		self.logging.info('Dumped AppFactory Frontline state.')
 
 
 IntegrationBridge = FrontlineBus()
