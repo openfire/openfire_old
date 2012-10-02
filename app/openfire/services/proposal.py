@@ -3,7 +3,6 @@ import webapp2, config
 from apptools.util import debug
 from apptools.util import datastructures
 
-
 from google.appengine.ext import ndb
 from apptools.services.builtin import Echo
 from protorpc import messages, message_types, remote
@@ -15,7 +14,7 @@ from openfire.messages import common as common_messages
 
 from openfire.core.payment import PaymentAPI
 
-from openfire.models import social
+from openfire.models import social, user
 from openfire.models.assets import CustomURL
 from openfire.models.project import Proposal, Project, Goal, FutureGoal, Tier, NextStep
 
@@ -248,7 +247,8 @@ class ProposalService(RemoteService):
                         if comment.user not in comment_users:
                             comment_users.append(comment.user)
 
-                    users = dict([tuple([key, user]) for key, user in zip(comment_users, ndb.get_multi(comment_users))])
+                    users = dict([tuple([key, u]) for key, u in zip(comment_users, ndb.get_multi(comment_users))])
+                    permissions = dict([tuple([key, permissions]) for key, permissions in zip(comment_users, ndb.get_multi([ndb.Key(user.Permissions, 'global', parent=k) for k in comment_users]))])
 
                     return common_messages.Comments(**{
 
@@ -260,11 +260,11 @@ class ProposalService(RemoteService):
                             'subject': request.subject,
                             'author': common_messages.Comment.Commenter(**{
                                 'username': users.get(comment.user).username,
-                                'profile': '',
+                                'profile': users.get(comment.user).get_custom_url(),
                                 'firstname': users.get(comment.user).firstname,
                                 'lastname': users.get(comment.user).lastname,
-                                'is_admin': False,
-                                'avatar': ''
+                                'is_admin': permissions.get(comment.user).admin,
+                                'avatar': users.get(comment.user).get_avatar_url()
                             })
 
                         }) for comment in comments],
