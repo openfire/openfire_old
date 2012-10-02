@@ -102,6 +102,8 @@ class User(AppModel):
                     return self.url_for('serve-asset-filename', asset_key=str(asset.blob), filename='.'.join(['profile', extension]), s=size)
                 else:
                     return self.url_for('serve-asset', asset_key=str(asset.blob))
+        else:
+            return 'gravatar'
         return False
 
 
