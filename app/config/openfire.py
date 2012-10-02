@@ -448,3 +448,9 @@ config['openfire.pipelines.integration.mailchimp.MailChimpEmailEntry'] = {
     'debug': True,
 
 }
+
+config['openfire.project.updates'] = {
+
+    'debug': True,
+
+}
