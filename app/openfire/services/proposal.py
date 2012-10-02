@@ -1,43 +1,61 @@
-import webapp2, config
+# -*- coding: utf-8 -*-
 
+# Base
+import config
+import webapp2
+
+# AppTools
 from apptools.util import debug
 from apptools.util import datastructures
 
+# ProtoRPC
+from protorpc import remote
+from protorpc import messages
+from protorpc import message_types
+
+# NDB / Builtins
 from google.appengine.ext import ndb
 from apptools.services.builtin import Echo
-from protorpc import messages, message_types, remote
 
-from openfire.services import RemoteService
-from openfire.messages import proposal as proposal_messages
-from openfire.messages import project as project_messages
-from openfire.messages import common as common_messages
-
+# Core APIs
 from openfire.core.payment import PaymentAPI
 
-from openfire.models import social, user
+# Service + Messages
+from openfire.services import RemoteService
+from openfire.messages import common as common_messages
+from openfire.messages import project as project_messages
+from openfire.messages import proposal as proposal_messages
+
+# Models
+from openfire.models import user
+from openfire.models import social
+from openfire.models.project import Goal
+from openfire.models.project import Tier
+from openfire.models.project import Project
+from openfire.models.project import NextStep
+from openfire.models.project import Proposal
+from openfire.models.project import FutureGoal
 from openfire.models.assets import CustomURL
-from openfire.models.project import Proposal, Project, Goal, FutureGoal, Tier, NextStep
 
 
+## Proposal API.
 class ProposalService(RemoteService):
 
-    ''' Proposal service api. '''
+    ''' Interact and mutate project proposals. '''
 
-    class LoginRequired(RemoteService.exceptions.ApplicationError):
-
-		''' Thrown when login is required. '''
-
-    class NotAuthorizedToComment(RemoteService.exceptions.ApplicationError):
-
-        ''' Thrown when a user isn't authorized to comment on a subject data point. '''
+    ## +=+=+ Exceptions +=+=+ ##
+    class ProposalServiceException(RemoteService.exceptions.ApplicationError): ''' Base exception for all errors specific to the Proposal Service. '''
+    class LoginRequired(ProposalServiceException): ''' Thrown when login is required to perform an action on the Proposal Service. '''
+    class NotAuthorized(ProposalServiceException): ''' Thrown when a user isn't authorized to comment on a subject data point. '''
 
     exceptions = datastructures.DictProxy({
 
 		'LoginRequired': LoginRequired,
-        'NotAuthorizedToComment': NotAuthorizedToComment
+        'NotAuthorized': NotAuthorized
 
 	})
 
+    ## +=+=+ Internals +=+=+ ##
     @webapp2.cached_property
     def config(self):
 
@@ -52,6 +70,7 @@ class ProposalService(RemoteService):
 
         return debug.AppToolsLogger(path='openfire.services.proposal', name='ProposalService')._setcondition(self.config.get('debug', False))
 
+    ## +=+=+ Exposed Methods +=+=+ ##
     @remote.method(message_types.VoidMessage, proposal_messages.Proposals)
     def list(self, request):
 
@@ -178,11 +197,11 @@ class ProposalService(RemoteService):
             try:
                 s = ndb.Key(urlsafe=request.subject)
                 sub = s.get()
-               
+
                 if sub is not None:
 
                     if (self.user.key not in sub.owners) and (self.user.key not in sub.viewers) and not self.permissions.admin:
-                        raise self.exceptions.NotAuthorizedToComment("Woops! You aren't allowed to comment on that!")
+                        raise self.exceptions.NotAuthorized("Woops! You aren't allowed to comment on that!")
 
                     c = social.Comment(**{
                         'key': ndb.Key(social.Comment, social.Comment.allocate_ids(1)[0], parent=s),
@@ -235,7 +254,7 @@ class ProposalService(RemoteService):
             if sub is not None:
 
                 if (self.user.key not in sub.owners) and (self.user.key not in sub.viewers) and not self.permissions.admin:
-                    raise self.exceptions.NotAuthorizedToComment("Woops! You aren't allowed to comment on that!")
+                    raise self.exceptions.NotAuthorized("Woops! You aren't allowed to comment on that!")
 
                 comments_q = social.Comment.query(ancestor=s).order(social.Comment.created)
                 count = comments_q.count()

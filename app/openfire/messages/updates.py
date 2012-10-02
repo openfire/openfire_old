@@ -55,18 +55,18 @@ class Update(messages.Message):
         media = messages.EnumField(MediaTypes, 1)
         provider = messages.EnumField(MediaProviders, 2)
         href = messages.StringField(3)
-        mime = messages.STringField(4)
+        mime = messages.StringField(4)
 
     key = messages.StringField(1)
     subject = messages.StringField(2)
     content = messages.StringField(3)
     privacy = messages.EnumField(PrivacyOptions, 4, default=PrivacyOptions.PRIVATE)
     attachment = messages.MessageField(Attachment, 5)
-    author = messages.MessageField(Poster)
-    modified = messages.StringField(6)
-    modified_ago = messages.StringField(7)
-    created = messages.StringField(8)
-    created_ago = messages.StringField(9)
+    author = messages.MessageField(Poster, 6)
+    modified = messages.StringField(7)
+    modified_ago = messages.StringField(8)
+    created = messages.StringField(9)
+    created_ago = messages.StringField(10)
 
 
 ## Updates - request/response for a list of updates, given a project or user
@@ -74,6 +74,6 @@ class Updates(messages.Message):
 
     ''' Retrieve updates. '''
 
-    updates = messages.MessageField(Post, 1, repeated=True)
+    updates = messages.MessageField(Update, 1, repeated=True)
     count = messages.IntegerField(2)
     subject = messages.StringField(3)

@@ -6,6 +6,7 @@ from openfire.models import AppModel
 
 # Message Classes
 from openfire.messages import common
+from openfire.messages import updates
 from openfire.messages import project
 from openfire.messages import proposal
 
@@ -279,7 +280,7 @@ class Update(AppModel):
 
     ''' Describes an update posted by project admins. '''
 
-    _message_class = common.Post
+    _message_class = updates.Update
     _pipeline_class = pipelines.UpdatePipeline
 
     project = ndb.KeyProperty('p', indexed=True, required=True)
