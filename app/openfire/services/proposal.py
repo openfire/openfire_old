@@ -1,3 +1,9 @@
+import webapp2, config
+
+from apptools.util import debug
+from apptools.util import datastructures
+
+
 from google.appengine.ext import ndb
 from apptools.services.builtin import Echo
 from protorpc import messages, message_types, remote
@@ -8,12 +14,44 @@ from openfire.messages import project as project_messages
 from openfire.messages import common as common_messages
 
 from openfire.core.payment import PaymentAPI
+
+from openfire.models import social
 from openfire.models.assets import CustomURL
 from openfire.models.project import Proposal, Project, Goal, FutureGoal, Tier, NextStep
+
 
 class ProposalService(RemoteService):
 
     ''' Proposal service api. '''
+
+    class LoginRequired(RemoteService.exceptions.ApplicationError):
+
+		''' Thrown when login is required. '''
+
+    class NotAuthorizedToComment(RemoteService.exceptions.ApplicationError):
+
+        ''' Thrown when a user isn't authorized to comment on a subject data point. '''
+
+    exceptions = datastructures.DictProxy({
+
+		'LoginRequired': LoginRequired,
+        'NotAuthorizedToComment': NotAuthorizedToComment
+
+	})
+
+    @webapp2.cached_property
+    def config(self):
+
+        ''' Named config pipe. '''
+
+        return config.config
+
+    @webapp2.cached_property
+    def logging(self):
+
+        ''' Named logging pipe. '''
+
+        return debug.AppToolsLogger(path='openfire.services.proposal', name='ProposalService')._setcondition(self.config.get('debug', False))
 
     @remote.method(message_types.VoidMessage, proposal_messages.Proposals)
     def list(self, request):
@@ -128,17 +166,121 @@ class ProposalService(RemoteService):
         proposal_key.delete()
         return Echo(message='Proposal removed')
 
-    @remote.method(common_messages.Comment, Echo)
+    @remote.method(common_messages.Comment, common_messages.Comment)
     def comment(self, request):
 
-        ''' Comment/iterate on a proposal. '''
+        ''' Comment on a proposal. '''
 
-        return Echo(message='You have commented on a proposal.')
+        self.logging.info('Received a request to post a comment by user "%s" on subject item "%s".' % (self.__dict__.get('user', None), str(request.subject)))
+        if not hasattr(self, 'user') or not getattr(self, 'user'):
+            self.logging.warning('User tried to post a comment without being logged in. Returning error.')
+            raise self.exceptions.LoginRequired("You must log in to post a comment!")
+        else:
+            try:
+                s = ndb.Key(urlsafe=request.subject)
+                sub = s.get()
+               
+                if sub is not None:
 
-    @remote.method(message_types.VoidMessage, common_messages.Comments)
+                    if (self.user.key not in sub.owners) and (self.user.key not in sub.viewers) and not self.permissions.admin:
+                        raise self.exceptions.NotAuthorizedToComment("Woops! You aren't allowed to comment on that!")
+
+                    c = social.Comment(**{
+                        'key': ndb.Key(social.Comment, social.Comment.allocate_ids(1)[0], parent=s),
+                        'user': self.user.key,
+                        'content': request.text,
+                        'subject': s})
+
+                    ckey = c.put(use_cache=True, use_memcache=True, use_datastore=True)
+                    self.logging.info('Successfully posted comment at new key "%s".' % str(ckey.urlsafe()))
+
+                    return common_messages.Comment(**{
+                        'text': request.text,
+                        'timestamp': str(c.created),
+                        'timeago': 'some time ago',
+                        'subject': s.urlsafe(),
+                        'author': common_messages.Comment.Commenter(**{
+                            'username': self.user.username,
+                            'profile': self.user.get_custom_url(),
+                            'firstname': self.user.firstname,
+                            'lastname': self.user.lastname,
+                            'is_admin': self.permissions.admin,
+                            'avatar': self.user.get_avatar_url()
+                        })
+                    })
+
+                else:
+                    self.logging.error('Subject at key "%s" could not be found.' % str(request.subject))
+                    raise self.exceptions.SubjectNotFound("Couldn't find the specified subject key.")
+
+            except RemoteService.exceptions.ApplicationError, e:
+                raise
+
+            except Exception, e:
+                self.logging.error('Encountered an unknown exception posting a comment.')
+                raise self.exceptions.ApplicationError('Oops! Something went wrong.')
+
+    @remote.method(common_messages.Comments, common_messages.Comments)
     def comments(self, request):
 
         ''' Comments for a proposal. '''
+
+        if not hasattr(self, 'user') or not self.user:
+            self.logging.warning('User tried to view comments without being logged in. Returning error.')
+            raise self.exceptions.LoginRequired("You must log in to view comments!")
+
+        else:
+            s = ndb.Key(urlsafe=request.subject)
+            sub = s.get()
+
+            if sub is not None:
+
+                if (self.user.key not in sub.owners) and (self.user.key not in sub.viewers) and not self.permissions.admin:
+                    raise self.exceptions.NotAuthorizedToComment("Woops! You aren't allowed to comment on that!")
+
+                comments_q = social.Comment.query(ancestor=s).order(social.Comment.created)
+                count = comments_q.count()
+                if count > 0:
+                    comments = comments_q.fetch(comments_q.count(), projection=('c', 'u', '_tc'))
+                    comment_users = []
+
+                    for comment in comments:
+                        if comment.user not in comment_users:
+                            comment_users.append(comment.user)
+
+                    users = dict([tuple([key, user]) for key, user in zip(comment_users, ndb.get_multi(comment_users))])
+
+                    return common_messages.Comments(**{
+
+                        'comments': [common_messages.Comment(**{
+
+                            'text': comment.content,
+                            'timeago': 'some time ago',
+                            'timestamp': str(comment.created),
+                            'subject': request.subject,
+                            'author': common_messages.Comment.Commenter(**{
+                                'username': users.get(comment.user).username,
+                                'profile': '',
+                                'firstname': users.get(comment.user).firstname,
+                                'lastname': users.get(comment.user).lastname,
+                                'is_admin': False,
+                                'avatar': ''
+                            })
+
+                        }) for comment in comments],
+
+                        'count': len(comments),
+                        'subject': request.subject
+
+                    })
+
+                else:
+
+                    return common_messages.Comments(**{
+                        'comments': [],
+                        'count': 0,
+                        'subject': request.subject
+                    })
 
         return common_messages.Comments()
 

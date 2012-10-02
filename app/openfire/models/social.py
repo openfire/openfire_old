@@ -19,6 +19,7 @@ class Comment(AppModel):
     user = ndb.KeyProperty('u', indexed=True, required=True)
     content = ndb.StringProperty('c', indexed=True, required=True)
     reply_to = ndb.KeyProperty('r', indexed=True, default=None)
+    subject = ndb.KeyProperty('s', indexed=True)
 
 
 ## Follow - abstract model for a request to subscribe to a site datapoint, added by a user
