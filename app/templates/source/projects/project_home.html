@@ -1,5 +1,32 @@
 {% extends "layout/project.html" %}
 
+{# Title Tags #}
+{% block title %}{{ project.name }} - {{ project.pitch }} - openfire!{% endblock title %}
+{% block og_title %}{{ project.name }} - {{ project.pitch }}{% endblock og_title %}
+
+{# Description, URL #}
+{% block meta_description %}{{ project.summary }}{% endblock meta_description %}
+{% block og_description %}{{ project.summary }}{% endblock og_description %}
+{% block og_url %}https://staging.openfi.re/{{ project.get_custom_url() }}{% endblock og_url %}
+
+{# Image, Video #}
+{% block og_image %}{{ project.avatar.url }}{% endblock og_image %}
+{% block og_image_height %}140{% endblock og_image_height %}
+{% block og_image_width %}120{% endblock og_image_width %}
+{% block og_extra %}
+		<meta property="og:video" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}{{ video.sources.raw.hidef }}{%- else -%}{{ video.url }}{%- endif -%}" />
+		<meta property="og:video:type" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}video/mp4{%- else -%}text/html{%- endif -%}">
+		<meta property="og:video:width" content="720">
+		<meta property="og:video:height" content="400">
+		{%- if video.provider == 'vimeo' -%}
+		{% if video_config.html5.enable %}
+		<meta property="og:video" content="{{ video.url }}">
+		<meta property="og:video:type" content="text/html">
+		{% endif %}
+		{%- endif -%}
+{% endblock og_extra %}
+
+
 {% block jsready %}
 {%- from "macros/page_social.js" import social_naked -%}
 {{ social_naked(page)|safe }}

@@ -1,4 +1,9 @@
+import json
+import base64
 import hashlib
+
+from apptools.util import json
+
 
 _query_booleans = frozenset(['NOT', 'OR', 'AND'])
 
@@ -59,32 +64,34 @@ class Query(object):
 
 		''' Retrieve an NDB key for this Query, if assigned. '''
 
-		pass
+		raise NotImplemented
 
-	def get_hash(self, hash_algorithm=None):
+	def get_hash(self, hash_algorithm=hashlib.sha256):
 
 		''' Retrieve a hashed version of this Query. '''
 
-		pass
+		return hash_algorithm(base64.b64encode(self.get_string())).hexdigest()
 
 	def get_query(self):
 
 		''' Retrieve an NDB Query built from this Query. '''
 
-		pass
+		raise NotImplemented
 
 	def get_string(self):
 
 		''' Retrieve a formatted querystring built from this Query. '''
 
-		pass
+		fblocks = []
 
-	@classmethod
-	def from_query(cls, dbquery, **kwargs):
+		# pack filters
+		for p, v in self.__filters.items():
+			if p == '*':
+				fblocks.append(v)
+			else:
+				fblocks.append(':'.join([p, v]))
 
-		''' Build a Query object from an NDB Query. '''
-
-		raise NotImplementedError
+		return fblocks.join(' ')
 
 	@classmethod
 	def from_string(cls, querystring, **kwargs):
@@ -99,9 +106,9 @@ class Query(object):
 			else:
 				key, value = '*', filtergroup[0]
 
-			filtergroups[key] = filtergroups.get(key, []).append((value))
+			filtergroups[key] = value
 
-		return cls(filters=query, **kwargs)
+		return cls(filters=filtergroups, **kwargs)
 
 	@classmethod
 	def from_model(cls, querymodel, **kwargs):
@@ -109,3 +116,10 @@ class Query(object):
 		''' Build a Query object from a MatcherQuery model. '''
 
 		return cls.from_string(querymodel.query, namespace=querymodel.namespace, model=querymodel)
+
+	@classmethod
+	def from_query(cls, dbquery, **kwargs):
+
+		''' Build a Query object from an NDB Query. '''
+
+		raise NotImplementedError

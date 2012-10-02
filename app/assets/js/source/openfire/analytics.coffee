@@ -56,7 +56,7 @@ class AnalyticsController extends OpenfireController
                 campaigns: {}
                 transactions: {}
 
-            # analytics API references
+            # analytics API mappings
             _ga:
                 queue: null
                 tracker: null
