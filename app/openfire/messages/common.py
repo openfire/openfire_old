@@ -235,20 +235,6 @@ class Comments(messages.Message):
     count = messages.IntegerField(2)
     subject = messages.StringField(3)
 
-class Post(messages.Message):
-
-    ''' Post something. '''
-
-    username = messages.StringField(1)
-    text = messages.StringField(2)
-
-
-class Posts(messages.Message):
-
-    ''' A list of posts. '''
-
-    posts = messages.MessageField(Post, 1, repeated=True)
-
 
 class Follow(messages.Message):
 
