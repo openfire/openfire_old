@@ -7,7 +7,7 @@ from openfire.messages import user as user_messages
 from openfire.messages import common as common_messages
 
 
-## User service api.
+## User service API.
 class UserService(RemoteService):
 
     @remote.method(user_messages.ProfileRequest, user_messages.Profile)
