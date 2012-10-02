@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 # Base
+import config
 import webapp2
-from apptools import debug
 from protorpc import remote
+from apptools.util import debug
 
 # Models
 from openfire.models import user
@@ -21,6 +22,21 @@ class UpdatesService(RemoteService):
 
     ''' Interact with project updates. '''
 
+    ## +=+=+ Exceptions +=+=+ ##
+    class UpdateServiceException(RemoteService.exceptions.ApplicationError): ''' Base exception for all errors specific to the Updates Service. '''
+    class LoginRequired(UpdateServiceException): ''' Thrown when login is required to perform an action on the Updates Service. '''
+    class NotAuthorized(UpdateServiceException): ''' Thrown when a user is logged in, but not allowed to post/read updates on the specified subject. '''
+    class InvalidSubject(UpdateServiceException): ''' Thrown when a subject key cannot be resolved, or is of an invalid type. '''
+
+    exceptions = datastructures.DictProxy({
+
+        'LoginRequired': LoginRequired,
+        'NotAuthorized': NotAuthorized,
+        'InvalidSubject': InvalidSubject
+
+    })
+
+    ## +=+=+ Internals +=+=+ ##
     @webapp2.cached_property
     def config(self):
 
@@ -28,12 +44,14 @@ class UpdatesService(RemoteService):
 
         return config.config.get('openfire.project.updates', {})
 
+    @webapp2.cached_property
     def logging(self):
 
         ''' Named logging pipe. '''
 
         return debug.AppToolsLogger(path='openfire.services.updates', name='UpdatesServices')._setcondition(self.config.get('debug', False))
 
+    ## +=+=+ Exposed Methods +=+=+ ##
     @remote.method(updates.Update, updates.Update)
     def publish(self, request):
 
