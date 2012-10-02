@@ -49,6 +49,12 @@
         "keywords": ["health", "disasters"]
     },
     {
+        "slug": "technology",
+        "name": "Technology",
+        "description": "Having to do with tech itself! Perhaps the web, or something else with a little 'i' or 'e' in front of it!",
+        "keywords": ["web", "media", "computing"]
+    },
+    {
         "slug": "recreation",
         "name": "Recreation",
         "description": "Ready for a revolution in how we spend our downtime?",

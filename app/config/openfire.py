@@ -283,7 +283,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'profile'
+    'namespace': 'demo'
 }
 
 config['openfire.output'] = {

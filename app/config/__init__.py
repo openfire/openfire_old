@@ -99,13 +99,15 @@ _config['apptools.system'] = {
     },
 
     'include': [  # Extended configuration files to include
-        ('layer9', 'config.layer9'),  # layer9 hosting configuration
-        ('project', 'config.project'),  # Project config
-        ('openfire', 'config.openfire'),  # Openfire config
-        ('services', 'config.services'),  # Global + site services (RPC/API) config
-        ('assets', 'config.assets'),       # Asset manangement layer config
+
+        ('layer9', 'config.layer9'),          # layer9 hosting configuration
+        ('assets', 'config.assets'),          # Asset manangement layer config
+        ('project', 'config.project'),        # Project config
+        ('openfire', 'config.openfire'),      # Openfire config
+        ('services', 'config.services'),      # Global + site services (RPC/API) config
         ('middleware', 'config.middleware'),  # Service middleware config
-        ('extensions', 'config.extensions')  # Output extension config
+        ('extensions', 'config.extensions')   # Output extension config
+
     ]
 
 }
@@ -116,7 +118,8 @@ _config['apptools.system.platform'] = {
     'installed_platforms': [
 
         {'name': 'Generic WSGI', 'path': 'apptools.platform.generic.GenericWSGI'},
-        {'name': 'Google App Engine', 'path': 'apptools.platform.appengine.GoogleAppEngine'}
+        {'name': 'Google App Engine', 'path': 'apptools.platform.appengine.GoogleAppEngine'},
+        {'name': 'Layer9 AppFactory', 'path': 'apptools.platform.appfactory.AppFactory'}
 
     ]
 

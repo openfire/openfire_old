@@ -10,15 +10,27 @@ config = {}
 
 config['layer9.appfactory'] = {
 
-	'enabled': False,
-	'logging': False,
+	'enabled': True,
+	'logging': True,
 
-	'control': {
-		'endpoint': {},
-		'beacon': {}
+	'headers': {
+		'full_prefix': 'X-AppFactory',
+		'compact_prefix': 'XAF',
+		'use_compact': False
 	}
 
 }
 
-config['layer9.appfactory.frontline'] = {}
-config['layer9.appfactory.upstream'] = {}
+config['layer9.appfactory.upstream'] = {
+
+}
+
+config['layer9.appfactory.frontline'] = {
+
+	'debug': True
+
+}
+
+config['layer9.appfactory.controller'] = {
+
+}

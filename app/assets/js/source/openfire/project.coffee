@@ -706,9 +706,33 @@ class ProjectController extends OpenfireController
             $.apptools.widgets.modal.get("back-project-dialog").close()
 
         @change_backing_tier = () ->
-            values = @[@.selectedIndex].innerHTML.match(/[\s\S\w+]+ -- [\\$]([\d+]+).[\d+]+ -- \(votes: ([\d+]+)\)/)
-            document.getElementById("back-project-amount-input").value = values[1]
-            document.getElementById("back-project-remaining-votes").value = values[2]
+            rads = document.getElementsByName("tier")
+            value = ""
+            for rad in rads
+                if rad.checked
+                    value = rad.value
+                    # TODO: Use this value to populate number of votes and amount.
+                    break
+
+        @vote_plus_clicked = () ->
+            # TODO: Increase input here.
+
+        @vote_minus_clicked = () ->
+            # TODO: Decread input here.
+
+        @detect_cc_type = () ->
+            val = @.value
+            type = ""
+            if /^4/.test(val)
+                type = "Visa"
+            if /^(34|37)/.test(val)
+                type = "American Express"
+            if /^5[1-5]/.test(val)
+                type = "MasterCard"
+            if /^6011/.test(val)
+                type = "Discover"
+            document.getElementById("back-project-cc-type-display").innerHTML = type
+            return false
 
         @submit_payment = () =>
             # Simple way to submit a back project request with a new credit card for now.
@@ -717,10 +741,18 @@ class ProjectController extends OpenfireController
                 votes.push
                     key: el.id
                     num_votes: parseInt(el.value)
+
+            tier = ""
+            rads = document.getElementsByName("tier")
+            for rad in rads
+                if rad.checked
+                    tier = rad.value
+                    break
+
             params =
                 user: null # TODO: Get user so that we can double check with the session? Should we do that?
                 project: @project_key
-                tier: document.getElementById("back-project-tier-input").value
+                tier: tier
                 amount: document.getElementById("back-project-amount-input").value
                 next_step_votes: votes
                 money_source: document.getElementById("back-project-money-source-input").value
@@ -1622,7 +1654,13 @@ class ProjectController extends OpenfireController
                 # Event listeners in the back project dialog.
                 document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
                 document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
-                document.getElementById('back-project-tier-input').addEventListener('change', @change_backing_tier, false)
+                for node in document.getElementsByName('tier')
+                    node.addEventListener('change', @change_backing_tier, false)
+                document.getElementById('back-project-cc-num-input').onkeyup = @detect_cc_type
+                for node in document.getElementsByClassName("vote-plus")
+                    node.addEventListener('click', @vote_plus_clicked, false)
+                for node in document.getElementsByClassName("vote-minus")
+                    node.addEventListener('click', @vote_minus_clicked, false)
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)

@@ -3,6 +3,7 @@
 // Smartphones
 @media only screen and (min-width: 320px) and (max-width: 480px)
   +smartphone
+
   #how-it-works-button
     height: 50px
     width: 90%
@@ -48,6 +49,7 @@
 @media only screen and (min-width: 321px)
   +smartphone-landscape
 
+
 // Smartphone portrait
 @media only screen and (max-width: 320px)
   +smartphone-portrait
@@ -56,13 +58,16 @@
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px)
   +ipad
 
+
 // iPad landscape
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
   +ipad-landscape
 
+
 // iPad portrait
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)
   +ipad-portrait
+
 
 // Other tablet / intermediate screen
 @media only screen and (min-width: 480px) and (max-width: 768px)
@@ -72,12 +77,19 @@
     height: 80px
     width: 44%
     min-width: 200px
-    left: 52%
+    left: 68%
     bottom: 4%
     border-radius: 9px
     a
       margin: 26px 3px 0 0
       font-size: 23px
+
+  #title
+    left: 15% !important
+    top: 63% !important
+    span
+      display: block
+      font-size: 27pt !important
 
   #content
     section
@@ -120,6 +132,14 @@
 // Other tablet portrait
 @media only screen and (max-width: 620px)
   +tablet-portrait
+
+  #title
+    span
+      display: none
+
+  #how-it-works-button
+    display: none
+
   #content
     section
       width: 100%
@@ -158,6 +178,7 @@
       margin-left: auto
       margin-right: auto
 
+
 // Fullscreen desktop/laptop
 @media only screen and (min-width: 768px) and (max-width: 1140px)
   +fullscreen
@@ -167,6 +188,15 @@
 // Widescreen
 @media only screen and (min-width: 1140px)
   +widescreen
+  html
+    overflow: hidden
+  #superbar
+    background: transparent !important
+  #title
+    top: 75%
+    span
+      font-size: 32pt !important
+
 
 // iPhone 4
 @media only screen and (min-device-pixel-ratio: 1.5)
@@ -186,9 +216,6 @@
   margin-left: auto
   margin-right: auto
   line-height: 50px
-
-#superbar
-  background: transparent !important
 
 #main
   #content
@@ -221,7 +248,14 @@
       background: -o-linear-gradient(top center, #f79331, #f57220)
       background: -ms-linear-gradient(top center, #f79331, #f57220)
       background: linear-gradient(top center, #f79331, #f57220)
-      text-align: right
+      text-align: center
+      top: 40%
+      right: 20%
+      width: 250px
+      height: 75px
+      font-size: 18pt
+      line-height: 75px
+      border-radius: 5px
       &:hover
         background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffd468), color-stop(100%, #ffb246))
         background: -webkit-linear-gradient(top center, #ffd468, #ffb246)
@@ -247,6 +281,7 @@
   font-weight: 700
   font-size: 8pt
   width: auto
+  text-align: center
 
   .activity-row
     .activity-cell
@@ -256,14 +291,16 @@
       margin: 10px 0 0 10px
       display: inline-table
       padding: 5px
-      max-width: 262px
+      width: 315px
+      height: 200px
+      position: relative
 
       label
         text-transform: uppercase
 
       .graph
         border: 1px solid #000
-        max-width: 250px
+        height: 165px
 
 #spark-graph
   rect
