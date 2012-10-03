@@ -1,0 +1,8 @@
+<span class="proposals-title">Your Proposals</span>
+
+{% for proposal in proposals %}
+    <div class="proposal-info">
+        <span class="proposal-name"><a href="/proposal/{{ proposal.key.urlsafe() }}">{{ proposal.name }}</a></span>
+        <span class="proposal-status">({{ {"f": "Draft", "s": "Submitted", "r": "Review", "d": "Denied", "a": "Accepted", "p": "Suspended"}[proposal.status] }})</span>
+    </div>
+{% endfor %}
