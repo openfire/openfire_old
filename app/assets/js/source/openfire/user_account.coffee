@@ -25,11 +25,11 @@ class UserAccountController extends OpenfireController
             for btn in refundPaymentBtns
                 btn.addEventListener('click', @refundPayment, false)
 
-            updateAccountBalanceBtns = document.getElementsByClassName('update-account-balance')
+            updateAccountBalanceBtns = document.getElementsByClassName('wepay-update-account-balance-btn')
             for btn in updateAccountBalanceBtns
                 btn.addEventListener('click', @updateAccountBalance, false)
 
-            startWithdrawalBtns = document.getElementsByClassName('start-withdrawal')
+            startWithdrawalBtns = document.getElementsByClassName('wepay-start-withdrawal-btn')
             for btn in startWithdrawalBtns
                 btn.addEventListener('click', @generateWithdrawal, false)
 

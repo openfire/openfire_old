@@ -23,105 +23,113 @@
     <div id="donate-step-1" style="display: none;">
         <h2 class="step-title">Choose Donation Tier</h2>
         <div class="donate-tiers">
-        {% for tier in tiers %}
-            <span class="tier-info">
-                <input type="radio" name="tier" value="{{ encrypt(tier.key.urlsafe()) }}" class="radio"/>
-                <span class="tier-name">
-                    <span>{{ tier.name }}</span>
+            <form>
+            {% for tier in tiers %}
+                <span class="tier-info">
+                    <input type="radio" name="tier" value="{{ encrypt(tier.key.urlsafe()) }}" class="radio"/>
+                    <span class="tier-name">
+                        <span>{{ tier.name }}</span>
+                    </span>
+                    <span class="tier-subinfo">
+                        <span class="tier-amount">$<span class="dollar-amount">{{ tier.amount }}</span></span>
+                        <span class="tier-votes">votes : <span class="num-votes">{{ tier.next_step_votes }}</span></span>
+                    </span>
                 </span>
-                <span class="tier-subinfo">
-                    <span class="tier-amount">${{ tier.amount }}</span>
-                    <span class="tier-votes">votes : {{ tier.next_step_votes }}</span>
-                </span>
-            </span>
-        {% else %}
-            <span>No project tiers to donate to yet!</span>
-        {% endfor %}
+            {% else %}
+                <span>No project tiers to donate to yet!</span>
+            {% endfor %}
+            </form>
         </div>
     </div>
 
     <div id="donate-step-2" style="display: none;">
         <h2 class="step-title">Vote for Project Next Steps (optional)</h2>
         <label for="back-project-remaining-votes">Next Step Votes Granted:</label>
-        <input type="text" readonly="readonly" disabled="disabled" id="back-project-remaining-votes" value="0">
-        <ul class="donate-next-steps">
-        {% for step in next_steps %}
-            <li class="next-step-li">
-                <span class="ns-votes">({{ step.votes }})</span>
-                <span class="vote-minus"></span>
-                <input type="text" id="{{ encrypt(step.key.urlsafe()) }}" value="0" class="back-project-next-step-input" readonly="readonly" />
-                <span class="vote-plus"></span>
-                <span class="ns-summary">{{ step.summary }}</span>
-            </li>
-        {% endfor %}
-        </ul>
+        <form>
+            <input type="text" readonly="readonly" disabled="disabled" id="back-project-remaining-votes" value="0">
+            <ul class="donate-next-steps">
+            {% for step in next_steps %}
+                <li class="next-step-li">
+                    <span class="ns-votes">({{ step.votes }})</span>
+                    <span class="vote-minus"></span>
+                    <input type="text" id="{{ encrypt(step.key.urlsafe()) }}" value="0" class="back-project-next-step-input" readonly="readonly" />
+                    <span class="vote-plus"></span>
+                    <span class="ns-summary">{{ step.summary }}</span>
+                </li>
+            {% endfor %}
+            </ul>
+            <div>
+                Coming soon: Suggest a new next step! (moderated by project team)
+            </div>
+        </form>
     </div>
 
     <div id="donate-step-3" style="display: none;">
         <h2 class="step-title">Payment Method</h2>
-        <p>
-            <label for="back-project-amount-input">$</label>
-            <input type="text" id="back-project-amount-input">
-            <span>will be charged on TODO: DATE</span>
-        </p>
-        <span class="explain-txt">Choose an existing payment source or enter your credit card info</span>
-        <div id="existing-payment-source">
+        <form>
             <p>
-                <label for="back-project-money-source-input">Existing Payment Source:</label>
+                <span>$</span>
+                <input type="text" id="back-project-amount-input">
+                <span>will be charged on TODO: DATE</span>
+            </p>
+            <span class="explain-txt">Choose an existing payment source or enter your credit card info</span>
+            <div id="existing-payment-source">
                 <select id="back-project-money-source-input">
-                    <option value="">- - - - -</option>
+                    <option value="">Choose existing payment account...</option>
                 </select>
-            </p>
-        </div>
-        <div id="use-new-cc">
-            <p>
-                <span>Credit Card Will be Processed by <a href="http://www.wepay.com">WePay</a></span>
-                <span id="back-project-cc-type-display"></span>
-            </p>
-            <p>
-                <label for="back-project-cc-name-input">Name on Card:</label>
-                <input type="text" id="back-project-cc-name-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-num-input">Card Number:</label>
-                <input type="text" id="back-project-cc-num-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-ccv-input">CCV:</label>
-                <input type="text" id="back-project-cc-ccv-input" />
-                <label for="back-project-cc-month-input">Month:</label>
-                <input type="text" id="back-project-cc-month-input" />
-                <label for="back-project-cc-year-input">Year:</label>
-                <input type="text" id="back-project-cc-year-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-email-input">Email:</label>
-                <input type="text" id="back-project-cc-email-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-address-1-input">Address 1:</label>
-                <input type="text" id="back-project-cc-address-1-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-address-2-input">Address 2:</label>
-                <input type="text" id="back-project-cc-address-2-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-city-input">City:</label>
-                <input type="text" id="back-project-cc-city-input" />
-                <label for="back-project-cc-state-input">State:</label>
-                <input type="text" id="back-project-cc-state-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-zipcode-input">Zipcode:</label>
-                <input type="text" id="back-project-cc-zipcode-input" />
-                <label for="back-project-cc-country-input">Country:</label>
-                <input type="text" id="back-project-cc-country-input" />
-            </p>
-            <p>
-                <label for="back-project-cc-save-input">Save card for reuse?</label>
-                <input type="checkbox" id="back-project-cc-save-input" />
-            </p>
-        </div>
+            </div>
+            <div id="use-new-cc">
+                <div class="col left-col">
+                    <p>
+                        <label for="back-project-cc-name-input">Name on Card:</label>
+                        <input type="text" id="back-project-cc-name-input" />
+                    </p>
+                    <p>
+                        <label for="back-project-cc-num-input">Card Number:</label>
+                        <input type="text" id="back-project-cc-num-input" />
+                        <span id="back-project-cc-type-display"></span>
+                    </p>
+                    <p>
+                        <label for="back-project-cc-ccv-input">CCV:</label>
+                        <input type="text" id="back-project-cc-ccv-input" />
+                        <label for="back-project-cc-month-input">Month:</label>
+                        <input type="text" id="back-project-cc-month-input" />
+                        <label for="back-project-cc-year-input">Year:</label>
+                        <input type="text" id="back-project-cc-year-input" />
+                    </p>
+                    <p>
+                        <label for="back-project-cc-email-input">Email:</label>
+                        <input type="text" id="back-project-cc-email-input" />
+                    </p>
+                </div>
+                <div class="col right-col">
+                    <p>
+                        <label for="back-project-cc-address-1-input">Address 1:</label>
+                        <input type="text" id="back-project-cc-address-1-input" />
+                    </p>
+                    <p>
+                        <label for="back-project-cc-address-2-input">Address 2:</label>
+                        <input type="text" id="back-project-cc-address-2-input" />
+                    </p>
+                    <p>
+                        <label for="back-project-cc-city-input">City:</label>
+                        <input type="text" id="back-project-cc-city-input" />
+                        <label for="back-project-cc-state-input">State:</label>
+                        <input type="text" id="back-project-cc-state-input" />
+                    </p>
+                    <p>
+                        <label for="back-project-cc-zipcode-input">Zipcode:</label>
+                        <input type="text" id="back-project-cc-zipcode-input" />
+                        <label for="back-project-cc-country-input">Country:</label>
+                        <input type="text" id="back-project-cc-country-input" />
+                    </p>
+                    <p>
+                        <label for="back-project-cc-save-input">Save card for reuse?</label>
+                        <input type="checkbox" id="back-project-cc-save-input" />
+                    </p>
+                </div>
+            </div>
+            <div>Credit Card Will be Processed by <a href="http://www.wepay.com">WePay</a></div>
+        </form>
     </div>
 </div>

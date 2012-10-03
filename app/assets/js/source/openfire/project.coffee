@@ -734,6 +734,40 @@ class ProjectController extends OpenfireController
             document.getElementById("back-project-cc-type-display").innerHTML = type
             return false
 
+        @choose_donation_tier = () ->
+            # Set the number of next step votes.
+            document.getElementById('back-project-remaining-votes').value = this.parentNode.find('num-votes').innerHTML
+            document.getElementById('back-project-amount-input').value = parseInt(this.parentNode.find('dollar-amount').innerHTML)
+
+        @next_step_vote_plus = () ->
+            # Increment the nearest votes input and decrement the overall votes count.
+            increment = this.parentNode.find('back-project-next-step-input')
+            decrement = document.getElementById('back-project-remaining-votes')
+
+            remaining = parseInt(decrement.value)
+            if remaining > 0
+                increment.value = parseInt(increment.value) + 1
+                decrement.value = remaining - 1
+
+        @next_step_vote_minus = () ->
+            # Decrement the nearest votes input and increment the overall votes count.
+            decrement = this.parentNode.find('back-project-next-step-input')
+            increment = document.getElementById('back-project-remaining-votes')
+
+            remaining = parseInt(decrement.value)
+            if remaining > 0
+                increment.value = parseInt(increment.value) + 1
+                decrement.value = remaining - 1
+
+        @select_money_source = () ->
+            # If a previous money source was selected, clear and disable the new cc form.
+            for el in document.getElementById('use-new-cc').find('input')
+                if this.value
+                    el.value = ''
+                    el.disabled = true
+                else
+                    el.disabled = false
+
         @submit_payment = () =>
             # Simple way to submit a back project request with a new credit card for now.
             votes = []
@@ -792,6 +826,8 @@ class ProjectController extends OpenfireController
                     if response.sources and response.sources.length
                         for source in response.sources
                             options += "<option value='" + source.key + "'>" + source.description + "</option>"
+                    else
+                        options = "<option value=''>No saved payment accounts</option>"
                     selector.innerHTML = options
                     # TODO: Does 'get' not work anymore?
                     #$.apptools.widgets.modal.get("back-project-dialog").open()
@@ -1652,11 +1688,17 @@ class ProjectController extends OpenfireController
                 document.getElementById('back').addEventListener('click', @back, false)
 
                 # Event listeners in the back project dialog.
-                #document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
-                #document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
+                for el in document.getElementsByClassName('vote-plus')
+                    el.addEventListener('click', @next_step_vote_plus, false)
+                for el in document.getElementsByClassName('vote-minus')
+                    el.addEventListener('click', @next_step_vote_minus, false)
+                for el in document.getElementById('donate-step-1').find('input')
+                    el.addEventListener('click', @choose_donation_tier, false)
+                document.getElementById('back-project-money-source-input').addEventListener('change', @select_money_source)
 
-                _.ready () ->
-                    $("#donate-wizard").smartWizard()
+                _.ready () =>
+                    $("#donate-wizard").smartWizard
+                        onFinish: @submit_payment
 
                 for node in document.getElementsByName('tier')
                     node.addEventListener('change', @change_backing_tier, false)
