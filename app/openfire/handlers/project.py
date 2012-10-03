@@ -12,7 +12,7 @@ from google.appengine.ext import ndb
 
 ## QueryOptions objects
 _keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
-_avatars_q = ndb.QueryOptions(limit=1, projection=('r', 'a'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+_avatars_q = ndb.QueryOptions(limit=1, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
 
 
 ## ProjectLanding - page for a listing of projects (`browse`)
@@ -92,9 +92,10 @@ class ProjectHome(WebHandler):
                 return self.error(404)
 
             # pull avatar
-            avatar = a.Avatar.query(ancestor=project.key).filter(a.Avatar.active == True).filter(a.Avatar.active == True).order(-a.Avatar.modified)
-            avatar = avatar.get(options=_avatars_q)
-            if avatar is not None:
+            avatar = a.Avatar.query(ancestor=project.key, default_options=_avatars_q).filter(a.Avatar.active == True).order(-a.Avatar.modified)
+            avatar = avatar.fetch(options=_avatars_q)
+            if len(avatar) > 0:
+                avatar = avatar[0]
                 asset = avatar.asset.get()
                 avatar = avatar.to_dict()
                 avatar['asset'] = asset
