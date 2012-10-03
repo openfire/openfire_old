@@ -1,0 +1,14 @@
+hey there, {{ signup.firstname }}! it's openfire again.
+
+We're writing because we've got a freshly baked invite to our private beta, just for you! Imagine that!
+
+To claim your invite, <a href="{{ link('auth/invite', t=util.converters.base64.b64encode(token.token), s='em', a=1, m='rg') }}">click here</a>, or enter the following code on our homepage:
+
+{{ token.token }}
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team
