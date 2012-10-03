@@ -1,19 +1,19 @@
 <!doctype html>
 {%- block _tpl_root -%}
 {% if not page.manifest %}
-<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns#"><![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns#"><!--<![endif]-->
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns#"> <!--<![endif]-->
+<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"><![endif]-->
+<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"><!--<![endif]-->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <!--<![endif]-->
 {% else %}
-<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"><![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"><!--<![endif]-->
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <![endif]-->
-<!--[if (IE 7)&!(IEMobile)]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <![endif]-->
-<!--[if (IE 8)&!(IEMobile)]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <!--<![endif]-->
+<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"><![endif]-->
+<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"><!--<![endif]-->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <![endif]-->
+<!--[if (IE 8)&!(IEMobile)]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <!--<![endif]-->
 {% endif %}
 
 <head>
@@ -56,6 +56,7 @@
 		<meta property="fb:app_id" content="{%- if 'staging' in util.request.host -%}257586781019220{%- else -%}{{ _opengraph.get('facebook', {}).get('app_id') }}{%- endif -%}" />
 		<meta property="fb:admins" content="{%- block og_fb_admins -%}{{ ','.join(_opengraph.get('facebook', {}).get('admins')) }}{%- endblock og_fb_admins -%}" />
 			{%- block og_extra %}{% endblock og_extra %}
+		<!-- Images -->
 		<meta property="og:image" content="{%- block og_image -%}{%- if page.image -%}{{ page.image }}{%- else -%}{{ _opengraph.get('image') }}{%- endif -%}{%- endblock og_image -%}" />
 		<meta property="og:image:width" content="{% block og_image_width %}298{% endblock og_image_width %}" />
 		<meta property="og:image:height" content="{% block og_image_height %}298{% endblock og_image_height %}" />

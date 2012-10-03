@@ -72,6 +72,7 @@ class Image(Media):
     _pipeline_class = pipelines.ImagePipeline
 
     content = ndb.BlobProperty('bc', indexed=False)
+    placement = ndb.StringProperty('pl', indexed=True, choices=['ogimage', 'touch-icon', 'touch-icon-precomposed', 'touch-icon-precomposed-114', 'touch-startup', 'favicon', 'logo'], repeated=True)
 
 
 ## Video - a piece of content that is a video or movie (always external, never has an Asset attachment)
