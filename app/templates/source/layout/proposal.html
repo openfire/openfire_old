@@ -1,4 +1,5 @@
 {% extends "layout/layout_base.html" %}
+{% from "macros/video.html" import video_embed %}
 
 {% block postnorth %}
     <link rel="stylesheet" href="{{ asset.style('proposal', 'openfire') }}">
@@ -161,27 +162,11 @@
 
             <div id='welcomebox'>
                 {% block media %}
-                    {% if video %}
-                        {% if video.provider == 'vimeo' %}
-                        <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                            {% if video.ext_id %}
-                                <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                            {% else %}
-                                <iframe src="{{ video.url }}" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                            {% endif %}
-                        </div>
-                        {% else %}
-                            {% if video.provider == 'youtube' %}
-                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            {% else %}
-                                <img src="http://placehold.it/640x360/222222&text=video" />
-                            {% endif %}
-                        {% endif %}
-                    {% else %}
-                        <img src="http://placehold.it/640x360/222222&text=video" />
-                    {% endif %}
+					{% if video %}
+						{{ video_embed('mainvideo', video) }}
+					{% else %}
+						{{ video_embed('mainvideo', None, uploader=true) }}
+					{% endif %}
                 {% endblock media %}
             </div>
 
