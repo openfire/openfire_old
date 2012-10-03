@@ -21,7 +21,9 @@
 		<meta property="og:video:height" content="400">
 		{%- if video.provider == 'vimeo' -%}
 		{% if video_config.html5.enable %}
-		<meta property="og:video" content="{{ video.url }}">
+		<meta property="og:video" content="http://vimeo.com/moogaloop.swf?clip_id={{ video.name }}&force_embed=1&server=vimeo.com&show_title=0&show_byline=0&show_portrait=0&color=ffb246&fullscreen=1&autoplay=0&loop=0">
+		<meta property="og:video:secure_url" content="https://vimeo.com/moogaloop.swf?clip_id={{ video.name }}&force_embed=1&server=vimeo.com&show_title=0&show_byline=0&show_portrait=0&color=ffb246&fullscreen=1&autoplay=0&loop=0"
+		<meta property="og:video:type" content="application/x-shockwave-flash" />
 		<meta property="og:video:secure_url" content="{{ video.url }}" />
 		<meta property="og:video:type" content="text/html">
 		{% endif %}
