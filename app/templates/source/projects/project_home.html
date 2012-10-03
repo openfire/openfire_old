@@ -8,36 +8,38 @@
 {% block meta_description %}{{ project.summary }}{% endblock meta_description %}
 {% block og_description %}{{ project.summary }}{% endblock og_description %}
 {% block og_url %}https://staging.openfi.re/{{ project.get_custom_url() }}{% endblock og_url %}
+{% block og_type %}openfirelabs:project{% endblock og_type %}
 
 {# Image, Video #}
-{% block og_image %}{{ avatar.url }}{% endblock og_image %}
-{% block og_image_height %}140{% endblock og_image_height %}
-{% block og_image_width %}120{% endblock og_image_width %}
+{% block og_image %}{%- if images.placement.ogimage -%}{{ images.placement.ogimage.url }}{%- else -%}{{ images.avatar.url }}}{%- endif -%}{% endblock og_image %}
+{% block og_image_height %}400{% endblock og_image_height %}
+{% block og_image_width %}400{% endblock og_image_width %}
 {% block og_extra %}
 
 		<!-- OpenGraph Video -->
 
 		<!-- HTML5 -->
 		<meta property="og:video" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}{{ video.sources.raw.hidef }}{%- else -%}{{ video.url }}{%- endif -%}" />
-		<meta property="og:video:url" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}{{ video.sources.raw.hidef }}{%- else -%}{{ video.url }}{%- endif -%}" />
 		<meta property="og:video:secure_url" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}{{ video.sources.raw.hidef }}{%- endif -%}" />
-		<meta property="og:video:type" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}video/mp4{%- else -%}text/html{%- endif -%}">
-		<meta property="og:video:width" content="720">
-		<meta property="og:video:height" content="400">
+		<meta property="og:video:type" content="{%- if video.provider == 'vimeo' and video_config.html5.enable -%}video/mp4{%- else -%}text/html{%- endif -%}" />
+		<meta property="og:video:width" content="720" />
+		<meta property="og:video:height" content="400" />
 		{%- if video.provider == 'vimeo' -%}
 		{% if video_config.html5.enable %}
 
 		<!-- Flash -->
-		<meta property="og:video" content="http://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}&force_embed=1&server=vimeo.com&show_title=0&show_byline=0&show_portrait=0&color=ffb246&fullscreen=1&autoplay=0&loop=0">
-		<meta property="og:video:url" content="http://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}&force_embed=1&server=vimeo.com&show_title=0&show_byline=0&show_portrait=0&color=ffb246&fullscreen=1&autoplay=0&loop=0">
-		<meta property="og:video:secure_url" content="https://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}&force_embed=1&server=vimeo.com&show_title=0&show_byline=0&show_portrait=0&color=ffb246&fullscreen=1&autoplay=0&loop=0"
+		<meta property="og:video" content="http://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}" />
+		<meta property="og:video:secure_url" content="https://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}"
 		<meta property="og:video:type" content="application/x-shockwave-flash" />
+		<meta property="og:video:width" content="500" />
+		<meta property="og:video:height" content="281" />
 
 		<!-- Link -->
 		<meta property="og:video" content="{{ video.url }}" />
-		<meta property="og:video:url" content="{{ video.url }}" />
 		<meta property="og:video:secure_url" content="{{ video.url }}" />
-		<meta property="og:video:type" content="text/html">
+		<meta property="og:video:type" content="text/html" />
+		<meta property="og:video:width" content="720" />
+		<meta property="og:video:height" content="400" />
 		{% endif %}
 		{%- endif -%}
 {%- endblock og_extra -%}
