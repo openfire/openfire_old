@@ -91,10 +91,18 @@ class ProjectHome(WebHandler):
             if project is None:
                 return self.error(404)
 
-            # pull avatar
+            # pull avatar + image/video assets
             avatar = a.Avatar.query(ancestor=project.key, default_options=_avatars_q).filter(a.Avatar.active == True).order(-a.Avatar.modified)
             avatar = avatar.fetch(options=_avatars_q)
-            if len(avatar) > 0:
+            if len(avatar) > 0 and video is not None:
+                avatar = avatar[0]
+                av_asset, vi_asset = ndb.get_multi([avatar.asset, video.asset], use_cache=True, use_memcache=True, use_datastore=True)
+                avatar = avatar.to_dict()
+                avatar['asset'] = av_asset
+
+                video._asset = vi_asset
+
+            elif video is None and len(avatar) > 0:
                 avatar = avatar[0]
                 asset = avatar.asset.get()
                 avatar = avatar.to_dict()
