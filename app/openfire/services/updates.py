@@ -5,6 +5,7 @@ import config
 import webapp2
 from protorpc import remote
 from apptools.util import debug
+from apptools.util import datastructures
 
 # Models
 from openfire.models import user
