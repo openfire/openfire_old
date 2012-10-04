@@ -106,12 +106,7 @@
 
 		<script id='js-clock' type='text/javascript' data-role='appclock'>
 			var __pn = window.performance.now ? function () { return window.performance.now.call(window.performance); } : window.performance.webkitNow ? function () { return window.performance.webkitNow.call(window.performance) } : function () {
-				return +new Date(); }, __clock = {ts: [__pn()], clockpoint: function (n) { this.ts.push([n, window.__pn()]); } };
-		</script>
-
-		<script id='js-clock' type='text/javascript' data-role='appclock'>
-			var __pn = window.performance.now ? function () { return window.performance.now.call(window.performance); } : window.performance.webkitNow ? function () { return window.performance.webkitNow.call(window.performance) } : function () {
-				return +new Date(); }, __clock = {ts: [__pn()], clockpoint: function (n) { this.ts.push([n, window.__pn()]); } };
+				return +new Date(); }, __clock = {pn: __pn, ts: [__pn()], clockpoint: function (c, v, s, l, o) { this.ts.push(this.track([window.__pn(), [c, v, s, l, o]])); }, track: function (t) { return t; }};
 		</script>
 
 		{% block page_services %}
