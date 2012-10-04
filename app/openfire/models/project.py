@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import webapp2
+
 # Datastore Imports
 from google.appengine.ext import ndb
 from openfire.models import AppModel
@@ -169,6 +171,15 @@ class Proposal(AppModel):
     _message_class = proposal.Proposal
     _pipeline_class = pipelines.ProposalPipeline
 
+    _status_choices = {
+        'f': 'Draft',
+        's': 'Submitted',
+        'r': 'Review',
+        'd': 'Denied',
+        'a': 'Accepted',
+        'p': 'Suspended',
+    }
+
     # Naming/Status
     name = ndb.StringProperty('n', indexed=True, required=True)
     status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a', 'p'], default='f')  # draft, submitted, review, denied, accepted, suspended
@@ -208,6 +219,15 @@ class Project(AppModel):
 
     _message_class = project.Project
     _pipeline_class = pipelines.ProjectPipeline
+
+    _status_choices = {
+        'p': 'Private',
+        'f': 'Featured',
+        'o': 'Open',
+        'c': 'Closed',
+        'x': 'Canceled',
+        's': 'Suspended',
+    }
 
     # Naming/Status/Ancestry
     name = ndb.StringProperty('n', indexed=True, required=True)

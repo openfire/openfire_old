@@ -2,19 +2,16 @@
     <ul>
         <li>
             <a href="#donate-step-1">
-                <label class="step-number">1</label>
                 <span class="step-desc">Donation Tier</span>
             </a>
         </li>
         <li>
             <a href="#donate-step-2">
-                <label class="step-number">2</label>
                 <span class="step-desc">Project Next Steps</span>
             </a>
         </li>
         <li>
             <a href="#donate-step-3">
-                <label class="step-number">3</label>
                 <span class="step-desc">Payment Method</span>
             </a>
         </li>
@@ -31,7 +28,8 @@
                         <span>{{ tier.name }}</span>
                     </span>
                     <span class="tier-subinfo">
-                        <span class="tier-amount">$<span class="dollar-amount">{{ tier.amount }}</span></span>
+                        <span class="tier-amount">{{ tier.amount | currency }}</span>
+                        <span class="dollar-amount" style="display: none;">{{ tier.amount }}</span>
                         <span class="tier-votes">votes : <span class="num-votes">{{ tier.next_step_votes }}</span></span>
                     </span>
                 </span>
@@ -70,7 +68,11 @@
             <p>
                 <span>$</span>
                 <input type="text" id="back-project-amount-input">
-                <span>will be charged on {{ active_goal.funding_deadline }}</span>
+                {% if active_goal.met %}
+                    <span>will be charged now</span>
+                {% else %}
+                    <span>will be charged if the goal is met before {{ active_goal.funding_deadline }}</span>
+                {% endif %}
             </p>
             <span class="explain-txt">Choose an existing payment source or enter your credit card info</span>
             <div id="existing-payment-source">

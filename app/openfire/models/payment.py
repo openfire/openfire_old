@@ -74,6 +74,16 @@ class Payment(AppModel):
     _message_class = messages.Payment
     _pipeline_class = pipelines.PaymentPipeline
 
+    _status_choices = {
+        'p': 'Pledged',
+        'x': 'Executing',
+        'ex': 'Executed',
+        'rg': 'Refunding',
+        'rd': 'Refunded',
+        'c': 'Cancelled',
+        'err': 'Error',
+    }
+
     description = ndb.StringProperty('n', indexed=True, required=True)
     amount = ndb.FloatProperty('a', indexed=True, required=True)
     commission = ndb.FloatProperty('cut', indexed=True, default=0.0)
@@ -109,6 +119,15 @@ class Transaction(polymodel.PolyModel, AppModel):
 
     _message_class = messages.Transaction
     _pipeline_class = pipelines.TransactionPipeline
+
+    _status_choices = {
+        'i': 'Initial',
+        'p': 'Pending',
+        'c': 'Completed',
+        'x': 'Canceled',
+        'r': 'Refunded',
+        'e': 'Error',
+    }
 
     # Action: (Execute, Authorize, Cancel, Retry, Refund, Withdrawal).
     action = ndb.StringProperty('a', indexed=True, choices=['ex', 'au', 'c', 'rt', 'rf', 'w'])

@@ -13,7 +13,7 @@
             <tr>
                 <td>{{ payment.to_project.get().name }}</td>
                 <td>{{ currency(payment.amount) }}</td>
-                <td>{{ payment.status }}</td>
+                <td>{{ payment.status | payment_status }}</td>
                 <td>
                     <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
                     {% if payment.current_transaction %}

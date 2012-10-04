@@ -19,10 +19,11 @@
     <span class="owned-projects-title">Projects You Own</span>
     {% for project_key, project_dict in owned_projects.iteritems() %}
         <span class="owned-project-name">{{ project_dict['project'].name }}</span>
+        <span class="owned-project-status">({{ project_dict['project'].status | project_status }})</span>
         {% if project_dict['account'] %}
             <div class="wepay-project-account">
                 <span class="wepay-account-name">{{ project_dict['account'].name }}</span>
-                <span class="wepay-account-balance">${{ project_dict['account'].balance }}</span>
+                <span class="wepay-account-balance">{{ project_dict['account'].balance | currency }}</span>
                 <button class="wepay-update-account-balance-btn" id="{{ project_dict['account'].key.urlsafe() }}" class="update-account-balance">update</button>
                 <button class="wepay-start-withdrawal-btn" id="{{ project_dict['account'].key.urlsafe() }}" class="start-withdrawal">withdraw</button>
                 <span><a href="" id="account-{{ project_dict['account'].key.urlsafe() }}"></a></span>
@@ -44,7 +45,7 @@
                             <tr>
                                 <td>{{ payment.from_user }}</td>
                                 <td>{{ currency(payment.amount) }}</td>
-                                <td>{{ payment.status }}</td>
+                                <td>{{ payment.status | payment_status }}</td>
                                 <td>
                                     <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
                                     <button id="{{ payment.key.urlsafe() }}" class="refund-payment">Refund</button>
