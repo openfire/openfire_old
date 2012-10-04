@@ -1,0 +1,13 @@
+Hey there, {{ user.firstname }}!
+
+Your project, {{ project.name }}, just gained a new follower!
+<a href="{% if follower.has_custom_url() %}{{ link('custom_url', customurl=follower.get_custom_url()) }}{% else %}{{ link('user/profile', username=follower.username) }}{% endif %}">{{ follower.firstname }} {{ follower.lastname[0] }}</a> is now following your project updates.
+
+This brings your total follower count up to {{ project.followers }}.
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

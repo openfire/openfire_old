@@ -1,0 +1,15 @@
+Hey there, {{ user.firstname }}!
+
+Your project, {{ project.name }}, just scored another backer!
+<a href="{% if donor.has_custom_url() %}{{ link('custom_url', customurl=donor.get_custom_url()) }}{% else %}{{ link('user/profile', username=donor.username) }}{% endif %}">{{ donor.firstname }} {{ donor.lastname[0] }}</a> just contributed at the {{ contribution.tier.name }} tier, with ${{ contribution.amount }}!
+
+This brings your project donor count up to {{ project.backers }}, with a total amount of ${{ project.money }} in contributions.
+
+This puts you {{ project.progress }}% towards your next goal! Congrats!
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

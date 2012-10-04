@@ -1,0 +1,17 @@
+Hey {{ user.firstname }}!
+
+We're writing with great news! Your proposal, "{{ proposal.name }}", just got approved by an openfire staff member!
+
+In the next few hours, your proposal will be upgraded to an official project. This means you'll be ready to accept contributions soon!
+
+Don't worry, your new project is still private and definitely not displayed on the site publicly. You can add viewers, other owners, and share a private URL for your friends, however.
+
+Take a look at your <a href="{{ link('project/home', key=project.key.urlsafe()) }}">new project page</a>:
+{{ link('project/home') }}
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team
