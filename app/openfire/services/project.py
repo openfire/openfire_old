@@ -1,12 +1,18 @@
+import config
 import webapp2
 
 from protorpc import remote
 from protorpc import message_types
 
+from apptools.util import debug
+from apptools.util import datastructures
+
 from google.appengine.ext import ndb
 from apptools.services.builtin import Echo
 
 from openfire.services import RemoteService
+
+from openfire.models import social
 
 from openfire.models.project import Goal
 from openfire.models.project import Tier
@@ -16,6 +22,7 @@ from openfire.models.project import NextStep
 from openfire.core.matcher import CoreMatcherAPI
 
 from openfire.messages import media as media_messages
+from openfire.messages import social as social_messages
 from openfire.messages import common as common_messages
 from openfire.messages import updates as update_messages
 from openfire.messages import project as project_messages
@@ -28,6 +35,36 @@ class ProjectService(RemoteService):
 
     __matcher_api = None
 
+    ## +=+=+ Exceptions +=+=+ ##
+    class ProjectServiceBaseException(RemoteService.exceptions.ApplicationError): ''' Abstract base exception for all Project Service-related errors. '''
+    class LoginRequired(ProjectServiceBaseException): ''' Thrown when a user must be logged in and is not. '''
+    class NotAuthorized(ProjectServiceBaseException): ''' Thrown when a user is not allowed to perform an action. '''
+    class ProjectNotFound(ProjectServiceBaseException): ''' Thrown when a specified project does not exist. '''
+
+    exceptions = datastructures.DictProxy({
+
+        'ProjectServiceBaseException': ProjectServiceBaseException,
+        'LoginRequired': LoginRequired,
+        'NotAuthorized': NotAuthorized,
+        'ProjectNotFound': ProjectNotFound
+
+    })
+
+    ## +=+=+ Internals +=+=+ ##
+    @webapp2.cached_property
+    def config(self):
+
+	    ''' Named config pipe. '''
+
+	    return config.config.get('openfire.services.project.ProjectService', {})
+
+	@webapp2.cached_property
+	def logging(self):
+
+		''' Named logging pipe. '''
+
+		return debug.AppToolsLogger(path='openfire.services.project', name='ProjectService')._setcondition(self.config.get('debug', False))
+
     @webapp2.cached_property
     def matcher(self):
 
@@ -38,6 +75,7 @@ class ProjectService(RemoteService):
 
         return self.__matcher_api
 
+    ## +=+=+ Methods +=+=+ ##
     @remote.method(message_types.VoidMessage, project_messages.Projects)
     def list(self, request):
 
@@ -137,19 +175,118 @@ class ProjectService(RemoteService):
 
         return common_messages.Media()
 
-    @remote.method(common_messages.FollowRequest, Echo)
+    @remote.method(social_messages.Follow, social_messages.Follow)
     def follow(self, request):
 
         ''' Follow a project and return the new follow count. '''
 
-        return Echo(message='cool')
+        if not hasattr(self, 'user') or not getattr(self, 'user'):
+            raise self.exceptions.LoginRequired("You must be logged in to follow a project!")
 
-    @remote.method(common_messages.FollowersRequest, common_messages.FollowersResponse)
+        else:
+            try:
+                subject = ndb.Key(urlsafe=request.subject.key).get()
+                
+                assert subject is not None
+                assert (not subject.is_private()) or (self.user in subject.viewers + subject.owners)
+
+                follow = social.Follow(**{
+                    'key': ndb.Key(social.Follow, self.user.key.urlsafe(), parent=subject.key),
+                    'user': self.user.key,
+                    'subject': subject.key,
+                    'options': social.Follow.NotificationOptions(**{
+                        'frequency': request.options.frequency,
+                        'transport': request.optoins.transport
+                    })
+                })
+
+                f_key = follow.put(use_cache=True, use_memcache=True, use_datastore=True)
+                return social_messages.Follow(**{
+                    'subject': social_messages.Follow.FollowSubject(**{
+                        'key': subject.key.urlsafe(),
+                        'kind': social_messages.Follow.FollowSubject.SubjectType.PROJECT,
+                        'project': project_messages.Project(**{
+                            'name': subject.name,
+                            'status': subject.status,
+                            'category': subject.category.urlsafe(),
+                            'customurl': subject.get_custom_url() if subject.has_custom_url() else None,
+                            'public': subject.public,
+                            'summary': subject.summary,
+                            'pitch': subject.pitch
+                        })
+                    }),
+                    'follower': social_messages.Follow.Follower(**{
+                        'key': self.user.key.urlsafe(),
+                        'username': self.user.username,
+                        'firstname': self.user.firstname,
+                        'lastname': self.user.lastname,
+                        'profile': 'profile!',
+                        'avatar': 'avatar!'
+                    })
+                })
+
+            except AssertionError, e:
+                raise self.exceptions.ProjectNotFound("Woops! It looks like that project doesn't exist!")
+
+            except Exception, e:
+                raise self.exceptions.ProjectServiceBaseException("Woops! Something went wrong.")                
+
+    @remote.method(social_messages.Followers, social_messages.Followers)
     def followers(self, request):
 
         ''' Return followers of a project. '''
 
-        return common_messages.FollowersResponse()
+        try:
+            subject = ndb.Key(urlsafe=request.subject.key).get()
+            
+            assert subject is not None
+            if hasattr(self, 'user')
+                assert (not subject.is_private()) or (self.user in subject.owners + subject.viewers)
+            else:
+                assert subject.public is True
+
+            follows = Project.query(ancestor=subject.key, options=_follow_options)
+            c = follows.count()
+            if c == 0:
+                return social_messages.Followers(**{
+                    'count': 0,
+                    'followers': []
+                })
+
+            else:
+
+                return social_messages.Followers(**{
+	                'count': len(follows),
+                    'follows': [social_messages.Follow(**{
+                        'subject': social_messages.Follow.FollowSubject(**{
+                            'key': subject.key.urlsafe(),
+                            'kind': social_messages.Follow.FollowSubject.SubjectType.PROJECT,
+                            'project': project_messages.Project(**{
+                                'name': subject.name,
+                                'status': subject.status,
+                                'category': subject.category.urlsafe(),
+                                'customurl': subject.get_custom_url() if subject.has_custom_url() else None,
+                                'public': subject.public,
+                                'summary': subject.summary,
+                                'pitch': subject.pitch
+                            })
+                        }),
+                        'follower': social_messages.Follow.Follower(**{
+                            'key': follower.key.urlsafe(),
+                            'username': follower.username,
+                            'firstname': follower.firstname,
+                            'lastname': follower.lastname,
+                            'profile': 'profile!',
+                            'avatar': 'avatar!'
+                        })
+                    }) for follow, follower in zip(follows, followers)]
+                })
+
+        except AssertionError, e:
+            raise self.exceptions.ProjectNotFound("Woops! It looks like that project doesn't exist!")
+
+        except Exception, e:
+            raise self.exceptions.ProjectServiceBaseException("Woops! Something went wrong.")                
 
     @remote.method(message_types.VoidMessage, project_messages.Backers)
     def backers(self, request):
