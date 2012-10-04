@@ -171,20 +171,21 @@
 <script id='js-deferred' type='text/javascript' data-role='pageready'>
 {%- block pre_pageready -%}{% endblock pre_pageready %}
 (function () { return _.ready(function (window) {
-	var _gaq = _gaq || [], _gat = _gat || {}, _cfgst = 'js-config', _dfrst = 'js-deferred', _dfeln = 'script', _dfelt = 'text/javascript',
-		_ofjscfg = document.getElementById(_cfgst), _ofdfrd = document.getElementById(_dfrst), _ofinject = document.createDocumentFragment(),
-		{%- block pageready_js -%}
-		{%- block page_analytics -%}
-		{%- if page.analytics -%}
-		{%- from "macros/page_analytics.js" import google_analytics_naked -%}
-		{{ google_analytics_naked(page.analytics, page.analytics.multitrack, page.analytics.anonymize) }}
-		{%- endif -%}{%- endblock -%}
-		{%- block pre_jsready -%}{%- endblock pre_jsready -%}
-		{%- block jsready -%}{% endblock jsready %}
-		{%- block jsinject %}
-		undefined = _ofdfrd.parentElement.appendChild(_ofinject);
-		{%- endblock jsinject -%}
-		{%- block post_jsready -%}{% endblock post_jsready %}{% endblock pageready_js %}
+    var _gaq = _gaq || [], _gat = _gat || {}, _cfgst = 'js-config', _dfrst = 'js-deferred', _dfeln = 'script', _dfelt = 'text/javascript',
+        _gaq = _gaq || [], _gat = _gat || {}, _g = function (s) {return _.get(['#', s].join(''))}, _dfeln = 'script', _cfgst = 'js-config',
+        _dfrst = 'js-deferred', _ofjscfg = _g(_cfgst), _ofdfrd = _g(_dfrst), _ofinject = document.createDocumentFragment(), 
+        {%- block pageready_js -%}
+        {%- block page_analytics -%}
+        {%- if page.analytics -%}
+        {%- from "macros/page_analytics.js" import google_analytics_naked -%}
+        {{ google_analytics_naked(page.analytics, page.analytics.multitrack, page.analytics.anonymize) }}
+        {%- endif -%}{%- endblock -%}
+        {%- block pre_jsready -%}{%- endblock pre_jsready -%}
+        {%- block jsready -%}{% endblock jsready %}
+        {%- block jsinject %}
+        undefined = _ofdfrd.parentElement.appendChild(_ofinject);
+        {%- endblock jsinject -%}
+        {%- block post_jsready -%}{% endblock post_jsready %}{% endblock pageready_js %}
 })}).call(this);
 {% block post_pageready %}{%- endblock post_pageready -%}
 </script>
