@@ -153,7 +153,7 @@ class Openfire
                 window.apptools?.dev?.verbose 'Openfire', 'Openfire systems go.'
                 @sys.state.status = 'READY'
                 if window.__clock?
-                   window.__clock.clockpoint('JavaScript', 'Platform Ready', window.__clock.ts[0][0], 'openfire', 100)
+                   window.__clock.clockpoint('JavaScript', 'Platform Ready', window.__clock.ts[0], 'openfire', 100)
 
 	                $.apptools.events.hook 'RPC_FULFILL', (directive) =>
 	                    directive.firetime = window.__clock.pn()
