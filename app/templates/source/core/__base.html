@@ -1,19 +1,19 @@
 <!doctype html>
 {%- block _tpl_root -%}
 {% if not page.manifest %}
-<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns#"><![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns#"><!--<![endif]-->
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns#"> <!--<![endif]-->
+<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"><![endif]-->
+<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"><!--<![endif]-->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#"> <!--<![endif]-->
 {% else %}
-<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"><![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"><!--<![endif]-->
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <![endif]-->
-<!--[if (IE 7)&!(IEMobile)]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <![endif]-->
-<!--[if (IE 8)&!(IEMobile)]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns#" manifest="{{ page.manifest.location }}"> <!--<![endif]-->
+<!--[if IEMobile 7]><html class="no-js iem7" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"><![endif]-->
+<!--[if (gt IEMobile 7)|!(IEMobile)]><!--><html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"><!--<![endif]-->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]>    <html class="no-js ie7 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <![endif]-->
+<!--[if (IE 8)&!(IEMobile)]>    <html class="no-js ie8 oldie" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# openfirelabs: http://ogp.me/ns/fb/openfirelabs#" manifest="{{ page.manifest.location }}"> <!--<![endif]-->
 {% endif %}
 
 <head>
@@ -52,15 +52,17 @@
 		<meta propert="og:locale" content="{%- block og_locale -%}{{ _opengraph.get('locale', 'en_US') }}{%- endblock og_locale -%}" />
 		<meta property="og:url" content="{%- block og_url -%}{%- if page.url -%}{{ page.url }}{%- else -%}{{ _opengraph.get('url') }}{%- endif -%}{%- endblock og_url -%}" />
 		<meta property="og:description" content="{%- block og_description -%}{{ _meta.get('description') }}{%- endblock og_description -%}" />
-		<meta property="og:image" content="{%- block og_image -%}{%- if page.image -%}{{ page.image }}{%- else -%}{{ _opengraph.get('image') }}{%- endif -%}{%- endblock og_image -%}" />
-		<meta property="og:image:width" content="{% block og_image_width %}298{% endblock og_image_width %}" />
-		<meta property="og:image:height" content="{% block og_image_height %}298{% endblock og_image_height %}" />
 		<meta property="og:site_name" content="{%- block og_sitename -%}{{ _opengraph.get('site_name') }}{%- endblock og_sitename -%}" />
 		<meta property="fb:app_id" content="{%- if 'staging' in util.request.host -%}257586781019220{%- else -%}{{ _opengraph.get('facebook', {}).get('app_id') }}{%- endif -%}" />
 		<meta property="fb:admins" content="{%- block og_fb_admins -%}{{ ','.join(_opengraph.get('facebook', {}).get('admins')) }}{%- endblock og_fb_admins -%}" />
 			{%- block og_extra %}{% endblock og_extra %}
+		<!-- Images -->
+		<meta property="og:image" content="{%- block og_image -%}{%- if page.image -%}{{ page.image }}{%- else -%}{{ _opengraph.get('image') }}{%- endif -%}{%- endblock og_image -%}" />
+		<meta property="og:image:width" content="{% block og_image_width %}298{% endblock og_image_width %}" />
+		<meta property="og:image:height" content="{% block og_image_height %}298{% endblock og_image_height %}" />
 
-		<!-- Location/Geo -->
+
+		{#<!-- Location/Geo -->
 		<meta property="og:latitude" content="{%- block og_latitude -%}{{ _location.get('latitude') }}{%- endblock og_latitude -%}">
 		<meta property="og:longitude" content="{%- block og_longitude -%}{{ _location.get('longitude') }}{%- endblock og_longitude -%}">
 		<meta property="og:street-address" content="{%- block og_address -%}{{ _location.get('address') }}{%- endblock og_address -%}">
@@ -69,7 +71,7 @@
 		<meta property="og:postal-code" content="{%- block og_zipcode -%}{{ _location.get('zipcode') }}{%- endblock og_zipcode -%}">
 		<meta property="og:country-name" content="{%- block og_country -%}{{ _location.get('country') }}{%- endblock og_country -%}">
 		<meta property="og:email" content="{%- block og_email -%}{{ _location.get('email') }}{%- endblock og_email -%}">
-		<meta property="og:phone_number" content="{%- block og_phone -%}{{ _location.get('phone') }}{%- endblock og_phone -%}">
+		<meta property="og:phone_number" content="{%- block og_phone -%}{{ _location.get('phone') }}{%- endblock og_phone -%}">#}
 		{% endblock %}
 
 		{%- block mobile -%}
@@ -110,14 +112,14 @@
 		</script>
 
 		{% block page_services %}
-		{% if page.services %}
+		{%- if page.services -%}
 		<script id='js-config' type='application/json' data-role='pageconfig'>
 		{%- block js_pageobject -%}
 		{% from "macros/page_object.js" import build_native_page_object %}
 		{{ build_native_page_object(page, transport, security) }}
 		{%- endblock js_pageobject %}
 		</script>
-		{% endif %}
+		{%- endif -%}
 		{%- endblock page_services -%}
 
 	{% endblock %}

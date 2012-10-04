@@ -39,6 +39,13 @@ class ProposalHome(WebHandler):
 
         return super(ProposalHome, self).logging.extend(name='ProposalHome')._setcondition(self.should_log)
 
+    @webapp2.cached_property
+    def videoConfig(self):
+
+	    ''' Named access to video config. '''
+
+	    return config.config.get('openfire.video')
+
     def get(self, key):
 
         ''' Render proposal_home.html. '''
@@ -102,6 +109,7 @@ class ProposalHome(WebHandler):
                     proposal=proposal,
                     owners=owners,
                     viewers=viewers,
+                    video_config=self.videoConfig,
                     flush=False
             )
 

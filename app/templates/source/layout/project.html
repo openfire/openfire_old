@@ -1,5 +1,5 @@
 {% extends "layout/layout_base.html" %}
-
+{% from "macros/video.html" import video_embed %}
 {% block stylesheets %}<link rel="stylesheet" href="{{ asset.style('project', 'openfire') }}">{% endblock stylesheets %}
 
 {% block main %}
@@ -178,77 +178,11 @@
 
             <div id='welcomebox'>
                 {% block media %}
-                    {% if video %}
-                        {% if video.provider == 'vimeo' %}
-                            {% if video_config.html5.enable %}
-                                {% if video_config.html5.force or page.robust or page.mobile %}
-
-                                    {#  Native HTML5 Video  #}
-
-                                    {% if page.robust %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='robust' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                            <div id='voverlay'>
-                                                <img src="{{ asset.image('video', 'watermark.png') }}" alt='openfire!'>
-                                            </div>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails['1280'] }}">
-                                                <source src="{{ video.sources.raw.hidef }}">
-                                            </video>
-                                        </div>
-                                    {% elif page.mobile %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='mobile'>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails.1280 }}">
-                                                <source src="{{ video.sources.raw.live }}">
-                                                <source src="{{ video.sources.raw.mobile }}">
-                                            </video>
-                                        </div>
-                                    {% else %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='generic'>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails.1280 }}">
-                                                <source src="{{ video.sources.raw.hidef }}">
-                                                <source src="{{ video.sources.raw.live }}">
-                                                <source src="{{ video.sources.raw.sdef }}">
-                                            </video>
-                                    {% endif %}
-
-                                {% else %}
-
-                                    {#  Vimeo Player  #}
-
-                                    <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                        {% if video.ext_id %}
-                                            <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% else %}
-                                            <iframe src="{{ video.url }}" width="718" height="400" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% endif %}
-                                    </div>
-
-                                {% endif %}
-                            {% else %}
-
-                                    {#  Vimeo Player  #}
-
-                                    <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                        {% if video.ext_id %}
-                                            <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% else %}
-                                            <iframe src="{{ video.url }}" width="718" height="400" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% endif %}
-                                    </div>
-
-                            {% endif %}
-
-                        {% else %}
-                            {% if video.provider == 'youtube' %}
-                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            {% else %}
-                                <img src="http://placehold.it/640x360/222222&text=video" />
-                            {% endif %}
-                        {% endif %}
-                    {% else %}
-                        <img src="http://placehold.it/640x360/222222&text=video" />
-                    {% endif %}
+					{% if video %}
+						{{ video_embed('mainvideo', page, video, video_config) }}
+					{% else %}
+						{{ video_embed('mainvideo', page, None, video_config, uploader=true) }}
+					{% endif %}
                 {% endblock media %}
             </div>
 

@@ -296,9 +296,9 @@ class CustomUrlHandler(WebHandler):
 
         url_key = ndb.Key('CustomURL', customurl)
         url_object = url_key.get()
-        url_target = url_object.target.get()
         if not url_object:
             return self.error(404)  # Failed to find custom url
+        url_target = url_object.target.get()
         if not url_target:
             return self.error(404)  # Custom URL exists, but parent doesn't
 
