@@ -238,7 +238,7 @@ class Comments(messages.Message):
 
 class Follow(messages.Message):
 
-    ''' Represents a user Follow. @TODO: Fill this out. '''
+    ''' Represents a user Follow. '''
 
     pass
 
