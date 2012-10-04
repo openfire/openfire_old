@@ -28,11 +28,11 @@
 		{% if video_config.html5.enable %}
 
 		<!-- Flash -->
-		<meta property="og:video" content="http://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}" />
-		<meta property="og:video:secure_url" content="https://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}"
+		<meta property="og:video" content="http://vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}&force_embed=1&width=360&height=640&show_title=0&show_byline=0&show_portrait=0&color=ffb246" />
+		<meta property="og:video:secure_url" content="https://secure.vimeo.com/moogaloop.swf?clip_id={{ video._asset.name }}&force_embed=1&width=360&height=640&show_title=0&show_byline=0&show_portrait=0&color=ffb246"
 		<meta property="og:video:type" content="application/x-shockwave-flash" />
-		<meta property="og:video:width" content="500" />
-		<meta property="og:video:height" content="281" />
+		<meta property="og:video:width" content="360" />
+		<meta property="og:video:height" content="640" />
 
 		<!-- Link -->
 		<meta property="og:video" content="{{ video.url }}" />

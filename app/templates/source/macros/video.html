@@ -1,8 +1,37 @@
-
-{% macro video_embed(id, video, uploader=False) %}
+{% macro video_embed(id, page, video, video_config, uploader=False) %}
 
 {% set encrypt = str %}
-{% set video_config = util.config.get('openfire.video', {}) %}
+
+	<script id='video-config' type='application/json' data-role='mediaconfig'>
+	{{ {
+
+	    'id': id,
+	    'agent': {
+		    'robust': page.robust,
+		    'mobile': page.mobile
+	    },
+	    'media': {
+		    'provider': video.provider,
+		    'url': video.url,
+		    'sources': {
+			    'hidef': video.sources.raw.hidef,
+			    'sdef': video.sources.raw.sdef,
+			    'mobile': video.sources.raw.mobile,
+			    'live': video.sources.raw.live,
+			    'swf': ('//vimeo.com/moogaloop.swf?clip_id=%s' % video.name) if video.provider == 'vimeo' else 'youtube'
+		    }
+	    },
+	    'features': {
+	        'uploader': uploader,
+	        'analytics': true,
+	        'html5': {
+		        'enabled': video_config.get('html5', {}).get('enable', false),
+		        'forced': video_config.get('html5', {}).get('force', false)
+		    }
+	    }
+
+	}|json|safe }}
+	</script>
 
 	{% if video is not none %}
 	    {% if video.provider == 'vimeo' %}
