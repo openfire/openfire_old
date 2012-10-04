@@ -1,0 +1,18 @@
+Hey {{ user.firstname }}!
+
+A decision has been reached about your proposal, "{{ proposal.name }}", by the openfire staff. Unfortunately, we believe your proposal needs a bit more iteration before becoming a full project.
+
+The specific reason for rejecting your proposal at this time:
+<i>"{{ proposal.reason }}"</i>
+
+Don't worry - this is by no means a final decision! We encourage you to submit your proposal again after some adjustments.
+
+Take a look at your <a href="{{ link('project/home', key=project.key.urlsafe()) }}">new project page</a> now to see the new comments:
+{{ link('project/home') }}
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

@@ -1,0 +1,17 @@
+Hey {{ user.firstname }}!
+
+Your proposal for "{{ proposal.name }}" just got a new comment{% if poster.permissions.admin %} from an openfire admin!{% else %}!{% endif %}
+
+{{ poster.firstname }} {{ poster.lastname }} says:
+<i>"{{ comment.content }}"</i>
+
+To view this comment, head over to your <a href="{{ link('proposal/home', key=proposal.key.urlsafe()) }}#comment-{{ encrypt(comment.key.urlsafe()) }}">proposal page</a> at any time:
+
+{{ link('proposal/home', key=proposal.key.urlsafe()) }}
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

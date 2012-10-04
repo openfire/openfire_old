@@ -1,0 +1,14 @@
+Hey there, {{ user.firstname }}!
+
+You just backed a project on openfire: <a href="{{ link('custom_url', customurl=project.get_custom_url()) }}">{{ project.name }}</a>!
+
+Your contribution at the "{{ contribution.tier.name }}" tier in the amount of ${{ contribution.amount }} makes you backer #{{ project.backers }}.
+
+It also brought {{ project.name }} up to {{ project.progress }} completion towards the next goal!
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team
