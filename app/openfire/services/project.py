@@ -28,6 +28,10 @@ from openfire.messages import updates as update_messages
 from openfire.messages import project as project_messages
 
 
+## Query Options
+_follow_options = ndb.QueryOptions(projection=('u', 'sj'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+
+
 ## Project service API.
 class ProjectService(RemoteService):
 
@@ -54,16 +58,16 @@ class ProjectService(RemoteService):
     @webapp2.cached_property
     def config(self):
 
-	    ''' Named config pipe. '''
+        ''' Named config pipe. '''
 
-	    return config.config.get('openfire.services.project.ProjectService', {})
+        return config.config.get('openfire.services.project.ProjectService', {})
 
-	@webapp2.cached_property
-	def logging(self):
+    @webapp2.cached_property
+    def logging(self):
 
-		''' Named logging pipe. '''
+        ''' Named logging pipe. '''
 
-		return debug.AppToolsLogger(path='openfire.services.project', name='ProjectService')._setcondition(self.config.get('debug', False))
+        return debug.AppToolsLogger(path='openfire.services.project', name='ProjectService')._setcondition(self.config.get('debug', False))
 
     @webapp2.cached_property
     def matcher(self):
@@ -195,8 +199,8 @@ class ProjectService(RemoteService):
                     'user': self.user.key,
                     'subject': subject.key,
                     'options': social.Follow.NotificationOptions(**{
-                        'frequency': request.options.frequency,
-                        'transport': request.optoins.transport
+                        'frequency': str(request.options.frequency.name),
+                        'transport': [x.name for x in request.options.transport]
                     })
                 })
 
@@ -209,13 +213,13 @@ class ProjectService(RemoteService):
                             'name': subject.name,
                             'status': subject.status,
                             'category': subject.category.urlsafe(),
-                            'customurl': subject.get_custom_url() if subject.has_custom_url() else None,
+                            'customurl': subject.get_custom_url(),
                             'public': subject.public,
                             'summary': subject.summary,
                             'pitch': subject.pitch
                         })
                     }),
-                    'follower': social_messages.Follow.Follower(**{
+                    'follower': social_messages.Follower(**{
                         'key': self.user.key.urlsafe(),
                         'username': self.user.username,
                         'firstname': self.user.firstname,
@@ -240,38 +244,24 @@ class ProjectService(RemoteService):
             subject = ndb.Key(urlsafe=request.subject.key).get()
             
             assert subject is not None
-            if hasattr(self, 'user')
+            if hasattr(self, 'user'):
                 assert (not subject.is_private()) or (self.user in subject.owners + subject.viewers)
             else:
                 assert subject.public is True
 
-            follows = Project.query(ancestor=subject.key, options=_follow_options)
+            follows = social.Follow.query(ancestor=subject.key, default_options=_follow_options)
             c = follows.count()
             if c == 0:
                 return social_messages.Followers(**{
-                    'count': 0,
-                    'followers': []
+                    'count': 0
                 })
 
             else:
-
+                followers = ndb.get_multi([k.user for k in follows])
                 return social_messages.Followers(**{
-	                'count': len(follows),
+                    'count': c,
                     'follows': [social_messages.Follow(**{
-                        'subject': social_messages.Follow.FollowSubject(**{
-                            'key': subject.key.urlsafe(),
-                            'kind': social_messages.Follow.FollowSubject.SubjectType.PROJECT,
-                            'project': project_messages.Project(**{
-                                'name': subject.name,
-                                'status': subject.status,
-                                'category': subject.category.urlsafe(),
-                                'customurl': subject.get_custom_url() if subject.has_custom_url() else None,
-                                'public': subject.public,
-                                'summary': subject.summary,
-                                'pitch': subject.pitch
-                            })
-                        }),
-                        'follower': social_messages.Follow.Follower(**{
+                        'follower': social_messages.Follower(**{
                             'key': follower.key.urlsafe(),
                             'username': follower.username,
                             'firstname': follower.firstname,
