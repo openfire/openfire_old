@@ -166,9 +166,9 @@
             <div id='welcomebox'>
                 {% block media %}
 					{% if video %}
-						{{ video_embed('mainvideo', video) }}
+						{{ video_embed('mainvideo', page, video, video_config) }}
 					{% else %}
-						{{ video_embed('mainvideo', None, uploader=true) }}
+						{{ video_embed('mainvideo', page, None, video_config, uploader=true) }}
 					{% endif %}
                 {% endblock media %}
             </div>

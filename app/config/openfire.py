@@ -283,7 +283,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'ogvideo'
+    'namespace': 'ogvideo2'
 }
 
 config['openfire.output'] = {

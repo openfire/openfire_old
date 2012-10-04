@@ -111,20 +111,15 @@
 				return +new Date(); }, __clock = {ts: [__pn()], clockpoint: function (n) { this.ts.push([n, window.__pn()]); } };
 		</script>
 
-		<script id='js-clock' type='text/javascript' data-role='appclock'>
-			var __pn = window.performance.now ? function () { return window.performance.now.call(window.performance); } : window.performance.webkitNow ? function () { return window.performance.webkitNow.call(window.performance) } : function () {
-				return +new Date(); }, __clock = {ts: [__pn()], clockpoint: function (n) { this.ts.push([n, window.__pn()]); } };
-		</script>
-
 		{% block page_services %}
-		{% if page.services %}
+		{%- if page.services -%}
 		<script id='js-config' type='application/json' data-role='pageconfig'>
 		{%- block js_pageobject -%}
 		{% from "macros/page_object.js" import build_native_page_object %}
 		{{ build_native_page_object(page, transport, security) }}
 		{%- endblock js_pageobject -%}
 		</script>
-		{% endif %}
+		{%- endif -%}
 		{%- endblock page_services -%}
 
 	{% endblock %}
