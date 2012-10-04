@@ -3,6 +3,7 @@ import config
 import webapp2
 import logging
 from openfire.models import user as u
+from openfire.models import social as s
 from openfire.models import assets as a
 from openfire.models import project as p
 from openfire.handlers import WebHandler
@@ -85,7 +86,11 @@ class ProjectHome(WebHandler):
             vi = ndb.Key(a.Video, 'mainvideo', parent=pr)
 
             # pull project and attachments
-            project, video = tuple(ndb.get_multi([pr, vi], use_cache=True, use_memcache=True, use_datastore=True))
+            if not isinstance(self.user, ndb.Model):
+                project, video = tuple(ndb.get_multi([pr, vi], use_cache=True, use_memcache=True, use_datastore=True))
+                follow = None
+            else:
+                project, follow, video = tuple(ndb.get_multi([pr, ndb.Key(s.Follow, getattr(self, 'user').key.id(), parent=pr), vi], use_cache=True, use_memcache=True, use_datastore=True))
 
             # couldn't find project
             if project is None:
@@ -134,6 +139,7 @@ class ProjectHome(WebHandler):
             page_content = self.render(
                     self.template,
                     project=project,
+                    follow=follow,
                     video=video,
                     owners=owners,
                     viewers=viewers,
