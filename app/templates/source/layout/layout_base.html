@@ -5,6 +5,10 @@
     <link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
 {% endblock stylesheets %}
 
+{% block jstemplates %}
+	<script id='sample' type='apptools/template'></script>
+{% endblock jstemplates %}
+
 {% block header %}
 {% block tinylogo %}
 <div id='tinylogo'>
