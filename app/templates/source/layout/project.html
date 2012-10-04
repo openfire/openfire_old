@@ -19,11 +19,24 @@
                 </div>
             {% endif %}
 
+			<style>
+			  #follow {
+				-webkit-transition-property: color;
+				-webkit-transition-duration: 0.8s;
+			  }
+			  #follow.active {
+				 color: blue;
+			  }
+			  #follow.error {
+				 color: red;
+			  }
+			</style>
+
             <div id='sidebar' class='pre-sticky'>
                 <header>
                     <div id='sidebuttons' class='buttons'>
-                        <button id='follow' onclick='' class='momentron{%- if project.current_user_following -%} following{%- endif -%}'>&#xf007f;</button>
-                        <button id='share' onclick='' class='momentron'>&#xf0085;</button>
+                        <button id='follow' class='momentron{%- if follow -%} active{%- endif -%}'>&#xf007f;</button>
+                        <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                     <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ project.name }}</h1></div>
                 </header> <!-- end header -->
@@ -300,7 +313,7 @@
 {% endblock %}
 
 {% block presouth %}
-<script>
+<script type='text/javascript'>
 
   // openfire project init
   window._cp = {
@@ -309,7 +322,7 @@
     kd: '{{ project.key.urlsafe() }}',
     {%- endif -%}
     i: {{ project.key.id() }},
-    {%- if project.current_user_following -%}
+    {%- if follow -%}
     f: true,
     {%- else -%}
     f: false,
@@ -330,6 +343,25 @@
     v: false
     {%- endif -%}
   };
+
+</script>
+
+<script type="text/javascript">
+
+	function follow(ev) {
+		$.apptools.api.project.follow({subject: {key: window._cp.ke, kind: 'PROJECT'}}).fulfill({
+			success: function (r) {
+				document.getElementById('follow').classList.add('active');
+				$.apptools.analytics.track.social("Project", "Follow", "{{ project.name }}");
+			},
+			failure: function (e) {
+				document.getElementById('follow').classList.add('error');
+			}
+		});
+	}
+
+	document.getElementById('follow').onclick = follow;
+	window.follow = follow;
 
 </script>
 {% endblock %}
