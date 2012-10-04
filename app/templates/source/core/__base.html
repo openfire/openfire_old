@@ -175,7 +175,7 @@
 (function () { return _.ready(function (window) {
     var _gaq = _gaq || [], _gat = _gat || {}, _cfgst = 'js-config', _dfrst = 'js-deferred', _dfeln = 'script', _dfelt = 'text/javascript',
         _gaq = _gaq || [], _gat = _gat || {}, _g = function (s) {return _.get(['#', s].join(''))}, _dfeln = 'script', _cfgst = 'js-config',
-        _dfrst = 'js-deferred', _ofjscfg = _g(_cfgst), _ofdfrd = _g(_dfrst), _ofinject = document.createDocumentFragment(), 
+        _dfrst = 'js-deferred', _ofjscfg = _g(_cfgst), _ofdfrd = _g(_dfrst), _ofinject = document.createDocumentFragment(),
         {%- block pageready_js -%}
         {%- block page_analytics -%}
         {%- if page.analytics -%}
@@ -194,6 +194,7 @@
 {% endblock pageready %}
 
 {% block postsouth %}{% endblock postsouth %}
+<script>_.ready(function (w) {w.__track_ofpr(w);});</script>
 </body>
 </html>
 {%- endblock _tpl_root -%}
