@@ -18,7 +18,7 @@
 		_gac = {multitrack: {% if multitrack %}true{%- else -%}false{%- endif -%}, anonymize: {% if anonymize %}true{%- else -%}false{%- endif -%}, account_ids: {{ util.converters.json.dumps(account_ids)|safe }}},
 		undefined = _ofinject.appendChild(_.create_doc_frag(_.create_element_string(_dfeln, {'id': 'js-analytics', 'async': '', 'type': _dfelt,
 		'src': '{{ config.selected_client }}', 'data-hostname':{%- if util.handler.force_hostname -%} '{{ util.handler.force_hostname }}'{%- else -%} '{{ util.request.host }}'{%- endif -%}}, ''))),
-		_gacol = _ofinject.lastChild.onload = function (ev) { $.openfire.analytics.internal.initialize(window._gaq, window._gat, _gac, ev); },
+		_gacol = _ofinject.lastChild.onload = function (ev) { $.apptools.analytics.internal.initialize(window._gaq, window._gat, _gac, ev); },
 {%- endif -%}
 {% endmacro %}
 {% macro google_analytics_async(config, multitrack=false, anonymize=false, account_ids={}) %}
@@ -49,7 +49,7 @@
 			}, '')),
 			scpr = document.getElementsByTagName('script')[0],
 			iscp = aswc.lastChild;
-			iscp.onload = function (ev) { $.openfire.analytics.internal.initialize(w._gaq, w._gat, _gac, ev); }
+			iscp.onload = function (ev) { $.apptools.analytics.internal.initialize(w._gaq, w._gat, _gac, ev); }
 			scpr.parentNode.insertBefore(aswc);
 	});
 

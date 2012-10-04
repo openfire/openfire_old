@@ -129,6 +129,7 @@
 
 <div id='templates' class='hidden resource'>
 	<!-- JS Templates -->
+	{% block jstemplates %}
 	<script type="text/template" id="Button">
 		<button[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[=content]]]</button>
 	</script>
@@ -151,6 +152,7 @@
 			</span>
 		</div>
 	</script>
+	{% endblock jstemplates %}
 </div>
 
 <div id="fb-root"></div>
