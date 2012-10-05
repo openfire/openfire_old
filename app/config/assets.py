@@ -198,7 +198,7 @@ config['apptools.project.assets'] = {
                 'landing': {'version': 0.6},  # styles for the landing
                 'proposal': {'version': 0.3},  # styles for the proposal page
                 'project': {'version': 0.5},  # styles for the project page
-                'profile': {'version': 0.4}   # styles for the profile page
+                'profile': {'version': 0.4},   # styles for the profile page
                 'propose': {'version': 0.2},  # styles for the propose page & wizard
                 'account': {'version': 0.2},   # styles for the user account page
                 'about': {'version': 0.2}

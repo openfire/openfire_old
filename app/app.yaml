@@ -65,15 +65,16 @@ derived_file_type:
 pagespeed:
   domains_to_rewrite:
   - open-fire-staging.appspot.com
+  - deliver.openfi.re
   - staging.openfi.re
   - www-beta.openfi.re
   - open-fire.appspot.com
   - www.openfi.re
   - openfi.re
+  - d2ipw8y1masjpy.cloudfront.net
+  - m.openfi.re
+  - beta.openfi.re
   enabled_rewriters:
-  - ProxyCss
-  - ProxyImages
-  - ProxyJs
   - ConvertMetaTags
   - InlineCss
   - InlineJs
@@ -83,6 +84,9 @@ pagespeed:
   - CombineHeads
   - ElideAttributes
   - RemoveComments
+  - ProxyCss
+  - ProxyImages
+  - ProxyJs
   - MinifyCss
   - CombineCss
   - MoveCssToHead
@@ -101,7 +105,6 @@ pagespeed:
   disabled_rewriters:
   - LeftTrimUrls
   - DeferJs
-
 
 #### ===== Custom Admin Pages
 #admin_console:
