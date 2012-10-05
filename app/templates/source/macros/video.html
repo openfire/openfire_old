@@ -14,10 +14,10 @@
 		    'provider': video.provider,
 		    'url': video.url,
 		    'sources': {
-			    'hidef': video.sources.raw.hidef,
-			    'sdef': video.sources.raw.sdef,
-			    'mobile': video.sources.raw.mobile,
-			    'live': video.sources.raw.live,
+			    'hidef': video.sources.get('raw', {}).get('hidef', ''),
+			    'sdef': video.sources.get('raw', {}).get('sdef', ''),
+			    'mobile': video.sources.get('raw', {}).get('mobile', ''),
+			    'live': video.sources.get('raw', {}).get('live', ''),
 			    'swf': ('//vimeo.com/moogaloop.swf?clip_id=%s' % video.name) if video.provider == 'vimeo' else 'youtube'
 		    }
 	    },
