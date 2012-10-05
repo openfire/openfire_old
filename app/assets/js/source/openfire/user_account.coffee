@@ -12,8 +12,8 @@ class UserAccountController extends OpenfireController
             btn.bind('click', @removeMoneySource, false) for btn in _('.remove-money-source')
             btn.bind('click', @cancelPayment, false) for btn in _('.cancel-payment')
             btn.bind('click', @refundPayment, false) for btn in _('.refund-payment')
-            btn.bind('click', @updateAccountBalance, false) for btn in _('.update-account-balance')
-            btn.bind('click', @generateWithdrawal, false) for btn in _('.start-withdrawal')
+            btn.bind('click', @updateAccountBalance, false) for btn in _('.wepay-update-account-balance-btn')
+            btn.bind('click', @generateWithdrawal, false) for btn in _('.wepay-start-withdrawal-btn')
 
             # Init jQuery.dataTable
             _.ready ->
@@ -24,10 +24,8 @@ class UserAccountController extends OpenfireController
         @linkWePayAccount = () =>
             $.apptools.api.payment.get_auth_url().fulfill
                 success: (response) =>
+                    _('#link-wepay-account-link').attr('href', response.url)
                     _('#link-wepay-account-inline').fadeIn()
-                    link = _('#link-wepay-account-link')
-                    link.html(response.url)
-                    link.attr('href', response.url)
 
                 failure: (error) =>
                     @log "Failed to get auth url to link WePay account: " + error
@@ -37,7 +35,7 @@ class UserAccountController extends OpenfireController
                 "project": this.id
             ).fulfill
                 success: (response) =>
-                    alert("Success! Reloading page...")
+                    alert("Account created. Reloading page...")
                     window.location.reload()
                 failure: (error) =>
                     alert("failure!")
@@ -47,7 +45,7 @@ class UserAccountController extends OpenfireController
                 "source": this.id
             ).fulfill
                 success: (response) =>
-                    alert("Success! Reloading page...")
+                    alert("Money source removed. Reloading page...")
                     window.location.reload()
                 failure: (error) =>
                     alert("failure!")
@@ -57,7 +55,7 @@ class UserAccountController extends OpenfireController
                 "payment": this.id
             ).fulfill
                 success: (response) =>
-                    alert("Success! Reloading page...")
+                    alert("Payment canceled. Reloading page...")
                     window.location.reload()
                 failure: (error) =>
                     alert("failure!")
@@ -67,31 +65,30 @@ class UserAccountController extends OpenfireController
                 "payment": this.id
             ).fulfill
                 success: (response) =>
-                    alert("Success! Reloading page...")
+                    alert("Payment refunded. Reloading page...")
                     window.location.reload()
                 failure: (error) =>
                     alert("failure!")
 
         @updateAccountBalance = () ->
             $.apptools.api.payment.update_account_balance(
-                "key": this.id
+                "key": this.id.match(/update-account-balance-([\w-]+)/)[1]
             ).fulfill
                 success: (response) =>
-                    alert("Success! Reloading page...")
+                    alert("Account balance updated. Reloading page...")
                     window.location.reload()
                 failure: (error) =>
                     alert("failure!")
 
         @generateWithdrawal = () ->
-            accountID = this.id
+            accountID = this.id.match(/start-withdrawal-([\w-]+)/)[1]
             $.apptools.api.payment.withdraw_funds(
                 "account": accountID
             ).fulfill
                 success: (response) =>
-                    elem = _('#account-'+accountID)
-                    elem.fadeIn()
-                    elem.html(response.wepay_withdrawal_uri)
+                    elem = _('#withdrawal-url-'+accountID)
                     elem.attr('href', response.wepay_withdrawal_uri)
+                    elem.fadeIn()
 
                 failure: (error) =>
                     alert("failure!")

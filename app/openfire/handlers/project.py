@@ -126,7 +126,11 @@ class ProjectHome(WebHandler):
                             placed_images[placement] = image
                     project_images.append(image)
 
-            p_images = {'placement': placed_images, 'library': project_images, 'avatar': avatar['asset']}
+            p_images = {'placement': placed_images, 'library': project_images}
+            if avatar:
+                p_images['avatar'] = avatar['asset']
+            else:
+                p_images['avatar'] = None
 
             # pull goals and tiers
             active_goal = project.active_goal and project.active_goal.get() or None

@@ -739,11 +739,12 @@ class ProjectController extends OpenfireController
             $.apptools.api.payment.back_project(params).fulfill
                 success: (response) =>
                     alert("Success! " + response.message)
+                    $.apptools.widgets.modal.get("back-project-dialog").close()
                     document.getElementById('back-text').innerHTML = 'you rock.'
                     document.getElementById('back').classList.add('backed')
                 failure: (error, status, xhr) =>
-                    msg = JSON.parse(xhr.responseText)?.response?.content?.error_message
-                    alert("Failure! " + msg)
+                    msg = error.error_message
+                    $("#donate-wizard").smartWizard("showMessage", msg)
 
 
         @back = () =>
@@ -1623,18 +1624,9 @@ class ProjectController extends OpenfireController
                 for el in document.getElementById('donate-step-1').find('input')
                     el.addEventListener('click', @choose_donation_tier, false)
                 document.getElementById('back-project-money-source-input').addEventListener('change', @select_money_source)
-
                 _.ready () =>
                     $("#donate-wizard").smartWizard
                         onFinish: @submit_payment
-
-                for node in document.getElementsByName('tier')
-                    node.addEventListener('change', @change_backing_tier, false)
-                document.getElementById('back-project-cc-num-input').onkeyup = @detect_cc_type
-                for node in document.getElementsByClassName("vote-plus")
-                    node.addEventListener('click', @vote_plus_clicked, false)
-                for node in document.getElementsByClassName("vote-minus")
-                    node.addEventListener('click', @vote_minus_clicked, false)
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)
