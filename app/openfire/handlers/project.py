@@ -101,7 +101,7 @@ class ProjectHome(WebHandler):
             avatar = avatar.fetch(options=_images_q)
             if len(avatar) > 0 and video is not None:
                 avatar = avatar[0]
-                avatar, av_asset, vi_asset = ndb.get_multi([avatar, ndb.Key(urlsafe=avatar.id()), video.asset], use_cache=True, use_memcache=True, use_datastore=True)
+                avatar, av_asset, vi_asset = tuple(ndb.get_multi([avatar, ndb.Key(urlsafe=avatar.id()), video.asset], use_cache=True, use_memcache=True, use_datastore=True))
                 avatar = avatar.to_dict()
                 avatar['asset'] = av_asset
 
@@ -109,7 +109,11 @@ class ProjectHome(WebHandler):
 
             elif video is None and len(avatar) > 0:
                 avatar = avatar[0]
-                asset = avatar.asset.get()
+                if isinstance(avatar, ndb.Model):
+                    asset = avatar.asset
+                else:
+                    asset = ndb.Key(urlsafe=avatar.id())
+                avatar, av_asset = tuple(ndb.get_multi([avatar, ndb.Key(urlsafe=avatar.id())], use_cache=True, use_memcache=True, use_datastore=True))
                 avatar = avatar.to_dict()
                 avatar['asset'] = asset
 

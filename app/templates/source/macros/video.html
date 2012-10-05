@@ -2,6 +2,7 @@
 
 {% set encrypt = str %}
 
+    {%- if video is not none -%}
 	<script id='video-config' type='application/json' data-role='mediaconfig'>
 	{{ {
 
@@ -32,6 +33,28 @@
 
 	}|json|safe }}
 	</script>
+	{%- else -%}
+	<script id='video-config' type='application/json' data-role='mediaconfig'>
+	{{ {
+
+		'id': id,
+		'agent': {
+			'robust': page.robust,
+			'mobile': page.mobile
+		},
+		'media': null,
+		'features': {
+			'uploader': uploader,
+			'analytics': true,
+			'html5': {
+				'enabled': video_config.get('html5', {}).get('enable', false),
+				'forced': video_config.get('html5', {}).get('force', false)
+			}
+		}
+
+	}|json|safe }}
+    </script>
+    {%- endif -%}
 
 	{% if video is not none %}
 	    {% if video.provider == 'vimeo' %}
