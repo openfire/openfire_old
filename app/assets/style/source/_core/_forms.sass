@@ -17,9 +17,19 @@ input, label
     &:focus
         outline: none
 
-input
-    border: 1px solid #ccc
+input, textarea
+    -webkit-transition-property: border-color
+    -webkit-transition-duration: 0.25s
+    border-width: 1px
+    border-style: solid
+    border-color: #ccc
     border-radius: 4px
+
+    &.valid
+        border-color: #68a83d
+
+    &.invalid
+        border-color: #b31717
 
 input[type="text"], input[type="password"]
     box-shadow: inset 1px 1px 2px 1px rgba(0,0,0,0.1)
