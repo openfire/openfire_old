@@ -126,9 +126,9 @@ class ProjectHome(WebHandler):
             # calculate owners and viewers
             owners, viewers = [], []
             for v in allowed_viewers:
-                if v.key in project.owners:
+                if v.key in project.owners and not v in owners:
                     owners.append(v)
-                elif v.key in project.viewers:
+                elif v.key in project.viewers and not v in viewers:
                     viewers.append(v)
 
             page_content = self.render(

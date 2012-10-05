@@ -35,37 +35,86 @@
                 <section id='quickinfo'>
                     {% block right %}
 
-                        <div id='global_progress'>
-                            <!-- project progress -->
+                        <div id='active_goal_progress'>
+                            <!-- active goal progress -->
                             <div id='progress' data-value="{{ project.progress }}" data-max="100"{% if project.progress == 100 %} class="done"{% endif %}>
-                                <div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
+                                <div id='progress-inner' style='width: {{ min(project.progress, 100) }}%;'>{{ project.progress }}%</div>
                             </div>
-                        </div><!-- end #global_progress -->
+                        </div><!-- end #active_goal_progress -->
 
-                        <div id='project_goals' data-section-title="goals">
+                        <div id='active_goal' data-section-title="goals">
                             {% if active_goal %}
-                            <div id="project-goals-accordion" class='css-accordion widget'>
-                                <a id="a-{{ encrypt(active_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(active_goal.key.urlsafe()) }}" class="target-link{% if active_goal.amount < project.money %} reached{% endif %}">{{ currency(active_goal.amount) }}</a>
-                                <div id="{{ encrypt(active_goal.key.urlsafe()) }}" class="fold">
-                                    <p>{% if active_goal.description != none %}{{ active_goal.description }}{% else %}  {% endif %}</p>
+                                <a id="a-{{ encrypt(active_goal.key.urlsafe()) }}" href="#"
+                                    data-href="#{{ encrypt(active_goal.key.urlsafe()) }}"
+                                    class="target-link{% if active_goal.amount < project.money %} reached{% endif %}">
+                                        Current Goal: {{ currency(active_goal.amount) }}
+                                </a>
+                                <div id="{{ encrypt(active_goal.key.urlsafe()) }}">
+                                    <p>{{ active_goal.description }}</p>
                                 </div>
-                            </div>
                             {% else %}
-                                <b>no active project goal! :(</b>
+                                <b>No active project goal. Propose one now (coming soon)!</b>
                             {% endif %}
-                        </div> <!-- end #project_goals -->
+                        </div><!-- end #active_goal -->
+
+                        <div id='back_project'>
+                            <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
+                            <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":390}}' data-title="Backing {{ project.name }}...">
+                                {% include "snippets/back_project.html" with context %}
+                            </div>
+                        </div> <!-- end #back_project -->
+
+                        <div id='completed_goals' data-section-title="completed goals">
+                            {% if completed_goals %}
+                                <div id="project-completed-goals-accordion" class='css-accordion widget'>
+                                    {% for completed_goal in completed_goals %}
+                                        <a id="a-{{ encrypt(completed_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(completed_goal.key.urlsafe()) }}" class="target-link{% if completed_goal.amount < project.money %} reached{% endif %}">{{ currency(completed_goal.amount) }}</a>
+                                        <div id="{{ encrypt(completed_goal.key.urlsafe()) }}" class="fold">
+                                            <p>{% if completed_goal.description != none %}{{ completed_goal.description }}{% else %}  {% endif %}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <b>no goals have been completed yet.</b>
+                            {% endif %}
+                        </div> <!-- end #completed_goals -->
+
+                        <div id='project_next_steps'  data-section-title="next steps">
+                            {% if next_steps %}
+                                <div id="project-next-steps-accordion" class='css-accordion widget'>
+                                    {% for next_step in next_steps %}
+                                        <a id="a-{{ encrypt(next_step.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(next_step.key.urlsafe()) }}" class="target-link">({{ next_step.votes }}) {{ next_step.summary }}</a>
+                                        <div id="{{ encrypt(next_step.key.urlsafe()) }}" class="fold">
+                                            <p>{{ next_step.description }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <b>no next steps have been proposed.</b>
+                            {% endif %}
+                        </div> <!-- end #project_next_steps -->
+
+                        <div id='future_goal' data-section-title="future goal">
+                            {% if future_goal %}
+                                <a id="a-{{ encrypt(future_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(future_goal.key.urlsafe()) }}" class="target-link">{{ future_goal.summary }}</a>
+                                <div id="{{ encrypt(future_goal.key.urlsafe()) }}" class="fold">
+                                    <p>{{ future_goal.description }}</p>
+                                </div>
+                            {% else %}
+                                <b>no future goal has been proposed.</b>
+                            {% endif %}
+                        </div> <!-- end #future_goal -->
 
                         <div id='project_tiers'  data-section-title="tiers">
                             {% if tiers %}
-                            <div id="project-tiers-accordion" class='css-accordion widget'>
-                                {% for tier in tiers %}
-                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
-                                    <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
-                                        <p>{{ tier.description|safe }}</p>
-                                    </div>
-                                {% endfor %}
-                             </div>
-
+                                <div id="project-tiers-accordion" class='css-accordion widget'>
+                                    {% for tier in tiers %}
+                                        <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                        <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
+                                            <p>{{ tier.description|safe }}</p>
+                                        </div>
+                                    {% endfor %}
+                                 </div>
                             {% else %}
                                 <b>no project tiers yet! :(</b>
                             {% endif %}
@@ -76,18 +125,8 @@
 
                 <hr class="hr-inset most"></span>
 
-                <section id='backers'>
-                    <div id='backproject'>
-                        <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
-                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"ratio":{"x":0.5,"y":0.5}}' data-title="Backing {{ project.name }}...">
-                            {% include "snippets/back_project.html" with context %}
-                        </div>
-
-                    </div> <!-- end #backproject -->
-                    <!--<div id='backer_summary'>
-                        backerz
-                    </div>--> <!-- end #backer_summary -->
-
+                {#
+                <section id='freeform'>
                     <!--
                     {% block freeform %}
                         <div {{ {
@@ -106,8 +145,8 @@
                         </div>
                     {% endblock freeform %}
                     -->
-
-                </section> <!-- end #backers -->
+                </section> <!-- end #freeform-->
+                #}
 
                 <div id='owners' >
                     <ul class='naked'>
