@@ -1,0 +1,13 @@
+Hey there, {{ user.firstname }}!
+
+Your project, {{ project.name }}, was just shared!
+<a href="{% if sharer.has_custom_url() %}{{ link('custom_url', customurl=sharer.get_custom_url()) }}{% else %}{{ link('user/profile', username=sharer.username) }}{% endif %}">{{ sharer.firstname }} {{ sharer.lastname[0] }}</a> posted on {% for href, provider in share.providers %}<a href='{{ href }}'>{{ provider }}</a>{% if not loop.last %}, {% endif %}{% endfor %}.
+
+This means {{ project.name }} has been shared {{ project.shares }} {% if project.shares > 1 %}for the first time! Congrats!{% else %}times{% endif %}!
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

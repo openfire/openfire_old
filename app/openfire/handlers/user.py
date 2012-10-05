@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.models.user import User
 from openfire.models.payment import Payment, MoneySource, WePayUserPaymentAccount, WePayProjectAccount
-from openfire.models.project import Project
+from openfire.models.project import Project, Proposal
 
 
 class UserLanding(WebHandler):
@@ -179,6 +179,7 @@ class UserAccount(WebHandler):
         wepay_account = None
         wepay_accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == self.user.key).fetch()
         project_query = Project.query(Project.owners == self.user.key).fetch()
+        proposals = Proposal.query(ndb.OR(Proposal.owners == self.user.key, Proposal.viewers == self.user.key)).fetch()
 
         owned_projects = {}
         for project in project_query:
@@ -209,6 +210,7 @@ class UserAccount(WebHandler):
             'owned_projects': owned_projects,
             'money_sources': money_sources,
             'payment_history': payment_history,
+            'proposals': proposals,
         }
 
         self.render('user/account.html', **context)

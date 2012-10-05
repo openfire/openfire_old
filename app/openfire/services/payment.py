@@ -163,7 +163,7 @@ class PaymentService(RemoteService):
                     step.votes = step.votes + vote.num_votes
                     step.put()
 
-        return Echo(message='Thanks for contributing! (all votes recorded? %s)' % all_votes_recorded)
+        return Echo(message='Thanks for contributing!')
 
     @remote.method(payment_messages.MoneySources, payment_messages.MoneySources)
     def money_sources(self, request):

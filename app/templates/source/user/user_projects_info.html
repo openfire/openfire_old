@@ -2,10 +2,10 @@
 
 <div class="user-wepay-account">
 {% if not wepay_account %}
-    <span class="link-wepay-info-txt">To collect payments for an account yourself you must link a new or existing WePay account to openfire. Click here to be redirected to a page on the WePay site where you can link or create and account:</span>
+    <span class="link-wepay-info-txt">To collect payments for an account yourself you must link a new or existing WePay account to openfire. The button below will generate a link to the WePay site where you can link an account now. You will be redirected back to openfire once you are finished.</span>
     <button id="link-wepay-account-btn" type="button">Link or Create a WePay Account</button>
     <div id="link-wepay-account-inline" style="display: none;">
-        <span><a href="" id="link-wepay-account-link"></a></span>
+        <span><a href="" id="link-wepay-account-link">Click here to link a WePay account to openfire.</a></span>
     </div>
 {% else %}
     <div>
@@ -18,17 +18,18 @@
 {% if owned_projects %}
     <span class="owned-projects-title">Projects You Own</span>
     {% for project_key, project_dict in owned_projects.iteritems() %}
-        <span class="owned-project-name">{{ project_dict['project'].name }}</span>
+        <span class="owned-project-name"><a href="/{{ project_dict['project'].get_custom_url() }}">{{ project_dict['project'].name }}</a></span>
+        <span class="owned-project-status">({{ project_dict['project'].status | project_status }})</span>
         {% if project_dict['account'] %}
             <div class="wepay-project-account">
                 <span class="wepay-account-name">{{ project_dict['account'].name }}</span>
-                <span class="wepay-account-balance">${{ project_dict['account'].balance }}</span>
-                <button class="wepay-update-account-balance-btn" id="{{ project_dict['account'].key.urlsafe() }}" class="update-account-balance">update</button>
-                <button class="wepay-start-withdrawal-btn" id="{{ project_dict['account'].key.urlsafe() }}" class="start-withdrawal">withdraw</button>
-                <span><a href="" id="account-{{ project_dict['account'].key.urlsafe() }}"></a></span>
+                <span class="wepay-account-balance">{{ project_dict['account'].balance | currency }}</span>
+                <button class="wepay-update-account-balance-btn" id="update-account-balance-{{ project_dict['account'].key.urlsafe() }}" class="update-account-balance">update</button>
+                <button class="wepay-start-withdrawal-btn" id="start-withdrawal-{{ project_dict['account'].key.urlsafe() }}" class="start-withdrawal">withdraw</button>
+                <span><a href="" id="withdrawal-url-{{ project_dict['account'].key.urlsafe() }}" target="_blank" style="display: none;">Click Here to Start Your Withdrawal</a></span>
 
 
-                <a id="a-project-payment-history-dialog-{{ project_key }}" href="#project-payment-history-dialog-{{ project_key }}">View {{ project_dict['project'].name }} payment history</a>
+                <a id="a-project-payment-history-dialog-{{ project_key }}" href="#project-payment-history-dialog-{{ project_key }}">View payment history for {{ project_dict['project'].name }}</a>
                 <div id="project-payment-history-dialog-{{ project_key }}" class="pre-modal project-payment-history" style="opacity: 0;">
                     <h4>{{ project_dict['account'].name }} payment history</h4>
                     {% if project_dict['history'] %}
@@ -44,7 +45,7 @@
                             <tr>
                                 <td>{{ payment.from_user }}</td>
                                 <td>{{ currency(payment.amount) }}</td>
-                                <td>{{ payment.status }}</td>
+                                <td>{{ payment.status | payment_status }}</td>
                                 <td>
                                     <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
                                     <button id="{{ payment.key.urlsafe() }}" class="refund-payment">Refund</button>

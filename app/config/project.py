@@ -49,6 +49,10 @@ config['apptools.project.output'] = {
             'staging': 'UA-31611943-2',    # used on the staging version of the site
             'production': 'UA-31611943-1'  # used on the production version of the site
         },
+        'sitespeed': {
+            'enable': True,           # enable google analytics' site speed tracking
+            'sample': 100            # set the sitespeed sample rate
+        },
         'webclient':{
             'dev': 'https://ssl.google-analytics.com/u/ga_debug.js',
             'http': 'https://deliver.openfi.re/analytics/ga.js',

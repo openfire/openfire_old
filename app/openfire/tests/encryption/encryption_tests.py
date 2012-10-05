@@ -65,7 +65,6 @@ class AdvancedEncryptTestCase(OFTestCase):
 
     ''' Tests AES-based encryption. '''
 
-    @unittest.expectedFailure
     def test_aes_support(self):
 
         # Try to import AES

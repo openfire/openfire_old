@@ -175,6 +175,19 @@ config['apptools.project.services'] = {
             }
         },
 
+        ## Updates API - Publish and interact with profile/project updates.
+        'updates': {
+            'enabled': True,
+            'service': 'openfire.services.updates.UpdatesService',
+            'methods': ['publish', 'comment', 'comments'],
+
+            'config': {
+                'caching': 'none',
+                'security': 'none',
+                'recording': 'none'
+            }
+        },
+
         ## Media API - Add, delete, and update for images, videos, and scripts.
         'media': {
             'enabled': False,
@@ -222,8 +235,8 @@ config['apptools.project.services'] = {
         'project': {
             'enabled': False,
             'service': 'openfire.services.project.ProjectService',
-            'methods': ['get', 'list', 'put', 'go_live', 'delete', 'comment', 'comments',
-                        'post', 'posts', 'media', 'follow', 'followers', 'backers', 'suspend', 'cancel',
+            'methods': ['get', 'list', 'put', 'go_live', 'delete',
+                        'update', 'updates', 'media', 'follow', 'followers', 'backers', 'suspend', 'cancel',
                         'shutdown', 'get_tier', 'list_tiers', 'put_tier', 'delete_tier', 'get_goal',
                         'active_goal', 'completed_goals', 'future_goal', 'put_goal', 'put_future_goal',
                         'delete_goal', 'propose_goal', 'proposed_goals', 'approve_goal', 'reject_goal',

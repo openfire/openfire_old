@@ -1,4 +1,7 @@
 @import "../_core/mediaqueries"
+@import "../_partials/shared"
+@import "../_partials/_back_project"
+@import _partials/wizard/main_horizontal
 
 
 #mainvideo
@@ -41,73 +44,13 @@
         &.active
             top: 0px
 
-    #promote
-        margin: 0 auto
-
-        &::before
-            margin-top: -11px
-            margin-left: 5px
-
-        button
-            font-size: 8pt
-            padding: 0 3px
-            margin: 3px 3px 3px 0
-            border-radius: 3px
-            background-color: #eee
-            border: none
-            clear: both
-
-    #welcomebox
-        position: relative
-        width: 100%
-        left: 0
-        padding-top: 20px
-        background-color: #ddd
-
-    #mainvideo
-        min-height: 200px
-
-        video
-            width: 340px
-
-    #sidebar
-        div,
-        section
-            display: none
-
-        #quickinfo,
-        #global_progress,
-        #global_progress div,
-        header,
-        header div
-            display: block
-
-            div, section
-                display: block
-
-
-    #sidebuttons
-        right: 5px
-        top: 5px
-        width: auto
-        text-align: right
-
-    #progress
-        width: 100%
-        left: 0
-        margin-top: 10px
-
-        &::before,
-        &::after
-            display: none
-
-    #deets
-        .prsection
-            p
-                font-size: 9pt
-
-            h3
-                font-size: 15pt
+    +promote-smartphone
+    +welcomebox-smartphone
+    +mainvideo-smartphone
+    +sidebar-smartphone
+    +sidebuttons-smartphone
+    +progress-smartphone
+    +deets-smartphone
 
     #project-title
         margin-top: 0
@@ -117,18 +60,7 @@
             font-size: 24pt
             line-height: 37pt
 
-    #deet-actions
-        .zocial
-            &::before
-                font: 110%/1.45 "zocial"
-
-            &.icon
-                max-width: 2em
-                max-height: 1.792em
-
-                &::before
-                    width: 1.667em
-                    height: 1.667em
+    +deet-actions-smartphone
 
     #project-tabset
         .tab-rounded,
@@ -161,31 +93,10 @@
 @media only screen and (min-width: 480px) and (max-width: 768px)
     +tablet
 
-    #promote
-        &::before
-            margin-top: -11px
-            margin-left: 5px
-
-    #mainvideo
-        min-height: 300px
-
-        video
-            width: 718px
-
-    #sidebuttons
-        right: 20px
-        top: 25px
-        width: 70px
-        text-align: center
-
-    #deets
-        margin-bottom: 100px
-
-        .prsection
-            p
-                font-size: 10pt
-            h3
-                font-size: 14pt
+    +promote-intermediate
+    +mainvideo-intermediate
+    +sidebuttons-intermediate
+    +deets-intermediate
 
     #projecttitle
         h1,
@@ -222,53 +133,11 @@
         &.active
             top: 0px
 
-    #promote
-        display: none
-        position: relative
-        width: 100%
-        top: 0
-        height: auto
-
-    #welcomebox
-        position: relative
-        width: 100%
-        left: 0
-        padding-top: 20px
-        background-color: #ddd
-
-    #mainvideo
-        width: 90%
-        margin: 0 auto
-        height: auto
-
-        // hide embed until IR works!
-        iframe
-            display: none
-
-        video
-            width: 340px
-
-    #sidebar
-        position: fixed
-        bottom: 0px
-        left: 0px
-        right: 0px
-        top: 88%
-        padding-top: 10px
-        min-height: 56px
-
-        &.active
-            top: 40%
-            overflow-y: auto
-
-    #progress
-        width: 100%
-        left: 0
-
-        &::before,
-        &::after
-            display: none
-            content: none
+    +promote-tablet-portrait
+    +welcomebox-tablet-portrait
+    +mainvideo-tablet-portrait
+    +sidebar-tablet-portrait
+    +progress-tablet-portrait
 
     #project_goals,
     #project-tiers
@@ -276,11 +145,7 @@
             display: none
             content: none
 
-    #deets
-        width: 100%
-        margin: 0 auto
-        height: auto
-        background-color: #999
+    +deets-tablet-portrait
 
     #project-tabset
         margin-bottom: 0px
@@ -295,58 +160,20 @@
             position: relative
             bottom: 0px
 
-    #footer-container
-        display: none
+    +footer-tablet-portrait
 
 @media only screen and (min-width: 768px)
-    #welcomebox, #deets
-        margin-right: 320px
-
-    #welcomebox
-        text-align: center
+    +bigscreen-shared
 
 // Fullscreen desktop/laptop
 @media only screen and (min-width: 768px) and (max-width: 1140px)
     +fullscreen
-
-    #promote
-        margin: 20px auto
-
-    #sidebar
-        display: block
-        float: right
-        width: 300px
-
-        section
-            width: 95%
-            margin: 2.5%
-
-    #progress
-        width: 320px
-        left: -17px
-
-        &::before,
-        &::after
-            display: block
-
-    #mainvideo
-        height: auto
-        width: auto
-
-    #deets
-        min-width: 460px
+    +fullscreen-shared
 
 // Widescreen
 @media only screen and (min-width: 1140px)
     +widescreen
-    #sidebar
-        display: block
-        float: right
-        width: 300px
-
-        section
-            width: 95%
-            margin: 2.5%
+    +widescreen-shared
 
 // iPhone 4
 @media only screen and (min-device-pixel-ratio: 1.5)
@@ -585,7 +412,10 @@
     text-transform: uppercase
     font-family: Karla
 
-#project_goals,
+#active_goal,
+#completed_goals,
+#project_next_steps,
+#future_goal,
 #project_tiers
 
     margin: 10px
@@ -642,6 +472,12 @@
         border-top-left-radius: 3px
         border-top-right-radius: 3px
 
+    .sidebar-title
+        font-size: 12px
+
+    .sidebar-title-subtext
+        font-size: 10px
+
 #backers
     position: relative
     width: 100%
@@ -675,255 +511,24 @@
     height: 40px
     text-align: center
 
+// Main styles
+@import "../main"
++main-shared
 
-.contentwrap
-    padding: 20px
+#project_goals, #project_tiers
+    +goals-tiers-shared
 
 #project
-
-    -webkit-transition-property: top
-
-    z-index: 700
-    position: relative
-    height: 100%
-    max-width: 1120px
-
-    h1, h2, h3
-        font:
-            family: Karla, sans-serif
-            weight: 700
-
-    article
-        section
-            width: 100% !important
-            margin: 0 !important
-
-#deets
-    position: relative
-
-
-    .prsection
-        padding: 10px 0
-        background-color: transparent
-
-        p,
-        ul,
-        section
-            margin: 0 10px 10px
-
-        h2,
-        h3
-            -webkit-margin-before: 0
-            -webkit-margin-after: 0
-            margin: 0 auto 10px 5px
-            letter-spacing: 0.25em
-
-        h3
-            text-transform: lowercase
+    +page-shared
 
 #projecttitle
-    height: 50px
-    margin-bottom: 10px
-    display: block
-    width: 100%
-    background-color: #ddd
-
-    h1,
-    a h1
-        font-family: Karla
-        font-weight: 700
-        text-transform: uppercase
-        color: black !important
-        margin: 0 0 0 5px !important
-        float: left
-        clear: left
-
-#deetactions
-    float: right
-    height: 50px
-    line-height: 30px
-    padding: 0
-
-    .buttongroup
-        text-align: right
-        margin-right: 3px
-        width: 95px
-        position: relative
-
-        #fblike
-            width: 50px !important
-            overflow: hidden !important
-            top: 0px !important
-            position: relative
-
-        &::before
-            display: block
-            content: attr(data-action)
-            width: 100%
-            height: 13px
-            font-size: 11px
-            text-align: center
-            border: none
-            background-color: #eee
-            font-family: 'Karla'
-            font-weight: 700
-            text-transform: uppercase
-            line-height: 13px
-            margin: 3px 0
-            max-width: 150px
-
-        button
-            margin: 0
-            padding: 0
-
-        .zocial
-            -webkit-transition-property: font-size, height, width
-            &.icon
-                -webkit-transition-property: font-size, height, width
+    +title-shared
 
 #project-tabset
-
-    &.tabset
-        text-align: center
-
-        a
-            &:link,
-            &:visited,
-            &:active
-                text-decoration: none
-                color: #e0e0e0
-
-            &:hover
-                color: white
-
-            &.current-tab
-                background-color: #e0e0e0
-                color: #333
-
-        .tab-rounded
-            border-top-left-radius: 3px
-            border-top-right-radius: 3px
-
-        .tab-rounded,
-        .tab-link
-            cursor: pointer
-            padding: 10px
-            margin-top: 5px
-            font-family: "Karla"
-            font-weight: 400
-            text-transform: uppercase
-            margin-right: 2%
-            display: inline-block
-            border: none !important
-            background-color: #797977
-            color: #ccc
-            font-size: 18px
-            line-height: 18px
-
-
-        .tab
-            min-height: 350px
-            bottom: 0
-            text-align: left
-            background-color: #e0e0e0
-            opacity: 0
-
-.modal-button
-    width: 30%
-    margin: 5px
-    font-family: "Karla"
-    font-size: 11pt
-    text-transform: uppercase
-    color: #404044
-
-.modal-editable
-    text-transform: uppercase
-    position: relative
-    margin: 10px auto
-    padding: 5px
-    text-align: center
-    font:
-        family: "Karla", sans-serif
-        size: 15pt
-        weight: 700
-    color: #aaa
-    background-color: #fcfcfc
-    border: 1px solid #aaa
-    border-radius: 3px
-
-    &.alone
-        width: 45%
-        display: block
-
-    &:focus
-        color: #494949
-        border-color: #494949
-
-        &::before
-            color: #aaa
-
-    &::before
-        text-transform: lowercase
-        content: attr(data-ext)
-        color: #bcbcbc
-        position: absolute
-        right: 0
-
+    +tabset-shared
 
 #project-goal-editor,
 #project-goal-editor-modal-content,
 #project-tier-editor,
 #project-tier-editor-modal-content
-
-    font:
-        family: "Karla"
-
-    text-align: center
-    overflow-y: scroll
-
-    .goal,
-    .tier
-        -webkit-transition-property: opacity
-        margin: 2%
-        background-color: #ddd
-        padding-bottom: 10px
-
-        .amount,
-        .description
-            color: #666
-
-            &:hover,
-            &:focus
-                color: #222
-
-        .amount
-            display: block
-            width: 96%
-            margin: 0 auto
-            padding: 10px
-            background-color: #ccc
-            text-transform: uppercase
-            font:
-                size: 14pt
-                weight: 700
-
-        .description
-            background-color: #eee
-            margin: 10px
-            padding: 10px
-            border-radius: 10px
-            font:
-                size: 11pt
-                weight: 400
-
-        .goal-button,
-        .tier-button
-            -webkit-transition-property: background-color
-            padding: 4px
-            margin: 2px
-            font-family: "Karla"
-            font-size: 13px
-            font-weight: 700
-            text-transform: uppercase
-            border-radius: 5px
-
+    +goal-tier-editor-shared

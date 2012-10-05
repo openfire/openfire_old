@@ -1,15 +1,27 @@
 import webapp2
-from apptools.services.builtin import Echo
+
+from protorpc import remote
+from protorpc import message_types
+
 from google.appengine.ext import ndb
-from protorpc import message_types, remote
+from apptools.services.builtin import Echo
+
 from openfire.services import RemoteService
-from openfire.messages import project as project_messages
-from openfire.messages import common as common_messages
-from openfire.messages import media as media_messages
-from openfire.models.project import Project, Tier, Goal, NextStep
+
+from openfire.models.project import Goal
+from openfire.models.project import Tier
+from openfire.models.project import Project
+from openfire.models.project import NextStep
+
 from openfire.core.matcher import CoreMatcherAPI
 
+from openfire.messages import media as media_messages
+from openfire.messages import common as common_messages
+from openfire.messages import updates as update_messages
+from openfire.messages import project as project_messages
 
+
+## Project service API.
 class ProjectService(RemoteService):
 
     ''' Project service api. '''
@@ -101,7 +113,6 @@ class ProjectService(RemoteService):
 
         return Echo(message='Opened project')
 
-
     @remote.method(project_messages.ProjectRequest, Echo)
     def delete(self, request):
 
@@ -112,30 +123,8 @@ class ProjectService(RemoteService):
         project_key.delete()
         return Echo(message='Project removed')
 
-
-    @remote.method(common_messages.Comment, Echo)
-    def comment(self, request):
-
-        ''' Comment on a project. '''
-
-        return Echo(message='')
-
-    @remote.method(common_messages.Comments, Echo)
-    def comments(self, request):
-
-        ''' Return comments for a project. '''
-
-        return common_messages.Comments()
-
-    @remote.method(common_messages.Post, message_types.VoidMessage)
-    def post(self, request):
-
-        ''' Post and update to a project. '''
-
-        return None
-
-    @remote.method(message_types.VoidMessage, common_messages.Posts)
-    def posts(self, request):
+    @remote.method(message_types.VoidMessage, update_messages.Updates)
+    def updates(self, request):
 
         ''' Return posts for a project. '''
 

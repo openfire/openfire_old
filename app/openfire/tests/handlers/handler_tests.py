@@ -5,6 +5,7 @@ Route tests.
 import unittest
 from openfire.tests import OFTestCase
 import openfire.fixtures.fixture_util as db_loader
+import webapp2
 
 
 class HomepageTestCase(OFTestCase):
@@ -22,6 +23,10 @@ class AboutPagesTestCase(OFTestCase):
     def test_about_page(self):
         self.of_handler_test('/about')
 
+
+    '''
+    These are all on the about page for now.
+
     def test_terms_page(self):
         self.of_handler_test('/terms')
 
@@ -30,6 +35,7 @@ class AboutPagesTestCase(OFTestCase):
 
     def test_support_page(self):
         self.of_handler_test('/support')
+    '''
 
 
 class UserPageTestCase(OFTestCase):
@@ -44,11 +50,11 @@ class UserPageTestCase(OFTestCase):
         db_loader.create_custom_url(slug='fakie', target_key=user_key)
         self.of_handler_test('/fakie')
 
-    @unittest.expectedFailure # Need to learn how to log in. See OF-155 for more details.
     def test_user_account_page(self):
-        user_key = db_loader.create_user(username='fakie')
+        user_key = db_loader.create_user(username='fakie', email='fakie@mcfakerton.com')
         db_loader.create_custom_url(slug='fakie', target_key=user_key)
-        self.of_handler_test('/user/fakie/account')
+        cookie = self.get_login_cookie('fakie', 'fakieiscool')
+        self.of_handler_test('/user/fakie/account', cookie=cookie)
 
 
 class ProposalPageTestCase(OFTestCase):

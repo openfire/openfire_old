@@ -10,7 +10,13 @@ config = {}
 
 config['openfire'] = {
 
-    'version': '0.2-alpha',
+    'version': '0.3-alpha',
+
+}
+
+config['openfire.fixtures'] = {
+
+    'production_only': False,
 
 }
 
@@ -82,9 +88,9 @@ config['openfire.meta'] = {
     'icon': 'https://d2ipw8y1masjpy.cloudfront.net/static/branding/icons/of_favicon_32x32.ico',
     'logo': 'https://d2ipw8y1masjpy.cloudfront.net/static/branding/openfire_transparent_optimized.png',
     'author': 'a collaboration between labor lapsus L3C + momentum labs',
-    'publisher': 'openfire now!',
+    'publisher': 'openfire!',
     'copyright': 'openfire, (c) 2012',
-    'robots': 'index,follow',
+    'robots': 'noindex,nofollow',  #'index,follow',
     'revisit': '7 days',
 
     'description': 'openfire brings technologists, investors, developers and crowdfunders together around one thing: putting momentum behind disruptive innovation.',
@@ -106,7 +112,7 @@ config['openfire.meta'] = {
         'determiner': 'a',
         'locale': 'en_US',
         'url': 'https://openfi.re',
-        'site_name': 'openfire',
+        'site_name': 'openfire!',
 
         'location': {
             'latitude': '37.751185',
@@ -283,7 +289,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'demo'
+    'namespace': 'ogvideo2'
 }
 
 config['openfire.output'] = {
@@ -435,6 +441,12 @@ config['openfire.services.BetaService'] = {
 }
 
 config['openfire.pipelines.integration.mailchimp.MailChimpEmailEntry'] = {
+
+    'debug': True,
+
+}
+
+config['openfire.project.updates'] = {
 
     'debug': True,
 

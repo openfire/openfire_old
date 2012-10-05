@@ -1,0 +1,34 @@
+[
+    {
+        "slug": "fatcatmap",
+        "target_key": "project__fat cat map"
+    },
+    {
+        "slug": "seasteading",
+        "target_key": "project__SeaSteading"
+    },
+    {
+        "slug": "urbsly",
+        "target_key": "project__urbsly"
+    },
+    {
+        "slug": "ose",
+        "target_key": "project__Open Source Ecology"
+    },
+    {
+        "slug": "blueseed",
+        "target_key": "project__BlueSeed"
+    },
+    {
+        "slug": "carrotmob",
+        "target_key": "project__Carrotmob"
+    },
+    {
+        "slug": "savetheeverything",
+        "target_key": "project__Save the Everything"
+    },
+    {
+        "slug": "apptools",
+        "target_key": "project__AppTools"
+    }
+]

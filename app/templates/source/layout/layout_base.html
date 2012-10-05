@@ -5,6 +5,10 @@
     <link rel="stylesheet" href="{{ asset.style('main', 'compiled') }}">
 {% endblock stylesheets %}
 
+{% block jstemplates %}
+	<script id='sample' type='apptools/template'></script>
+{% endblock jstemplates %}
+
 {% block header %}
 {% block tinylogo %}
 <div id='tinylogo'>
@@ -17,7 +21,7 @@
 	{% block leftnav %}
 	<ul class='left'>
 		<li><a href="{{ link('landing') }}" title="openfire home">Home</a></li>
-		<li><a href="{{ link('project/landing') }}" title="browse projects">Projects</a></li>
+		<li><a href="{{ link('propose/landing') }}" title="browse projects">Propose a Project</a></li>
 	</ul>
 	{% endblock leftnav %}
 

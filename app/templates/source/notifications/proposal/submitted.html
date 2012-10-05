@@ -1,0 +1,14 @@
+Hey {{ signup.firstname }}!
+
+We're just writing to let you know that your recent proposal, "{{ proposal.name }}", has been submitted!
+
+It's now pending review by openfire staff members. To read comments and iterate on your proposal, you can visit your <a href="{{ link('proposal/home', key=proposal.key.urlsafe()) }}">proposal page</a> at any time:
+
+{{ link('proposal/home', key=proposal.key.urlsafe()) }}
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

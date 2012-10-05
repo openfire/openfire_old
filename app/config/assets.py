@@ -82,8 +82,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'base': {'min': True, 'version': 1.5},  # RPC, events, dev, storage, user, etc (see $.apptools)
-                'admin': {'name': 'base.admin', 'min': True, 'version': 1.5}  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'base': {'min': True, 'version': 1.6},  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'admin': {'name': 'base.admin', 'min': True, 'version': 1.6}  # RPC, events, dev, storage, user, etc (see $.apptools)
             }
 
         },
@@ -149,10 +149,11 @@ config['apptools.project.assets'] = {
                 'datepickr': {'name': '_datepickr.sass', 'module': '_partials', 'version': 0.1},
 
                 ## Openfire
-                'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.2},
-                'landing': {'name': 'landing.sass', 'module': 'openfire', 'version': 0.2},
-                'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.2},
-                'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.2},
+                'bbq': {'name': 'bbq.sass', 'module': 'openfire', 'version': 0.1},
+                'landing': {'name': 'landing.sass', 'module': 'openfire', 'version': 0.1},
+                'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.1},
+                'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.1},
+                'about': {'name': 'about.sass', 'module': 'openfire', 'version': 0.1},
 
                 ## Main
                 'ie': {'name': 'ie.sass', 'version': 0.2},
@@ -200,7 +201,8 @@ config['apptools.project.assets'] = {
                 'project': {'version': 0.4},  # styles for the project page
                 'profile': {'version': 0.3},   # styles for the profile page
                 'propose': {'version': 0.1},  # styles for the propose page & wizard
-                'account': {'version': 0.1}   # styles for the user account page
+                'account': {'version': 0.1},   # styles for the user account page
+                'about': {'version': 0.1}
 
             }
 

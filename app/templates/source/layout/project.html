@@ -1,8 +1,6 @@
 {% extends "layout/layout_base.html" %}
-
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset.style('project', 'openfire') }}">
-{% endblock stylesheets %}
+{% from "macros/video.html" import video_embed %}
+{% block stylesheets %}<link rel="stylesheet" href="{{ asset.style('project', 'openfire') }}">{% endblock stylesheets %}
 
 {% block main %}
 
@@ -21,10 +19,23 @@
                 </div>
             {% endif %}
 
+			<style>
+			  #follow {
+				-webkit-transition-property: color;
+				-webkit-transition-duration: 0.8s;
+			  }
+			  #follow.active {
+				 color: blue;
+			  }
+			  #follow.error {
+				 color: red;
+			  }
+			</style>
+
             <div id='sidebar' class='pre-sticky'>
                 <header>
                     <div id='sidebuttons' class='buttons'>
-                        <button id='follow' class='momentron{%- if project.current_user_following -%} following{%- endif -%}'>&#xf007f;</button>
+                        <button id='follow' class='momentron{%- if follow -%} active{%- endif -%}'>&#xf007f;</button>
                         <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                     <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ project.name }}</h1></div>
@@ -35,37 +46,96 @@
                 <section id='quickinfo'>
                     {% block right %}
 
-                        <div id='global_progress'>
-                            <!-- project progress -->
+                        <div id='active_goal_progress'>
+                            <!-- active goal progress -->
                             <div id='progress' data-value="{{ project.progress }}" data-max="100"{% if project.progress == 100 %} class="done"{% endif %}>
-                                <div id='progress-inner' style='width: {{ project.progress }}%;'>{{ project.progress }}%</div>
+                                <div id='progress-inner' style='width: {{ min(project.progress, 100) }}%;'>{{ project.progress }}%</div>
                             </div>
-                        </div><!-- end #global_progress -->
+                        </div><!-- end #active_goal_progress -->
 
-                        <div id='project_goals' data-section-title="goals">
+                        <div id='active_goal' data-section-title="goal">
                             {% if active_goal %}
-                            <div id="project-goals-accordion" class='css-accordion widget'>
-                                <a id="a-{{ encrypt(active_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(active_goal.key.urlsafe()) }}" class="target-link{% if active_goal.amount < project.money %} reached{% endif %}">{{ currency(active_goal.amount) }}</a>
-                                <div id="{{ encrypt(active_goal.key.urlsafe()) }}" class="fold">
-                                    <p>{% if active_goal.description != none %}{{ active_goal.description }}{% else %}  {% endif %}</p>
+                                <a id="a-{{ encrypt(active_goal.key.urlsafe()) }}" href="#"
+                                    data-href="#{{ encrypt(active_goal.key.urlsafe()) }}"
+                                    class="target-link{% if active_goal.amount < project.money %} reached{% endif %}">
+                                        Current Goal: {{ currency(active_goal.amount) }}
+                                </a>
+                                <div id="{{ encrypt(active_goal.key.urlsafe()) }}">
+                                    <p>{{ active_goal.description }}</p>
                                 </div>
-                            </div>
                             {% else %}
-                                <b>no active project goal! :(</b>
+                                <b>No active project goal. Propose one now (coming soon)!</b>
                             {% endif %}
-                        </div> <!-- end #project_goals -->
+                        </div><!-- end #active_goal -->
+
+                        <div id='back_project'>
+                            <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
+                            <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":390}}' data-title="Backing {{ project.name }}...">
+                                {% include "snippets/back_project.html" with context %}
+                            </div>
+                        </div> <!-- end #back_project -->
+
+                        {% if completed_goals %}
+                            <div id='completed_goals' data-section-title="completed goals">
+                                <div id="project-completed-goals-accordion" class='css-accordion widget'>
+                                    {% for completed_goal in completed_goals %}
+                                        <a id="a-{{ encrypt(completed_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(completed_goal.key.urlsafe()) }}" class="target-link{% if completed_goal.amount < project.money %} reached{% endif %}">{{ currency(completed_goal.amount) }}</a>
+                                        <div id="{{ encrypt(completed_goal.key.urlsafe()) }}" class="fold">
+                                            <p>{% if completed_goal.description != none %}{{ completed_goal.description }}{% else %}  {% endif %}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div> <!-- end #completed_goals -->
+                        {% endif %}
+
+                        <div id='project_next_steps'>
+                            {% if next_steps %}
+                                <div class="sidebar-title">
+                                    Potential next steps for this project
+                                </div>
+                                <div class="sidebar-title-subtext">
+                                    (voted on by backers)
+                                </div>
+                                <div id="project-next-steps-accordion" class='css-accordion widget'>
+                                    {% for next_step in next_steps %}
+                                        <a id="a-{{ encrypt(next_step.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(next_step.key.urlsafe()) }}" class="target-link">({{ next_step.votes }}) {{ next_step.summary }}</a>
+                                        <div id="{{ encrypt(next_step.key.urlsafe()) }}" class="fold">
+                                            <p>{{ next_step.description }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <b>no next steps have been proposed.</b>
+                            {% endif %}
+                        </div> <!-- end #project_next_steps -->
+
+                        <div id='future_goal'>
+                            <div class="sidebar-title">
+                                Ultimate goal
+                            </div>
+                            {% if future_goal %}
+                                <a id="a-{{ encrypt(future_goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(future_goal.key.urlsafe()) }}" class="target-link">{{ future_goal.summary }}</a>
+                                <div id="{{ encrypt(future_goal.key.urlsafe()) }}" class="fold">
+                                    <p>{{ future_goal.description }}</p>
+                                </div>
+                            {% else %}
+                                <b>no future goal has been proposed.</b>
+                            {% endif %}
+                        </div> <!-- end #future_goal -->
 
                         <div id='project_tiers'  data-section-title="tiers">
+                            <div class="sidebar-title">
+                                Donation tiers
+                            </div>
                             {% if tiers %}
-                            <div id="project-tiers-accordion" class='css-accordion widget'>
-                                {% for tier in tiers %}
-                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
-                                    <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
-                                        <p>{{ tier.description|safe }}</p>
-                                    </div>
-                                {% endfor %}
-                             </div>
-
+                                <div id="project-tiers-accordion" class='css-accordion widget'>
+                                    {% for tier in tiers %}
+                                        <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                        <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
+                                            <p>{{ tier.description|safe }}</p>
+                                        </div>
+                                    {% endfor %}
+                                 </div>
                             {% else %}
                                 <b>no project tiers yet! :(</b>
                             {% endif %}
@@ -76,18 +146,8 @@
 
                 <hr class="hr-inset most"></span>
 
-                <section id='backers'>
-                    <div id='backproject'>
-                        <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
-                        <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-title="Backing {{ project.name }}...">
-                            {% include "snippets/back_project.html" with context %}
-                        </div>
-
-                    </div> <!-- end #backproject -->
-                    <!--<div id='backer_summary'>
-                        backerz
-                    </div>--> <!-- end #backer_summary -->
-
+                {#
+                <section id='freeform'>
                     <!--
                     {% block freeform %}
                         <div {{ {
@@ -106,8 +166,8 @@
                         </div>
                     {% endblock freeform %}
                     -->
-
-                </section> <!-- end #backers -->
+                </section> <!-- end #freeform-->
+                #}
 
                 <div id='owners' >
                     <ul class='naked'>
@@ -167,77 +227,11 @@
 
             <div id='welcomebox'>
                 {% block media %}
-                    {% if video %}
-                        {% if video.provider == 'vimeo' %}
-                            {% if video_config.html5.enable %}
-                                {% if video_config.html5.force or page.robust or page.mobile %}
-
-                                    {#  Native HTML5 Video  #}
-
-                                    {% if page.robust %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='robust' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                            <div id='voverlay'>
-                                                <img src="{{ asset.image('video', 'watermark.png') }}" alt='openfire!'>
-                                            </div>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails['1280'] }}">
-                                                <source src="{{ video.sources.raw.hidef }}">
-                                            </video>
-                                        </div>
-                                    {% elif page.mobile %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='mobile'>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails.1280 }}">
-                                                <source src="{{ video.sources.raw.live }}">
-                                                <source src="{{ video.sources.raw.mobile }}">
-                                            </video>
-                                        </div>
-                                    {% else %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='generic'>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails.1280 }}">
-                                                <source src="{{ video.sources.raw.hidef }}">
-                                                <source src="{{ video.sources.raw.live }}">
-                                                <source src="{{ video.sources.raw.sdef }}">
-                                            </video>
-                                    {% endif %}
-
-                                {% else %}
-
-                                    {#  Vimeo Player  #}
-
-                                    <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                        {% if video.ext_id %}
-                                            <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% else %}
-                                            <iframe src="{{ video.url }}" width="718" height="400" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% endif %}
-                                    </div>
-
-                                {% endif %}
-                            {% else %}
-
-                                    {#  Vimeo Player  #}
-
-                                    <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                        {% if video.ext_id %}
-                                            <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% else %}
-                                            <iframe src="{{ video.url }}" width="718" height="400" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% endif %}
-                                    </div>
-
-                            {% endif %}
-
-                        {% else %}
-                            {% if video.provider == 'youtube' %}
-                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            {% else %}
-                                <img src="http://placehold.it/640x360/222222&text=video" />
-                            {% endif %}
-                        {% endif %}
-                    {% else %}
-                        <img src="http://placehold.it/640x360/222222&text=video" />
-                    {% endif %}
+					{% if video %}
+						{{ video_embed('mainvideo', page, video, video_config) }}
+					{% else %}
+						{{ video_embed('mainvideo', page, None, video_config, uploader=true) }}
+					{% endif %}
                 {% endblock media %}
             </div>
 
@@ -302,7 +296,7 @@
 {% endblock %}
 
 {% block presouth %}
-<script>
+<script type='text/javascript'>
 
   // openfire project init
   window._cp = {
@@ -311,7 +305,7 @@
     kd: '{{ project.key.urlsafe() }}',
     {%- endif -%}
     i: {{ project.key.id() }},
-    {%- if project.current_user_following -%}
+    {%- if follow -%}
     f: true,
     {%- else -%}
     f: false,
@@ -334,4 +328,27 @@
   };
 
 </script>
+
+<script type="text/javascript">
+
+	function follow(ev) {
+		$.apptools.api.project.follow({subject: {key: window._cp.ke, kind: 'PROJECT'}}).fulfill({
+			success: function (r) {
+				document.getElementById('follow').classList.add('active');
+				$.apptools.analytics.track.social("Project", "Follow", "{{ project.name }}");
+			},
+			failure: function (e) {
+				document.getElementById('follow').classList.add('error');
+			}
+		});
+	}
+
+	document.getElementById('follow').onclick = follow;
+	window.follow = follow;
+
+</script>
 {% endblock %}
+
+{% block postsouth %}
+    <script type="text/javascript" src="/assets/js/static/core/jquery/jquery.smartWizard-2.0.js"></script>
+{% endblock postsouth %}

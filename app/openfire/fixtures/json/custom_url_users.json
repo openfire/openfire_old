@@ -1,0 +1,18 @@
+[
+    {
+        "slug": "sam",
+        "target_key": "user__sam"
+    },
+    {
+        "slug": "david",
+        "target_key": "user__david"
+    },
+    {
+        "slug": "ethan",
+        "target_key": "user__ethan"
+    },
+    {
+        "slug": "pug",
+        "target_key": "user__pug"
+    }
+]

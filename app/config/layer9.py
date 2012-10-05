@@ -23,14 +23,40 @@ config['layer9.appfactory'] = {
 
 config['layer9.appfactory.upstream'] = {
 
+	'debug': True,
+	'enabled': True,
+
+	'preloading': {
+		'gather_assets': True,
+		'enable_spdy_push': True,
+		'enable_link_fallback': True
+	},
+
+	'spdy': {
+
+		'push': {
+
+			'assets': {
+				'force_priority': False,
+				'default_priority': 7
+			}
+
+		}
+
+	}
+
 }
 
 config['layer9.appfactory.frontline'] = {
 
-	'debug': True
+	'debug': True,
+	'enabled': True
 
 }
 
 config['layer9.appfactory.controller'] = {
+
+	'debug': True,
+	'enabled': True
 
 }
