@@ -142,10 +142,17 @@ config['apptools.project.assets'] = {
                 'print': {'name': '_print.sass', 'module': '_core', 'version': 0.2},
 
                 ## Partials
+<<<<<<< HEAD
                 'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.1},
                 'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.1},
                 'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.1},
                 'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.1},
+=======
+                'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.2},
+                'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.2},
+                'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.2},
+                'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.2},
+>>>>>>> 7e8c078f7508ed1e42c8648c971619ea1c92de4d
                 'datepickr': {'name': '_datepickr.sass', 'module': '_partials', 'version': 0.1},
 
                 ## Openfire
