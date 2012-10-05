@@ -446,7 +446,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         '_full': True,
                         '_scheme': 'https' if not cfg.debug else 'http',
                         '_netloc': self.force_hostname or self.request.host
-                    })
+                    }))
 
             # no errors
             else:
@@ -550,7 +550,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         '_full': True,
                         '_scheme': 'https' if not cfg.debug else 'http',
                         '_netloc': self.force_hostname or self.request.host
-                    })
+                    }))
 
         else:
             self.logging.critical('WARNING! POSSIBLE SECURITY BREACH.')
