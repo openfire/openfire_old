@@ -16,11 +16,23 @@ class Goal extends Model
         key: String()
         target: String()
         contribution_type: String()
+        approved: Boolean()
+        rejected: Boolean()
         amount: Number()
         description: String()
         backer_count: Number()
         progress: Number()
         met: Boolean()
+        created: String()
+        modified: String()
+        amount_pledged: Number()
+        amount_processed: Number()
+        funding_day_limit: Number()
+        funding_deadline: String()
+        deliverable_description: String()
+        deliverable_date: String()
+        tiers: ListField(Tier)
+        next_steps: ListField(NextStep)
 
 
 class Tier extends Model
@@ -33,8 +45,18 @@ class Tier extends Model
         amount: Number()
         description: String()
         delivery: String()
+        next_step_votes: Number()
         backer_count: Number()
         backer_limit: Number()
+
+
+class NextStep extends Model
+
+    model:
+        key: String()
+        summary: String()
+        description: String()
+        votes: Number()
 
 
 # base project class
@@ -54,12 +76,21 @@ class Project extends Model
         keywords: Array()
         creator: String()
         owners: Array()
-        goals: Array()
-        tiers: Array()
+        public: Boolean()
+        viewers: Array()
+        backers: Number()
+        followers: Number()
+        money: Number()
+        progress: Number()
+        active_goal: String()
+        completed_goals: Array()
+        future_goal: String()
 
     constructor: () ->
 
         super
+
+        @log = () => return console.log.apply(console, arguments)
 
         @stashes = {}
         @internal =
@@ -198,10 +229,10 @@ class ProjectController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        @project = new Project(@_state.ke)
+        @project = new Project(@_state.ke).get()
         @project_key = @project.key
 
-        @log = (message) => return @constructor::log(@constructor.name, message)
+        @log = () => return console.log.apply(console, arguments)
 
         @internal =
 
@@ -1267,7 +1298,7 @@ class ProjectController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.project.list_tiers(project: @project_key).fulfill
+                    $.apptools.api.project.list_tiers(goal: @project.active_goal).fulfill
                         success: (response) =>
                             tiers = []
                             tiers.push(@attach(new Goal(target: @project_key).from_message(tier))) for tier in response.tiers
@@ -1601,6 +1632,49 @@ class ProjectController extends OpenfireController
 
                 , sync
 
+        @go_live = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.go_live({key: @project_key}).fulfill
+                success: () ->
+                    alert("Your project is live! Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @suspend = () =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.suspend({"key": @project_key}).fulfill
+                success: () ->
+                    alert("Your project has been suspended. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @shutdown = () =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.shutdown({"key": @project_key}).fulfill
+                success: () ->
+                    alert("Your project has been shut down. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @cancel = () =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.go_live({"key": @project_key}).fulfill
+                success: () ->
+                    alert("Your project has been canceled. Refunding all payments. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
 
         @_init = () =>
 
@@ -1632,6 +1706,12 @@ class ProjectController extends OpenfireController
                     document.body.addEventListener('drop', @add_media, false)
                     document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
                     document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
+
+                    # Project Owner Actions
+                    document.getElementById('promote-live').addEventListener('click', @go_live, false)
+                    document.getElementById('promote-suspend').addEventListener('click', @suspend, false)
+                    document.getElementById('promote-shutdown').addEventListener('click', @shutdown, false)
+                    document.getElementById('promote-cancel').addEventListener('click', @cancel, false)
 
                     document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
