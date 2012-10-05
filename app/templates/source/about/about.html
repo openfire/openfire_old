@@ -1,7 +1,44 @@
 {% extends "layout/about.html" %}
 
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset.style('about', 'openfire') }}">
+{% endblock %}
+
+
 {% block info %}
-    <div>
-        <p>About us!</p>
+    <div class="fixed" id="about-controls" data-options="{'bundle': 'rich'}">
+        <a href="#about-sp">about</a>
+        <a href="#legal-sp">legal</a>
+        <a href="#support-sp">support</a>
+    </div>
+    <div class="fullpage" id="about">
+        <div class="scrollpoint" id="about-sp"></div>
+        <h1 id="about-title">[ABOUT] the openfire team</h1>
+        <div id="about-content" class="content">
+            <p>About us!</p>
+        </div>
+    </div>
+    <div class="fullpage" id="legal">
+        <div class="scrollpoint" id="legal-sp"></div>
+        <h1 id="legal-title">[LEGAL] privacy | terms</h1>
+        <div id="legal-content" class="content">
+            <p>Here is some privacy information.</p>
+            <p>And here is some information about our TOS.</p>
+            <p><a href="#">Full Terms of Service?</a></p>
+        </div>
+    </div>
+    <div class="fullpage" id="support">
+        <div class="scrollpoint" id="support-sp"></div>
+        <h1 id="support-title">[SUPPORT] let's chat | FAQ</h1>
+        <div id="support-content" class="content">
+            <p>Here we are telling you we love you.</p>
+            <p>And we'd love to hear from you, good or bad.</p>
+            <p>Find a bug? <a href="#">Let us know!</a></p>
+            <p><a href="#">Give feedback / ask a question</a>.</p>
+            <p><a href="#">Here lives FAQ?</a></p>
+            <p>Maybe we give you digits later.</p>
+        </div>
     </div>
 {% endblock %}
+

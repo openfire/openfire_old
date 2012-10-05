@@ -153,6 +153,7 @@ config['apptools.project.assets'] = {
                 'landing': {'name': 'landing.sass', 'module': 'openfire', 'version': 0.1},
                 'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.1},
                 'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.1},
+                'about': {'name': 'about.sass', 'module': 'openfire', 'version': 0.1},
 
                 ## Main
                 'ie': {'name': 'ie.sass', 'version': 0.1},
@@ -200,6 +201,7 @@ config['apptools.project.assets'] = {
                 'project': {'version': 0.3},  # styles for the project page
                 'profile': {'version': 0.2},   # styles for the profile page
                 'account': {'version': 0.1},   # styles for the user account page
+                'about': {'version': 0.1}
             }
 
         },

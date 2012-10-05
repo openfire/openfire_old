@@ -224,121 +224,51 @@ class ProjectController extends OpenfireController
 
             process_goal: (goal) =>
 
-                index = if goal.key? then @get_attached('goal', goal.key, true) else 'new'
+                template = window.GoalEditor ||= new Template('{{+TierEditModal}}', true, 'GoalEditor')
+                ctx = _.extend({type: 'goal'}, goal)
+                ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
-                amount = _.create_element_string('h3',
-                    id: 'goal-amount-' + index
-                    class: 'goal-field amount'
-                    contenteditable: true
-                , goal.amount)
+                btnctx =
+                    attributes:
+                        'data-index': '{{=index}}'
 
-                description = _.create_element_string('p',
-                    id: 'goal-description-' + index
-                    class: 'rounded goal-field description'
-                    contenteditable: true
-                , if goal.description? then goal.description else 'default description')
-
-                if index isnt 'new'
-
-                    save_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'save'
-                        class: 'goal-button save'
-                    , 'save goal')
-
-                    reset_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'reset'
-                        class: 'goal-button reset'
-                    , 'reset goal')
-
-                    delete_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'delete'
-                        class: 'goal-button delete'
-                    , 'delete goal')
-
-                    buttons = [save_goal, reset_goal, delete_goal].join('&nbsp;')
-
+                if !!ctx.new
+                    axns = ['add']
                 else
-                    add_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'add'
-                        class: 'goal-button add'
-                    , 'add goal')
+                    axns = ['save', 'reset', 'delete']
 
-                    buttons = [add_goal]
+                ctx.buttons = [(_.extend(true, btnctx,
+                    attributes:
+                        'data-action': axn
+                        class: '{{=type}}-button '+axn
+                    content: axn + ' {{=type]}}'
+                )) for axn in axns]
 
-                content = [amount, description, buttons].join('')
-
-                goal_wrapper = _.create_element_string('div',
-                    id: 'goal-editing-' + index
-                    class: 'goal'
-                , content)
-
-                return goal_wrapper
+                return template(ctx)
 
             process_tier: (tier) =>
 
-                index = if tier.key? then @get_attached('tier', tier.key, true) else 'new'
+                template = window.TierEditor ||= new Template('{{+TierEditModal}}', true, 'TierEditor')
+                ctx = _.extend({type: 'tier'}, tier)
+                ctx.index = if tier.key? then @get_attached('tier', tier.key, true) else (ctx.new = true; 'new')
 
-                name = _.create_element_string('h3',
-                    id: 'tier-name' + index
-                    class: 'tier-field name'
-                    contenteditable: true
-                , if tier.name? then tier.name else 'tier name')
+                btnctx =
+                    attributes:
+                        'data-index': '{{=index}}'
 
-                amount = _.create_element_string('h3',
-                    id: 'tier-amount-' + index
-                    class: 'tier-field amount'
-                    contenteditable: true
-                , if tier.amount? then tier.amount else '$0.02')
-
-                description = _.create_element_string('p',
-                    id: 'tier-description-' + index
-                    class: 'rounded tier-field description'
-                    contenteditable: true
-                , if tier.description? then tier.description else 'default description')
-
-                if index isnt 'new'
-
-                    save_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'save'
-                        class: 'tier-button save'
-                    , 'save tier')
-
-                    reset_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'reset'
-                        class: 'tier-button reset'
-                    , 'reset tier')
-
-                    delete_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'delete'
-                        class: 'tier-button delete'
-                    , 'delete tier')
-
-                    buttons = [save_tier, reset_tier, delete_tier].join('&nbsp;')
-
+                if !!ctx.new
+                    axns = ['add']
                 else
-                    add_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'add'
-                        class: 'tier-button add'
-                    , 'add tier')
+                    axns = ['save', 'reset', 'delete']
 
-                    buttons = [add_tier]
+                ctx.buttons = [(_.extend(true, btnctx,
+                    attributes:
+                        'data-action': axn
+                        class: '{{=type}}-button '+axn
+                    content: axn + ' {{=type]}}'
+                )) for axn in axns]
 
-                content = [name, amount, description, buttons].join('')
-
-                tier_wrapper = _.create_element_string('div',
-                    id: 'tier-editing-' + index
-                    class: 'tier'
-                , content)
-
-                return tier_wrapper
+                return template(ctx)
 
             prep_dropped_modal_html: (name, ext) =>
                 # takes filename, returns [premodal_element, trigger_element]
@@ -829,9 +759,7 @@ class ProjectController extends OpenfireController
                     else
                         options = "<option value=''>No saved payment accounts</option>"
                     selector.innerHTML = options
-                    # TODO: Does 'get' not work anymore?
-                    #$.apptools.widgets.modal.get("back-project-dialog").open()
-                    $.apptools.widgets.modal._state.modals[0].open()
+                    $.apptools.widgets.modal.get("back-project-dialog").open()
                 failure: (error) =>
                     alert("Failed to start donation. Are you logged in?")
             return
