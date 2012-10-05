@@ -18,7 +18,7 @@
 {% if owned_projects %}
     <span class="owned-projects-title">Projects You Own</span>
     {% for project_key, project_dict in owned_projects.iteritems() %}
-        <span class="owned-project-name">{{ project_dict['project'].name }}</span>
+        <span class="owned-project-name"><a href="/{{ project_dict['project'].get_custom_url() }}">{{ project_dict['project'].name }}</a></span>
         <span class="owned-project-status">({{ project_dict['project'].status | project_status }})</span>
         {% if project_dict['account'] %}
             <div class="wepay-project-account">

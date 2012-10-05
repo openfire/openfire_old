@@ -14,6 +14,12 @@ config['openfire'] = {
 
 }
 
+config['openfire.fixtures'] = {
+
+    'production_only': False,
+
+}
+
 config['openfire.video'] = {
 
     'debug': False,  # show log messages about video serving ops

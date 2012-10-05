@@ -23,6 +23,10 @@ class AboutPagesTestCase(OFTestCase):
     def test_about_page(self):
         self.of_handler_test('/about')
 
+
+    '''
+    These are all on the about page for now.
+
     def test_terms_page(self):
         self.of_handler_test('/terms')
 
@@ -31,6 +35,7 @@ class AboutPagesTestCase(OFTestCase):
 
     def test_support_page(self):
         self.of_handler_test('/support')
+    '''
 
 
 class UserPageTestCase(OFTestCase):
