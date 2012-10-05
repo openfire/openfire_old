@@ -833,6 +833,7 @@ task 'minify:coffee', 'minify js codebase', (options) ->
 		["AmplifyJS", fixpath(js_prefix, 'static', 'core', 'amplify.min.js'), fixpath(js_prefix, 'static', 'core', 'amplify.js')],
 		["BackboneJS", fixpath(js_prefix, 'static', 'core', 'backbone.min.js'), fixpath(js_prefix, 'static', 'core', 'backbone.js')],
 		["jQuery", fixpath(js_prefix, 'static', 'core', 'jquery.min.js'), fixpath(js_prefix, 'static', 'core', 'jquery.js')],
+		["Datepickr", fixpath(js_prefix, 'static', 'core', 'datepickr.min.js'), fixpath(js_prefix, 'static', 'core', 'datepickr.js')],
 		["Lawnchair", fixpath(js_prefix, 'static', 'core', 'lawnchair.min.js'), fixpath(js_prefix, 'static', 'core', 'lawnchair.js')],
 		["openfire", fixpath(js_prefix, 'static', 'openfire', 'app.min.js'), fixpath(js_prefix, 'static', 'openfire', 'app.js')],
 		["openfire admin", fixpath(js_prefix, 'static', 'openfire', 'app.admin.min.js'), fixpath(js_prefix, 'static', 'openfire', 'app.admin.js')]

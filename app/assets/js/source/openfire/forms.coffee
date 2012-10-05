@@ -72,13 +72,13 @@ class FormController extends OpenfireController
                 f = new FormObject(form)
                 @_state.index[f.name] = @_state.data.push(f) - 1
                 for input in form.find('input').concat(form.find('textarea'))
-                    type = input.type or 'text'
-                    type = 'text' if type is 'textarea'
-                    type = 'multi' if type is 'radio' or type is 'checkbox'
+                    if input
+                        type = 'text' if type is 'textarea'
+                        type = 'multi' if type is 'radio' or type is 'checkbox'
 
-                    if not input.data('validation')?
-                        input.data('validation', type)
-                    input.addEventListener('blur', @validate, false)
+                        if not input.data('validation')?
+                            input.data('validation', type)
+                        input.addEventListener('blur', @validate, false)
 
             @_state.init = true
             return @
