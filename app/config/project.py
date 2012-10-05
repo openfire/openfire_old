@@ -18,10 +18,10 @@ config['apptools.project'] = {
 
     'version': {               # Change this according to your app's version
         'major': 0,
-        'minor': 2,
+        'minor': 3,
         'micro': 0,
-        'build': 20120911,
-        'release': 'ALPHA'
+        'build': 20121005,
+        'release': 'RC1'
     }
 
 }
@@ -36,7 +36,7 @@ config['apptools.project.output'] = {
 
     # Output Configuration
 
-    'minify': False,      # whether to minify page output or not
+    'minify': True,      # whether to minify page output or not
     'optimize': True,     # whether to use the async script loader or not
     'standalone': False,  # whether to render only the current template, or the whole context (ignores "extends")
 

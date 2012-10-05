@@ -289,7 +289,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'production'
+    'namespace': 'production-test'
 }
 
 config['openfire.output'] = {

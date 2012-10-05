@@ -142,17 +142,10 @@ config['apptools.project.assets'] = {
                 'print': {'name': '_print.sass', 'module': '_core', 'version': 0.2},
 
                 ## Partials
-<<<<<<< HEAD
-                'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.1},
-                'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.1},
-                'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.1},
-                'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.1},
-=======
                 'social': {'name': '_social.sass', 'module': '_partials', 'version': 0.2},
                 'widgets': {'name': '_widgets.sass', 'module': '_partials', 'version': 0.2},
                 'superbar': {'name': '_superbar.sass', 'module': '_partials', 'version': 0.2},
                 'loginbox': {'name': '_loginbox.sass', 'module': '_partials', 'version': 0.2},
->>>>>>> 7e8c078f7508ed1e42c8648c971619ea1c92de4d
                 'datepickr': {'name': '_datepickr.sass', 'module': '_partials', 'version': 0.1},
 
                 ## Openfire
@@ -184,11 +177,11 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'main': {'version': 0.4},  # reset, main, layout, forms
-                'ie': {'version': 0.4},    # fixes for internet explorer (grrr...)
-                'print': {'version': 0.4},  # proper format for printing
-                'admin': {'version': 0.4},   # admin
-                'security': {'version': 0.3}  # login/register/etc
+                'main': {'version': 0.5},  # reset, main, layout, forms
+                'ie': {'version': 0.5},    # fixes for internet explorer (grrr...)
+                'print': {'version': 0.5},  # proper format for printing
+                'admin': {'version': 0.5},   # admin
+                'security': {'version': 0.4}  # login/register/etc
             }
 
         },
@@ -202,13 +195,13 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'landing': {'version': 0.5},  # styles for the landing
-                'proposal': {'version': 0.2},  # styles for the proposal page
-                'project': {'version': 0.4},  # styles for the project page
-                'profile': {'version': 0.3}   # styles for the profile page
-                'propose': {'version': 0.1},  # styles for the propose page & wizard
-                'account': {'version': 0.1},   # styles for the user account page
-                'about': {'version': 0.1}
+                'landing': {'version': 0.6},  # styles for the landing
+                'proposal': {'version': 0.3},  # styles for the proposal page
+                'project': {'version': 0.5},  # styles for the project page
+                'profile': {'version': 0.4}   # styles for the profile page
+                'propose': {'version': 0.2},  # styles for the propose page & wizard
+                'account': {'version': 0.2},   # styles for the user account page
+                'about': {'version': 0.2}
             }
 
         },
