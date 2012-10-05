@@ -47,7 +47,7 @@ config['apptools.project.services'] = {
 
         ## Assets API - allows asset sync, AJAX access to asset URLs, and dynamic manifest access
         'assets': {
-            'enabled': False,
+            'enabled': True,
             'service': 'apptools.services.builtin.AssetsService',
             'methods': ['image_url', 'script_url', 'style_url', 'blob_url', 'manifest', 'generate_upload_url'],
 
@@ -60,7 +60,7 @@ config['apptools.project.services'] = {
 
         ## Activity API - general and personal site activity.
         'activity': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.activity.ActivityService',
             'methods': ['site_metrics', 'known_backers', 'known_followers'],
 
@@ -73,7 +73,7 @@ config['apptools.project.services'] = {
 
         ## Alerts API - used for managing subscriptions on site items
         'alerts': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.alerts.AlertsService',
             'methods': ['subscribe', 'unsubscribe', 'edit', 'subscriptions', 'pending', 'all'],
 
@@ -86,7 +86,7 @@ config['apptools.project.services'] = {
 
         ## Auth API - allows async login/logout, session management, and related stuff
         'auth': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.auth.AuthService',
             'methods': ['login', 'logout', 'session', 'request', 'verify', 'thirdparty', 'renew', 'signup'],
 
@@ -112,7 +112,7 @@ config['apptools.project.services'] = {
 
         ## BBQ API - admin stuff (shhh!)
         'bbq': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.bbq.BBQService',
             'methods': ['grant', 'revoke', 'flush_cache', 'create_user'],
 
@@ -125,7 +125,7 @@ config['apptools.project.services'] = {
 
         ## Category API - provides structured information about openfire categories
         'category': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.category.CategoryService',
             'methods': ['get', 'list', 'put', 'delete'],
 
@@ -138,7 +138,7 @@ config['apptools.project.services'] = {
 
         ## Topic API - provides structured information about openfire user topics
         'topic': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.topic.TopicService',
             'methods': ['get', 'list', 'put', 'delete'],
 
@@ -164,7 +164,7 @@ config['apptools.project.services'] = {
 
         ## URL API - Add, delete, and update custom urls.
         'url': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.url.CustomUrlService',
             'methods': ['get', 'list', 'put', 'delete', 'check'],
 
@@ -190,7 +190,7 @@ config['apptools.project.services'] = {
 
         ## Media API - Add, delete, and update for images, videos, and scripts.
         'media': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.media.MediaService',
             'methods': ['generate_endpoint', 'attach_image', 'attach_avatar', 'attach_video'],
 
@@ -216,7 +216,7 @@ config['apptools.project.services'] = {
 
         ## Payment API - dealing with everything payments.
         'payment': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.payment.PaymentService',
             'methods': ['get_auth_url', 'get_user_payment_account', 'update_account_balance',
                         'create_project_payment_account', 'get_project_payment_account',
@@ -233,7 +233,7 @@ config['apptools.project.services'] = {
 
         ## Project API - provides structured information about openfire projects
         'project': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.project.ProjectService',
             'methods': ['get', 'list', 'put', 'go_live', 'delete',
                         'update', 'updates', 'media', 'follow', 'followers', 'backers', 'suspend', 'cancel',
@@ -252,7 +252,7 @@ config['apptools.project.services'] = {
 
         ## Proposal API - provides methods dealing with proposals for openfire projects
         'proposal': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.proposal.ProposalService',
             'methods': ['get', 'list', 'put', 'submitted', 'delete', 'comment', 'comments', 'submit',
                         'promote', 'suspend', 'reject', 'reopen', 'add_viewer', 'remove_viewer'],
@@ -279,7 +279,7 @@ config['apptools.project.services'] = {
 
         ## Search API - provides methods to retrieve/traverse quick/autocomplete/fulltext search results
         'search': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.search.SearchService',
             'methods': ['quick', 'advanced', 'autocomplete', 'topic_autocomplete'],
 
@@ -292,7 +292,7 @@ config['apptools.project.services'] = {
 
         ## User API - allows user profiles/data and facepiles to be retrieved
         'user': {
-            'enabled': False,
+            'enabled': True,
             'service': 'openfire.services.user.UserService',
             'methods': ['profile', 'set_topics', 'account', 'follow', 'followers'],
 
