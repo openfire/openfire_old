@@ -1,8 +1,6 @@
 {% extends "layout/layout_base.html" %}
-
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset.style('project', 'openfire') }}">
-{% endblock stylesheets %}
+{% from "macros/video.html" import video_embed %}
+{% block stylesheets %}<link rel="stylesheet" href="{{ asset.style('project', 'openfire') }}">{% endblock stylesheets %}
 
 {% block main %}
 
@@ -21,10 +19,23 @@
                 </div>
             {% endif %}
 
+			<style>
+			  #follow {
+				-webkit-transition-property: color;
+				-webkit-transition-duration: 0.8s;
+			  }
+			  #follow.active {
+				 color: blue;
+			  }
+			  #follow.error {
+				 color: red;
+			  }
+			</style>
+
             <div id='sidebar' class='pre-sticky'>
                 <header>
                     <div id='sidebuttons' class='buttons'>
-                        <button id='follow' class='momentron{%- if project.current_user_following -%} following{%- endif -%}'>&#xf007f;</button>
+                        <button id='follow' class='momentron{%- if follow -%} active{%- endif -%}'>&#xf007f;</button>
                         <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                     <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ project.name }}</h1></div>
@@ -206,77 +217,11 @@
 
             <div id='welcomebox'>
                 {% block media %}
-                    {% if video %}
-                        {% if video.provider == 'vimeo' %}
-                            {% if video_config.html5.enable %}
-                                {% if video_config.html5.force or page.robust or page.mobile %}
-
-                                    {#  Native HTML5 Video  #}
-
-                                    {% if page.robust %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='robust' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                            <div id='voverlay'>
-                                                <img src="{{ asset.image('video', 'watermark.png') }}" alt='openfire!'>
-                                            </div>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails['1280'] }}">
-                                                <source src="{{ video.sources.raw.hidef }}">
-                                            </video>
-                                        </div>
-                                    {% elif page.mobile %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='mobile'>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails.1280 }}">
-                                                <source src="{{ video.sources.raw.live }}">
-                                                <source src="{{ video.sources.raw.mobile }}">
-                                            </video>
-                                        </div>
-                                    {% else %}
-                                        <div id='mainvideo' data-provider='vimeo' data-runtime='html5' data-profile='generic'>
-                                            <video controls width="713" height="400" preload="auto" poster="{{ video.sources.thumbnails.1280 }}">
-                                                <source src="{{ video.sources.raw.hidef }}">
-                                                <source src="{{ video.sources.raw.live }}">
-                                                <source src="{{ video.sources.raw.sdef }}">
-                                            </video>
-                                    {% endif %}
-
-                                {% else %}
-
-                                    {#  Vimeo Player  #}
-
-                                    <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                        {% if video.ext_id %}
-                                            <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% else %}
-                                            <iframe src="{{ video.url }}" width="718" height="400" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% endif %}
-                                    </div>
-
-                                {% endif %}
-                            {% else %}
-
-                                    {#  Vimeo Player  #}
-
-                                    <div id='mainvideo' data-provider='vimeo' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                        {% if video.ext_id %}
-                                            <iframe src="http://player.vimeo.com/video/{{ video.ext_id }}?title=0&amp;byline=0&amp;portrait=0&amp;color=BADA55&amp;api=1&amp;player_id=prj" width="640" height="360" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% else %}
-                                            <iframe src="{{ video.url }}" width="718" height="400" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-                                        {% endif %}
-                                    </div>
-
-                            {% endif %}
-
-                        {% else %}
-                            {% if video.provider == 'youtube' %}
-                            <div id='mainvideo' data-provider='youtube' data-media-key='{{ encrypt(video.key.urlsafe()) }}'>
-                                <iframe width="640" height="360" src="{{ video.url }}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            {% else %}
-                                <img src="http://placehold.it/640x360/222222&text=video" />
-                            {% endif %}
-                        {% endif %}
-                    {% else %}
-                        <img src="http://placehold.it/640x360/222222&text=video" />
-                    {% endif %}
+					{% if video %}
+						{{ video_embed('mainvideo', page, video, video_config) }}
+					{% else %}
+						{{ video_embed('mainvideo', page, None, video_config, uploader=true) }}
+					{% endif %}
                 {% endblock media %}
             </div>
 
@@ -341,7 +286,7 @@
 {% endblock %}
 
 {% block presouth %}
-<script>
+<script type='text/javascript'>
 
   // openfire project init
   window._cp = {
@@ -350,7 +295,7 @@
     kd: '{{ project.key.urlsafe() }}',
     {%- endif -%}
     i: {{ project.key.id() }},
-    {%- if project.current_user_following -%}
+    {%- if follow -%}
     f: true,
     {%- else -%}
     f: false,
@@ -371,6 +316,25 @@
     v: false
     {%- endif -%}
   };
+
+</script>
+
+<script type="text/javascript">
+
+	function follow(ev) {
+		$.apptools.api.project.follow({subject: {key: window._cp.ke, kind: 'PROJECT'}}).fulfill({
+			success: function (r) {
+				document.getElementById('follow').classList.add('active');
+				$.apptools.analytics.track.social("Project", "Follow", "{{ project.name }}");
+			},
+			failure: function (e) {
+				document.getElementById('follow').classList.add('error');
+			}
+		});
+	}
+
+	document.getElementById('follow').onclick = follow;
+	window.follow = follow;
 
 </script>
 {% endblock %}

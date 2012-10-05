@@ -82,8 +82,8 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'base': {'min': True, 'version': 1.5},  # RPC, events, dev, storage, user, etc (see $.apptools)
-                'admin': {'name': 'base.admin', 'min': True, 'version': 1.5}  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'base': {'min': True, 'version': 1.6},  # RPC, events, dev, storage, user, etc (see $.apptools)
+                'admin': {'name': 'base.admin', 'min': True, 'version': 1.6}  # RPC, events, dev, storage, user, etc (see $.apptools)
             }
 
         },

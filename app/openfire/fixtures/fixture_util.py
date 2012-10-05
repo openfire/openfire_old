@@ -408,7 +408,7 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
     parent.put()
 
 
-def create_image(parent_key=None, url='', name='', mime='', pending=False,
+def create_image(parent_key=None, url='', name='', mime='', placement=None, pending=False,
             approved=True, blob_file=None, mime_type='image/png'):
 
     ''' Create an image and add it to a project. '''
@@ -439,7 +439,7 @@ def create_image(parent_key=None, url='', name='', mime='', pending=False,
     else:
         asset_key = Asset(url=serving_url, name=name, mime=mime, pending=pending, kind='i').put()
     image_key = Image(key=ndb.Key(Image, asset_key.urlsafe(), parent=parent_key),
-            url=serving_url, asset=asset_key, approved=approved).put()
+            url=serving_url, asset=asset_key, placement=placement, approved=approved).put()
     parent.images.append(image_key)
     parent.put()
 

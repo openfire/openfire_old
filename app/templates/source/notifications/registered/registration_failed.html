@@ -1,0 +1,12 @@
+Hey there, {{ signup.firstname }}!
+
+We couldn't help but notice that you left in the middle of registration! Was it something we said?
+
+Just in case you change your mind, and you'd still like to register... the signup form is waiting, <a href="{{ link('auth/register', k=encrypt(signup.key.urlsafe())) }}">filled out just for you!</a>
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

@@ -1,0 +1,16 @@
+hey there, {{ user.firstname }}!
+
+Your proposal, {{ proposal.name }}, has been promoted to a project! Don't worry, it's not public or anything yet. It is, however, ready for your discerning project creator's eye!
+
+To check it out and start filling out project details, head on over to your new <a href="{{ link('project/home', key= encrypt(project.key)) }}" alt="{{ project.name }}'s new project page!">project page</a>! Or, enter the following URL into your browser:
+
+{{ link('project/home', key=encrypt(project.key)) }}
+
+That URL is long, huh! It'll get shorter when you pick a custom one for your project.
+
+Thanks for your interest in our beta, and we hope you enjoy the platform! It is still under active development, and we welcome early feedback.
+
+Just reach out at <a href="mailto:disrupt@openfi.re">disrupt@openfi.re</a> if there's anything we can do!
+
+Thanks,
+-the openfire team

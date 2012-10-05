@@ -3,6 +3,7 @@ import config
 import webapp2
 import logging
 from openfire.models import user as u
+from openfire.models import social as s
 from openfire.models import assets as a
 from openfire.models import project as p
 from openfire.handlers import WebHandler
@@ -12,7 +13,7 @@ from google.appengine.ext import ndb
 
 ## QueryOptions objects
 _keys_only = ndb.QueryOptions(keys_only=True, limit=20, read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
-_avatars_q = ndb.QueryOptions(limit=1, projection=('r', 'a'), read_policy=ndb.EVENTUAL_CONSISTENCY, produce_cursors=False, hint=ndb.QueryOptions.ANCESTOR_FIRST)
+_images_q = ndb.QueryOptions(limit=1, produce_cursors=False, keys_only=True, hint=ndb.QueryOptions.ANCESTOR_FIRST)
 
 
 ## ProjectLanding - page for a listing of projects (`browse`)
@@ -85,19 +86,47 @@ class ProjectHome(WebHandler):
             vi = ndb.Key(a.Video, 'mainvideo', parent=pr)
 
             # pull project and attachments
-            project, video = tuple(ndb.get_multi([pr, vi], use_cache=True, use_memcache=True, use_datastore=True))
+            if not isinstance(self.user, ndb.Model):
+                project, video = tuple(ndb.get_multi([pr, vi], use_cache=True, use_memcache=True, use_datastore=True))
+                follow = None
+            else:
+                project, follow, video = tuple(ndb.get_multi([pr, ndb.Key(s.Follow, getattr(self, 'user').key.id(), parent=pr), vi], use_cache=True, use_memcache=True, use_datastore=True))
 
             # couldn't find project
             if project is None:
                 return self.error(404)
 
-            # pull avatar
-            avatar = a.Avatar.query(ancestor=project.key).filter(a.Avatar.active == True).filter(a.Avatar.active == True).order(-a.Avatar.modified)
-            avatar = avatar.get(options=_avatars_q)
-            if avatar is not None:
+            # pull avatar/asset + video asset
+            avatar = a.Avatar.query(ancestor=project.key, default_options=_images_q).filter(a.Avatar.active == True).order(-a.Avatar.modified)
+            avatar = avatar.fetch(options=_images_q)
+            if len(avatar) > 0 and video is not None:
+                avatar = avatar[0]
+                avatar, av_asset, vi_asset = ndb.get_multi([avatar, ndb.Key(urlsafe=avatar.id()), video.asset], use_cache=True, use_memcache=True, use_datastore=True)
+                avatar = avatar.to_dict()
+                avatar['asset'] = av_asset
+
+                video._asset = vi_asset
+
+            elif video is None and len(avatar) > 0:
+                avatar = avatar[0]
                 asset = avatar.asset.get()
                 avatar = avatar.to_dict()
                 avatar['asset'] = asset
+
+            # pull project images
+            project_images = []
+            placed_images = {}
+            images = a.Image.query(ancestor=project.key, default_options=_images_q)
+            i_count = images.count()
+            if i_count > 0:
+                images = ndb.get_multi(images, use_cache=True, use_memcache=True, use_datastore=True)
+                for image in images:
+                    if len(image.placement) > 0:
+                        for placement in image.placement:
+                            placed_images[placement] = image
+                    project_images.append(image)
+
+            p_images = {'placement': placed_images, 'library': project_images, 'avatar': avatar['asset']}
 
             # pull goals and tiers
             active_goal = project.active_goal and project.active_goal.get() or None
@@ -134,10 +163,12 @@ class ProjectHome(WebHandler):
             page_content = self.render(
                     self.template,
                     project=project,
+                    follow=follow,
                     video=video,
                     owners=owners,
                     viewers=viewers,
                     avatar=avatar,
+                    images=p_images,
                     active_goal=active_goal,
                     completed_goals=completed_goals,
                     future_goal=future_goal,

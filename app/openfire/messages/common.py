@@ -207,10 +207,24 @@ class FutureGoal(messages.Message):
 
 class Comment(messages.Message):
 
-    ''' Comment on something. '''
+    ''' An existing comment. '''
 
-    username = messages.StringField(1)
-    text = messages.StringField(2)
+    class Commenter(messages.Message):
+
+		''' Represents a user attached to a comment. '''
+
+		username = messages.StringField(1)
+		profile = messages.StringField(2)
+		firstname = messages.StringField(3)
+		lastname = messages.StringField(4)
+		is_admin = messages.BooleanField(5)
+		avatar = messages.StringField(6)
+
+    text = messages.StringField(1)
+    timestamp = messages.StringField(2)
+    timeago = messages.StringField(3)
+    author = messages.MessageField(Commenter, 4)
+    subject = messages.StringField(5)
 
 
 class Comments(messages.Message):
@@ -218,21 +232,8 @@ class Comments(messages.Message):
     ''' A list of comments. '''
 
     comments = messages.MessageField(Comment, 1, repeated=True)
-
-
-class Post(messages.Message):
-
-    ''' Post something. '''
-
-    username = messages.StringField(1)
-    text = messages.StringField(2)
-
-
-class Posts(messages.Message):
-
-    ''' A list of posts. '''
-
-    posts = messages.MessageField(Post, 1, repeated=True)
+    count = messages.IntegerField(2)
+    subject = messages.StringField(3)
 
 
 class Follow(messages.Message):

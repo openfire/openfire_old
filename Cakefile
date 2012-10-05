@@ -693,7 +693,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'modernizr.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'jacked.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'd3.coffee'),
-									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'analytics', 'google_analytics.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'integrations', 'analytics', 'google_analytics.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling AppTools JS for admins...'
@@ -732,7 +732,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'modernizr.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'jacked.coffee'),
 									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'libraries', 'd3.coffee'),
-									#fixpath(js_prefix, 'source', 'apptools', 'integrations', 'analytics', 'google_analytics.coffee'),
+									fixpath(js_prefix, 'source', 'apptools', 'integrations', 'analytics', 'google_analytics.coffee'),
 									fixpath(js_prefix, 'source', 'apptools', '_init.coffee')]
 
 
@@ -749,7 +749,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', 'proposal.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'widgets.coffee'),
-									fixpath(js_prefix, 'source', 'openfire', 'analytics.coffee'),
+									#fixpath(js_prefix, 'source', 'openfire', 'analytics.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling openfire JS for admins...'
@@ -766,7 +766,7 @@ task 'compile:coffee', 'compile js codebase', (options) ->
 									fixpath(js_prefix, 'source', 'openfire', 'proposal.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'project.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', 'widgets.coffee'),
-									fixpath(js_prefix, 'source', 'openfire', 'analytics.coffee'),
+									#fixpath(js_prefix, 'source', 'openfire', 'analytics.coffee'),
 									fixpath(js_prefix, 'source', 'openfire', '_init.coffee')]
 
 	out.shout 'coffee', 'Compiling openfire unit tests...'

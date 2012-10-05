@@ -176,15 +176,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         # Initialize dynamic content API
         self._initialize_dynamic_content(self.app)
 
-        # Preload second
-        if self.should_preload:
-            self.preload()
-
-        # TODO: This is required for logged in testing to work. See [OF-155] for details.
-        #if os.environ.get("RUNNING_TESTS", None) == "TESTING":
-        #    self.dispatch()
-
-
     def preload(self):
 
         ''' Preloaded data and template support. '''
@@ -199,6 +190,10 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
     def dispatch(self):
 
         ''' Retrieve session + dispatch '''
+
+        # Preload second
+        if self.should_preload:
+            self.preload()
 
         if self.sessions:
             # Resolve user session

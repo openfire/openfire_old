@@ -33,6 +33,7 @@ FIXTURE_FILES = [
     ('avatar', util.create_avatar, 'name'),
     ('video', util.create_video, 'name'),
     ('custom_url', util.create_custom_url, 'slug'),
+    ('images', util.create_image, 'name')
 ]
 
 def make_fixture_key(val, data):
