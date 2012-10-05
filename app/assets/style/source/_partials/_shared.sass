@@ -264,7 +264,7 @@
             right: 3.5em
             bottom: 4em
 
-    #promote
+    #promote, #bbq
         margin: 20px auto
         text-align: right
         background-color: #ccc
@@ -275,16 +275,12 @@
             width: 35px
             display: block
             content: attr(data-section-title)
-            color: #888
             font-family: "Karla"
             font-size: 11px
             text-transform: uppercase
             float: left
-            background-color: #ccc
-            text-align: right
+            text-align: left
             padding: 2px
-            border-top-left-radius: 3px
-            border-top-right-radius: 3px
 
         button
             border-radius: 10px
@@ -292,9 +288,16 @@
             font-family: "Karla"
             font-size: 11pt
             text-transform: uppercase
-            color: #404044
-            background-color: #ccc
 
+    #promote
+        background-color: #ccc
+
+        &::before
+            color: #606066
+
+        button
+            color: #404044
+            background-color: inherit
             &:hover,
             &:active
                 background-color: #bada55
@@ -319,6 +322,16 @@
                 border-color: #444
                 border-style: solid
                 color: #444
+
+
+    #bbq
+        background-color: #f57720
+        &::before
+            color: #ffb246
+        button
+            background-color: inherit
+            color: #ffb246
+            font-weight: 700
 
     #owners
         margin-left: auto
@@ -483,6 +496,72 @@
         font-weight: 700
         text-transform: uppercase
         font-family: Karla
+
+    #active_goal,
+    #completed_goals,
+    #project_next_steps,
+    #future_goal,
+    #project_tiers
+
+        margin: 10px
+
+        a
+            font-size: 15px
+            font-family: Karla
+            font-weight: 700
+            line-height: 17px
+            color: #666
+            text-decoration: none
+            cursor: pointer
+            display: block
+            width: 100%
+
+            &:link
+                text-decoration: inherit
+                color: inherit
+
+            &.reached
+                color: #999
+
+            &.current
+                color: black
+
+
+        p
+            -webkit-transition-property: height
+            overflow-y: auto
+            margin: 2% 0 0
+            padding: 5px
+            font-size: 11px
+            background: #eee
+            border-radius: 3px
+
+        &::before
+            width: 35px
+            display: block
+            content: attr(data-section-title)
+            color: #888
+            font-family: Karla
+            font-size: 11px
+            text-transform: uppercase
+            transform: rotate(-90deg)
+            -webkit-transform: rotate(-90deg)
+            -moz-transform: rotate(-90deg)
+            -o-transform: rotate(-90deg)
+            position: relative
+            background-color: #ccc
+            left: -42px
+            top: 25px
+            text-align: right
+            padding-right: 3px
+            border-top-left-radius: 3px
+            border-top-right-radius: 3px
+
+        .sidebar-title
+            font-size: 12px
+
+        .sidebar-title-subtext
+            font-size: 10px
 
     #global_progress
         width: 320px

@@ -11,11 +11,24 @@
     <div id='content'>
         <div id='project'>
 
+
+                <div id="bbq" data-section-title="bbq">
+                    <button id="bbq-live" value="go live">go live</button>
+                    <button id="bbq-suspend" value="suspend">suspend</button>
+                    <button id="bbq-shutdown" value="shutdown">shutdown</button>
+                    <button id="bbq-cancel" value="cancel">cancel</button>
+                </div>
+
+
             {% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
-                    <button id='promote-goals' value="goals">edit goals</button>
                     <button id='promote-tiers' value="tiers">edit tiers</button>
+                    <button id='promote-goal' value="goal">propose goal</button>
+                    <button id='promote-live' value="go live">go live</button>
+                    <button id='promote-suspend' value="suspend">suspend</button>
+                    <button id='promote-shutdown' value="shutdown">shutdown</button>
+                    <button id='promote-cancel' value="cancel">cancel</button>
                 </div>
             {% endif %}
 
