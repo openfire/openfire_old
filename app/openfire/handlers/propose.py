@@ -5,6 +5,7 @@ import logging
 from google.appengine.ext import ndb
 
 from openfire.handlers import WebHandler
+from openfire.models.project import Category
 
 
 class ProposeLanding(WebHandler):
@@ -15,7 +16,10 @@ class ProposeLanding(WebHandler):
 
         ''' Render propose_landing.html. '''
 
-        self.render('propose/proposal_landing.html')
+        context = {
+            'categories': Category.query().fetch(),
+        }
+        self.render('propose/proposal_landing.html', **context)
         return
 
 
@@ -34,6 +38,13 @@ class ProposalHome(WebHandler):
         ''' Named logging pipe. '''
 
         return super(ProposalHome, self).logging.extend(name='ProposalHome')._setcondition(self.should_log)
+
+    @webapp2.cached_property
+    def videoConfig(self):
+
+	    ''' Named access to video config. '''
+
+	    return config.config.get('openfire.video')
 
     def get(self, key):
 
@@ -98,6 +109,7 @@ class ProposalHome(WebHandler):
                     proposal=proposal,
                     owners=owners,
                     viewers=viewers,
+                    video_config=self.videoConfig,
                     flush=False
             )
 

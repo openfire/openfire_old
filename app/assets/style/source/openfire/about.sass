@@ -1,0 +1,113 @@
+@import "../main"
+@media only screen and (max-width: 767px)
+    #main
+        margin-top: 42px
+    .fullpage
+        .content
+            height: 86%
+
+@media only screen and (min-width: 768px)
+    #main
+        margin-top: 50px
+    .fullpage
+        .content
+            height: 85%
+
+@media only screen and (min-width: 1120px)
+    .fullpage
+        .content
+            height: 84%
+
+#footer-container
+    display: none
+
+#superbar
+    position: fixed
+
+#about-controls
+    top: 60px
+    right: 10px
+    background-color: rgba(0,0,0,0.47)
+    border-radius: 3px
+    padding: 10px
+    font-size: 10pt
+    color: #dedede
+    box-shadow: 2px 2px 3px 1px rgba(0,0,0,0.3)
+    a
+        padding-top: 0
+        border-top: 1px solid rgba(0,0,0,0)
+        display: block
+        width: 70px
+        background-color: #bababa
+        color: rgba(0,0,0,0.5)
+        line-height: 16pt
+        vertical-align: middle
+        margin-bottom: 1px
+        text-decoration: none
+        text-align: center
+        cursor: pointer
+        text-transform: uppercase
+
+        &:hover
+            color: rgba(0,0,0,0.67)
+            border-top-color: whitesmoke
+            background-color: #cecece
+
+        &:active
+            background-color: #bababa
+            border-top-color: #999
+
+
+    &::before
+        display: block
+        content: 'jump to'
+        width: 95%
+        margin: 0 auto 10px
+        text-align: center
+        font:
+            family: "Karla"
+            weight: 700
+            size: 11pt
+        color: #ccc
+
+
+.fullpage
+    width: 100%
+    height: 100%
+    background-color: #aaa
+
+    h1
+        display: block
+        max-height: 48px
+        width: 98%
+        margin: 0 auto 10px
+        margin-left: auto
+        margin-right: auto
+        font:
+            family: "Karla"
+            weight: 700
+            size: 34pt
+        line-height: 40pt
+        vertical-align: middle
+        letter-spacing: 3px
+        color: #dedede
+        overflow: hidden
+        white-space: nowrap
+        text-overflow: ellipsis
+
+    .content
+        width: 96%
+        padding: 1%
+        border-radius: 10px
+        margin-left: auto
+        margin-right: auto
+        background-color: #ccc
+
+        p
+            margin: 0 auto 12px
+            color: #696969
+            font-size: 13pt
+
+    .scrollpoint
+        float: left
+        margin-top: -50px

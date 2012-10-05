@@ -24,10 +24,10 @@
                   elmActionBar = $('<div></div>').addClass("action-bar");
                 }
 
-                msgBox = $('.msgBox',obj);
+                msgBox = $('.msg-box',obj);
                 if(msgBox.length == 0){
-                  msgBox = $('<div class="msgBox"><div class="content"></div><a href="#" class="close">X</a></div>');
-                  elmActionBar.append(msgBox);
+                  msgBox = $('<div class="msg-box" style="display: none;"><span class="title"></span><span class="content"></span><a href="#" class="close" style="z-index: 100;">X</a></div>');
+                  obj.append(msgBox);
                 }
 
                 $('.close',msgBox).click(function() {

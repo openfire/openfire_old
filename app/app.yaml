@@ -1,5 +1,5 @@
 application: open-fire-staging
-version: placeholder
+version: video
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -202,6 +202,7 @@ handlers:
 - url: /assets/style/static
   static_dir: assets/style/static
   mime_type: text/css
+  expiration: "364d"
   http_headers:
     Vary: "Accept-Encoding"
     Access-Control-Allow-Origin: :"beta.openfi.re staging.openfi.re"

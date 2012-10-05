@@ -1,546 +1,169 @@
-@import "../main"
+@import "../_core/mediaqueries"
+@import "../_partials/shared"
 
-#main
-    #content::before
-        display: none !important
+// Smartphones
+@media only screen and (min-width: 320px) and (max-width: 480px)
+    +smartphone
+    #proposal
+        top: -200px
 
-#welcomebox
-    z-index: 800
+        &.active
+            top: 0px
 
-#promote
-    text-align: right
-    background-color: #ccc
-    border-top-right-radius: 3px
-    border-bottom-right-radius: 3px
+    +promote-smartphone
+    +welcomebox-smartphone
+    +mainvideo-smartphone
+    +sidebar-smartphone
+    +sidebuttons-smartphone
+    +progress-smartphone
+    +deets-smartphone
 
-    &::before
-        width: 35px
-        display: block
-        content: attr(data-section-title)
-        color: #888
-        font-family: "Karla"
-        font-size: 11px
-        text-transform: uppercase
-        float: left
-        background-color: #ccc
-        text-align: right
-        padding: 2px
-        border-top-left-radius: 3px
-        border-top-right-radius: 3px
+    #proposal-title
+        margin-top: 0
 
-    button
-        border-radius: 10px
-        margin: 6px
-        font-family: "Karla"
-        font-size: 11pt
-        text-transform: uppercase
-        color: #404044
-        background-color: #ccc
+        h1,
+        a h1
+            font-size: 24pt
+            line-height: 37pt
 
-        &:hover,
-        &:active
-            background-color: #bada55
+    +deet-actions-smartphone
 
-    .dropzone
-        float: left
-        margin: 5px
-        padding: 2px 15px
-        background-color: transparent
-        border-radius: 5px
-        border: 1px dashed #888
-        color: #888
-        text-align: center
-        line-height: 16pt
-        vertical-align: middle
-        font-family: "Karla"
-        font-size: 11pt
-        text-transform: uppercase
-        font-style: italic
+    #proposal-tabset
+        .tab-rounded,
+        .tab-link
+            font-size: 14px
+            line-height: 16px
 
-        &.hover
-            border-color: #444
-            border-style: solid
-            color: #444
 
-#owners
-    margin-left: auto
-    margin-right: auto
-    height: 150px
+// Smartphone landscape
+@media only screen and (min-width: 321px)
+    +smartphone-landscape
 
-.nametag
-    display: inline
+// Smartphone portrait
+@media only screen and (max-width: 320px)
+    +smartphone-portrait
 
-    .byline
-        color: #999
-        font-size: 11pt
+// iPad
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px)
+    +ipad
 
-.hr-inset
-    margin: 15px auto
-    width: 100%
-    height: 1px
-    background-color: #e9e9ee
-    border: 0px solid #e9e9ee
+// iPad landscape
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)
+    +ipad-landscape
 
-    &::after
-        display: block
-        content: ""
-        width: 99%
+// iPad portrait
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)
+    +ipad-portrait
+
+// Other tablet / intermediate screen
+@media only screen and (min-width: 480px) and (max-width: 768px)
+    +tablet
+
+    +promote-intermediate
+    +mainvideo-intermediate
+    +sidebuttons-intermediate
+    +deets-intermediate
+
+    #proposaltitle
+        h1,
+        a h1
+            font-size: 32pt
+            line-height: 44pt
+
+    #proposal-tabset
+        .tab-rounded,
+        .tab-link
+            font-size: 16px
+            line-height: 18px
+
+// Other tablet landscape
+@media only screen and (min-width: 481px)
+    +tablet-landscape
+    #proposal
         margin: 0 auto
-        background-color: #9f9f99
-        height: 1px
-        position: relative
-        top: -1px
 
-    &.half
-        width: 50%
+    #proposaltitle
+        h1,
+        a h1
+            font-size: 32pt
+            line-height: normal
 
-    &.quarter
-        width: 25%
-
-    &.most
-        width: 75%
-
-
-#sidebar
-    -webkit-transition-property: height, top
-    z-index: 900
-    background: #CCC
-    border-radius: 8px
-
-    &.fixed
-        position: fixed !important
-
-    header
-
-        #sidetitle
-            margin-left: 20px
-            text-align: left
-
-            h1
-                font:
-                    family: "Karla"
-                    size: 240%
-                color: black
-
-        #sidebuttons
-            float: right
-            margin: 5px
-
-            button
-                color: #222
-                padding: 0px
-                margin-right: 3px
-
-                &.following
-                    color: #f57220
-
-                    &:hover
-                        color: #f79331
-
-                &:hover
-                    color: #f79331
-
-                &:active,
-                &:visited
-                    color: #f57220
-
-    section
-        min-height: 50px
-
-    #quickinfo
-        position: relative
-        padding: 0
-
-        #progress
-            height: 30px
-            position: relative
-            background-color: white
-            border: none
-            box-shadow: 0px 2px 8px -3px rgba(0,0,0, 0.75)
-            z-index: 900
-
-            &::before,
-            &::after
-                display: block
-                content: ' '
-                position: absolute
-                top: 30px
-                width: 9px
-                height: 9px
-                background-color: transparent
-
-            &::before
-                left: 1px
-                +background(linear-gradient(top right, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
-                clip: rect(0px 10px 8px 2px)
-                box-shadow: inset -2px 3px 11px -5px rgba(0,0,0, 0.75)
-
-            &::after
-                right: 1px
-                +background(linear-gradient(top left, white 0%, white 50%, transparent 50%, transparent 100%))
-                clip: rect(0px 8px 8px 0px)
-                box-shadow: inset 2px 3px 11px -5px rgba(0,0,0, 0.75)
-
-            &.done
-                &::after
-                    background: none
-                    +background(linear-gradient(top left, #bada55 0%, #bada55 50%, transparent 50%, transparent 100%))
-
-
-            #progress-inner
-                position: absolute
-                padding-right: 5px
-                left: 0px
-                height: 30px
-                background-color: #bada55
-                border: none
-                text-align: right
-                color: white
-                line-height: 30px
-                font-size: 20px
-                font-weight: 700
-                text-transform: uppercase
-                font-family: Karla
-
-        #proposal_goals,
-        #proposal_tiers
-
-            margin: 10px
-
-            a
-                font-size: 15px
-                font-family: Karla
-                font-weight: 700
-                line-height: 17px
-                color: #666
-                text-decoration: none
-                cursor: pointer
-                display: block
-                width: 100%
-
-                &:link
-                    text-decoration: inherit
-                    color: inherit
-
-                &.reached
-                    color: #999
-
-                &.current
-                    color: black
-
-
-            p
-                -webkit-transition-property: height
-                overflow-y: auto
-                margin: 2% 0 0
-                padding: 5px
-                font-size: 11px
-                background: #eee
-                border-radius: 3px
-
-            &::before
-                width: 35px
-                display: block
-                content: attr(data-section-title)
-                color: #888
-                font-family: Karla
-                font-size: 11px
-                text-transform: uppercase
-                transform: rotate(-90deg)
-                -webkit-transform: rotate(-90deg)
-                -moz-transform: rotate(-90deg)
-                -o-transform: rotate(-90deg)
-                position: relative
-                background-color: #ccc
-                left: -42px
-                top: 25px
-                text-align: right
-                padding-right: 3px
-                border-top-left-radius: 3px
-                border-top-right-radius: 3px
-
-
-
-
-    #backers
-        position: relative
+// Other tablet portrait
+@media only screen and (max-width: 620px)
+    +tablet-portrait
+    #proposal
+        overflow: hidden
         width: 100%
-        margin-top: 15px
-        height: 130px
-        text-align: center
+        top: -200px
 
-        #backproposal
-            height: 50px
+        &.active
+            top: 0px
 
-            #back
-                font-family: Karla
-                font-size: 18px
-                font-weight: 700
-                line-height: 40px
-                color: white
-                margin: 0 10px
-                width: 80%
-                border-radius: 10px
-                text-transform: uppercase
-                +background(linear-gradient(top center, #f79331, #f57220))
+    +promote-tablet-portrait
+    +welcomebox-tablet-portrait
+    +mainvideo-tablet-portrait
+    +sidebar-tablet-portrait
+    +progress-tablet-portrait
 
-                &:hover
-                    +background(linear-gradient(top center, #ffd468, #ffb246))
+    #proposal_goals,
+    #proposal-tiers
+        &::before
+            display: none
+            content: none
 
-                &.backed
-                    +background(linear-gradient(top center, #bada55, green))
+    +deets-tablet-portrait
 
-        #backer_summary
-            margin-top: 15px
-            height: 40px
-            text-align: center
+    #proposal-tabset
+        margin-bottom: 0px
+
+        .tab-rounded,
+        .tab-link
+            margin: 0 auto
+            font-weight: 700
+            padding: 10px
+
+        .tab
+            position: relative
+            bottom: 0px
+
+    +footer-tablet-portrait
+
+@media only screen and (min-width: 768px)
+    +bigscreen-shared
+
+// Fullscreen desktop/laptop
+@media only screen and (min-width: 768px) and (max-width: 1140px)
+    +fullscreen
+    +fullscreen-shared
+
+// Widescreen
+@media only screen and (min-width: 1140px)
+    +widescreen
+    +widescreen-shared
+
+// iPhone 4
+@media only screen and (min-device-pixel-ratio: 1.5)
+    +iphone
 
 
-.contentwrap
-    padding: 20px
+// Main styles
+@import "../main"
++main-shared
+
+#proposal_goals, #proposal_tiers
+    +goals-tiers-shared
 
 #proposal
+    +page-shared
 
-    -webkit-transition-property: top
+#proposaltitle
+    +title-shared
 
-    h1,
-    h2,
-    h3
-        font:
-            family: Karla, sans-serif
-            weight: 700
-
-    z-index: 700
-    position: relative
-    height: 100%
-    max-width: 1120px
-
-    article
-        section
-            width: 100% !important
-            margin: 0 !important
-
-    #deets
-        position: relative
-
-
-        .prsection
-            padding: 10px 0
-            background-color: transparent
-
-            p,
-            ul,
-            section
-                margin: 0 10px 10px
-
-            h2,
-            h3
-                -webkit-margin-before: 0
-                -webkit-margin-after: 0
-                margin: 0 auto 10px 5px
-                letter-spacing: 0.25em
-
-            h3
-                text-transform: lowercase
-
-        #proposaltitle
-            height: 50px
-            margin-bottom: 10px
-            display: block
-            width: 100%
-            background-color: #ddd
-
-            h1,
-            a h1
-                font-family: Karla
-                font-weight: 700
-                text-transform: uppercase
-                color: black !important
-                margin: 0 0 0 5px !important
-                float: left
-                clear: left
-
-            #deetactions
-                float: right
-                height: 50px
-                line-height: 30px
-                padding: 0
-
-                .buttongroup
-                    text-align: right
-                    margin-right: 3px
-
-                    &::before
-                        display: block
-                        content: attr(data-action)
-                        width: 100%
-                        height: 13px
-                        font-size: 11px
-                        text-align: center
-                        border: none
-                        background-color: #eee
-                        font-family: 'Karla'
-                        font-weight: 700
-                        text-transform: uppercase
-                        line-height: 13px
-                        margin: 3px 0
-                        max-width: 150px
-
-                    button
-                        margin: 0
-                        padding: 0
-
-                    .zocial
-                        -webkit-transition-property: font-size, height, width
-                        &.icon
-                            -webkit-transition-property: font-size, height, width
-
-        #proposal-tabset
-
-            &.tabset
-                text-align: center
-
-                a
-                    &:link,
-                    &:visited,
-                    &:active
-                        text-decoration: none
-                        color: #e9e9e9
-
-                    &:hover
-                        color: white
-
-                    &.current-tab
-                        background-color: #e9e9e9
-                        color: #333
-
-                .tab-rounded
-                    border-top-left-radius: 3px
-                    border-top-right-radius: 3px
-
-                .tab-rounded,
-                .tab-link
-                    cursor: pointer
-                    margin-top: 5px
-                    font-family: "Karla"
-                    font-weight: 400
-                    text-transform: uppercase
-                    margin-right: 2%
-                    display: inline-block
-                    border: none !important
-                    background-color: #797977
-                    color: #ccc
-                    font-size: 18px
-                    line-height: 18px
-
-
-                .tab
-                    min-height: 350px
-                    bottom: 0
-                    text-align: left
-                    background-color: #e9e9e9
-                    opacity: 0
-
-
-
-
-
-
-.modal-button
-    width: 30%
-    margin: 5px
-    font-family: "Karla"
-    font-size: 11pt
-    text-transform: uppercase
-    color: #404044
-
-.modal-editable
-    text-transform: uppercase
-    position: relative
-    margin: 10px auto
-    padding: 5px
-    text-align: center
-    font:
-        family: "Karla", sans-serif
-        size: 15pt
-        weight: 700
-    color: #aaa
-    background-color: #fcfcfc
-    border: 1px solid #aaa
-    border-radius: 3px
-
-    &.alone
-        width: 45%
-        display: block
-
-    &:focus
-        color: #494949
-        border-color: #494949
-
-        &::before
-            color: #aaa
-
-    &::before
-        text-transform: lowercase
-        content: attr(data-ext)
-        color: #bcbcbc
-        position: absolute
-        right: 0
-
+#proposal-tabset
+    +tabset-shared
 
 #proposal-goal-editor,
 #proposal-goal-editor-modal-content,
 #proposal-tier-editor,
 #proposal-tier-editor-modal-content
-
-    font:
-        family: "Karla"
-
-    text-align: center
-    overflow-y: scroll
-
-    .goal,
-    .tier
-        -webkit-transition-property: opacity
-        margin: 2%
-        background-color: #ddd
-        padding-bottom: 10px
-
-        .amount,
-        .description
-            color: #666
-
-            &:hover,
-            &:focus
-                color: #222
-
-        .amount
-            display: block
-            width: 96%
-            margin: 0 auto
-            padding: 10px
-            background-color: #ccc
-            text-transform: uppercase
-            font:
-                size: 14pt
-                weight: 700
-
-        .description
-            background-color: #eee
-            margin: 10px
-            padding: 10px
-            border-radius: 10px
-            font:
-                size: 11pt
-                weight: 400
-
-        .goal-button,
-        .tier-button
-            -webkit-transition-property: background-color
-            padding: 4px
-            margin: 2px
-            font-family: "Karla"
-            font-size: 13px
-            font-weight: 700
-            text-transform: uppercase
-            border-radius: 5px
+    +goal-tier-editor-shared

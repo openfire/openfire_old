@@ -53,6 +53,16 @@ class User(AppModel):
     email = ndb.KeyProperty('em', indexed=True, repeated=True)
     avatar = ndb.KeyProperty('av')
     images = ndb.KeyProperty('im', repeated=True)
+    accounts = ndb.KeyProperty('ac', repeated=True, indexed=True)
+
+    def get_accounts(self):
+
+        ''' Get the user's attached social accounts. '''
+
+        if len(self.accounts) > 0:
+            return self.accounts
+        else:
+            return None
 
     def has_custom_url(self):
 
@@ -92,6 +102,8 @@ class User(AppModel):
                     return self.url_for('serve-asset-filename', asset_key=str(asset.blob), filename='.'.join(['profile', extension]), s=size)
                 else:
                     return self.url_for('serve-asset', asset_key=str(asset.blob))
+        else:
+            return 'gravatar'
         return False
 
 

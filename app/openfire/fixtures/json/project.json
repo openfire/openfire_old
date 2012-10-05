@@ -4,8 +4,8 @@
         "status": "o",
         "category_key": "category__transparency",
         "proposal_key": "proposal__fat cat map",
-        "summary": "ever wonder where your local congressman gets his money?",
-        "pitch": "cool fat pitch herr",
+        "summary": "ever wonder where your local congressman gets his money? that's the question fatcatmap seeks to answer, through the magic of data. all blah blah are logged, and can be analyzed via blabble. this produces cool visualizations like shmapple so you can blip your blap as an informed schmibble!",
+        "pitch": "an online, easy-to-use, objective political GPS for american politics",
         "tech": "Google App Engine, Amazon AWS, Layer9, AppTools",
         "keywords": ["transparency", "politics", "opendata", "visualization"],
         "creator_key": "user__sam",
@@ -96,6 +96,20 @@
         "keywords": ["conservation", "animals"],
         "creator_key": "user__ethan",
         "owners_keys": ["user__ethan"],
+        "public": true,
+        "viewers_keys": ["user__ethan", "user__pug"]
+    },
+    {
+        "name": "AppTools",
+        "proposal_key": "proposal__AppTools",
+        "status": "o",
+        "category_key": "category__technology",
+        "summary": "An app development framework that doesn't make you dependent.",
+        "pitch": "Raise money to create a framework for developers that hasn't suffered from the pressures of paying work!",
+        "tech": "Lots of Stuff",
+        "keywords": ["web", "technology", "programming"],
+        "creator_key": "user__sam",
+        "owners_keys": ["user__sam", "user__david"],
         "public": true,
         "viewers_keys": ["user__ethan", "user__pug"]
     }

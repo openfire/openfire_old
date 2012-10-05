@@ -111,7 +111,7 @@ class OFTestCase(unittest.TestCase):
         return responseDict
 
     def of_handler_test(self, url, desired_response_code=200, expect_response_content=True,
-                error='generic handler error', is_post=False, post_data=None):
+                error='generic handler error', is_post=False, post_data=None, cookie=''):
 
         ''' A generic success test for a given url.
 
@@ -119,6 +119,8 @@ class OFTestCase(unittest.TestCase):
         '''
 
         request = webapp2.Request.blank(url, POST=post_data)
+        if cookie:
+            request.headers['Cookie'] = cookie
         if is_post:
             request.method = 'POST'
         response = request.get_response(dispatch.gateway)
@@ -126,6 +128,23 @@ class OFTestCase(unittest.TestCase):
         if expect_response_content:
             self.assertTrue(len(response.body), error)
         return response
+
+    def get_login_cookie(self, username, password):
+
+        ''' Return the cookie that the server returns after a login. '''
+
+        login_post = {
+            'username': username,
+            'password': password,
+        }
+        request = webapp2.Request.blank('/login', POST=login_post)
+        request.method = 'POST'
+        response = request.get_response(dispatch.gateway)
+
+        home_request = webapp2.Request.blank('/')
+        home_request.headers['Cookie'] = response.headers['Set-Cookie']
+        home_response = home_request.get_response(dispatch.gateway)
+        return home_response.headers['Set-Cookie']
 
 
 class LoggedInTestCase(OFTestCase):

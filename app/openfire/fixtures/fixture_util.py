@@ -228,21 +228,26 @@ def create_category(slug='test', name='Test Category', description='some txt', k
 
 
 def create_goal(parent_key=None, contribution_type_id='fake', amount=1, description='DESCRIPTION',
-        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE', slug='SLUG'):
+        backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE',
+        slug='SLUG', funding_open=True, approved=True, rejected=False):
 
     ''' Create a new funding goal. If parent is None, do not put the object (for proposals).'''
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     goal = Goal(contribution_type=contribution_type, amount=amount, description=description,
             backer_count=backer_count, progress=progress, met=met, parent=parent_key,
-            deliverable_description=deliverable_description)
+            deliverable_description=deliverable_description, funding_open=funding_open,
+            approved=approved, rejected=rejected)
     parent_obj = None
     if parent_key:
         goal.parent = parent_key
         goal.put()
         parent_obj = parent_key.get()
         if parent_obj:
-            parent_obj.active_goal = goal.key
+            if met:
+                parent_obj.completed_goals.append(goal.key)
+            else:
+                parent_obj.active_goal = goal.key
             parent_obj.put()
     if tiers:
         tier_list = []
@@ -253,13 +258,15 @@ def create_goal(parent_key=None, contribution_type_id='fake', amount=1, descript
 
 
 def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amount=1,
-        description='DESCRIPTION', delivery="tomorrow", backer_count=0, backer_limit=100):
+        description='DESCRIPTION', delivery="tomorrow", backer_count=0, backer_limit=100,
+        next_step_votes=1):
 
     ''' Create a new contribution tier. If parent is None, do not put the object (for proposals).'''
 
     contribution_type = ndb.Key('ContributionType', contribution_type_id)
     tier = Tier(name=name, contribution_type=contribution_type, amount=amount, description=description,
-            delivery=delivery, backer_count=backer_count, backer_limit=backer_limit)
+            delivery=delivery, backer_count=backer_count, backer_limit=backer_limit,
+            next_step_votes=next_step_votes)
     parent_obj = None
     if parent_key:
         if hasattr(parent_key, 'key'):
@@ -267,7 +274,7 @@ def create_tier(parent_key=None, name='NAME', contribution_type_id='cash', amoun
         tier.parent = parent_key
         tier.put()
         parent_obj = parent_key.get()
-        if parent_obj:
+        if parent_obj and hasattr(parent_obj, 'tiers'):
             parent_obj.tiers.append(tier.key)
             parent_obj.put()
     return tier
@@ -313,7 +320,7 @@ def create_proposal(name='Test Proposal', status='s', public=True,
             summary='SUMMARY', pitch='PITCH', tech='TECH', keywords=['KEYWORDS'],
             category_key=ndb.Key('Category', 'test_category_key'),
             creator_key=ndb.Key('User', 'test_user_key'),
-            initial_goal=None, future_goal=None, tiers=[],
+            initial_goal=None, future_goal=None, initial_tiers=[], initial_next_steps=[],
             owners_keys=[], viewers_keys=[]):
 
     ''' Create a proposal. '''
@@ -325,12 +332,16 @@ def create_proposal(name='Test Proposal', status='s', public=True,
     if future_goal:
         future_goal_obj = create_future_goal(**future_goal)
     tier_list = []
-    for tier in tiers:
+    for tier in initial_tiers:
         tier_list.append(create_tier(**tier))
+    next_step_list = []
+    for next_step in initial_next_steps:
+        next_step_list.append(create_next_step(**next_step))
     return Proposal(name=name, status=status, public=public,
-                    summary=summary, pitch=pitch, tech=tech, keywords=keywords, tiers=tier_list,
+                    summary=summary, pitch=pitch, tech=tech, keywords=keywords, initial_tiers=tier_list,
                     category=category_key, creator=creator_key, initial_goal=initial_goal_obj,
-                    future_goal=future_goal_obj, viewers=viewers_keys, owners=owners_keys).put()
+                    future_goal=future_goal_obj, viewers=viewers_keys, owners=owners_keys,
+                    initial_next_steps=next_step_list).put()
 
 
 def create_project(name='Test Project', status='o', public=True, summary='SUMMARY', pitch='PITCH',
@@ -367,12 +378,13 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
     blob_key = None
     serving_url = url
     if blob_file:
-        # Upload the file to the blobstore.
-        try:
-            # Try to fetch the file from a url.
-            blob_key = fetch_url_to_blobstore(blob_file)
-        except:
-            pass
+        # Upload the file to the blobstore if not running tests.
+        if os.environ.get('RUNNING_TESTS', None) != 'TESTING':
+            try:
+                # Try to fetch the file from a url.
+                blob_key = fetch_url_to_blobstore(blob_file)
+            except:
+                pass
 
         if not blob_key:
             # Fall back to loading from a local copy.
@@ -396,7 +408,7 @@ def create_avatar(parent_key=None, url='', name='', mime='', pending=False, vers
     parent.put()
 
 
-def create_image(parent_key=None, url='', name='', mime='', pending=False,
+def create_image(parent_key=None, url='', name='', mime='', placement=None, pending=False,
             approved=True, blob_file=None, mime_type='image/png'):
 
     ''' Create an image and add it to a project. '''
@@ -427,7 +439,7 @@ def create_image(parent_key=None, url='', name='', mime='', pending=False,
     else:
         asset_key = Asset(url=serving_url, name=name, mime=mime, pending=pending, kind='i').put()
     image_key = Image(key=ndb.Key(Image, asset_key.urlsafe(), parent=parent_key),
-            url=serving_url, asset=asset_key, approved=approved).put()
+            url=serving_url, asset=asset_key, placement=placement, approved=approved).put()
     parent.images.append(image_key)
     parent.put()
 

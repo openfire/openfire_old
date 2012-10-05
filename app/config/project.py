@@ -36,7 +36,7 @@ config['apptools.project.output'] = {
 
     # Output Configuration
 
-    'minify': True,      # whether to minify page output or not
+    'minify': False,      # whether to minify page output or not
     'optimize': True,     # whether to use the async script loader or not
     'standalone': False,  # whether to render only the current template, or the whole context (ignores "extends")
 
@@ -48,6 +48,10 @@ config['apptools.project.output'] = {
             'dev': 'UA-31611943-3',         # used when running from the devserver
             'staging': 'UA-31611943-2',    # used on the staging version of the site
             'production': 'UA-31611943-1'  # used on the production version of the site
+        },
+        'sitespeed': {
+            'enable': True,           # enable google analytics' site speed tracking
+            'sample': 100            # set the sitespeed sample rate
         },
         'webclient':{
             'dev': 'https://ssl.google-analytics.com/u/ga_debug.js',

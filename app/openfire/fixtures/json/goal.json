@@ -4,6 +4,15 @@
         "parent_key": "project__fat cat map",
         "amount": 5000,
         "description": "We'll build a website to visualize contributions.",
+        "funding_open": true,
+        "deliverable_description": "A website that will visualize all money in politics. Built on apptools."
+    },
+    {
+        "slug": "apptools",
+        "parent_key": "project__AppTools",
+        "amount": 1000,
+        "description": "We'll clean up and release the library, and build a sweet documentation site for devs just like you!",
+        "funding_open": true,
         "deliverable_description": "A website that will visualize all money in politics. Built on apptools."
     },
     {
@@ -11,6 +20,7 @@
         "parent_key": "project__SeaSteading",
         "amount":  1000000,
         "description": "We'll buy a boat!",
+        "funding_open": true,
         "deliverable_description": "A boat to start this off."
     },
     {
@@ -18,6 +28,7 @@
         "parent_key": "project__urbsly",
         "amount":  1000000,
         "description": "We'll start shipping seeds to anyone who requests them!",
+        "funding_open": true,
         "deliverable_description": "A website to request seeds."
     },
     {
@@ -25,6 +36,7 @@
         "parent_key": "project__BlueSeed",
         "amount":  100000,
         "description": "We'll get a small boat.",
+        "funding_open": true,
         "deliverable_description": "A small boat with a desk and wifi.."
     },
     {
@@ -32,6 +44,7 @@
         "parent_key": "project__Carrotmob",
         "amount":  1000000,
         "description": "We'll buy a lot of carrots!",
+        "funding_open": true,
         "deliverable_description": "Carrots for everyone!"
     },
     {
@@ -39,6 +52,7 @@
         "parent_key": "project__Open Source Ecology",
         "amount":  1000000,
         "description": "We'll plant a whole lot of stuff!",
+        "funding_open": true,
         "deliverable_description": "Lots of tools for a small village."
     },
     {
@@ -46,6 +60,7 @@
         "parent_key": "project__Save the Everything",
         "amount":  5000,
         "description": "We'll start a website that can be a place to discuss how best to save certain species.",
+        "funding_open": true,
         "deliverable_description": "A website to get the discussion."
     }
 ]

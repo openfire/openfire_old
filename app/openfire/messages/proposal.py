@@ -1,5 +1,5 @@
 from protorpc import messages
-from openfire.messages.common import Goal, Tier
+from openfire.messages.common import Goal, Tier, FutureGoal, NextStep
 
 
 class Proposal(messages.Message):
@@ -10,14 +10,18 @@ class Proposal(messages.Message):
     name = messages.StringField(2)
     status = messages.StringField(3)
     category = messages.StringField(4)
-    summary = messages.StringField(5)
-    pitch = messages.StringField(6)
-    tech = messages.StringField(7)
-    keywords = messages.StringField(8, repeated=True)
-    creator = messages.StringField(9)
-    owners = messages.StringField(10, repeated=True)
-    goals = messages.MessageField(Goal, 11, repeated=True)
-    tiers = messages.MessageField(Tier, 12, repeated=True)
+    desired_url = messages.StringField(5)
+    summary = messages.StringField(6)
+    pitch = messages.StringField(7)
+    tech = messages.StringField(8)
+    team = messages.StringField(9)
+    keywords = messages.StringField(10, repeated=True)
+    creator = messages.StringField(11)
+    owners = messages.StringField(12, repeated=True)
+    initial_goal = messages.MessageField(Goal, 13)
+    initial_tiers = messages.MessageField(Tier, 14, repeated=True)
+    initial_next_steps = messages.MessageField(NextStep, 15, repeated=True)
+    future_goal = messages.MessageField(FutureGoal, 16)
 
 
 class Proposals(messages.Message):
@@ -32,26 +36,4 @@ class ProposalRequest(messages.Message):
     ''' Request proposal info by key. '''
 
     key = messages.StringField(1)
-
-
-class Promote(messages.Message):
-
-    ''' Promote a proposal to a project. '''
-
-    key = messages.StringField(1)
-
-
-class RejectProposal(messages.Message):
-
-    ''' Reject a proposal. '''
-
-    key = messages.StringField(1)
-    reason = messages.StringField(2)
-
-
-class SuspendProposal(messages.Message):
-
-    ''' Suspend a proposal. '''
-
-    key = messages.StringField(1)
-    reason = messages.StringField(2)
+    comment = messages.StringField(2)

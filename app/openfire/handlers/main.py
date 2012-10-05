@@ -16,6 +16,7 @@ from openfire.handlers.user import UserProfile
 from webapp2_extras.security import generate_random_string
 
 
+## Placeholder - landing page for pre-beta, with a simple name/email signup page for requesting a beta invite.
 class Placeholder(WebHandler):
 
     ''' openfire placeholder! '''
@@ -44,7 +45,7 @@ class Placeholder(WebHandler):
 
     def _make_services_object(self, services):
 
-        ''' Return only the beta signup method/service. '''
+        ''' Make an object describing services that should be exposed to the page. '''
 
         return [['beta', ['signup'], {'caching': False}]]
 
@@ -52,35 +53,45 @@ class Placeholder(WebHandler):
 
         ''' Return a rendered submission form. '''
 
-        self.force_hostname = "beta.openfi.re"
+        ## force HTTPS assets on beta.openfi.re
         self.force_https_assets = True
+        self.force_hostname = "beta.openfi.re"
 
+        ## pull URL args if we somehow got redirected here
         args = {
             'state': self.request.GET.get('st'),
             'reason': self.request.GET.get('r'),
             'exception': self.request.GET.get('xc')
         }
 
+        ## we also accept args from kwargs
         args.update(kwargs)
-
         if self.should_cache:
+
+            ## generate cache key
             cache_key = '::'.join(['of', 'pagecache', 'placeholder'] + [','.join([':'.join([str(k), str(v)]) for k, v in args.items() if v != None])])
             self.logging.info('Pagecache enabled. Looking for placeholder content in cache key "%s".' % cache_key)
 
             cached = self.api.memcache.get(cache_key)
-            if cached is None:
+            if cached is not None:
+                self.logging.info('Cached copy found. Returning cached page.')
+                return cached
+            else:
                 self.logging.info('No cached copy found. Rendering.')
-                rendered = self.render('main/placeholder.html', flags=args, csrf=base64.b64encode(hashlib.sha512(generate_random_string(32)).hexdigest()))
-                self.api.memcache.set(cache_key, rendered)
-                return rendered
-            self.logging.info('Cached copy found. Returning cached page.')
-        return cached
+
+        ## render with flags and new CSRF
+        rendered = self.render('main/placeholder.html', flags=args, csrf=base64.b64encode(hashlib.sha512(generate_random_string(32)).hexdigest()))
+
+        ## gotta set it if caching is enabled
+        if self.should_cache:
+            self.api.memcache.set(cache_key, rendered)
+
+        return rendered
+
 
     def post(self):
 
         ''' Handle a signup, when the JS mechanism for registering either fails or is not supported by the client. '''
-
-        #import pdb; pdb.set_trace()
 
         ## check for the appropriate action
         if self.request.POST.get('action', False) == 'of.beta.placeholder.registerSignup':
@@ -108,44 +119,35 @@ class Placeholder(WebHandler):
                 except BetaService.BetaServiceException, e:
 
                     ## render with specific error message
-                    # return self.redirect_to('landing', st='error', xc=e.__class__, ms=str(e))
-
                     self.logging.error('Encountered known BetaServiceException.')
                     self.logging.error('Exception class: "%s".' % str(e.__class__))
-                    self.logging.error('Exception str: "%s".' % str(e))
-                    self.logging.info('Rendering known error.')
                     return self.get(state='error', reason=str(e), exception=e.__class__)
 
                 except Exception, e:
 
-                    ## redirect to generic error message
-                    # return self.redirect_to('landing', st='error', r='generic')
-
+                    ## render with generic error message
                     self.logging.error('Encountered unknown exception.')
                     self.logging.error('Exception class: "%s".' % str(e.__class__))
-                    self.logging.error('Exception str: "%s".' % str(e))
-                    self.logging.info('Rendering generic error.')
                     return self.get(state='error', r='generic')
 
                 else:
 
-                    ## redirect to success
-                    # return self.redirect_to('landing', st='success')
+                    ## render with success
                     self.logging.info('Signup success! Rendering generic success.')
                     return self.get(state='success')
 
         ## render to generic error
-        # return self.redirect_to('landing', st='error', r='generic')
         self.logging.error('Unknown POST form action encountered: "%s". Rendering generic error. ' % self.request.POST.get('action'))
         return self.get(state='error', reason='generic')
 
 
+## Landing - prepare and serve openfire's landing page :)
 class Landing(WebHandler):
 
     ''' openfire landing page. '''
 
     template = 'main/landing.html'
-    projects_per_page = 6
+    projects_per_page = 8
     activity_per_page = 10
 
     def get(self):
@@ -193,6 +195,7 @@ class Landing(WebHandler):
 
                     # create the project context entry
                     projects[key.id()] = entity.to_dict()
+                    projects[key.id()]['key'] = entity.key
                     projects[key.id()]['model'] = entity
                     projects[key.id()]['slug'] = entity.get_custom_url()
 
@@ -293,15 +296,16 @@ class CustomUrlHandler(WebHandler):
 
         url_key = ndb.Key('CustomURL', customurl)
         url_object = url_key.get()
-        url_target = url_object.target.get()
         if not url_object:
             return self.error(404)  # Failed to find custom url
+        url_target = url_object.target.get()
         if not url_target:
             return self.error(404)  # Custom URL exists, but parent doesn't
 
         kind = url_object.target.kind()
         context = {}
         handler = None
+
         if kind not in ('Project', 'User'):
             return self.error(404)  # Invalid kind
 
@@ -319,6 +323,7 @@ class CustomUrlHandler(WebHandler):
 
         # Initialize the new handler with the current request and response.
         #handler.initialize(self.request, self.response)  # commented out by sam and moved to handler construction
+        handler.uagent = self.uagent
 
         # Copy over session, user, permissions
         handler.session = self.session

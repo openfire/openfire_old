@@ -13,6 +13,7 @@ logic / request handling stuff across your entire app, by putting it here.
 '''
 
 ## General Imports
+import os
 import config
 import hashlib
 
@@ -175,11 +176,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         # Initialize dynamic content API
         self._initialize_dynamic_content(self.app)
 
-        # Preload second
-        if self.should_preload:
-            self.preload()
-
-
     def preload(self):
 
         ''' Preloaded data and template support. '''
@@ -194,6 +190,10 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
     def dispatch(self):
 
         ''' Retrieve session + dispatch '''
+
+        # Preload second
+        if self.should_preload:
+            self.preload()
 
         if self.sessions:
             # Resolve user session
@@ -244,7 +244,7 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
         return ''.join([char for char in filter(lambda x: x is not None,
                 [''.join([i for i in reversed(formatted_number)]), '%'])])
 
-    def _format_as_currency(self, number, places=2, curr='', sep=',', dp='.', pos='', neg='-', trailneg=''):
+    def _format_as_currency(self, number, places=0, curr='', sep=',', dp='.', pos='', neg='-', trailneg=''):
 
         '''
         Format a number as currency. Using standard python 'moneyfmt' recipe for Decimals.
@@ -272,7 +272,8 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
             build(trailneg)
         for i in range(places):
             build(next() if digits else '0')
-        build(dp)
+        if len(result):
+            build(dp)
         if not digits:
             build('0')
         i = 0

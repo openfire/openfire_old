@@ -1,0 +1,11 @@
+[
+    {
+        "parent_key": "project__fat cat map",
+        "blob_file": "https://d2ipw8y1masjpy.cloudfront.net/static/branding/fatcatmap-square-400.jpg",
+        "url": "/assets/img/static/projects/largestock/fatcatmap-square-400.jpg",
+        "name": "fatcatmap-square-400.jpg",
+        "mime": "image/jpeg",
+        "placement": ["ogimage"],
+        "approved": true
+    }
+]

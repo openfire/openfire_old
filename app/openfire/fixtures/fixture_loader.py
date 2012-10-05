@@ -1,6 +1,7 @@
-import fixture_util as util
-import json
 import os
+import json
+import config
+import fixture_util as util
 
 
 # Model indexes.
@@ -18,22 +19,30 @@ FIXTURE_INDEXES = ['user', 'update', 'project', 'topic', 'category', 'activity']
 
     Order of these fixtures matter.
 '''
+
 FIXTURE_FILES = [
     # ( <json file>, <function used to save the object>, <unique field used for key relations> )
     ('topic', util.create_topic, 'slug'),
     ('user', util.create_user, 'username'),
     ('contribution_type', util.create_contribution_type, 'slug'),
     ('category', util.create_category, 'slug'),
-    ('proposal', util.create_proposal, 'name'),
-    ('project', util.create_project, 'name'),
-    ('goal', util.create_goal, 'slug'),
-    ('tier', util.create_tier, 'name'),
-    ('next_step', util.create_next_step, 'summary'),
-    ('future_goal', util.create_future_goal, 'summary'),
-    ('avatar', util.create_avatar, 'name'),
-    ('video', util.create_video, 'name'),
-    ('custom_url', util.create_custom_url, 'slug'),
+    ('custom_url_users', util.create_custom_url, 'slug'),
 ]
+
+if not config.config.get('openfire.fixtures', {}).get('production_only', True):
+    # These fixtures should not be run in production.
+    FIXTURE_FILES.extend([
+        ('proposal', util.create_proposal, 'name'),
+        ('project', util.create_project, 'name'),
+        ('goal', util.create_goal, 'slug'),
+        ('tier', util.create_tier, 'name'),
+        ('next_step', util.create_next_step, 'summary'),
+        ('future_goal', util.create_future_goal, 'summary'),
+        ('avatar', util.create_avatar, 'name'),
+        ('video', util.create_video, 'name'),
+        ('custom_url_projects', util.create_custom_url, 'slug'),
+        ('images', util.create_image, 'name')
+    ])
 
 def make_fixture_key(val, data):
 
@@ -77,6 +86,7 @@ def load_fixtures():
     loaded_data = {}
     for name, create_func, unique_slug in FIXTURE_FILES:
         filename = os.path.join(os.path.dirname(__file__), 'json', name + '.json')
+
         with open(filename) as fixture:
             fixture_data = json.loads(fixture.read())
 

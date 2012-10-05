@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import webapp2
+
 # Datastore Imports
 from google.appengine.ext import ndb
 from openfire.models import AppModel
 
 # Message Classes
 from openfire.messages import common
+from openfire.messages import updates
 from openfire.messages import project
 from openfire.messages import proposal
 
@@ -13,6 +16,8 @@ from openfire.models.assets import Avatar, Video
 
 # Pipeline Classes
 from openfire.pipelines.model import project as pipelines
+
+import datetime
 
 
 _default_contribution_type = ndb.Key('ContributionType', 'money')
@@ -53,6 +58,8 @@ class Goal(AppModel):
     slug = ndb.StringProperty('sl', indexed=True)
     target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
+    approved = ndb.BooleanProperty('aa', default=False)
+    rejected = ndb.BooleanProperty('rj', default=False)
 
     # Description and stats.
     description = ndb.TextProperty('d', indexed=False)
@@ -67,10 +74,17 @@ class Goal(AppModel):
     amount_pledged = ndb.FloatProperty('ar', indexed=True, default=0.0)
     amount_processed = ndb.FloatProperty('ap', indexed=True, default=0.0)
 
-    # Funding and deliverable deadlines.
-    funding_deadline = ndb.DateTimeProperty('fd', indexed=True)
+    # Funding status, limits, and exact times.
+    funding_open = ndb.BooleanProperty('fo', indexed=True, default=False)
+    funding_day_limit = ndb.IntegerProperty('fl', indexed=True, choices=range(7, 101))
+    funding_deadline = ndb.DateTimeProperty('fd', indexed=True, required=False)
+    funding_start = ndb.DateTimeProperty('fs', indexed=True, required=False)
+    funding_end = ndb.DateTimeProperty('fe', indexed=True, required=False)
+
+    # Deliverable and deadline.
     deliverable_description = ndb.TextProperty('ds', indexed=True)
     deliverable_date = ndb.DateTimeProperty('dt', indexed=True)
+    deliverable_complete = ndb.BooleanProperty('dc', indexed=True, default=False)
 
     # Donation tiers for this goal and potential next steps.
     tiers = ndb.KeyProperty('tr', repeated=True)
@@ -80,6 +94,27 @@ class Goal(AppModel):
     igniting_payments = ndb.KeyProperty('ip', repeated=True)
     extra_payments = ndb.KeyProperty('ep', repeated=True)
     successful_payments = ndb.KeyProperty('sp', repeated=True)
+
+    def open_goal(self):
+
+        ''' Set the funding start to now and set the funding deadline
+        to funding limit days from now, then open the goal.
+        '''
+
+        now = datetime.datetime.now()
+        self.funding_start = now
+        self.funding_deadline = now + datetime.timedelta(days=self.funding_day_limit)
+        self.funding_open = True
+        self.put()
+
+    def close_goal(self):
+
+        ''' Set the goal to closed and note the time. '''
+
+        now = datetime.datetime.now()
+        self.funding_end = now
+        self.funding_open = False
+        self.put()
 
 
 ## Goal Next Step
@@ -137,15 +172,26 @@ class Proposal(AppModel):
     _message_class = proposal.Proposal
     _pipeline_class = pipelines.ProposalPipeline
 
+    _status_choices = {
+        'f': 'Draft',
+        's': 'Submitted',
+        'r': 'Review',
+        'd': 'Denied',
+        'a': 'Accepted',
+        'p': 'Suspended',
+    }
+
     # Naming/Status
     name = ndb.StringProperty('n', indexed=True, required=True)
-    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a'])  # draft, submitted, review, denied, accepted
+    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a', 'p'], default='f')  # draft, submitted, review, denied, accepted, suspended
     category = ndb.KeyProperty('ct', indexed=True, required=True)
+    desired_url = ndb.StringProperty('u', indexed=True, required=False)
 
     # Content
     summary = ndb.StringProperty('m', indexed=True)
     pitch = ndb.TextProperty('p', indexed=False)
     tech = ndb.TextProperty('t', indexed=False)
+    team = ndb.TextProperty('te', indexed=False)
     keywords = ndb.StringProperty('k', indexed=True, repeated=True)
 
     # Users
@@ -158,7 +204,8 @@ class Proposal(AppModel):
 
     # Goals + Tiers
     initial_goal = ndb.LocalStructuredProperty(Goal, 'ig', compressed=True)
-    tiers = ndb.LocalStructuredProperty(Tier, 'ts', compressed=True, repeated=True)
+    initial_tiers = ndb.LocalStructuredProperty(Tier, 'ts', compressed=True, repeated=True)
+    initial_next_steps = ndb.LocalStructuredProperty(NextStep, 'ns', compressed=True, repeated=True)
     future_goal = ndb.LocalStructuredProperty(FutureGoal, 'fg', compressed=True)
 
     # Avatar + Video
@@ -174,9 +221,18 @@ class Project(AppModel):
     _message_class = project.Project
     _pipeline_class = pipelines.ProjectPipeline
 
+    _status_choices = {
+        'p': 'Private',
+        'f': 'Featured',
+        'o': 'Open',
+        'c': 'Closed',
+        'x': 'Canceled',
+        's': 'Suspended',
+    }
+
     # Naming/Status/Ancestry
     name = ndb.StringProperty('n', indexed=True, required=True)
-    status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c'])  # private, featured, open, closed
+    status = ndb.StringProperty('st', indexed=True, choices=['p', 'f', 'o', 'c', 'x', 's'], default='p')  # private, featured, open, closed, canceled, suspended
     proposal = ndb.KeyProperty('pr', indexed=True, required=True)
     category = ndb.KeyProperty('ct', indexed=True, required=True)
     customurl = ndb.KeyProperty('url', indexed=True, default=None)
@@ -220,7 +276,7 @@ class Project(AppModel):
     def get_custom_url(self):
         if self.customurl:
             return self.customurl.id()
-        return None
+        return self.key.urlsafe()
 
 
 ######## ======== Project Submodels ======== ########
@@ -244,7 +300,7 @@ class Update(AppModel):
 
     ''' Describes an update posted by project admins. '''
 
-    _message_class = common.Post
+    _message_class = updates.Update
     _pipeline_class = pipelines.UpdatePipeline
 
     project = ndb.KeyProperty('p', indexed=True, required=True)

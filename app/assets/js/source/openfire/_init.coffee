@@ -148,10 +148,21 @@ class Openfire
                     return ctrlr
 
 
-            go: () =>
+            go: (window) =>
                 # oh snap it's go time
                 window.apptools?.dev?.verbose 'Openfire', 'Openfire systems go.'
                 @sys.state.status = 'READY'
+                if window.__clock?
+                   window.__clock.clockpoint('JavaScript', 'Platform Ready', window.__clock.ts[0], 'openfire', 100)
+
+	                $.apptools.events.hook 'RPC_FULFILL', (directive) =>
+	                    directive.firetime = window.__clock.pn()
+
+	                $.apptools.events.hook 'RPC_SUCCESS', (directive) =>
+                        directive.finishtime = window.__clock.pn()
+                        directive.runtime = (Math.floor(directive.finishtime) - Math.floor(directive.firetime))
+                        window.__clock.clockpoint("JavaScript", "AppTools RPC", directive.firetime, [directive.request.api, directive.request.method].join('.'), 100)
+
                 return @
 
         # consider preinit
@@ -170,7 +181,7 @@ class Openfire
                 $.apptools.api.internals.config.headers[@sys.config.session.header] = document.cookie
 
         # trigger system ready
-        return @sys.go()
+        return @sys.go(window)
 
 # bind openfire to window
 window.Openfire = Openfire

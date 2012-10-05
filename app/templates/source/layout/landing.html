@@ -33,7 +33,7 @@
                     {% for project in projects %}
                         <!-- project card for {{ project.slug }} -->
                         <div class='project-card' data-project='{{ project.slug }}'>
-                            <a href="{{ link('custom_url', customurl=project.slug) }}">
+                            <a href="{% if project.slug %}{{ link('custom_url', customurl=project.slug) }}{% else %}{{ link('project/home', key=project['key'].urlsafe()) }}{% endif %}">
                                 <div class='project-icon' data-name='{{ project.name }}' data-description='{{ project.summary }}'>
                                     {% if project.avatar %}
                                         {% if project.avatar.location %}
@@ -48,7 +48,7 @@
                                     {% endif %}
                                 </div>
                             </a>
-                            <div class='project-progress' style='width: {{ util.random.randint(1, 100) }}%'>
+                            <div class='project-progress' style='width: {{ project.progress if project.progress < 100 else 100 }}%'>
                             </div>
                         </div> <!-- end project card for {{ project.slug }} -->
                     {% endfor %}
@@ -102,7 +102,7 @@
 
      </div><!-- #content -->
 
-<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options='{"ratio":{"x":0.7,"y":0.7}}'>
+<div class="pre-modal" id="how-it-works" data-title="How it works!" data-options="{&quot;ratio&quot;:{&quot;x&quot;:0.7,&quot;y&quot;:0.7}}">
     <h1>Welcome to openfire!</h1>
     <p>Hello early <a href="http://openfi.re">openfi.re</a> user!</p>
 

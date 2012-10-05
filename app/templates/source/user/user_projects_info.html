@@ -1,0 +1,76 @@
+<span class="project-accounts-title">Your Project Payment Accounts</span>
+
+<div class="user-wepay-account">
+{% if not wepay_account %}
+    <span class="link-wepay-info-txt">To collect payments for an account yourself you must link a new or existing WePay account to openfire. The button below will generate a link to the WePay site where you can link an account now. You will be redirected back to openfire once you are finished.</span>
+    <button id="link-wepay-account-btn" type="button">Link or Create a WePay Account</button>
+    <div id="link-wepay-account-inline" style="display: none;">
+        <span><a href="" id="link-wepay-account-link">Click here to link a WePay account to openfire.</a></span>
+    </div>
+{% else %}
+    <div>
+        <span>You have linked your WePay account with openfire.</span>
+    </div>
+{% endif %}
+</div>
+
+<div class="user-owned-projects">
+{% if owned_projects %}
+    <span class="owned-projects-title">Projects You Own</span>
+    {% for project_key, project_dict in owned_projects.iteritems() %}
+        <span class="owned-project-name"><a href="/{{ project_dict['project'].get_custom_url() }}">{{ project_dict['project'].name }}</a></span>
+        <span class="owned-project-status">({{ project_dict['project'].status | project_status }})</span>
+        {% if project_dict['account'] %}
+            <div class="wepay-project-account">
+                <span class="wepay-account-name">{{ project_dict['account'].name }}</span>
+                <span class="wepay-account-balance">{{ project_dict['account'].balance | currency }}</span>
+                <button class="wepay-update-account-balance-btn" id="update-account-balance-{{ project_dict['account'].key.urlsafe() }}" class="update-account-balance">update</button>
+                <button class="wepay-start-withdrawal-btn" id="start-withdrawal-{{ project_dict['account'].key.urlsafe() }}" class="start-withdrawal">withdraw</button>
+                <span><a href="" id="withdrawal-url-{{ project_dict['account'].key.urlsafe() }}" target="_blank" style="display: none;">Click Here to Start Your Withdrawal</a></span>
+
+
+                <a id="a-project-payment-history-dialog-{{ project_key }}" href="#project-payment-history-dialog-{{ project_key }}">View payment history for {{ project_dict['project'].name }}</a>
+                <div id="project-payment-history-dialog-{{ project_key }}" class="pre-modal project-payment-history" style="opacity: 0;">
+                    <h4>{{ project_dict['account'].name }} payment history</h4>
+                    {% if project_dict['history'] %}
+                    <table class="project-payment-history-table payment-table" width="75%">
+                        <thead>
+                            <th>From User</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </thead>
+                        <tbody>
+                            {% for payment in project_dict['history'] %}
+                            <tr>
+                                <td>{{ payment.from_user }}</td>
+                                <td>{{ currency(payment.amount) }}</td>
+                                <td>{{ payment.status | payment_status }}</td>
+                                <td>
+                                    <button id="{{ payment.key.urlsafe() }}" class="cancel-payment">Cancel</button>
+                                    <button id="{{ payment.key.urlsafe() }}" class="refund-payment">Refund</button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td>No payments.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <span class="no-project-payment-history">No Payments</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="no-project-account">
+                <span class="info-txt">There is no collection account set up for this project. You may set one up now.</span>
+                <button class="create-account-for-project" id="{{ project_key }}" type="button">Create account for {{ project_dict['project'].name }}</button>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="no-owned-projects">You do not own any projects (yet).</span>
+{% endif %}
+</div>

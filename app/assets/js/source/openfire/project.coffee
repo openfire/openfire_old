@@ -224,121 +224,51 @@ class ProjectController extends OpenfireController
 
             process_goal: (goal) =>
 
-                index = if goal.key? then @get_attached('goal', goal.key, true) else 'new'
+                template = window.GoalEditor ||= new Template('{{+TierEditModal}}', true, 'GoalEditor')
+                ctx = _.extend({type: 'goal'}, goal)
+                ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
-                amount = _.create_element_string('h3',
-                    id: 'goal-amount-' + index
-                    class: 'goal-field amount'
-                    contenteditable: true
-                , goal.amount)
+                btnctx =
+                    attributes:
+                        'data-index': '{{=index}}'
 
-                description = _.create_element_string('p',
-                    id: 'goal-description-' + index
-                    class: 'rounded goal-field description'
-                    contenteditable: true
-                , if goal.description? then goal.description else 'default description')
-
-                if index isnt 'new'
-
-                    save_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'save'
-                        class: 'goal-button save'
-                    , 'save goal')
-
-                    reset_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'reset'
-                        class: 'goal-button reset'
-                    , 'reset goal')
-
-                    delete_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'delete'
-                        class: 'goal-button delete'
-                    , 'delete goal')
-
-                    buttons = [save_goal, reset_goal, delete_goal].join('&nbsp;')
-
+                if !!ctx.new
+                    axns = ['add']
                 else
-                    add_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'add'
-                        class: 'goal-button add'
-                    , 'add goal')
+                    axns = ['save', 'reset', 'delete']
 
-                    buttons = [add_goal]
+                ctx.buttons = [(_.extend(true, btnctx,
+                    attributes:
+                        'data-action': axn
+                        class: '{{=type}}-button '+axn
+                    content: axn + ' {{=type]}}'
+                )) for axn in axns]
 
-                content = [amount, description, buttons].join('')
-
-                goal_wrapper = _.create_element_string('div',
-                    id: 'goal-editing-' + index
-                    class: 'goal'
-                , content)
-
-                return goal_wrapper
+                return template(ctx)
 
             process_tier: (tier) =>
 
-                index = if tier.key? then @get_attached('tier', tier.key, true) else 'new'
+                template = window.TierEditor ||= new Template('{{+TierEditModal}}', true, 'TierEditor')
+                ctx = _.extend({type: 'tier'}, tier)
+                ctx.index = if tier.key? then @get_attached('tier', tier.key, true) else (ctx.new = true; 'new')
 
-                name = _.create_element_string('h3',
-                    id: 'tier-name' + index
-                    class: 'tier-field name'
-                    contenteditable: true
-                , if tier.name? then tier.name else 'tier name')
+                btnctx =
+                    attributes:
+                        'data-index': '{{=index}}'
 
-                amount = _.create_element_string('h3',
-                    id: 'tier-amount-' + index
-                    class: 'tier-field amount'
-                    contenteditable: true
-                , if tier.amount? then tier.amount else '$0.02')
-
-                description = _.create_element_string('p',
-                    id: 'tier-description-' + index
-                    class: 'rounded tier-field description'
-                    contenteditable: true
-                , if tier.description? then tier.description else 'default description')
-
-                if index isnt 'new'
-
-                    save_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'save'
-                        class: 'tier-button save'
-                    , 'save tier')
-
-                    reset_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'reset'
-                        class: 'tier-button reset'
-                    , 'reset tier')
-
-                    delete_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'delete'
-                        class: 'tier-button delete'
-                    , 'delete tier')
-
-                    buttons = [save_tier, reset_tier, delete_tier].join('&nbsp;')
-
+                if !!ctx.new
+                    axns = ['add']
                 else
-                    add_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'add'
-                        class: 'tier-button add'
-                    , 'add tier')
+                    axns = ['save', 'reset', 'delete']
 
-                    buttons = [add_tier]
+                ctx.buttons = [(_.extend(true, btnctx,
+                    attributes:
+                        'data-action': axn
+                        class: '{{=type}}-button '+axn
+                    content: axn + ' {{=type]}}'
+                )) for axn in axns]
 
-                content = [name, amount, description, buttons].join('')
-
-                tier_wrapper = _.create_element_string('div',
-                    id: 'tier-editing-' + index
-                    class: 'tier'
-                , content)
-
-                return tier_wrapper
+                return template(ctx)
 
             prep_dropped_modal_html: (name, ext) =>
                 # takes filename, returns [premodal_element, trigger_element]
@@ -705,13 +635,90 @@ class ProjectController extends OpenfireController
         @close_back_dialog = () =>
             $.apptools.widgets.modal.get("back-project-dialog").close()
 
+        @change_backing_tier = () ->
+            rads = document.getElementsByName("tier")
+            value = ""
+            for rad in rads
+                if rad.checked
+                    value = rad.value
+                    # TODO: Use this value to populate number of votes and amount.
+                    break
+
+        @vote_plus_clicked = () ->
+            # TODO: Increase input here.
+
+        @vote_minus_clicked = () ->
+            # TODO: Decread input here.
+
+        @detect_cc_type = () ->
+            val = @.value
+            type = ""
+            if /^4/.test(val)
+                type = "Visa"
+            if /^(34|37)/.test(val)
+                type = "American Express"
+            if /^5[1-5]/.test(val)
+                type = "MasterCard"
+            if /^6011/.test(val)
+                type = "Discover"
+            document.getElementById("back-project-cc-type-display").innerHTML = type
+            return false
+
+        @choose_donation_tier = () ->
+            # Set the number of next step votes.
+            document.getElementById('back-project-remaining-votes').value = this.parentNode.find('num-votes').innerHTML
+            document.getElementById('back-project-amount-input').value = parseInt(this.parentNode.find('dollar-amount').innerHTML)
+
+        @next_step_vote_plus = () ->
+            # Increment the nearest votes input and decrement the overall votes count.
+            increment = this.parentNode.find('back-project-next-step-input')
+            decrement = document.getElementById('back-project-remaining-votes')
+
+            remaining = parseInt(decrement.value)
+            if remaining > 0
+                increment.value = parseInt(increment.value) + 1
+                decrement.value = remaining - 1
+
+        @next_step_vote_minus = () ->
+            # Decrement the nearest votes input and increment the overall votes count.
+            decrement = this.parentNode.find('back-project-next-step-input')
+            increment = document.getElementById('back-project-remaining-votes')
+
+            remaining = parseInt(decrement.value)
+            if remaining > 0
+                increment.value = parseInt(increment.value) + 1
+                decrement.value = remaining - 1
+
+        @select_money_source = () ->
+            # If a previous money source was selected, clear and disable the new cc form.
+            for el in document.getElementById('use-new-cc').find('input')
+                if this.value
+                    el.value = ''
+                    el.disabled = true
+                else
+                    el.disabled = false
+
         @submit_payment = () =>
             # Simple way to submit a back project request with a new credit card for now.
+            votes = []
+            for el in document.getElementsByClassName("back-project-next-step-input")
+                votes.push
+                    key: el.id
+                    num_votes: parseInt(el.value)
+
+            tier = ""
+            rads = document.getElementsByName("tier")
+            for rad in rads
+                if rad.checked
+                    tier = rad.value
+                    break
+
             params =
                 user: null # TODO: Get user so that we can double check with the session? Should we do that?
                 project: @project_key
-                tier: document.getElementById("back-project-tier-input").value
+                tier: tier
                 amount: document.getElementById("back-project-amount-input").value
+                next_step_votes: votes
                 money_source: document.getElementById("back-project-money-source-input").value
                 new_cc:
                     cc_num: document.getElementById("back-project-cc-num-input").value
@@ -732,10 +739,12 @@ class ProjectController extends OpenfireController
             $.apptools.api.payment.back_project(params).fulfill
                 success: (response) =>
                     alert("Success! " + response.message)
+                    $.apptools.widgets.modal.get("back-project-dialog").close()
                     document.getElementById('back-text').innerHTML = 'you rock.'
                     document.getElementById('back').classList.add('backed')
-                failure: (error) =>
-                    alert("Failure! " + error.message)
+                failure: (error, status, xhr) =>
+                    msg = error.error_message
+                    $("#donate-wizard").smartWizard("showMessage", msg)
 
 
         @back = () =>
@@ -748,6 +757,8 @@ class ProjectController extends OpenfireController
                     if response.sources and response.sources.length
                         for source in response.sources
                             options += "<option value='" + source.key + "'>" + source.description + "</option>"
+                    else
+                        options = "<option value=''>No saved payment accounts</option>"
                     selector.innerHTML = options
                     $.apptools.widgets.modal.get("back-project-dialog").open()
                 failure: (error) =>
@@ -1593,7 +1604,7 @@ class ProjectController extends OpenfireController
 
         @_init = () =>
 
-            if window._cp
+            if window._cp and _.get('#project')?
 
                 # setup project method proxies
                 ((m) =>
@@ -1606,8 +1617,16 @@ class ProjectController extends OpenfireController
                 document.getElementById('back').addEventListener('click', @back, false)
 
                 # Event listeners in the back project dialog.
-                document.getElementById('submit-back-project').addEventListener('click', @submit_payment, false)
-                document.getElementById('cancel-back-project').addEventListener('click', @close_back_dialog, false)
+                for el in document.getElementsByClassName('vote-plus')
+                    el.addEventListener('click', @next_step_vote_plus, false)
+                for el in document.getElementsByClassName('vote-minus')
+                    el.addEventListener('click', @next_step_vote_minus, false)
+                for el in document.getElementById('donate-step-1').find('input')
+                    el.addEventListener('click', @choose_donation_tier, false)
+                document.getElementById('back-project-money-source-input').addEventListener('change', @select_money_source)
+                _.ready () =>
+                    $("#donate-wizard").smartWizard
+                        onFinish: @submit_payment
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)

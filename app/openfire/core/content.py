@@ -35,6 +35,8 @@ from google.appengine.ext import blobstore
 
 ## Openfire Imports
 from openfire.models import content as models
+from openfire.models import project as project_models
+from openfire.models import payment as payment_models
 
 
 ## == Globals == ##
@@ -821,8 +823,14 @@ class ContentBridge(object):
             # hook up filters
             filters = {
                 'currency': lambda x: self._format_as_currency(x, False),
-                'percentage': lambda x: self._format_as_currency(x, True),
-                'json': self.AppToolsJSONEncoder().encode
+                'percentage': lambda x: self._format_as_percentage(x, True),
+                'json': self.AppToolsJSONEncoder().encode,
+
+                # DB choice converters.
+                'proposal_status': lambda x: project_models.Proposal._status_choices.get(x, ''),
+                'project_status': lambda x: project_models.Project._status_choices.get(x, ''),
+                'payment_status': lambda x: payment_models.Payment._status_choices.get(x, ''),
+                'transaction_status': lambda x: payment_models.Transaction._status_choices.get(x, ''),
             }
 
             # generate environment

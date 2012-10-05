@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from openfire.handlers import WebHandler
 from openfire.models.user import User
 from openfire.models.payment import Payment, MoneySource, WePayUserPaymentAccount, WePayProjectAccount
-from openfire.models.project import Project
+from openfire.models.project import Project, Proposal
 
 
 class UserLanding(WebHandler):
@@ -178,11 +178,12 @@ class UserAccount(WebHandler):
 
         wepay_account = None
         wepay_accounts = WePayUserPaymentAccount.query(WePayUserPaymentAccount.user == self.user.key).fetch()
-        owned_projects = Project.query(Project.owners == self.user.key).fetch()
+        project_query = Project.query(Project.owners == self.user.key).fetch()
+        proposals = Proposal.query(ndb.OR(Proposal.owners == self.user.key, Proposal.viewers == self.user.key)).fetch()
 
-        project_accounts = {}
-        for project in owned_projects:
-            project_accounts[project.key.urlsafe()] = {
+        owned_projects = {}
+        for project in project_query:
+            owned_projects[project.key.urlsafe()] = {
                 'project': project,
                 'account': None,
                 'history': [],
@@ -193,22 +194,23 @@ class UserAccount(WebHandler):
             wepay_account = wepay_accounts[0]
             payment_account_query = WePayProjectAccount.query(
                 WePayProjectAccount.payment_account.IN([a.key for a in wepay_accounts]),
-                WePayProjectAccount.project.IN([p.key for p in owned_projects]),
+                WePayProjectAccount.project.IN([p.key for p in project_query]),
             )
             for account in payment_account_query.fetch():
                 history = Payment.query(Payment.to_account == account.key).fetch()
-                project_accounts[account.project.urlsafe()]['account'] = account
-                project_accounts[account.project.urlsafe()]['history'] = history
+                owned_projects[account.project.urlsafe()]['account'] = account
+                owned_projects[account.project.urlsafe()]['history'] = history
 
-        payments = Payment.query(Payment.from_user == self.user.key).fetch()
+        payment_history = Payment.query(Payment.from_user == self.user.key).fetch()
         money_sources = MoneySource.query(MoneySource.owner == self.user.key, MoneySource.save_for_reuse == True).fetch()
 
         context = {
             'user': self.user,
             'wepay_account': wepay_account,
-            'project_accounts': project_accounts,
+            'owned_projects': owned_projects,
             'money_sources': money_sources,
-            'payments': payments,
+            'payment_history': payment_history,
+            'proposals': proposals,
         }
 
         self.render('user/account.html', **context)
