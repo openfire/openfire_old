@@ -14,6 +14,29 @@
     color: black
     overflow-y: auto
 
+  .modal-title,
+  .modal-close
+    font:
+      family: 'Karla', sans-serif
+      size: 13px
+      weight: 700
+    line-height: 12px
+    text-transform: uppercase
+    cursor: pointer
+
+  .modal-close
+    color: #393939
+    right: 5px
+    top: 5px
+    padding: 3px
+    border-radius: 2px
+    opacity: 0.5
+
+    &:hover
+      cursor: pointer
+      background-color: #e3e3ee
+      opacity: 1
+
   .modal-ui
     left: 0
     bottom: 0
@@ -23,16 +46,6 @@
     border-bottom-right-radius: 7px
     border-bottom-left-radius: 7px
 
-    .modal-title,
-    .modal-close
-      font:
-        family: 'Karla', sans-serif
-        size: 13px
-        weight: 700
-      line-height: 12px
-      text-transform: uppercase
-      cursor: pointer
-
     .modal-title
       color: #5e5e5e
       max-width: 400px
@@ -40,18 +53,6 @@
       bottom: 3px
       padding: 3px
 
-    .modal-close
-      color: #393939
-      right: 5px
-      bottom: 3px
-      padding: 3px
-      border-radius: 2px
-      opacity: 0.5
-
-      &:hover
-        cursor: pointer
-        background-color: #e3e3ee
-        opacity: 1
 
 
 // accordion
@@ -90,14 +91,37 @@
 
   &:hover,
   &:focus
-    background-color: #F7F694
+
+    &::before
+      color: rgba(0,0,0,0.3)
+      content: "double click to edit"
+
 
   &:focus
     cursor: text
 
+  &::before
+    cursor: pointer
+    display: block
+    content: "edit"
+    color: rgba(0,0,0,0.15)
+    font:
+      family: "Karla"
+      size: 10px
+      weight: 700
+    text-transform: uppercase
+
+  &.editing::before
+    color: rgba(0,0,0,0.5)
+    content: "editing . . . double click to save"
+
+  &.saving::before
+    color: rgba(0,0,0,0.3)
+    content: "saving . . ."
+
 .editor
   -webkit-transition-property: top, opacity
-  -webkit-transition-duration: 300
+  -webkit-transition-duration: 175
   opacity: 0
   z-index: 1
   width: auto
