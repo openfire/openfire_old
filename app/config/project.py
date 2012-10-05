@@ -74,7 +74,7 @@ config['apptools.project.output'] = {
     'headers': {  # Default Headers (only supported headers are shown)
         'Cache-Control': 'private,max-age=3600',  # default to not caching dynamic content
         'X-UA-Compatible': 'IE=edge,chrome=1',  # http://code.google.com/chrome/chromeframe/
-        'Access-Control-Allow-Origin': 'https://beta.openfi.re https://staging.openfi.re https://openfi.re'  # allow crossdomain access from anywhere
+        'Access-Control-Allow-Origin': 'https://staging.openfi.re https://beta.openfi.re https://m.openfi.re https://www.openfi.re https://openfi.re'  # allow crossdomain access from anywhere
     }
 
 }

@@ -73,7 +73,7 @@ config['apptools.project.services'] = {
 
         ## Alerts API - used for managing subscriptions on site items
         'alerts': {
-            'enabled': True,
+            'enabled': False,
             'service': 'openfire.services.alerts.AlertsService',
             'methods': ['subscribe', 'unsubscribe', 'edit', 'subscriptions', 'pending', 'all'],
 
@@ -157,7 +157,7 @@ config['apptools.project.services'] = {
 
             'config': {
                 'caching': 'none',
-                'security': 'private',
+                'security': 'none',
                 'recording': 'none'
             }
         },
