@@ -1587,7 +1587,7 @@ class ProposalController extends OpenfireController
                 #document.getElementById('share').addEventListener('click', @share, false)
                 #document.getElementById('back').addEventListener('click', @back, false)
 
-                if @_state.o
+                if @_state.o and /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
 
                     # BBQ Actions

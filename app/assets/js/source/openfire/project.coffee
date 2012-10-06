@@ -1644,7 +1644,7 @@ class ProjectController extends OpenfireController
                     $("#donate-wizard").smartWizard
                         onFinish: @submit_payment
 
-                if @_state.o
+                if @_state.o and not /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
 
                     # Project Owner Actions
