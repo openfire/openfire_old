@@ -169,7 +169,7 @@ class ProjectController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        if not /proposal/.test(window.location.href)
+        if @_state.ke and not /proposal/.test(window.location.href)
             @project = new Project(@_state.ke)
             @project.get()
             @project_key = @project.key
