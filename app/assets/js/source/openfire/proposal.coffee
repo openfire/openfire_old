@@ -8,35 +8,6 @@ class ProposalVideo extends Asset
 class ProposalAvatar extends Asset
 
 
-# proposal object classes
-
-class Goal extends Model
-
-    model:
-        key: String()
-        target: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        backer_count: Number()
-        progress: Number()
-        met: Boolean()
-
-
-class Tier extends Model
-
-    model:
-        key: String()
-        target: String()
-        name: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        delivery: String()
-        backer_count: Number()
-        backer_limit: Number()
-
-
 # base proposal class
 class Proposal extends Model
 
@@ -60,6 +31,8 @@ class Proposal extends Model
     constructor: () ->
 
         super
+
+        @log = () => return console.log.apply(console, arguments)
 
         @stashes = {}
         @internal =
@@ -164,16 +137,6 @@ class Proposal extends Model
                     alert 'proposal get() failure'
 
 
-
-# base proposal object
-class Proposal extends Model
-
-    model: null
-
-    constructor: (@key) ->
-        return @
-
-
 # proposal controller
 class ProposalController extends OpenfireController
 
@@ -198,10 +161,12 @@ class ProposalController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        @proposal = new Proposal(@_state.ke)
-        @proposal_key = @proposal.key
+        if /proposal/.test(window.location.href)
+            @proposal = new Proposal(@_state.ke)
+            @proposal.get()
+            @proposal_key = @proposal.key
 
-        @log = (message) => return @constructor::log(@constructor.name, message)
+        @log = () => return console.log.apply(console, arguments)
 
         @internal =
 
@@ -1563,6 +1528,51 @@ class ProposalController extends OpenfireController
                 , sync
 
 
+        @bbq_promote = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.promote(key: @proposal_key).fulfill
+                success: () ->
+                    alert("This project has been promoted to a project. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @bbq_reject = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.reject(key: @proposal_key).fulfill
+                success: () ->
+                    alert("This proposal has been rejected. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @submit = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.submit(key: @project_key).fulfill
+                success: () ->
+                    alert("You have submitted your proposal. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @add_viewers = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            alert("Coming soon.")
+
+        @add_team_member = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            alert("Coming soon.")
+
         @_init = () =>
 
             if window._cp
@@ -1573,14 +1583,25 @@ class ProposalController extends OpenfireController
                 )(method) for method in @constructor::method_proxies
 
                 # event listeners
-                document.getElementById('follow').addEventListener('click', @follow, false)
-                document.getElementById('share').addEventListener('click', @share, false)
-                document.getElementById('back').addEventListener('click', @back, false)
+                #document.getElementById('follow').addEventListener('click', @follow, false)
+                #document.getElementById('share').addEventListener('click', @share, false)
+                #document.getElementById('back').addEventListener('click', @back, false)
 
-                if @_state.o
+                if @_state.o and /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
-                    document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
+
+                    # BBQ Actions
+                    document.getElementById('bbq-promote').addEventListener('click', @bbq_promote, false)
+                    document.getElementById('bbq-reject').addEventListener('click', @bbq_reject, false)
+
+                    # Proposal Owner Actions
+                    #document.getElementById('promote-goal').addEventListener('click', @active_goal.edit, false)
                     document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-submit').addEventListener('click', @submit, false)
+                    document.getElementById('promote-add-viewers').addEventListener('click', @add_viewers, false)
+                    document.getElementById('promote-add-team-member').addEventListener('click', @add_team_member, false)
+
+                    # Project Owner Actions
 
                     document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
@@ -1607,16 +1628,6 @@ class ProposalController extends OpenfireController
             return @get()
 
 
-
-# proposal controller
-class ProposalController extends OpenfireController
-
-    @events = []
-
-    constructor: (openfire, window) ->
-
-        @_init = () =>
-            return
 
 
 if @__openfire_preinit?

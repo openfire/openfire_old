@@ -73,6 +73,7 @@ class FormController extends OpenfireController
                 @_state.index[f.name] = @_state.data.push(f) - 1
                 for input in form.find('input').concat(form.find('textarea'))
                     if input
+                        type = input.type or 'text'
                         type = 'text' if type is 'textarea'
                         type = 'multi' if type is 'radio' or type is 'checkbox'
 
