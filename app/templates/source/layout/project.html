@@ -22,20 +22,17 @@
 			<style>
 			  #follow {
 				-webkit-transition-property: color;
-				-webkit-transition-duration: 0.8s;
+				-webkit-transition-duration: 0.3s;
 			  }
-			  #follow.active {
-				 color: blue;
-			  }
-			  #follow.error {
-				 color: red;
+			  #follow.following {
+				 color: orange;
 			  }
 			</style>
 
             <div id='sidebar' class='pre-sticky'>
                 <header>
                     <div id='sidebuttons' class='buttons'>
-                        <button id='follow' class='momentron{%- if follow -%} active{%- endif -%}'>&#xf007f;</button>
+                        <button id='follow' class='momentron{% if follow %} following{%- endif -%}'>&#xf007f;</button>
                         <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                     <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ project.name }}</h1></div>
@@ -334,11 +331,13 @@
 	function follow(ev) {
 		$.apptools.api.project.follow({subject: {key: window._cp.ke, kind: 'PROJECT'}}).fulfill({
 			success: function (r) {
-				document.getElementById('follow').classList.add('active');
+				document.getElementById('follow').classList.add('following');
+				$.apptools.dev.log('Project:Follow', 'Follow operation succeeded!', r);
 				$.apptools.analytics.track.social("Project", "Follow", "{{ project.name }}");
 			},
 			failure: function (e) {
 				document.getElementById('follow').classList.add('error');
+				$.apptools.dev.error('Project:Follow', 'An error was encountered trying to follow the specified project.', e);
 			}
 		});
 	}
