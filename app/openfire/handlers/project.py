@@ -90,7 +90,7 @@ class ProjectHome(WebHandler):
                 project, video = tuple(ndb.get_multi([pr, vi], use_cache=True, use_memcache=True, use_datastore=True))
                 follow = None
             else:
-                project, follow, video = tuple(ndb.get_multi([pr, ndb.Key(s.Follow, getattr(self, 'user').key.id(), parent=pr), vi], use_cache=True, use_memcache=True, use_datastore=True))
+                project, follow, video = tuple(ndb.get_multi([pr, ndb.Key(s.Follow, getattr(self, 'user').key.urlsafe(), parent=pr), vi], use_cache=True, use_memcache=True, use_datastore=True))
 
             # couldn't find project
             if project is None:
