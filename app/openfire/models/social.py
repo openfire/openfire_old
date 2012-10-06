@@ -30,6 +30,14 @@ class Follow(AppModel):
     _message_class = messages.Follow
     _pipeline_class = pipelines.FollowPipeline
 
+    class NotificationOptions(AppModel):
+
+	    ''' Describes notification options. '''
+
+	    frequency = ndb.StringProperty(choices=['REALTIME', 'DAILY', 'WEEKLY'], default=['REALTIME'])
+	    transport = ndb.StringProperty(choices=['EMAIL', 'XMPP', 'TEXT'], repeated=True)
+
     user = ndb.KeyProperty('u', indexed=True, required=True)
     subject = ndb.KeyProperty('sj', indexed=True, required=True)
-    subscription = ndb.KeyProperty('sb', indexed=True, required=True)
+    subscription = ndb.KeyProperty('sb', indexed=True)
+    options = ndb.LocalStructuredProperty(NotificationOptions, compressed=True)
