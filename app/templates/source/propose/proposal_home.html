@@ -14,11 +14,19 @@
         <div id="fb-root"></div>
         <div id='proposal'>
 
+                <div id="bbq" data-section-title="bbq">
+                    <button id="bbq-promote" value="promote">promote</button>
+                    <button id="bbq-reject" value="reject">reject</button>
+                </div>
+
             {% if security.current_user.key in proposal.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
-                    <button id='promote-goals' value="goals">edit goals</button>
+                    <button id='promote-goal' value="goals">edit goal</button>
                     <button id='promote-tiers' value="tiers">edit tiers</button>
+                    <button id='promote-submit' value="submit">submit</button>
+                    <button id='promote-add-viewers' value="add viewers">add viewers</button>
+                    <button id='promote-add-team-member' value="add team member">add team member</button>
                 </div>
             {% endif %}
 

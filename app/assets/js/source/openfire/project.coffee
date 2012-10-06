@@ -8,57 +8,6 @@ class ProjectVideo extends Asset
 class ProjectAvatar extends Asset
 
 
-# project object classes
-
-class Goal extends Model
-
-    model:
-        key: String()
-        target: String()
-        contribution_type: String()
-        approved: Boolean()
-        rejected: Boolean()
-        amount: Number()
-        description: String()
-        backer_count: Number()
-        progress: Number()
-        met: Boolean()
-        created: String()
-        modified: String()
-        amount_pledged: Number()
-        amount_processed: Number()
-        funding_day_limit: Number()
-        funding_deadline: String()
-        deliverable_description: String()
-        deliverable_date: String()
-        tiers: ListField(Tier)
-        next_steps: ListField(NextStep)
-
-
-class Tier extends Model
-
-    model:
-        key: String()
-        target: String()
-        name: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        delivery: String()
-        next_step_votes: Number()
-        backer_count: Number()
-        backer_limit: Number()
-
-
-class NextStep extends Model
-
-    model:
-        key: String()
-        summary: String()
-        description: String()
-        votes: Number()
-
-
 # base project class
 class Project extends Model
 
@@ -196,15 +145,6 @@ class Project extends Model
 
 
 
-# base proposal object
-class Proposal extends Model
-
-    model: null
-
-    constructor: (@key) ->
-        return @
-
-
 # project controller
 class ProjectController extends OpenfireController
 
@@ -229,8 +169,10 @@ class ProjectController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        @project = new Project(@_state.ke).get()
-        @project_key = @project.key
+        if not /proposal/.test(window.location.href)
+            @project = new Project(@_state.ke)
+            @project.get()
+            @project_key = @project.key
 
         @log = () => return console.log.apply(console, arguments)
 
@@ -1636,40 +1578,40 @@ class ProjectController extends OpenfireController
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.go_live({key: @project_key}).fulfill
+            $.apptools.api.project.go_live(key: @project_key).fulfill
                 success: () ->
                     alert("Your project is live! Refreshing page...")
                     window.location.reload()
                 failure: (response) ->
                     alert("Error:", response.error)
 
-        @suspend = () =>
+        @suspend = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.suspend({"key": @project_key}).fulfill
+            $.apptools.api.project.suspend(key: @project_key).fulfill
                 success: () ->
                     alert("Your project has been suspended. Refreshing page...")
                     window.location.reload()
                 failure: (response) ->
                     alert("Error:", response.error)
 
-        @shutdown = () =>
+        @shutdown = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.shutdown({"key": @project_key}).fulfill
+            $.apptools.api.project.shutdown(key: @project_key).fulfill
                 success: () ->
                     alert("Your project has been shut down. Refreshing page...")
                     window.location.reload()
                 failure: (response) ->
                     alert("Error:", response.error)
 
-        @cancel = () =>
+        @cancel = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.go_live({"key": @project_key}).fulfill
+            $.apptools.api.project.go_live(key: @project_key).fulfill
                 success: () ->
                     alert("Your project has been canceled. Refunding all payments. Refreshing page...")
                     window.location.reload()
@@ -1704,10 +1646,9 @@ class ProjectController extends OpenfireController
 
                 if @_state.o
                     document.body.addEventListener('drop', @add_media, false)
-                    document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
-                    document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
 
                     # Project Owner Actions
+                    document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
                     document.getElementById('promote-live').addEventListener('click', @go_live, false)
                     document.getElementById('promote-suspend').addEventListener('click', @suspend, false)
                     document.getElementById('promote-shutdown').addEventListener('click', @shutdown, false)
@@ -1736,19 +1677,6 @@ class ProjectController extends OpenfireController
 
             window.__pr = new Project('my-test-project-key')
             return @get()
-
-
-
-# proposal controller
-class ProposalController extends OpenfireController
-
-    @mount = 'proposal'
-    @events = []
-
-    constructor: (openfire, window) ->
-
-        @_init = () =>
-            return
 
 
 if @__openfire_preinit?
