@@ -4,19 +4,19 @@
         margin-top: 42px
     .fullpage
         .content
-            height: 86%
+            min-height: 86%
 
 @media only screen and (min-width: 768px)
     #main
         margin-top: 50px
     .fullpage
         .content
-            height: 85%
+            min-height: 85%
 
 @media only screen and (min-width: 1120px)
     .fullpage
         .content
-            height: 84%
+            min-height: 84%
 
 #footer-container
     display: none
@@ -73,7 +73,7 @@
 
 .fullpage
     width: 100%
-    height: 100%
+    min-height: 100%
     background-color: #aaa
 
     h1
@@ -95,6 +95,10 @@
         white-space: nowrap
         text-overflow: ellipsis
 
+    h2
+        margin-bottom: 10px
+        text-decoration: underline
+
     .content
         width: 96%
         padding: 1%
@@ -104,8 +108,9 @@
         background-color: #ccc
 
         p
-            margin: 0 auto 12px
-            color: #696969
+            margin-bottom: 12px
+            max-width: 640px
+            color: #474747
             font-size: 13pt
 
     .scrollpoint

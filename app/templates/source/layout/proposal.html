@@ -15,11 +15,21 @@
         <div id="fb-root"></div>
         <div id='proposal'>
 
+            {% if security.permissions.admin %}
+                <div id="bbq" data-section-title="bbq">
+                    <button id="bbq-promote" value="promote">promote to project</button>
+                    <button id="bbq-reject" value="reject">reject proposal</button>
+                </div>
+            {% endif %}
+
             {% if security.current_user.key in proposal.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
-                    <button id='promote-goals' value="goals">edit goals</button>
+                    <button id='promote-goal' value="goal">edit goal</button>
                     <button id='promote-tiers' value="tiers">edit tiers</button>
+                    <button id='promote-create' value="goals">create proposal</button>
+                    <button id='promote-submit' value="tiers">submit proposal!</button>
+
                 </div>
             {% endif %}
 

@@ -26,7 +26,7 @@
 
         <section id='projects' class='cardstack' role='region'>
 
-            <h2 class="editable">Projects</h2>
+            <h2>Projects</h2>
             <div class='section-wrap'>
                 <div id="project-cards">
                 {% if projects %}
@@ -103,14 +103,15 @@
      </div><!-- #content -->
 
 <div class="pre-modal" id="how-it-works" data-title="How it works!" data-options="{&quot;ratio&quot;:{&quot;x&quot;:0.6,&quot;y&quot;:0.6}}">
-    <div id="how-it-works-wrap" class="mini-editable">
+    <div id="how-it-works-wrap" class="dynamic mini-editable" data-keyname="how-it-works-content" data-namespace="_system_">
+        {% content "how-it-works-content", "_system_" %}
         <h1>Welcome to <span class="lightorange">open</span><span class="darkorange">fire</span>!</h1>
         <p>hello, <a href="http://openfi.re">openfi.re</a> trusted tester!</p>
-        <p>we believe the beauty and power of technology lies in its ability to apply abstract models of efficiency to the very real world around us, often effecting radical positive change in the process.</p>
-        <p></p>
-        <p>what do <em>you</em> think?</p>
-        <p></p>
+        <p>You must be interested in disruptive innovation... and boy, have you come to the right place.</p>
+        <p>Every technologist, hacker or designer we meet has a secret project that they know can change the world. Usually, that project is more about creating public value than private investor value. But generally, the psychology & logistics around their lack of investibility or positively-disruptive aims are enough to keep such projects from starting & happening. But Kickstarter (and particular project successes, such as Diaspora) have proven that there is a public appetite for supporting hackers for a cause or a mission. We are making that process easier, and scaling it up.</p>
+        <p>Won't that be cool?</p>
         <p>love, the <span class="lightorange">open</span><span class="darkorange">fi.re</span> team</p>.
+        {% endcontent %}
     </div>
 </div>
 {% endblock %}
