@@ -8,35 +8,6 @@ class ProjectVideo extends Asset
 class ProjectAvatar extends Asset
 
 
-# project object classes
-
-class Goal extends Model
-
-    model:
-        key: String()
-        target: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        backer_count: Number()
-        progress: Number()
-        met: Boolean()
-
-
-class Tier extends Model
-
-    model:
-        key: String()
-        target: String()
-        name: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        delivery: String()
-        backer_count: Number()
-        backer_limit: Number()
-
-
 # base project class
 class Project extends Model
 
@@ -54,12 +25,21 @@ class Project extends Model
         keywords: Array()
         creator: String()
         owners: Array()
-        goals: Array()
-        tiers: Array()
+        public: Boolean()
+        viewers: Array()
+        backers: Number()
+        followers: Number()
+        money: Number()
+        progress: Number()
+        active_goal: String()
+        completed_goals: Array()
+        future_goal: String()
 
     constructor: () ->
 
         super
+
+        @log = () => return console.log.apply(console, arguments)
 
         @stashes = {}
         @internal =
@@ -165,15 +145,6 @@ class Project extends Model
 
 
 
-# base proposal object
-class Proposal extends Model
-
-    model: null
-
-    constructor: (@key) ->
-        return @
-
-
 # project controller
 class ProjectController extends OpenfireController
 
@@ -198,10 +169,12 @@ class ProjectController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        @project = new Project(@_state.ke)
-        @project_key = @project.key
+        if @_state.ke and not /proposal/.test(window.location.href)
+            @project = new Project(@_state.ke)
+            @project.get()
+            @project_key = @project.key
 
-        @log = (message) => return @constructor::log(@constructor.name, message)
+        @log = () => return console.log.apply(console, arguments)
 
         @internal =
 
@@ -1267,7 +1240,7 @@ class ProjectController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.project.list_tiers(project: @project_key).fulfill
+                    $.apptools.api.project.list_tiers(goal: @project.active_goal).fulfill
                         success: (response) =>
                             tiers = []
                             tiers.push(@attach(new Goal(target: @project_key).from_message(tier))) for tier in response.tiers
@@ -1601,6 +1574,49 @@ class ProjectController extends OpenfireController
 
                 , sync
 
+        @go_live = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.go_live(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project is live! Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @suspend = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.suspend(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project has been suspended. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @shutdown = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.shutdown(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project has been shut down. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @cancel = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.go_live(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project has been canceled. Refunding all payments. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
 
         @_init = () =>
 
@@ -1628,10 +1644,15 @@ class ProjectController extends OpenfireController
                     $("#donate-wizard").smartWizard
                         onFinish: @submit_payment
 
-                if @_state.o
+                if @_state.o and not /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
-                    document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
+
+                    # Project Owner Actions
                     document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-live').addEventListener('click', @go_live, false)
+                    document.getElementById('promote-suspend').addEventListener('click', @suspend, false)
+                    document.getElementById('promote-shutdown').addEventListener('click', @shutdown, false)
+                    document.getElementById('promote-cancel').addEventListener('click', @cancel, false)
 
                     document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
@@ -1656,19 +1677,6 @@ class ProjectController extends OpenfireController
 
             window.__pr = new Project('my-test-project-key')
             return @get()
-
-
-
-# proposal controller
-class ProposalController extends OpenfireController
-
-    @mount = 'proposal'
-    @events = []
-
-    constructor: (openfire, window) ->
-
-        @_init = () =>
-            return
 
 
 if @__openfire_preinit?

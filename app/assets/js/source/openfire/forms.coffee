@@ -8,7 +8,6 @@ class FormObject extends OpenfireObject
         @name = form.name or form.getAttribute('id')
         @action = form.action
         @method = form.method
-        @fields = _.map(form.find('input').concat(texts), (it, i, arr) -> return arr[i] = (n = it.name or it.getAttribute('id')))
 
         console.log('[Forms]', 'Form registered:', @name)
         return @
@@ -71,14 +70,21 @@ class FormController extends OpenfireController
             for form in forms
                 f = new FormObject(form)
                 @_state.index[f.name] = @_state.data.push(f) - 1
-                for input in form.find('input').concat(form.find('textarea'))
-                    type = input.type or 'text'
-                    type = 'text' if type is 'textarea'
-                    type = 'multi' if type is 'radio' or type is 'checkbox'
+                _f = form.find('input')
+                _t = form.find('textarea')
+                if not _.is_array(_f)
+                    _f = [_f]
+                if not _.is_array(_t)
+                    _t = [_t]
+                for input in _f.concat(_t)
+                    if input
+                        type = input.type or 'text'
+                        type = 'text' if type is 'textarea'
+                        type = 'multi' if type is 'radio' or type is 'checkbox'
 
-                    if not input.data('validation')?
-                        input.data('validation', type)
-                    input.addEventListener('blur', @validate, false)
+                        if not input.data('validation')?
+                            input.data('validation', type)
+                        input.addEventListener('blur', @validate, false)
 
             @_state.init = true
             return @
