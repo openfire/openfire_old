@@ -183,6 +183,7 @@
 // tabs
 .tabset.default
   text-align: center
+  max-width: 600px
 
   .tab-rounded
     border-top-left-radius: 5px
@@ -190,30 +191,32 @@
 
   .tab-link,
   .tab-rounded
+    cursor: pointer
     margin: 0 3px
     padding: 15px 10px
     border: 1px solid #6f6f66
-    +background(linear-gradient(top, #dfdfdd, #eee))
+    +background(linear-gradient(top, #d0d0d0, #e7e7ee))
     font-size: 11px
     line-height: 11px
+    text-decoration: none
+    color: #444
 
-    &.tab-current
-      border-bottom: none !important
+    &.current-tab
+      background: #e7e7e7 !important
+      border-bottom-color: #e7e7ee !important
 
   .tab-link
     display: inline-block
 
   .tab
-    top: 52px
-    right: 0px
-    bottom: 0px
-    left: 0px
+    border-radius: 5px
+    margin-top: -1px
+    border: 1px solid #6f6f66
+    background-color: #e7e7ee
     text-align: left
-    background-color: #eee
 
-.current-tab
-  border-top-color: white
-  background-color: rgba(255,255,255, 1)
+    &.current-tab
+      border-top-color: white
 
 // openfire specific widgets
 input.autocomplete
@@ -230,15 +233,12 @@ input.autocomplete
     right: auto
     left: auto
 
-  width: 250px
-
 .autocomplete-results
   -webkit-transition-duration: 0.05s
   -webkit-transition-property: opacity
   opacity: 0
   margin: 0
   background-color: whitesmoke
-  width: 270px
 
   &.active
     z-index: 998
