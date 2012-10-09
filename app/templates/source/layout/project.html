@@ -80,10 +80,14 @@
 
                         <div id='back_project'>
                             {% if project.status == 'o' %}
-                                <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
-                                <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":390}}' data-title="Backing {{ project.name }}...">
-                                    {% include "snippets/back_project.html" with context %}
-                                </div>
+                                {% if security.current_user %}
+                                    <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
+                                    <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":390}}' data-title="Backing {{ project.name }}...">
+                                        {% include "snippets/back_project.html" with context %}
+                                    </div>
+                                {% else %}
+                                    <a href="/login" class="login-required-btn">Log in or sign up to contribute to this project</a>
+                                {% endif %}
                             {% else %}
                                 <span id='cannot-back'>Project is {{ project.status | project_status }}</span>
                             {% endif %}
