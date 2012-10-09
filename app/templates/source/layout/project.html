@@ -12,13 +12,14 @@
         <div id='project'>
 
 
+            {% if security.permissions.admin %}
                 <div id="bbq" data-section-title="bbq">
                     <button id="bbq-live" value="go live">go live</button>
                     <button id="bbq-suspend" value="suspend">suspend</button>
                     <button id="bbq-shutdown" value="shutdown">shutdown</button>
                     <button id="bbq-cancel" value="cancel">cancel</button>
                 </div>
-
+            {% endif %}
 
             {% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">

@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
 from openfire.pipelines.model import ModelPipeline
+from openfire.pipelines.primitive.transport.mail import SendAdminsEmail
 
+PROPOSAL_SUBMITTED_TEXT = """
+Hi guys,
+    <a href="%(url)s">This proposal</a> has been submitted and is waiting for us to approve/deny/comment on:
+    %(url)s
+
+    Yours Truely,
+        Codebot.
+"""
 
 ## CategoryPipeline - fired when a Category entity is put/deleted
 class CategoryPipeline(ModelPipeline):
@@ -17,6 +26,17 @@ class ProposalPipeline(ModelPipeline):
     ''' Processes proposal puts/deletes. '''
 
     _model_binding = 'openfire.models.project.Proposal'
+
+    def put(self, key, model):
+
+        # Send admins an email when a proposal is submitted for approval.
+        if model.status == 's':
+            subject = "Proposal waiting for approval: %s" % model.name
+            url = 'https://staging.openfi.re/proposal/%s' % key
+            body = PROPOSAL_SUBMITTED_TEXT % {'url': url}
+            pipeline = SendAdminsEmail('codebot@openfi.re', subject, body)
+            pipeline.start(queue_name='mail')
+
 
 
 ## ProjectPipeline - fired when a Project entity is put/deleted
