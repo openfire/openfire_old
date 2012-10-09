@@ -11,7 +11,7 @@
     <div id='content'>
         <div id='project'>
 
-
+            {% if security.permissions.admin %}
                 <div id="bbq" data-section-title="bbq">
                     <button id="bbq-live" value="go live">go live</button>
                     <button id="bbq-suspend" value="suspend">suspend</button>
@@ -19,6 +19,7 @@
                     <button id="bbq-cancel" value="cancel">cancel</button>
                 </div>
 
+            {% endif %}
 
             {% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">
@@ -264,9 +265,9 @@
 
                 <!-- project info tabset -->
                 <div id='project-tabset' class='pre-tabs relative tabset'>
-                    <a href='#details-tab' class='tab-rounded'>project<br>details</a>
-                    <a href='#members-tab' class='tab-rounded'>project<br>members</a>
-                    <a href='#team-tab' class='clear tab-rounded'>social<br>reach</a>
+                    <a href='#details-tab' class='tab-link tab-rounded'>project<br>details</a>
+                    <a href='#members-tab' class='tab-link tab-rounded'>project<br>members</a>
+                    <a href='#team-tab' class='clear tab-link tab-rounded'>social<br>reach</a>
 
                     <!-- details-tab -->
                     <div id='details-tab' class="tab" style="opacity: 0; display: none;">
