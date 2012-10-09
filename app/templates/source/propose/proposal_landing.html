@@ -25,10 +25,14 @@
     </div>
 
     <div>
-        <a id="a-proposal-wizard-dialog" href="#start-proposal-dialog">start your proposal!</a>
-        <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":750,"height":370}}'>
-            {% include "snippets/proposal_wizard.html" with context %}
-        </div>
+        {% if security.current_user %}
+            <a id="a-proposal-wizard-dialog" class="start-proposal-btn" href="#start-proposal-dialog">start your proposal!</a>
+            <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":750,"height":370}}'>
+                {% include "snippets/proposal_wizard.html" with context %}
+            </div>
+        {% else %}
+            <a id="a-proposal-wizard-dialog" class="start-proposal-btn login-required-btn" href="/login">log in or sign up to start your proposal now!</a>
+        {% endif %}
     </div>
 
 

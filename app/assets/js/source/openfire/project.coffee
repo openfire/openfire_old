@@ -634,7 +634,7 @@ class ProjectController extends OpenfireController
                 type = "MasterCard"
             if /^6011/.test(val)
                 type = "Discover"
-            document.getElementById("back-project-cc-type-display").innerHTML = type
+            document.getElementById("back-project-cc-type-display")?.innerHTML = type
             return false
 
         @choose_donation_tier = () ->
@@ -1630,16 +1630,16 @@ class ProjectController extends OpenfireController
                 # event listeners
                 document.getElementById('follow').addEventListener('click', @follow, false)
                 document.getElementById('share').addEventListener('click', @share, false)
-                document.getElementById('back').addEventListener('click', @back, false)
+                document.getElementById('back')?.addEventListener('click', @back, false)
 
                 # Event listeners in the back project dialog.
                 for el in document.getElementsByClassName('vote-plus')
                     el.addEventListener('click', @next_step_vote_plus, false)
                 for el in document.getElementsByClassName('vote-minus')
                     el.addEventListener('click', @next_step_vote_minus, false)
-                for el in document.getElementById('donate-step-1').find('input')
+                for el in document.getElementById('donate-step-1')?.find('input')?
                     el.addEventListener('click', @choose_donation_tier, false)
-                document.getElementById('back-project-money-source-input').addEventListener('change', @select_money_source)
+                document.getElementById('back-project-money-source-input')?.addEventListener('change', @select_money_source)
                 _.ready () =>
                     $("#donate-wizard").smartWizard
                         onFinish: @submit_payment
@@ -1648,29 +1648,29 @@ class ProjectController extends OpenfireController
                     document.body.addEventListener('drop', @add_media, false)
 
                     # Project Owner Actions
-                    document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
-                    document.getElementById('promote-live').addEventListener('click', @go_live, false)
-                    document.getElementById('promote-suspend').addEventListener('click', @suspend, false)
-                    document.getElementById('promote-shutdown').addEventListener('click', @shutdown, false)
-                    document.getElementById('promote-cancel').addEventListener('click', @cancel, false)
+                    document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-live')?.addEventListener('click', @go_live, false)
+                    document.getElementById('promote-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('promote-shutdown')?.addEventListener('click', @shutdown, false)
+                    document.getElementById('promote-cancel')?.addEventListener('click', @cancel, false)
 
-                    document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
+                    document.getElementById('promote-dropzone')?.addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.classList.add('hover')
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragover', d_on, false)
-                    document.getElementById('promote-dropzone').addEventListener('dragleave', d_off = (ev) ->
+                    document.getElementById('promote-dropzone')?.addEventListener('dragover', d_on, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('dragleave', d_off = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.className = 'dropzone'
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragexit', d_off, false)
-                    document.getElementById('promote-dropzone').addEventListener('drop', ((ev) =>
+                    document.getElementById('promote-dropzone')?.addEventListener('dragexit', d_off, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('drop', ((ev) =>
                         d_off(ev)
                         return @add_media(ev)
                     ), false)

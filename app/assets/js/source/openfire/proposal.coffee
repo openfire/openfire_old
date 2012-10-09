@@ -1554,9 +1554,9 @@ class ProposalController extends OpenfireController
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.submit(key: @project_key).fulfill
+            $.apptools.api.proposal.submit(key: @proposal_key).fulfill
                 success: () ->
-                    alert("You have submitted your proposal. Refreshing page...")
+                    alert("You have submitted your proposal for approval. Refreshing page...")
                     window.location.reload()
                 failure: (response) ->
                     alert("Error:", response.error)

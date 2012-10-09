@@ -399,6 +399,24 @@ class ProposalService(RemoteService):
         return new_project.to_message()
 
     @remote.method(proposal_messages.ProposalRequest, Echo)
+    def submit(self, request):
+
+        ''' Suspend a proposal. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('No proposal provided.')
+
+        proposal = ndb.Key(urlsafe=self.decrypt(request.key)).get()
+        if not proposal:
+            raise remote.ApplicationError('Proposal not found.')
+
+        proposal.status = 's'
+        proposal.put()
+
+        return Echo(message='Proposal submitted for approval')
+
+    @remote.method(proposal_messages.ProposalRequest, Echo)
     def suspend(self, request):
 
         ''' Suspend a proposal. '''
