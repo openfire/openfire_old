@@ -1,24 +1,4 @@
 ## openfire user models & controllers
-class TopicEditTemplate extends t
-
-    @export: 'public'
-    constructor: () ->
-        super(['<span class="interest topic-edit clear" data-topic="{{=key}}">',
-            '<div class="right">',
-                '<span class="ctrl promote">&#xf0020;</span>',
-                '<span class="ctrl demote">&#xf001f;</span>',
-                '<span class="ctrl remove">&#xf0016;</span>',
-            '</div>',
-            '{{=name}}',
-        '</span>'
-        ].join(''))
-        return @
-
-class TopicTagTemplate extends t
-    @export: 'public'
-    constructor: () ->
-        super('<span class="interest topic tag" data-topic-slug="{{=slug}}">{{=name}}<span class="delete-tag">x</span></span>')
-        return @
 
 # base session object: represents a single session
 class Session extends OpenfireObject
@@ -196,8 +176,12 @@ class UserController extends OpenfireController
                 return (if not sync then @user else $.apptools.api.user.set_topics(user: @user.username, topics: topic_keys).fulfill
                     success: () =>
                         _topics = topics.slice(0,3)
-                        @template.t = '{{>topics}}{{+TopicTagTemplate}}{{/topics}}<span class="tag" id="edit-topics">edit topics</span>'
-                        _.get('#topics').innerHTML = @template.parse(_.extend({}, @user, topics: _topics))
+                        html = ''
+                        for topic in _topics
+                            html += TopicTag(topic)
+                        html += '<span class="tag" id="edit-topics">edit topics</span>'
+
+                        _.get('#topics').innerHTML = html
                         _.bind(_.get('#edit-topics'), 'click', @topics.edit)
                         return (if cb? then cb(@user) else @user)
                     failure: (e) =>
@@ -210,7 +194,7 @@ class UserController extends OpenfireController
                 @template.t = [
                     '<div class="absolute snapbottom topics-existing">',
                         '{{>topics}}',
-                            '{{+TopicEditTemplate}}',
+                            '{{+TopicEditItem}}',
                         '{{/topics}}',
                     '</div>',
                     '<div class="absolute snapbottom snapright topics-new">',
@@ -251,7 +235,7 @@ class UserController extends OpenfireController
                                 parent.insertBefore(parent.removeChild(topic_el), prev) if (prev = topic_el.previousSibling)?
 
                             else if action is 'demote'
-                                (if (nxt = topic_el.nextSibling.nextSibling)? then parent.insertBefore(parent.removeChild(topic_el), nxt) else parent.appendChild(parent.removeChild(topic_el)))
+                                (if (nxt = topic_el.nextSibling?.nextSibling)? then parent.insertBefore(parent.removeChild(topic_el), nxt) else parent.appendChild(parent.removeChild(topic_el)))
 
                             else if action is 'remove'
                                 parent.removeChild(topic_el)
@@ -263,7 +247,7 @@ class UserController extends OpenfireController
                         auto = $.openfire.widgets.autocomplete.get(auto_id)
                         (auto ||= $.openfire.widgets.autocomplete.new(_.get('#topic-add-search'), {api: 'topic_autocomplete', result_key: 'topics'})).finish = (otto) =>
                             topic = new Topic().from_message(otto.choice)
-                            new_topic = _.create_doc_frag(@template.parse('{{+TopicEditTemplate}}',{key: otto.choice.key, name: otto.choice.name}))
+                            new_topic = _.create_doc_frag(TopicEditItem({key: otto.choice.key, name: otto.choice.name}))
                             topics_el.appendChild(new_topic)
                             (@user.topics ||= new ListField()).push(topic)
                             return
@@ -319,9 +303,7 @@ class UserController extends OpenfireController
         return @
 
 if @__openfire_preinit?
-    @__openfire_preinit.abstract_base_objects.push TopicEditTemplate,
-                                                   TopicTagTemplate
-                                                   Session,
+    @__openfire_preinit.abstract_base_objects.push Session,
                                                    User,
                                                    Topic
     @__openfire_preinit.abstract_base_controllers.push(UserController)
