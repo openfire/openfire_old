@@ -192,31 +192,35 @@
   .tab-link,
   .tab-rounded
     cursor: pointer
-    margin: 0 3px
+    margin: 0 3px -1px
     padding: 15px 10px
     border: 1px solid #6f6f66
     +background(linear-gradient(top, #d0d0d0, #e7e7ee))
-    font-size: 11px
+    font:
+      size: 12px
+      weight: 700
+    text-transform: uppercase
     line-height: 11px
     text-decoration: none
     color: #444
 
     &.current-tab
+      z-index: 9999
       background: #e7e7e7 !important
       border-bottom-color: #e7e7ee !important
 
   .tab-link
     display: inline-block
-
-  .tab
+  .tab-wrapper
     border-radius: 5px
-    margin-top: -1px
-    border: 1px solid #6f6f66
+    padding: 5px
     background-color: #e7e7ee
+    border: 1px solid #6e6e66
+    height: 400px
+    overflow: auto
+  .tab
     text-align: left
 
-    &.current-tab
-      border-top-color: white
 
 // openfire specific widgets
 input.autocomplete

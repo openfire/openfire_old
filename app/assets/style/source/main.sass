@@ -291,4 +291,79 @@ section.newsfeed ul.feed
       height: 50px
       background-color: orange
 
+.profile-card
+  img
+    opacity: 0.75
+  border-radius: 5px
+  background-color: #fff
+  padding: 10px
+  margin: 30px 15px 0 0
+  display: inline-table
+  box-shadow: 2px 2px 2px #cdcdcd
+  &:hover
+    img
+      opacity: 1
+    box-shadow: 2px 2px 2px #bfbfbf
+    .avatar::after
+      background-color: #eee
+      color: #666666
+  a
+    text-decoration: none
+  .avatar
+    cursor: pointer
+    &::after
+      display: block
+      content: attr(data-name)
+      padding-right: 4px
+      text-align: right
+      vertical-align: middle
+      background-color: #f4f4f4
+      color: #999
+      font:
+        family: "Karla",sans-serif
+        weight: 400
+        size: 16px
+      text-transform: uppercase
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+      text-decoration: none
+    &:hover::after
+      text-decoration: underline
+  .accounts
+    width: 140px
+    margin-top: 5px
+    text-align: right
+    border: none !important
+    .icon
+      display: inline-block
+      font:
+        family: "momentron social lite"
+        size: 14px
+      color: #999
+      vertical-align: middle
+      cursor: pointer
+      margin-left: 3px
+      &:hover
+        color: #f57220
+      &.facebook,
+      &.google,
+      &.linkedin,
+      &.github,
+      &.twitter
+        &::after
+          display: inherit
+          font: inherit
+
+      &.facebook::after
+        content: "f"
+      &.google::after
+        content: "g"
+      &.linkedin::after
+        content: "i"
+      &.github::after
+        content: "t"
+      &.twitter::after
+        content: "w"
+
 @import _partials/social.sass
