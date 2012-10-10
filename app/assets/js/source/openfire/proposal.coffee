@@ -8,35 +8,6 @@ class ProposalVideo extends Asset
 class ProposalAvatar extends Asset
 
 
-# proposal object classes
-
-class Goal extends Model
-
-    model:
-        key: String()
-        target: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        backer_count: Number()
-        progress: Number()
-        met: Boolean()
-
-
-class Tier extends Model
-
-    model:
-        key: String()
-        target: String()
-        name: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        delivery: String()
-        backer_count: Number()
-        backer_limit: Number()
-
-
 # base proposal class
 class Proposal extends Model
 
@@ -60,6 +31,8 @@ class Proposal extends Model
     constructor: () ->
 
         super
+
+        @log = () => return console.log.apply(console, arguments)
 
         @stashes = {}
         @internal =
@@ -164,16 +137,6 @@ class Proposal extends Model
                     alert 'proposal get() failure'
 
 
-
-# base proposal object
-class Proposal extends Model
-
-    model: null
-
-    constructor: (@key) ->
-        return @
-
-
 # proposal controller
 class ProposalController extends OpenfireController
 
@@ -198,10 +161,12 @@ class ProposalController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        @proposal = new Proposal(@_state.ke)
-        @proposal_key = @proposal.key
+        if /proposal/.test(window.location.href)
+            @proposal = new Proposal(@_state.ke)
+            @proposal.get()
+            @proposal_key = @proposal.key
 
-        @log = (message) => return @constructor::log(@constructor.name, message)
+        @log = () => return console.log.apply(console, arguments)
 
         @internal =
 
@@ -716,8 +681,8 @@ class ProposalController extends OpenfireController
                     $('#back-text').animate opacity: 0,
                         duration: 250
                         complete: () =>
-                            document.getElementById('back-text').innerHTML = 'you rock.'
-                            document.getElementById('back').classList.add('backed')
+                            document.getElementById('back-text')?.innerHTML = 'you rock.'
+                            document.getElementById('back')?.classList.add('backed')
                             $('#back-text').animate opacity: 1,
                                 duration: 250
                                 complete: () =>
@@ -737,7 +702,7 @@ class ProposalController extends OpenfireController
             $.apptools.api.proposal.follow(target: @proposal_key).fulfill
 
                 success: (response) =>
-                    document.getElementById('follow').classList.add('following')
+                    document.getElementById('follow')?.classList.add('following')
                     alert 'follow() success'
 
                 failure: (error) =>
@@ -1563,6 +1528,84 @@ class ProposalController extends OpenfireController
                 , sync
 
 
+        @bbq_promote = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.promote(key: @proposal_key).fulfill
+                success: () ->
+                    alert("This project has been promoted to a project. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @bbq_reject = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.reject(key: @proposal_key).fulfill
+                success: () ->
+                    alert("This proposal has been rejected. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @submit = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.submit(key: @proposal_key).fulfill
+                success: () ->
+                    alert("You have submitted your proposal for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reopen = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.reopen(key: @proposal_key).fulfill
+                success: () ->
+                    alert("You have reopened your proposal as a draft, and it is no longer submitted for approval.  Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @suspend = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.suspend(key: @proposal_key).fulfill
+                success: () ->
+                    alert("You have suspended this proposal. It may only be re-opened by an admin. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @review= (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.proposal.review(key: @proposal_key).fulfill
+                success: () ->
+                    alert("You have sent this proposal back for review. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @add_viewers = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            alert("Coming soon.")
+
+        @add_team_member = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            alert("Coming soon.")
+
         @_init = () =>
 
             if window._cp
@@ -1573,32 +1616,44 @@ class ProposalController extends OpenfireController
                 )(method) for method in @constructor::method_proxies
 
                 # event listeners
-                document.getElementById('follow').addEventListener('click', @follow, false)
-                document.getElementById('share').addEventListener('click', @share, false)
-                document.getElementById('back').addEventListener('click', @back, false)
+                #document.getElementById('share').addEventListener('click', @share, false)
 
-                if @_state.o
+                if @_state.o and /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
-                    document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
-                    document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
 
-                    document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
+                    # BBQ Actions
+                    document.getElementById('bbq-promote')?.addEventListener('click', @bbq_promote, false)
+                    document.getElementById('bbq-reject')?.addEventListener('click', @bbq_reject, false)
+                    document.getElementById('bbq-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('bbq-review')?.addEventListener('click', @review, false)
+
+                    # Proposal Owner Actions
+                    #document.getElementById('promote-goal').addEventListener('click', @active_goal.edit, false)
+                    document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-submit')?.addEventListener('click', @submit, false)
+                    document.getElementById('promote-reopen')?.addEventListener('click', @reopen, false)
+                    document.getElementById('promote-add-viewers')?.addEventListener('click', @add_viewers, false)
+                    document.getElementById('promote-add-team-member')?.addEventListener('click', @add_team_member, false)
+
+                    # Project Owner Actions
+
+                    document.getElementById('promote-dropzone')?.addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.classList.add('hover')
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragover', d_on, false)
-                    document.getElementById('promote-dropzone').addEventListener('dragleave', d_off = (ev) ->
+                    document.getElementById('promote-dropzone')?.addEventListener('dragover', d_on, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('dragleave', d_off = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.className = 'dropzone'
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragexit', d_off, false)
-                    document.getElementById('promote-dropzone').addEventListener('drop', ((ev) =>
+                    document.getElementById('promote-dropzone')?.addEventListener('dragexit', d_off, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('drop', ((ev) =>
                         d_off(ev)
                         return @add_media(ev)
                     ), false)
@@ -1607,16 +1662,6 @@ class ProposalController extends OpenfireController
             return @get()
 
 
-
-# proposal controller
-class ProposalController extends OpenfireController
-
-    @events = []
-
-    constructor: (openfire, window) ->
-
-        @_init = () =>
-            return
 
 
 if @__openfire_preinit?

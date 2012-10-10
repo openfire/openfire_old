@@ -7,7 +7,12 @@
 
 {% block main %}
 
-    <div>
+    {% if security.permissions.admin %}
+    <div id="proposal-explanation" data-keyname="proposal_explanation" data-namespace="_system_" data-options="{'bundle':'rich'}" class="dynamic mini-editable">
+    {% else %}
+    <div class="dynamic">
+    {% endif %}
+        {% content "proposal_explanation", "_system_" %}
         <h2>Have an idea for change that really needs to happen?</h2>
         <p>Submit an idea for a project on openfi.re!</p>
         <ul>
@@ -16,13 +21,18 @@
             <li>The openfire review team will take a look at your proposal - we may request iteration on items in your proposal to fully understand your project's scope and vision.</li>
             <li>Once it's been approved, you will be notified with a link to your preliminary project page, which is private until you've finalized your campaign...then it's time to go live!</li>
         </ul>
+        {% endcontent %}
     </div>
 
     <div>
-        <a id="a-proposal-wizard-dialog" href="#start-proposal-dialog">start your proposal!</a>
-        <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":750,"height":370}}'>
-            {% include "snippets/proposal_wizard.html" with context %}
-        </div>
+        {% if security.current_user %}
+            <a id="a-proposal-wizard-dialog" class="start-proposal-btn" href="#start-proposal-dialog">start your proposal!</a>
+            <div id="proposal-wizard-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"width":750,"height":370}}'>
+                {% include "snippets/proposal_wizard.html" with context %}
+            </div>
+        {% else %}
+            <a id="a-proposal-wizard-dialog" class="start-proposal-btn login-required-btn" href="/login">log in or sign up to start your proposal now!</a>
+        {% endif %}
     </div>
 
 

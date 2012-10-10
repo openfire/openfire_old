@@ -240,6 +240,7 @@ config['apptools.project.services'] = {
                         'shutdown', 'get_tier', 'list_tiers', 'put_tier', 'delete_tier', 'get_goal',
                         'active_goal', 'completed_goals', 'future_goal', 'put_goal', 'put_future_goal',
                         'delete_goal', 'propose_goal', 'proposed_goals', 'approve_goal', 'reject_goal',
+                        'review_goal', 'open_goal', 'close_goal', 'submit_proposed_goal', 'reopen_proposed_goal',
                         'get_next_step', 'list_next_steps', 'put_next_step', 'delete_next_step',
                         'add_viewer', 'remove_viewer'],
 
@@ -255,7 +256,7 @@ config['apptools.project.services'] = {
             'enabled': False,
             'service': 'openfire.services.proposal.ProposalService',
             'methods': ['get', 'list', 'put', 'submitted', 'delete', 'comment', 'comments', 'submit',
-                        'promote', 'suspend', 'reject', 'reopen', 'add_viewer', 'remove_viewer'],
+                        'promote', 'suspend', 'reject', 'reopen', 'review', 'add_viewer', 'remove_viewer'],
 
             'config': {
                 'caching': 'none',

@@ -11,31 +11,55 @@
     <div id='content'>
         <div id='project'>
 
+            {% if security.permissions.admin %}
+                <div id="bbq" data-section-title="bbq">
+                    {% if project.status in ['p', 'c', 'x', 's'] %}
+                        <button id="bbq-live" value="go live">go live</button>
+                    {% endif %}
+                    {% if project.status != 's' %}
+                        <button id="bbq-suspend" value="suspend">suspend</button>
+                    {% endif %}
+                    {% if project.status in ['p', 'f', 'o', 'x'] %}
+                        <button id="bbq-shutdown" value="shutdown">shutdown</button>
+                    {% endif %}
+                    {% if project.status != 'x' %}
+                        <button id="bbq-cancel" value="cancel">cancel</button>
+                    {% endif %}
+                </div>
+            {% endif %}
+
             {% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
-                    <button id='promote-goals' value="goals">edit goals</button>
-                    <button id='promote-tiers' value="tiers">edit tiers</button>
+                    {% if project.status != 's' %}
+                        <button id='promote-tiers' value="tiers">edit tiers</button>
+                    {% endif %}
+                    {% if project.status in ['p', 'c'] %}
+                        <button id='promote-live' value="go live">go live</button>
+                    {% endif %}
+                    {% if project.status in ['o', 'f'] %}
+                        <button id='promote-shutdown' value="shutdown">shutdown</button>
+                    {% endif %}
+                    {% if project.status != 'x' %}
+                        <button id='promote-cancel' value="cancel">cancel</button>
+                    {% endif %}
                 </div>
             {% endif %}
 
 			<style>
 			  #follow {
 				-webkit-transition-property: color;
-				-webkit-transition-duration: 0.8s;
+				-webkit-transition-duration: 0.3s;
 			  }
-			  #follow.active {
-				 color: blue;
-			  }
-			  #follow.error {
-				 color: red;
+			  #follow.following {
+				 color: orange;
 			  }
 			</style>
 
             <div id='sidebar' class='pre-sticky'>
                 <header>
                     <div id='sidebuttons' class='buttons'>
-                        <button id='follow' class='momentron{%- if follow -%} active{%- endif -%}'>&#xf007f;</button>
+                        <button id='follow' class='momentron{% if follow %} following{%- endif -%}'>&#xf007f;</button>
                         <button id='share' class='momentron'>&#xf0085;</button>
                     </div>
                     <div id='sidetitle' class='fancy title'><h1 data-href="#sidebar" class="target-link">{{ project.name }}</h1></div>
@@ -55,24 +79,105 @@
 
                         <div id='active_goal' data-section-title="goal">
                             {% if active_goal %}
-                                <a id="a-{{ encrypt(active_goal.key.urlsafe()) }}" href="#"
-                                    data-href="#{{ encrypt(active_goal.key.urlsafe()) }}"
-                                    class="target-link{% if active_goal.amount < project.money %} reached{% endif %}">
-                                        Current Goal: {{ currency(active_goal.amount) }}
-                                </a>
-                                <div id="{{ encrypt(active_goal.key.urlsafe()) }}">
-                                    <p>{{ active_goal.description }}</p>
+                                <div id="project-next-steps-accordion" class='css-accordion widget'>
+                                    <a id="a-active-goal-description" href="#" data-href="#active-goal-description" class="target-link">Current Goal: {{ currency(active_goal.amount) }}</a>
+                                    <div id="active-goal-description" class="fold">
+                                        <p>{{ active_goal.description }}</p>
+                                    </div>
+                                    <a id="a-active-goal-deliverable" href="#" data-href="#active-goal-deliverable" class="target-link">Goal deliverable: {{ active_goal.deliverable_date and active_goal.deliverable_date.strftime("%m/%d/%Y") or "TBD" }}</a>
+                                    <div id="active-goal-deliverable" class="fold">
+                                        <p>{{ active_goal.deliverable_description}}</p>
+                                    </div>
+                                    {% if security.current_user.key in project.owners %}
+                                        <a id="a-owner-proposed-goal-actions" href="#" data-href="#owner-proposed-goal-actions" class="target-link">owner actions</a>
+                                        <div id="owner-proposed-goal-actions" class="fold">
+                                            <p>
+                                                {% if active_goal.funding_open %}
+                                                    <button id="owner-close-goal">Close</button>
+                                                {% else %}
+                                                    <button id="owner-open-goal">Open</button>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                    {% if security.permissions.admin %}
+                                        <a id="a-bbq-proposed-goal-actions" href="#" data-href="#bbq-proposed-goal-actions" class="target-link">bbq actions</a>
+                                        <div id="bbq-proposed-goal-actions" class="fold">
+                                            <p>
+                                                {% if active_goal.funding_open %}
+                                                    <button id="bbq-close-goal">Close</button>
+                                                {% else %}
+                                                    <button id="bbq-open-goal">Open</button>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             {% else %}
-                                <b>No active project goal. Propose one now (coming soon)!</b>
+                                {% if security.current_user.key in project.owners %}
+                                    {% if proposed_goals %}
+                                        {% for goal in proposed_goals %}
+                                            <input type="hidden" id="proposed-goal-key" value="{{ encrypt(goal.key.urlsafe()) }}" />
+                                            <div id="project-next-steps-accordion" class='css-accordion widget'>
+                                                <a id="a-proposed-goal-description" href="#" data-href="#proposed-goal-description" class="target-link">Proposed Goal: {{ currency(goal.amount) }}</a>
+                                                <div id="proposed-goal-description" class="fold">
+                                                    <p>{{ goal.description }}</p>
+                                                </div>
+                                                <a id="a-proposed-goal-deliverable" href="#" data-href="#proposed-goal-deliverable" class="target-link">Proposed deliverable: {{ goal.deliverable_date and goal.deliverable_date.strftime("%m/%d/%Y") or "TBD" }}</a>
+                                                <div id="proposed-goal-deliverable" class="fold">
+                                                    <p>{{ goal.deliverable_description}}</p>
+                                                </div>
+                                                <a id="a-owner-proposed-goal-actions" href="#" data-href="#owner-proposed-goal-actions" class="target-link">owner actions</a>
+                                                <div id="owner-proposed-goal-actions" class="fold">
+                                                    <p>
+                                                        {% if goal.status in ['f', 'r'] %}
+                                                            <button id="owner-submit-proposed-goal">Submit</button>
+                                                            <button id="owner-edit-proposed-goal">Edit</button>
+                                                        {% endif %}
+                                                        {% if goal.status in ['s', 'c'] %}
+                                                            <button id="owner-reopen-proposed-goal">Re-Open for Revision</button>
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                                {% if security.permissions.admin %}
+                                                    <a id="a-bbq-proposed-goal-actions" href="#" data-href="#bbq-proposed-goal-actions" class="target-link">bbq actions</a>
+                                                    <div id="bbq-proposed-goal-actions" class="fold">
+                                                        <p>
+                                                            {% if goal.status in ['s', 'r', 'd'] %}
+                                                                <button id="bbq-approve-proposed-goal">Approve</button>
+                                                                <button id="bbq-reject-proposed-goal">Reject</button>
+                                                                <button id="bbq-review-proposed-goal">Send for Revisions</button>
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <a id="a-propose-project-goal" href="#propose-project-goal">Propose a goal now</a>
+                                        <div id="propose-project-goal" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":470}}' data-title="Propose a new goal for {{ project.name }}...">
+                                            {% include "snippets/propose_goal.html" %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <span>No active goal for this project</span>
+                                {% endif %}
                             {% endif %}
                         </div><!-- end #active_goal -->
 
                         <div id='back_project'>
-                            <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
-                            <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":390}}' data-title="Backing {{ project.name }}...">
-                                {% include "snippets/back_project.html" with context %}
-                            </div>
+                            {% if project.status == 'o' and active_goal and active_goal.funding_open %}
+                                {% if security.current_user %}
+                                    <button id='back'><span id='a-back-project-dialog' data-href="#back-project-dialog">Back this project!</span></button>
+                                    <div id="back-project-dialog" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":390}}' data-title="Backing {{ project.name }}...">
+                                        {% include "snippets/back_project.html" with context %}
+                                    </div>
+                                {% else %}
+                                    <a href="/login" class="login-required-btn">Log in or sign up to contribute to this project</a>
+                                {% endif %}
+                            {% else %}
+                                <span id='cannot-back'>Project is {{ project.status | project_status }}</span>
+                            {% endif %}
                         </div> <!-- end #back_project -->
 
                         {% if completed_goals %}
@@ -250,9 +355,9 @@
 
                 <!-- project info tabset -->
                 <div id='project-tabset' class='pre-tabs relative tabset'>
-                    <a href='#details-tab' class='tab-rounded'>project<br>details</a>
-                    <a href='#members-tab' class='tab-rounded'>project<br>members</a>
-                    <a href='#team-tab' class='clear tab-rounded'>social<br>reach</a>
+                    <a href='#details-tab' class='tab-link tab-rounded'>project<br>details</a>
+                    <a href='#members-tab' class='tab-link tab-rounded'>project<br>members</a>
+                    <a href='#team-tab' class='clear tab-link tab-rounded'>social<br>reach</a>
 
                     <!-- details-tab -->
                     <div id='details-tab' class="tab" style="opacity: 0; display: none;">
@@ -334,11 +439,13 @@
 	function follow(ev) {
 		$.apptools.api.project.follow({subject: {key: window._cp.ke, kind: 'PROJECT'}}).fulfill({
 			success: function (r) {
-				document.getElementById('follow').classList.add('active');
+				document.getElementById('follow').classList.add('following');
+				$.apptools.dev.log('Project:Follow', 'Follow operation succeeded!', r);
 				$.apptools.analytics.track.social("Project", "Follow", "{{ project.name }}");
 			},
 			failure: function (e) {
 				document.getElementById('follow').classList.add('error');
+				$.apptools.dev.error('Project:Follow', 'An error was encountered trying to follow the specified project.', e);
 			}
 		});
 	}

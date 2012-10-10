@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
 from openfire.pipelines.model import ModelPipeline
+from openfire.pipelines.primitive.transport.mail import SendAdminsEmail
 
+PROPOSAL_SUBMITTED_TEXT = """
+Hi guys,
+    This %(objtype)s has been submitted for our approval.
+    %(url)s
+
+    Yours Truely,
+        Codebot.
+"""
 
 ## CategoryPipeline - fired when a Category entity is put/deleted
 class CategoryPipeline(ModelPipeline):
@@ -18,6 +27,16 @@ class ProposalPipeline(ModelPipeline):
 
     _model_binding = 'openfire.models.project.Proposal'
 
+    def put(self, key, model):
+
+        # Send admins an email when a proposal is submitted for approval.
+        if model.status == 's':
+            subject = "Proposal waiting for approval: %s" % model.name
+            url = 'https://staging.openfi.re/proposal/%s' % key
+            body = PROPOSAL_SUBMITTED_TEXT % {'url': url, 'objtype': 'Proposal'}
+            pipeline = SendAdminsEmail('codebot@openfi.re', subject, body)
+            pipeline.start(queue_name='mail')
+
 
 ## ProjectPipeline - fired when a Project entity is put/deleted
 class ProjectPipeline(ModelPipeline):
@@ -33,6 +52,17 @@ class GoalPipeline(ModelPipeline):
     ''' Processes goal puts/deletes. '''
 
     _model_binding = 'openfire.models.project.Goal'
+
+    def put(self, key, model):
+
+        # Send admins an email when a goal is submitted for approval.
+        if model.status == 's':
+            project = model.key.parent().get()
+            subject = "Project Goal waiting for approval for project: %s" % project.name
+            url = 'https://staging.openfi.re/project/%s' % project.key.urlsafe()
+            body = PROPOSAL_SUBMITTED_TEXT % {'url': url, 'objtype': 'Project Goal'}
+            pipeline = SendAdminsEmail('codebot@openfi.re', subject, body)
+            pipeline.start(queue_name='mail')
 
 
 ## TierPipeline - fired when a Tier entity is put/deleted

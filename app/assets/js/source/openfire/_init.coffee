@@ -161,7 +161,7 @@ class Openfire
 	                $.apptools.events.hook 'RPC_SUCCESS', (directive) =>
                         directive.finishtime = window.__clock.pn()
                         directive.runtime = (Math.floor(directive.finishtime) - Math.floor(directive.firetime))
-                        window.__clock.clockpoint("JavaScript", "AppTools RPC", directive.firetime, [directive.request.api, directive.request.method].join('.'), 100)
+                        window.__clock.clockpoint("JavaScript", "AppTools RPC", directive.firetime, [directive.request.service, directive.request.method].join('.'), 100)
 
                 return @
 

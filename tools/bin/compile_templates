@@ -185,10 +185,22 @@ def main():
 
     j2cfg = config.config.get('webapp2_extras.jinja2')
     j2cfg['globals'] = Landing.baseContext
-    j2cfg['filters'] = {'json': json.dumps}
+    _filters = {
+        'json': json.dumps,
+        'currency': lambda x: handler._format_as_currency(x, False),
+        'percentage': lambda x: handler._format_as_percentage(x, True),
+        'proposal_status': lambda x: project_models.Proposal._status_choices.get(x, ''),
+        'project_status': lambda x: project_models.Project._status_choices.get(x, ''),
+        'payment_status': lambda x: payment_models.Payment._status_choices.get(x, ''),
+        'transaction_status': lambda x: payment_models.Transaction._status_choices.get(x, '')
+    }
+    j2cfg['filters'] = dict([
+	    tuple([k, v]) for k, v in _filters.items()[:]
+	])
 
     environment = Environment(extensions=[autoescape, with_, do, loopcontrols], optimized=True)
-    environment.filters['json'] = json.dumps
+    for k, v in _filters.items():
+        environment.filters[k] = v
 
     environment.extend(wsgi_current_application=object(), wsgi_current_handler=handler)
     environment.add_extension(content.DynamicContent)

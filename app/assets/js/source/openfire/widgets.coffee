@@ -102,31 +102,38 @@ class Autocomplete extends CoreWidget
             @_state.active = false
             return @
 
+        @style = (el) =>
+            th = _('#'+@id)
+            w = el.offsetWidth or el.scrollWidth
+            h = el.offsetHeight or el.scrollHeight
+            offset = el.getOffset()
+
+            autoCSS =
+                width: w + 'px'
+                top: offset.top + h + 'px'
+                left: offset.left + 'px'
+
+            th.style[k] = v for k, v of autoCSS
+            return @
+
         @render = () =>
 
             el = _.get(@element_id)
-            h = el.offsetHeight or el.scrollHeight
-            offset = _.get_offset(el)
-
-            autoCSS =
-                top:  offset.top + h + 'px'
-                left: offset.left + 3 + 'px'
 
             df = _.create_doc_frag(@template.parse(@))
-            df.firstChild.style[prop] = val for prop, val of autoCSS
             document.body.appendChild(df)
 
-            _.bind(el, 'input', @complete)
+            _('#'+@element_id).bind('input', @complete)
 
             @template.t = @_state.config.item_template ||= [
                 '{{>_state.results}}',
-                    '<div id="autocomplete-result-{{=slug}}" class="autocomplete-result" data-name="{{=name}}">',
+                    '<div id="autocomplete-result-{{=slug}}" class="autocomplete-result{{none}} disabled{{/none}}" data-name="{{=name}}">',
                         '{{avatar}}',
                             '<img class="preview-small" src="{{=avatar}}">',
                             '<h6>{{=firstname}} {{=lastname}} ({{=username}})</h6>',
                             '<span>{{=location}}</span>',
                         '{{:avatar}}',
-                            '<h4{{none}} class="disabled"{{/none}}>{{=name}}</h4>',
+                            '<h4>{{=name}}</h4>',
                             '{{description}}<span>{{=description}}</span>{{/description}}',
                         '{{/avatar}}',
                     '</div>',
@@ -138,8 +145,8 @@ class Autocomplete extends CoreWidget
                 html = @template.parse(@)
                 el = _.get('#'+@id)
                 el.innerHTML = html
-                result_els = _.filter(_.get('.autocomplete-result', el), (v)-> return (v.classList? and not v.classList.contains('disabled')))
-                _.bind(result_els, 'click', @fill)
+                result_els = _.filter(el.find('.autocomplete-result'), (v)-> return !(v.hasClass('disabled')))
+                result_el.bind('click', @fill, true) for result_el in result_els
 
                 @show() if not @_state.active
 
@@ -184,6 +191,7 @@ class Autocomplete extends CoreWidget
                 e.stopPropagation()
 
                 el = e.target
+
                 input = el.value or el.innerText
                 input = input.toLowerCase()
 
@@ -191,6 +199,7 @@ class Autocomplete extends CoreWidget
                     @hide() if @_state.active
                     return false
                 else
+                    @style(el)
                     api = @_state.config.api
                     return $.apptools.api.search[api](query: input).fulfill
                         success: (res) =>
