@@ -745,7 +745,7 @@ class ProjectController extends OpenfireController
                 description: document.getElementById("propose-goal-description").value
                 funding_day_limit: parseInt(document.getElementById("propose-goal-funding_day_limit").value)
                 deliverable_description: document.getElementById("propose-goal-deliverable_description").value
-                deliverable_date: document.getElementById("propose-goal-deliverable_date").value
+                deliverable_date: new Date(document.getElementById("propose-goal-deliverable_date").value).toISOString()
 
             $.apptools.api.project.propose_goal(params).fulfill
                 success: () ->

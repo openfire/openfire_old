@@ -84,20 +84,22 @@
                                     <div id="active-goal-description" class="fold">
                                         <p>{{ active_goal.description }}</p>
                                     </div>
-                                    <a id="a-active-goal-deliverable" href="#" data-href="#active-goal-deliverable" class="target-link">Goal deliverable: {{ active_goal.deliverable_date }}</a>
+                                    <a id="a-active-goal-deliverable" href="#" data-href="#active-goal-deliverable" class="target-link">Goal deliverable: {{ active_goal.deliverable_date and active_goal.deliverable_date.strftime("%m/%d/%Y") or "TBD" }}</a>
                                     <div id="active-goal-deliverable" class="fold">
                                         <p>{{ active_goal.deliverable_description}}</p>
                                     </div>
-                                    <a id="a-owner-proposed-goal-actions" href="#" data-href="#owner-proposed-goal-actions" class="target-link">owner actions</a>
-                                    <div id="owner-proposed-goal-actions" class="fold">
-                                        <p>
-                                            {% if active_goal.funding_open %}
-                                                <button id="owner-close-goal">Close</button>
-                                            {% else %}
-                                                <button id="owner-open-goal">Open</button>
-                                            {% endif %}
-                                        </p>
-                                    </div>
+                                    {% if security.current_user.key in project.owners %}
+                                        <a id="a-owner-proposed-goal-actions" href="#" data-href="#owner-proposed-goal-actions" class="target-link">owner actions</a>
+                                        <div id="owner-proposed-goal-actions" class="fold">
+                                            <p>
+                                                {% if active_goal.funding_open %}
+                                                    <button id="owner-close-goal">Close</button>
+                                                {% else %}
+                                                    <button id="owner-open-goal">Open</button>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    {% endif %}
                                     {% if security.permissions.admin %}
                                         <a id="a-bbq-proposed-goal-actions" href="#" data-href="#bbq-proposed-goal-actions" class="target-link">bbq actions</a>
                                         <div id="bbq-proposed-goal-actions" class="fold">
@@ -121,7 +123,7 @@
                                                 <div id="proposed-goal-description" class="fold">
                                                     <p>{{ goal.description }}</p>
                                                 </div>
-                                                <a id="a-proposed-goal-deliverable" href="#" data-href="#proposed-goal-deliverable" class="target-link">Proposed deliverable: {{ goal.deliverable_date }}</a>
+                                                <a id="a-proposed-goal-deliverable" href="#" data-href="#proposed-goal-deliverable" class="target-link">Proposed deliverable: {{ goal.deliverable_date and goal.deliverable_date.strftime("%m/%d/%Y") or "TBD" }}</a>
                                                 <div id="proposed-goal-deliverable" class="fold">
                                                     <p>{{ goal.deliverable_description}}</p>
                                                 </div>
@@ -153,7 +155,7 @@
                                         {% endfor %}
                                     {% else %}
                                         <a id="a-propose-project-goal" href="#propose-project-goal">Propose a goal now</a>
-                                        <div id="propose-project-goal" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":490}}' data-title="Propose a new goal for {{ project.name }}...">
+                                        <div id="propose-project-goal" class="pre-modal" style="opacity: 0;" data-options='{"size":{"height":470}}' data-title="Propose a new goal for {{ project.name }}...">
                                             {% include "snippets/propose_goal.html" %}
                                         </div>
                                     {% endif %}
