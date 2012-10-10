@@ -168,7 +168,7 @@ class ProjectService(RemoteService):
         else:
             try:
                 subject = ndb.Key(urlsafe=request.subject.key).get()
-                
+
                 assert subject is not None
                 assert (not subject.is_private()) or (self.user in subject.viewers + subject.owners)
 
@@ -228,7 +228,7 @@ class ProjectService(RemoteService):
 
         try:
             subject = ndb.Key(urlsafe=request.subject.key).get()
-            
+
             assert subject is not None
             if hasattr(self, 'user'):
                 assert (not subject.is_private()) or (self.user in subject.owners + subject.viewers)
@@ -262,7 +262,7 @@ class ProjectService(RemoteService):
             raise self.exceptions.ProjectNotFound("Woops! It looks like that project doesn't exist!")
 
         except Exception, e:
-            raise self.exceptions.ProjectServiceBaseException("Woops! Something went wrong.")                
+            raise self.exceptions.ProjectServiceBaseException("Woops! Something went wrong.")
 
     @remote.method(message_types.VoidMessage, project_messages.Backers)
     def backers(self, request):

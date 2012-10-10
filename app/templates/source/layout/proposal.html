@@ -17,19 +17,35 @@
 
             {% if security.permissions.admin %}
                 <div id="bbq" data-section-title="bbq">
-                    <button id="bbq-promote" value="promote">promote to project</button>
-                    <button id="bbq-reject" value="reject">reject proposal</button>
+                    {% if proposal.status == 's' %}
+                        <span class="bbq-message">This proposal is awaiting admin action.</span>
+                    {% endif %}
+                    {% if proposal.status in ['s', 'r', 'd'] %}
+                        <button id="bbq-promote" value="promote">promote to project</button>
+                        <button id="bbq-reject" value="reject">reject proposal</button>
+                    {% endif %}
+                    {% if proposal.status in ['s', 'd'] %}
+                        <button id="bbq-review" value="review">send for review</button>
+                    {% endif %}
+                    {% if proposal.status != 'a' %}
+                        <button id="bbq-suspend" value="suspend">suspend proposal</button>
+                    {% endif %}
                 </div>
             {% endif %}
 
             {% if security.current_user.key in proposal.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
-                    <button id='promote-goal' value="goals">edit goal</button>
-                    <button id='promote-tiers' value="tiers">edit tiers</button>
-                    <button id='promote-submit' value="submit" type="button">submit</button>
-                    <button id='promote-add-viewers' value="add viewers">add viewers</button>
+                    {% if proposal.status in ['f', 'r', 'd'] %}
+                        <button id='promote-goal' value="goals">edit goal</button>
+                        <button id='promote-tiers' value="tiers">edit tiers</button>
+                        <button id='promote-submit' value="submit" type="button">submit</button>
+                    {% endif %}
+                    {% if proposal.status in ['s', 'd'] %}
+                        <button id='promote-reopen' value="reopen" type="button">re-open as draft</button>
+                    {% endif %}
                     <button id='promote-add-team-member' value="add team member">add team member</button>
+                    <button id='promote-add-viewers' value="add viewers">add viewers</button>
                 </div>
             {% endif %}
 
@@ -46,39 +62,73 @@
                 <section id='quickinfo'>
                     {% block right %}
 
-                        <div id='global_progress'>
-                            <!-- proposal progress -->
-                            <div id='progress' data-value="{{ proposal.progress }}" data-max="100"{% if proposal.progress == 100 %} class="done"{% endif %}>
-                                <div id='progress-inner' style='width: {{ proposal.progress }}%;'>{{ proposal.progress }}%</div>
-                            </div>
-                        </div><!-- end #global_progress -->
-
-                        <div id='proposal_goals' data-section-title="goals">
-                            {% if proposal.goals %}
-                            <div id="proposal-goals-accordion" class='css-accordion widget'>
-                                {% for goal in goals %}
-                                    <a id="a-{{ encrypt(goal.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(goal.key.urlsafe()) }}" class="target-link{% if goal.amount < proposal.money %} reached{% endif %}">{{ currency(goal.amount) }}</a>
-                                    <div id="{{ encrypt(goal.key.urlsafe()) }}" class="fold">
-                                        <p>{% if goal.description != none %}{{ goal.description }}{% else %}  {% endif %}</p>
-                                    </div>
-                                {% endfor %}
-                            </div>
+                        <div id='initial_goal' data-section-title="goal">
+                            {% if proposal.initial_goal %}
+                                <a id="a-proposal-initial-goal" href="#"
+                                    data-href="#proposal-initial-goal"
+                                    class="target-link">
+                                        Initial Funding Goal: {{ currency(proposal.initial_goal.amount) }}
+                                </a>
+                                <div id="proposal-initial-goal">
+                                    <p>{{ proposal.initial_goal.description }}</p>
+                                </div>
                             {% else %}
-                                <b>no proposal goals yet! :(</b>
+                                <b>No initial goal has been proposed. Propose one now (coming soon)!</b>
                             {% endif %}
-                        </div> <!-- end #proposal_goals -->
+                        </div><!-- end #active_goal -->
+
+                        <div id='proposal_status'>
+                            <span id='proposal-status'>Proposal is {{ proposal.status | proposal_status }}</span>
+                        </div> <!-- end #proposal_status -->
+
+                        <div id='proposal_next_steps'>
+                            {% if proposal.initial_next_steps %}
+                                <div class="sidebar-title">
+                                    Potential next steps for this proposal
+                                </div>
+                                <div class="sidebar-title-subtext">
+                                    (to be optionally voted on by backers)
+                                </div>
+                                <div id="proposal-next-steps-accordion" class='css-accordion widget'>
+                                    {% for next_step in proposal.initial_next_steps %}
+                                        <a id="a-proposal-initial-next-step-{{ loop.counter }}" href="#" data-href="#proposal-initial-next-step-{{ loop.counter }}" class="target-link">{{ next_step.summary }}</a>
+                                        <div id="proposal-initial-next-step-{{ loop.counter }}" class="fold">
+                                            <p>{{ next_step.description }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <b>no initial next steps have been proposed.</b>
+                            {% endif %}
+                        </div> <!-- end #proposal_next_steps -->
+
+                        <div id='future_goal'>
+                            <div class="sidebar-title">
+                                Ultimate goal
+                            </div>
+                            {% if proposal.future_goal %}
+                                <a id="a-proposal-future-goal" href="#" data-href="#proposal-future-goal" class="target-link">{{ proposal.future_goal.summary }}</a>
+                                <div id="proposal-future-goal" class="fold">
+                                    <p>{{ proposal.future_goal.description }}</p>
+                                </div>
+                            {% else %}
+                                <b>no future goal has been proposed.</b>
+                            {% endif %}
+                        </div> <!-- end #future_goal -->
 
                         <div id='proposal_tiers'  data-section-title="tiers">
-                            {% if proposal.tiers %}
-                            <div id="proposal-tiers-accordion" class='css-accordion widget'>
-                                {% for tier in tiers %}
-                                    <a id="a-{{ encrypt(tier.key.urlsafe()) }}" href="#" data-href="#{{ encrypt(tier.key.urlsafe()) }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
-                                    <div id="{{ encrypt(tier.key.urlsafe()) }}" class="fold">
-                                        <p>{{ tier.description|safe }}</p>
-                                    </div>
-                                {% endfor %}
-                             </div>
-
+                            <div class="sidebar-title">
+                                Donation tiers
+                            </div>
+                            {% if proposal.initial_tiers %}
+                                <div id="proposal-tiers-accordion" class='css-accordion widget'>
+                                    {% for tier in proposal.initial_tiers %}
+                                        <a id="a-proposal-initial-tier-{{ loop.counter }}" href="#" data-href="#proposal-initial-tier-{{ loop.counter }}" class="target-link">{{ tier.name }} - {{ currency(tier.amount) }}</a>
+                                        <div id="proposal-initial-tier-{{ loop.counter }}" class="fold">
+                                            <p>{{ tier.description|safe }}</p>
+                                        </div>
+                                    {% endfor %}
+                                 </div>
                             {% else %}
                                 <b>no proposal tiers yet! :(</b>
                             {% endif %}
@@ -88,33 +138,6 @@
                 </section> <!-- end #quickinfo -->
 
                 <hr class="hr-inset most"></span>
-
-                <section id='backers'>
-                    <div id='backproposal'>
-                        <button id='back'><span id="back-text">Back this proposal</span></button>
-                    </div> <!-- end #backproposal -->
-                    <div id='backer_summary'>
-                        backerz
-                    </div> <!-- end #backer_summary -->
-
-                    {% block freeform %}
-                        <div {{ {
-
-                            'id': 'proposal_freeform',
-                            'data-keyname': 'proposal_freeform' if security.current_user.key in proposal.owners else none,
-                            'data-namespace': encrypt(proposal.key.urlsafe()) if security.current_user.key in proposal.owners else none,
-                            'class': 'dynamic mini-editable' if security.current_user.key in proposal.owners else 'dynamic'
-
-                        }|xmlattr }}>
-
-                            {% content 'proposal_freeform', proposal.key.urlsafe() %}
-                                <b>Default content! I am overridden when you edit!</b>
-                            {% endcontent %}
-
-                        </div>
-                    {% endblock freeform %}
-
-                </section> <!-- end #backers -->
 
                 <div id='owners' >
                     <b>proposal owners:</b>

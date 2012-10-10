@@ -1611,7 +1611,7 @@ class ProjectController extends OpenfireController
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.go_live(key: @project_key).fulfill
+            $.apptools.api.project.cancel(key: @project_key).fulfill
                 success: () ->
                     alert("Your project has been canceled. Refunding all payments. Refreshing page...")
                     window.location.reload()
@@ -1646,6 +1646,12 @@ class ProjectController extends OpenfireController
 
                 if @_state.o and not /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
+
+                    # BBQ Actions
+                    document.getElementById('bbq-live')?.addEventListener('click', @go_live, false)
+                    document.getElementById('bbq-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('bbq-shutdown')?.addEventListener('click', @shutdown, false)
+                    document.getElementById('bbq-cancel')?.addEventListener('click', @cancel, false)
 
                     # Project Owner Actions
                     document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
