@@ -99,9 +99,9 @@ class ProposalHome(WebHandler):
             # calculate owners and viewers
             owners, viewers = [], []
             for v in allowed_viewers:
-                if v.key in proposal.owners:
+                if v.key in proposal.owners and not v in owners:
                     owners.append(v)
-                elif v.key in proposal.viewers:
+                elif v.key in proposal.viewers and not v in viewers:
                     viewers.append(v)
 
             page_content = self.render(

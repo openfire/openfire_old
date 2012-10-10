@@ -289,6 +289,12 @@
             font-size: 11pt
             text-transform: uppercase
 
+        .bbq-message
+            float: left
+            margin-top: 10px
+            font-size: 14pt
+            color: #FFFFFF
+
     #promote
         background-color: #ccc
 
@@ -498,10 +504,13 @@
         font-family: Karla
 
     #active_goal,
+    #initial_goal,
     #completed_goals,
     #project_next_steps,
+    #proposal_next_steps,
     #future_goal,
-    #project_tiers
+    #project_tiers,
+    #proposal_tiers
 
         margin: 10px
 
@@ -710,7 +719,8 @@
         &.backed
             +background(linear-gradient(top center, #bada55, green))
 
-    #cannot-back
+    #cannot-back,
+    #proposal-status
         font-family: Karla
         font-size: 18px
         font-weight: 700

@@ -255,7 +255,7 @@ config['apptools.project.services'] = {
             'enabled': True,
             'service': 'openfire.services.proposal.ProposalService',
             'methods': ['get', 'list', 'put', 'submitted', 'delete', 'comment', 'comments', 'submit',
-                        'promote', 'suspend', 'reject', 'reopen', 'add_viewer', 'remove_viewer'],
+                        'promote', 'suspend', 'reject', 'reopen', 'review', 'add_viewer', 'remove_viewer'],
 
             'config': {
                 'caching': 'none',
