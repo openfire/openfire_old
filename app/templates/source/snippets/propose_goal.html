@@ -1,0 +1,29 @@
+<form id="propose-project-goal-form">
+<div id="propose-project-goal-dialog">
+    <p>
+        <label class="short-input-label">Funding Goal: $</label>
+        <span><input type="text" id="propose-goal-amount" class="short-input" data-validation="number" name="amount" /></span>
+    </p>
+    <p>
+        <label class="short-input-label">Funding Day Limit (7-100 days):</label>
+        <input type="text" id="propose-goal-funding_day_limit" class="short-input"  data-validation="number"/>
+    </p>
+    <p>
+        <label>Goal Description:</label>
+        <textarea id="propose-goal-description"></textarea>
+    </p>
+    <p>
+        <label class="date-input-label">Deliverable Date:</label>
+        <input type="text" id="propose-goal-deliverable_date" class="date-input"/>
+    </p>
+    <p>
+        <label>Deliverable Description:</label>
+        <textarea id="propose-goal-deliverable_description"></textarea>
+    </p>
+    <p class="actions">
+        <button id='submit-proposed-goal' type='button'>Submit</button>
+        <button id='cancel-submit-proposed-goal' class='cancel' type='button'>Cancel</button>
+    </p>
+</div>
+</form>
+

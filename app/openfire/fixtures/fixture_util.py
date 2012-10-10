@@ -229,7 +229,7 @@ def create_category(slug='test', name='Test Category', description='some txt', k
 
 def create_goal(parent_key=None, contribution_type_id='fake', amount=1, description='DESCRIPTION',
         backer_count=0, progress=50, met=False, tiers=[], deliverable_description='DELIVERABLE',
-        slug='SLUG', funding_open=True, approved=True, rejected=False):
+        slug='SLUG', funding_open=True, status='a'):
 
     ''' Create a new funding goal. If parent is None, do not put the object (for proposals).'''
 
@@ -237,7 +237,7 @@ def create_goal(parent_key=None, contribution_type_id='fake', amount=1, descript
     goal = Goal(contribution_type=contribution_type, amount=amount, description=description,
             backer_count=backer_count, progress=progress, met=met, parent=parent_key,
             deliverable_description=deliverable_description, funding_open=funding_open,
-            approved=approved, rejected=rejected)
+            status=status)
     parent_obj = None
     if parent_key:
         goal.parent = parent_key

@@ -738,6 +738,25 @@ class ProjectController extends OpenfireController
                     alert("Failed to start donation. Are you logged in?")
             return
 
+        @propose_goal = () =>
+            params =
+                project: @project_key
+                amount: parseFloat(document.getElementById("propose-goal-amount").value)
+                description: document.getElementById("propose-goal-description").value
+                funding_day_limit: parseInt(document.getElementById("propose-goal-funding_day_limit").value)
+                deliverable_description: document.getElementById("propose-goal-deliverable_description").value
+                deliverable_date: document.getElementById("propose-goal-deliverable_date").value
+
+            $.apptools.api.project.propose_goal(params).fulfill
+                success: () ->
+                    alert("Proposal submitted! Refreshing page...")
+                    window.location.reload()
+
+                failure: (response) ->
+                    alert("There was an error when submitting your proposed goal: " + response.responseText)
+
+        @close_propose_goal = () =>
+            $.apptools.widgets.modal.get("propose-project-goal").close()
 
         @follow = () =>
 
@@ -1618,6 +1637,89 @@ class ProjectController extends OpenfireController
                 failure: (response) ->
                     alert("Error:", response.error)
 
+
+        @approve_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.approve_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been approved. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reject_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.reject_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been rejectd. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @review_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.review_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been sent for revisions. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @submit_proposed_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.submit_proposed_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been submitted for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reopen_proposed_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.reopen_proposed_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been submitted for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @open_goal= (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.open_goal(key: @project.active_goal).fulfill
+                success: () ->
+                    alert("This goal has been opened. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @close_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.close_goal(key: @project.active_goal).fulfill
+                success: () ->
+                    alert("This goal has been closed. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
         @_init = () =>
 
             if window._cp and _.get('#project')?
@@ -1659,6 +1761,26 @@ class ProjectController extends OpenfireController
                     document.getElementById('promote-suspend')?.addEventListener('click', @suspend, false)
                     document.getElementById('promote-shutdown')?.addEventListener('click', @shutdown, false)
                     document.getElementById('promote-cancel')?.addEventListener('click', @cancel, false)
+
+                    # Propose a new goal
+                    document.getElementById('submit-proposed-goal')?.addEventListener('click', @propose_goal, false)
+                    document.getElementById('cancel-submit-proposed-goal')?.addEventListener('click', @close_propose_goal, false)
+                    if document.getElementById('propose-goal-deliverable_date')
+                        dpicker = new datepickr('propose-goal-deliverable_date', { dateFormat: 'm-d-Y' })
+
+                    # Owner goal actions
+                    document.getElementById('owner-open-goal')?.addEventListener('click', @open_goal, false)
+                    document.getElementById('owner-close-goal')?.addEventListener('click', @close_goal, false)
+                    document.getElementById('owner-submit-proposed-goal')?.addEventListener('click', @submit_proposed_goal, false)
+                    document.getElementById('owner-reopen-proposed-goal')?.addEventListener('click', @reopen_proposed_goal, false)
+                    document.getElementById('owner-edit-proposed-goal')?.addEventListener('click', @edit_goal, false)
+
+                    # BBQ goal actions
+                    document.getElementById('bbq-open-goal')?.addEventListener('click', @open_goal, false)
+                    document.getElementById('bbq-close-goal')?.addEventListener('click', @close_goal, false)
+                    document.getElementById('bbq-approve-proposed-goal')?.addEventListener('click', @approve_goal, false)
+                    document.getElementById('bbq-reject-proposed-goal')?.addEventListener('click', @reject_goal, false)
+                    document.getElementById('bbq-review-proposed-goal')?.addEventListener('click', @review_goal, false)
 
                     document.getElementById('promote-dropzone')?.addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
