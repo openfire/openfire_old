@@ -173,10 +173,27 @@ class CoreSessionAPI(CoreAPI):
         self.logging.info('Storing session.')
         if self.config.get('frontends', {}).get('cookies', {}).get('enabled', False):
 
+            if session.get('destroy', False) == True:
+                self.logging.info('CoreSessions received session destroy signal. Removing cookie.')
+                handler.response.delete_cookie(self.config['frontends']['cookies']['name'])
+                return self.manager._save_at_sid(sid, session, handler)
+
             name = self.config['frontends']['cookies']['name']
             self.logging.info('Cookies enabled. Setting secure cookie at name "%s".' % name)
             serialized_cookie = self.serializer.serialize(name, session)
-            handler.response.set_cookie(name, serialized_cookie)
+            if not gc.debug:
+                handler.response.set_cookie(name, serialized_cookie, **{
+                    'max_age': int(self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)),
+                    'path': self.config.get('frontends', {}).get('cookies', {}).get('path', '/'),
+                    'domain': self.config.get('frontends', {}).get('cookies', {}).get('domain', '*.openfi.re'),
+                    'secure': self.config.get('frontends', {}).get('cookies', {}).get('secure', False)
+                })
+            else:
+                handler.response.set_cookie(name, serialized_cookie, **{
+                    'max_age': int(self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)),
+                    'path': self.config.get('frontends', {}).get('cookies', {}).get('path', '/'),
+                    'secure': False
+                })
 
         if self.config.get('frontends', {}).get('localstorage', {}).get('enabled', False):
 

@@ -110,6 +110,11 @@ class MemcacheSessionLoader(OpenfireSessionLoader):
         self.logging.info('Saving session in memcache at ID: "%s"' % id)
         self.logging.info('Saving session in memcache at encoded ID: "%s"' % self._en(id))
 
+        if struct.get('destroy', False) == True:
+            self.logging.info('Memcache loader received destroy signal...')
+            memcache.delete(self._en(id))
+            return
+
         timeout = self.config.get('backends', {}).get('memcache', {}).get('ttl', self.config.get('ttl', 1200))
 
         self.logging.info('Timeout set to: "%s".' % timeout)
@@ -150,6 +155,21 @@ class PersistentSessionLoader(OpenfireSessionLoader):
         ''' Saves a session to the datastore, from a generated response. '''
 
         self.logging.info('Saving session in datastore at ID: "%s"' % id)
+
+        if struct.get('destroy', False) == True:
+            self.logging.info('Datastore loader received destroy signal...')
+            try:
+                skey = ndb.Key(sessions.Session, id)
+                skey.delete()
+            except Exception, e:
+                self.logging.error('Encountered unknown exception trying to destroy session at ID "%s". The uncaught exception was: "%s".' % (id, e))
+                if gc.debug:
+                    raise
+                else:
+	                return {}
+            else:
+                self.logging.info('Session destroyed successfully.')
+                return {}
 
         skey = ndb.Key(sessions.Session, id)
         session_o = sessions.Session(key=skey, sid=id, data=struct, user=None, addr=handler.request.environ.get('REMOTE_ADDR', '__NULL__'))

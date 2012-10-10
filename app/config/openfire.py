@@ -289,7 +289,7 @@ config['openfire.security'] = {
 
 config['openfire.multitenancy'] = {
     'enabled': True,
-    'namespace': 'production'
+    'namespace': 'authfixes'
 }
 
 config['openfire.output'] = {
@@ -361,22 +361,25 @@ config['openfire.classes.WebHandler'] = {
 config['openfire.sessions'] = {
 
     'ttl': 86400,  # timeout in seconds for stale session records
-    'logging': False,  # enable logging if you want to know what's going on
+    'logging': True,  # enable logging if you want to know what's going on
     'cookieless': True,  # whether to enable cookieless (localstorage-based) sessions
     'salt': 'j09h8v9b&!V!V6vcvkcudv11',  # used for custom meals
 
     'frontends': {
 
         'cookies': {
+            'enabled': True,
             'ttl': '86400',
             'name': 'ofsession',
-            'enabled': True
+            'path': '/',
+            'domain': '*.openfi.re',
+            'secure': True
         },
 
         'localstorage': {
+            'enabled': False,
             'ttl': '86400',
-            'name': 'ofsn',
-            'enabled': False
+            'name': 'ofsn'
         }
 
     },
