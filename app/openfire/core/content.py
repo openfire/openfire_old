@@ -829,6 +829,7 @@ class ContentBridge(object):
                 # DB choice converters.
                 'proposal_status': lambda x: project_models.Proposal._status_choices.get(x, ''),
                 'project_status': lambda x: project_models.Project._status_choices.get(x, ''),
+                'goal_status': lambda x: project_models.Goal._status_choices.get(x, ''),
                 'payment_status': lambda x: payment_models.Payment._status_choices.get(x, ''),
                 'transaction_status': lambda x: payment_models.Transaction._status_choices.get(x, ''),
             }

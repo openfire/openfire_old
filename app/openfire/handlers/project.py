@@ -138,6 +138,7 @@ class ProjectHome(WebHandler):
 
             # pull goals and tiers
             active_goal = project.active_goal and project.active_goal.get() or None
+            proposed_goals = p.Goal.query(ancestor=project.key).filter(p.Goal.status != 'a').fetch()
             tiers = []
             next_steps = []
             if active_goal:
@@ -178,6 +179,7 @@ class ProjectHome(WebHandler):
                     avatar=avatar,
                     images=p_images,
                     active_goal=active_goal,
+                    proposed_goals=proposed_goals,
                     completed_goals=completed_goals,
                     future_goal=future_goal,
                     tiers=tiers,
