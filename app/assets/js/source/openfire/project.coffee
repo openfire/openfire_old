@@ -8,35 +8,6 @@ class ProjectVideo extends Asset
 class ProjectAvatar extends Asset
 
 
-# project object classes
-
-class Goal extends Model
-
-    model:
-        key: String()
-        target: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        backer_count: Number()
-        progress: Number()
-        met: Boolean()
-
-
-class Tier extends Model
-
-    model:
-        key: String()
-        target: String()
-        name: String()
-        contribution_type: String()
-        amount: Number()
-        description: String()
-        delivery: String()
-        backer_count: Number()
-        backer_limit: Number()
-
-
 # base project class
 class Project extends Model
 
@@ -54,12 +25,21 @@ class Project extends Model
         keywords: Array()
         creator: String()
         owners: Array()
-        goals: Array()
-        tiers: Array()
+        public: Boolean()
+        viewers: Array()
+        backers: Number()
+        followers: Number()
+        money: Number()
+        progress: Number()
+        active_goal: String()
+        completed_goals: Array()
+        future_goal: String()
 
     constructor: () ->
 
         super
+
+        @log = () => return console.log.apply(console, arguments)
 
         @stashes = {}
         @internal =
@@ -165,15 +145,6 @@ class Project extends Model
 
 
 
-# base proposal object
-class Proposal extends Model
-
-    model: null
-
-    constructor: (@key) ->
-        return @
-
-
 # project controller
 class ProjectController extends OpenfireController
 
@@ -198,10 +169,12 @@ class ProjectController extends OpenfireController
 
         @_state = _.extend(true, {}, window._cp)
 
-        @project = new Project(@_state.ke)
-        @project_key = @project.key
+        if @_state.ke and not /proposal/.test(window.location.href)
+            @project = new Project(@_state.ke)
+            @project.get()
+            @project_key = @project.key
 
-        @log = (message) => return @constructor::log(@constructor.name, message)
+        @log = () => return console.log.apply(console, arguments)
 
         @internal =
 
@@ -661,7 +634,7 @@ class ProjectController extends OpenfireController
                 type = "MasterCard"
             if /^6011/.test(val)
                 type = "Discover"
-            document.getElementById("back-project-cc-type-display").innerHTML = type
+            document.getElementById("back-project-cc-type-display")?.innerHTML = type
             return false
 
         @choose_donation_tier = () ->
@@ -765,6 +738,25 @@ class ProjectController extends OpenfireController
                     alert("Failed to start donation. Are you logged in?")
             return
 
+        @propose_goal = () =>
+            params =
+                project: @project_key
+                amount: parseFloat(document.getElementById("propose-goal-amount").value)
+                description: document.getElementById("propose-goal-description").value
+                funding_day_limit: parseInt(document.getElementById("propose-goal-funding_day_limit").value)
+                deliverable_description: document.getElementById("propose-goal-deliverable_description").value
+                deliverable_date: new Date(document.getElementById("propose-goal-deliverable_date").value).toISOString()
+
+            $.apptools.api.project.propose_goal(params).fulfill
+                success: () ->
+                    alert("Proposal submitted! Refreshing page...")
+                    window.location.reload()
+
+                failure: (response) ->
+                    alert("There was an error when submitting your proposed goal: " + response.responseText)
+
+        @close_propose_goal = () =>
+            $.apptools.widgets.modal.get("propose-project-goal").close()
 
         @follow = () =>
 
@@ -1267,7 +1259,7 @@ class ProjectController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.project.list_tiers(project: @project_key).fulfill
+                    $.apptools.api.project.list_tiers(goal: @project.active_goal).fulfill
                         success: (response) =>
                             tiers = []
                             tiers.push(@attach(new Goal(target: @project_key).from_message(tier))) for tier in response.tiers
@@ -1601,6 +1593,132 @@ class ProjectController extends OpenfireController
 
                 , sync
 
+        @go_live = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.go_live(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project is live! Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @suspend = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.suspend(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project has been suspended. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @shutdown = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.shutdown(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project has been shut down. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @cancel = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.cancel(key: @project_key).fulfill
+                success: () ->
+                    alert("Your project has been canceled. Refunding all payments. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+
+        @approve_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.approve_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been approved. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reject_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.reject_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been rejectd. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @review_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.review_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been sent for revisions. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @submit_proposed_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.submit_proposed_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been submitted for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reopen_proposed_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.reopen_proposed_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been submitted for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @open_goal= (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.open_goal(key: @project.active_goal).fulfill
+                success: () ->
+                    alert("This goal has been opened. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @close_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.close_goal(key: @project.active_goal).fulfill
+                success: () ->
+                    alert("This goal has been closed. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
 
         @_init = () =>
 
@@ -1614,61 +1732,79 @@ class ProjectController extends OpenfireController
                 # event listeners
                 document.getElementById('follow').addEventListener('click', @follow, false)
                 document.getElementById('share').addEventListener('click', @share, false)
-                document.getElementById('back').addEventListener('click', @back, false)
+                document.getElementById('back')?.addEventListener('click', @back, false)
 
                 # Event listeners in the back project dialog.
                 for el in document.getElementsByClassName('vote-plus')
                     el.addEventListener('click', @next_step_vote_plus, false)
                 for el in document.getElementsByClassName('vote-minus')
                     el.addEventListener('click', @next_step_vote_minus, false)
-                for el in document.getElementById('donate-step-1').find('input')
+                for el in document.getElementById('donate-step-1')?.find('input')?
                     el.addEventListener('click', @choose_donation_tier, false)
-                document.getElementById('back-project-money-source-input').addEventListener('change', @select_money_source)
+                document.getElementById('back-project-money-source-input')?.addEventListener('change', @select_money_source)
                 _.ready () =>
                     $("#donate-wizard").smartWizard
                         onFinish: @submit_payment
 
-                if @_state.o
+                if @_state.o and not /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
-                    document.getElementById('promote-goals').addEventListener('click', @goals.edit, false)
-                    document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
 
-                    document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
+                    # BBQ Actions
+                    document.getElementById('bbq-live')?.addEventListener('click', @go_live, false)
+                    document.getElementById('bbq-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('bbq-shutdown')?.addEventListener('click', @shutdown, false)
+                    document.getElementById('bbq-cancel')?.addEventListener('click', @cancel, false)
+
+                    # Project Owner Actions
+                    document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-live')?.addEventListener('click', @go_live, false)
+                    document.getElementById('promote-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('promote-shutdown')?.addEventListener('click', @shutdown, false)
+                    document.getElementById('promote-cancel')?.addEventListener('click', @cancel, false)
+
+                    # Propose a new goal
+                    document.getElementById('submit-proposed-goal')?.addEventListener('click', @propose_goal, false)
+                    document.getElementById('cancel-submit-proposed-goal')?.addEventListener('click', @close_propose_goal, false)
+                    if document.getElementById('propose-goal-deliverable_date')
+                        dpicker = new datepickr('propose-goal-deliverable_date', { dateFormat: 'm-d-Y' })
+
+                    # Owner goal actions
+                    document.getElementById('owner-open-goal')?.addEventListener('click', @open_goal, false)
+                    document.getElementById('owner-close-goal')?.addEventListener('click', @close_goal, false)
+                    document.getElementById('owner-submit-proposed-goal')?.addEventListener('click', @submit_proposed_goal, false)
+                    document.getElementById('owner-reopen-proposed-goal')?.addEventListener('click', @reopen_proposed_goal, false)
+                    document.getElementById('owner-edit-proposed-goal')?.addEventListener('click', @edit_goal, false)
+
+                    # BBQ goal actions
+                    document.getElementById('bbq-open-goal')?.addEventListener('click', @open_goal, false)
+                    document.getElementById('bbq-close-goal')?.addEventListener('click', @close_goal, false)
+                    document.getElementById('bbq-approve-proposed-goal')?.addEventListener('click', @approve_goal, false)
+                    document.getElementById('bbq-reject-proposed-goal')?.addEventListener('click', @reject_goal, false)
+                    document.getElementById('bbq-review-proposed-goal')?.addEventListener('click', @review_goal, false)
+
+                    document.getElementById('promote-dropzone')?.addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.classList.add('hover')
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragover', d_on, false)
-                    document.getElementById('promote-dropzone').addEventListener('dragleave', d_off = (ev) ->
+                    document.getElementById('promote-dropzone')?.addEventListener('dragover', d_on, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('dragleave', d_off = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.className = 'dropzone'
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragexit', d_off, false)
-                    document.getElementById('promote-dropzone').addEventListener('drop', ((ev) =>
+                    document.getElementById('promote-dropzone')?.addEventListener('dragexit', d_off, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('drop', ((ev) =>
                         d_off(ev)
                         return @add_media(ev)
                     ), false)
 
             window.__pr = new Project('my-test-project-key')
             return @get()
-
-
-
-# proposal controller
-class ProposalController extends OpenfireController
-
-    @mount = 'proposal'
-    @events = []
-
-    constructor: (openfire, window) ->
-
-        @_init = () =>
-            return
 
 
 if @__openfire_preinit?

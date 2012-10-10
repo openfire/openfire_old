@@ -130,28 +130,6 @@
 <div id='templates' class='hidden resource'>
 	<!-- JS Templates -->
 	{% block jstemplates %}
-	<script type="text/template" id="Button">
-		<button[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[=content]]]</button>
-	</script>
-	<script type="text/template" id="TierEditModal">
-		<div id="[[[<type]]]-editing-[[[<index]]]" class="[[[&1]]]">
-			<h3 id="[[[&1]]]-amount-[[[&2]]]" class="[[[&1]]]-field amount" contenteditable=true>[[[=amount]]]</h3>
-			<p id="[[[&1]]]-description-[[[&2]]]" class="rounded [[[&1]]]-field description" contenteditable=true>
-				[[[description]]][[[=description]]][[[:description]]]default description[[[/description]]]
-			</p>
-			[[[>buttons]]][[[+Button]]][[[/buttons]]]
-		</div>
-	</script>
-	<script type="text/template" id="CommentItem">
-		<div class="comment" id="">
-			<span class="avatar-small"><img src="" width="32" height="32"></span>
-			<span class="comment-content">
-				<a href="https://openfi.re/[[[<username]]]">[[[&1]]]</a>&nbsp;
-				[[[=content]]]<br>
-				<span class="shh">[[[=created]]]</span>
-			</span>
-		</div>
-	</script>
 	{% endblock jstemplates %}
 </div>
 

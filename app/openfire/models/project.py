@@ -55,11 +55,20 @@ class Goal(AppModel):
     _message_class = common.Goal
     _pipeline_class = pipelines.GoalPipeline
 
+    _status_choices = {
+        'f': 'Draft',
+        's': 'Submitted',
+        'r': 'Review',
+        'd': 'Denied',
+        'a': 'Approved',
+        'p': 'Suspended',
+        'c': 'Closed',
+    }
+
     slug = ndb.StringProperty('sl', indexed=True)
     target = ndb.KeyProperty('t', indexed=True, default=None)
     contribution_type = ndb.KeyProperty('p', indexed=True, default=_default_contribution_type)
-    approved = ndb.BooleanProperty('aa', default=False)
-    rejected = ndb.BooleanProperty('rj', default=False)
+    status = ndb.StringProperty('st', indexed=True, choices=['f', 's', 'r', 'd', 'a', 'p', 'c'], default='f')  # draft, submitted, review, denied, approved, suspended, closed
 
     # Description and stats.
     description = ndb.TextProperty('d', indexed=False)

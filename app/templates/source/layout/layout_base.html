@@ -6,7 +6,58 @@
 {% endblock stylesheets %}
 
 {% block jstemplates %}
-	<script id='sample' type='apptools/template'></script>
+    <script type="text/template" id="Button">
+        <button[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[=content]]]</button>
+    </script>
+    <script type="text/template" id="TierEditModal">
+        <div id="[[[<type]]]-editing-[[[<index]]]" class="[[[&1]]]">
+            <h3 id="[[[&1]]]-amount-[[[&2]]]" class="[[[&1]]]-field amount" contenteditable=true>[[[=amount]]]</h3>
+            <p id="[[[&1]]]-description-[[[&2]]]" class="rounded [[[&1]]]-field description" contenteditable=true>
+                [[[description]]][[[=description]]][[[:description]]]default description[[[/description]]]
+            </p>
+            [[[>buttons]]][[[+Button]]][[[/buttons]]]
+        </div>
+    </script>
+    <script type="text/template" id="CommentItem">
+        <div class="comment" id="">
+            <span class="avatar-small"><img src="" width="32" height="32"></span>
+            <span class="comment-content">
+                <a href="https://openfi.re/[[[<username]]]">[[[&1]]]</a>&nbsp;
+                [[[=content]]]<br>
+                <span class="shh">[[[=created]]]</span>
+            </span>
+        </div>
+    </script>
+    <script type="text/template" id="ProfileCard">
+        <div class="profile-card">
+            <a href="[[[=url]]]">
+                <div class="avatar" data-name="[[[=name]]]">
+                    <img src="[[[=avatar_url]]]">
+                </div>
+            </a>
+            <div class="accounts">
+            [[[>accounts]]]
+                <a class="icon [[[=service]]]" href="[[[=url]]]"></a>
+            [[[/accounts]]]
+            </div>
+        </div>
+    </script>
+    <script type="text/template" id="TopicEditItem">
+        <span class="interest topic-edit clear" data-topic="[[[=key]]]">
+            <div class="right">
+                <span class="ctrl promote">&#xf0020;</span>
+                <span class="ctrl demote">&#xf001f;</span>
+                <span class="ctrl remove">&#xf0016;</span>
+            </div>
+            [[[=name]]]
+        </span>
+    </script>
+    <script type="text/template" id="TopicTag">
+        <span class="interest topic tag" data-topic-slug="[[[=slug]]]">
+            [[[=name]]]
+            <span class="delete-tag">x</span>
+        </span>
+    </script>
 {% endblock jstemplates %}
 
 {% block header %}

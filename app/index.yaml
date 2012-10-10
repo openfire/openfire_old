@@ -10,6 +10,11 @@ indexes:
   properties:
   - name: a
 
+- kind: Goal
+  ancestor: yes
+  properties:
+  - name: st
+
 - kind: Tier
   ancestor: yes
   properties:

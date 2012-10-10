@@ -414,7 +414,7 @@ config['openfire.datamodel'] = {
 config['openfire.datamodel.integration.pipelines'] = {
 
     'enable': True,  # enable/disable pipelines integration
-    'logging': False,  # enable/disable logging
+    'logging': True,  # enable/disable logging
     'autostart': True,  # automatically kick off bound pipelines
     'trigger_queue': 'trigger'  # task queue to send pipelines to
 
@@ -424,8 +424,8 @@ config['openfire.wepay'] = {
 
     'use_production': False,
     'auth_scope': 'manage_accounts,view_balance,collect_payments,refund_payments,view_user,send_money',
-    'redirect_uri': 'https://openfi.re/_payment/handler',
-    'callback_uri': 'https://openfi.re/_payment/ipn',
+    'redirect_uri': 'https://staging.openfi.re/_payment/handler',
+    'callback_uri': 'https://staging.openfi.re/_payment/ipn',
 
     'staging': {
         'client_id': '118300',

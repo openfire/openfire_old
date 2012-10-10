@@ -1,4 +1,6 @@
-@import "../main"
+@import ../main
+@import ../_partials/widgets
+
 @media only screen and (max-width: 767px)
     #main
         margin-top: 42px
@@ -95,6 +97,10 @@
         white-space: nowrap
         text-overflow: ellipsis
 
+    h2
+        margin-bottom: 10px
+        text-decoration: underline
+
     .content
         width: 96%
         padding: 1%
@@ -104,8 +110,9 @@
         background-color: #ccc
 
         p
-            margin: 0 auto 12px
-            color: #696969
+            margin: 0 1% 12px
+            max-width: 600px
+            color: #474747
             font-size: 13pt
 
     .scrollpoint
