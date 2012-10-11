@@ -96,6 +96,7 @@ class Login(WebHandler, SecurityConfigProvider):
             appid = self._metaConfig.get('opengraph', {}).get('facebook', {}).get('app_id', '__EMPTY_APP_ID__')
 
         return self.do_auth_redirect(
+
             "https://www.facebook.com/dialog/oauth?client_id=%(appid)s&redirect_uri=%(callback)s&scope=%(scope)s&state=%(state)s" % {
 
                 # appID and sessionID
@@ -105,9 +106,14 @@ class Login(WebHandler, SecurityConfigProvider):
                 # scopes and callback
                 'scope': ','.join([scope.get('name') for scope in self._resolveProvider('facebook').get('scopes', []) if scope.get('enabled', False)]),
                 'callback': ''.join([
-                                self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
-                                self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                                self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=hashlib.sha1(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+                                'https' if (self.force_https and not cfg.debug) else self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
+                                self.force_hostname or self.request.environ.get('HTTP_HOST', 'localhost:8080'),
+                                self.url_for('auth/action-provider',
+                                    action='callback',
+                                    provider='facebook',
+                                    csrf=hashlib.sha1(self.session.get('sid')).hexdigest(),
+                                    ofsid=self.encrypt(self.session.get('sid'))
+                                )
                             ])
 
         })
