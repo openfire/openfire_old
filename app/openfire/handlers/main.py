@@ -25,7 +25,7 @@ class Placeholder(WebHandler):
     should_cache = True
     transport = {
         'secure': True,
-        'endpoint': 'beta.openfi.re',
+        'endpoint': 'staging.openfi.re',
         'consumer': 'ofplaceholder'
     }
 

@@ -66,15 +66,15 @@ config['apptools.project.output'] = {
     },
 
     'assets': {  # Asset API
-        'minified': False,        # whether to switch to minified assets or not
-        'serving_mode': 'local',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
+        'minified': True,        # whether to switch to minified assets or not
+        'serving_mode': 'cdn',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
         'cdn_prefix': ['beta.openfi.re']          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
     },
 
     'headers': {  # Default Headers (only supported headers are shown)
-        'Cache-Control': 'no-cache',  # default to not caching dynamic content
+        'Cache-Control': 'private,max-age=3600',  # default to not caching dynamic content
         'X-UA-Compatible': 'IE=edge,chrome=1',  # http://code.google.com/chrome/chromeframe/
-        'Access-Control-Allow-Origin': '*.openfi.re *.lyr9.net beta.openfi.re staging.openfi.re'      # allow crossdomain access from anywhere
+        'Access-Control-Allow-Origin': 'https://beta.openfi.re https://staging.openfi.re https://openfi.re'  # allow crossdomain access from anywhere
     }
 
 }
