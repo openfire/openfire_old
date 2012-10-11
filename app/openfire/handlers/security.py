@@ -495,9 +495,14 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
                     'client': client,
                     'redirect': ''.join([
-                            self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
-                            self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                            self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=csrf)
+                            self.url_for('auth/action-provider',
+                                action='callback',
+                                provider='facebook',
+                                csrf=csrf,
+                                _full=True,
+                                _netloc=self.force_hostname or self.request.host,
+                                _scheme='https' if not cfg.debug else 'http'
+                            )
                     ]),
                     'secret': secret,
                     'code': code
