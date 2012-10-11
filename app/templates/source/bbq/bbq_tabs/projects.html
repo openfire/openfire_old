@@ -18,7 +18,7 @@
             <tr>
                 <td><a href="/{{ project.get_custom_url() }}">{{ project.name }}</a></td>
                 <td>{{ project.get_custom_url() }}</td>
-                <td>{{ project.status }}</td>
+                <td>{{ project.status | project_status }}</td>
                 <td>{{ project.summary }}</td>
                 <td>
                     {% for owner in project.owners %}

@@ -13,6 +13,9 @@
 
             {% if security.permissions.admin %}
                 <div id="bbq" data-section-title="bbq">
+                    {% if proposed_goals and proposed_goals[0].status == 's' %}
+                        <span class="bbq-message">This project has a goal that is awaiting admin action.</span>
+                    {% endif %}
                     {% if project.status in ['p', 'c', 'x', 's'] %}
                         <button id="bbq-live" value="go live">go live</button>
                     {% endif %}

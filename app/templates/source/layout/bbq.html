@@ -1,15 +1,23 @@
 {% extends "layout/layout_base.html" %}
 
 {% block postnorth %}
-    <link rel="stylesheet" href="/assets/style/static/compiled/openfire/bbq.css">
+    <link rel='stylesheet' href='{{ asset.style('bbq', 'openfire') }}'>
     <link rel="stylesheet" href="/assets/style/static/compiled/jquery.dataTables.css">
 {% endblock %}
 
 {% block main %}
 
-    {% block moderate %}
-        MODERATION
-    {% endblock %}
+    {% if security.permissions.admin %}
+    <div id="bbq-moderation-page">
+        {% block moderate %}
+            MODERATION
+        {% endblock moderate %}
+    </div>
+    {% else %}
+    <div class="login-redirect">
+        What are <em>you</em> doing here? (<a href="/login">login</a>?)
+    </div>
+    {% endif %}
 
 {% endblock %}
 

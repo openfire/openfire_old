@@ -285,7 +285,7 @@ class Project(AppModel):
     def get_custom_url(self):
         if self.customurl:
             return self.customurl.id()
-        return self.key.urlsafe()
+        return '/project/%s' % self.key.urlsafe()
 
 
 ######## ======== Project Submodels ======== ########

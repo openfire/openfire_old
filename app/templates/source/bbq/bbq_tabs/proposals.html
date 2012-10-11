@@ -14,8 +14,8 @@
         <tbody>
             {% for proposal in proposals %}
             <tr>
-                <td>{{ proposal.name }}</td>
-                <td>{{ proposal.status }}</td>
+                <td><a href="/proposal/{{ encrypt(proposal.key.urlsafe()) }}">{{ proposal.name }}</a></td>
+                <td>{{ proposal.status | proposal_status }}</td>
                 <td>{{ proposal.summary }}</td>
                 <td>
                     {% for owner in proposal.owners %}

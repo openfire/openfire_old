@@ -28,7 +28,7 @@
                 <td>{{ payment.to_project_tier }}</td>
                 <td>{{ payment.amount }}</td>
                 <td>{{ payment.commission }}</td>
-                <td>{{ payment.status }}</td>
+                <td>{{ payment.status | payment_status }}</td>
                 <td>{{ payment.current_transaction }}</td>
                 <td>
                     {% for transaction in payment.all_transactions %}
