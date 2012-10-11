@@ -341,13 +341,16 @@ class ProposalService(RemoteService):
         initial_goal = None
         if proposal.initial_goal:
             initial_goal = proposal.initial_goal
-            initial_goal.parent = new_project.key
+            key_id = Goal.allocate_ids(1, parent=new_project.key)[0]
+            initial_goal.key = ndb.Key(Goal, key_id, parent=new_project.key)
+            initial_goal.status = 'a'
             initial_goal.put()
 
             tier_keys = []
             for initial_tier in proposal.initial_tiers:
                 tier = initial_tier
-                tier.parent = initial_goal.key
+                key_id = Tier.allocate_ids(1, parent=initial_goal.key)[0]
+                tier.key = ndb.Key(Tier, key_id, parent=initial_goal.key)
                 tier.put()
                 tier_keys.append(tier.key)
             initial_goal.tiers = tier_keys
@@ -355,7 +358,8 @@ class ProposalService(RemoteService):
             next_step_keys = []
             for initial_next_step in proposal.initial_next_steps:
                 next_step = initial_next_step
-                next_step.parent = initial_goal.key
+                key_id = NextStep.allocate_ids(1, parent=initial_goal.key)[0]
+                next_step.key = ndb.Key(NextStep, key_id, parent=initial_goal.key)
                 next_step.put()
                 next_step_keys.append(next_step.key)
             initial_goal.next_steps = next_step_keys
@@ -368,7 +372,8 @@ class ProposalService(RemoteService):
         future_goal = None
         if proposal.future_goal:
             future_goal = proposal.future_goal
-            future_goal.parent = new_project.key
+            key_id = FutureGoal.allocate_ids(1, parent=new_project.key)[0]
+            future_goal.key = ndb.Key(FutureGoal, key_id, parent=new_project.key)
             future_goal.put()
             new_project.future_goal = future_goal.key
             project_needs_put = True

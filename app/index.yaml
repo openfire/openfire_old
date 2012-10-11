@@ -8,17 +8,22 @@ indexes:
 - kind: Goal
   ancestor: yes
   properties:
-  - name: a
-
-- kind: Goal
-  ancestor: yes
-  properties:
   - name: st
 
 - kind: Tier
   ancestor: yes
   properties:
   - name: a
+
+- kind: NextStep
+  ancestor: yes
+  properties:
+  - name: s
+
+- kind: FutureGoal
+  ancestor: yes
+  properties:
+  - name: s
 
 - kind: Media
   ancestor: yes

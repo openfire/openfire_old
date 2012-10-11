@@ -743,11 +743,11 @@ class ProjectController extends OpenfireController
 
             $.apptools.api.project.propose_goal(params).fulfill
                 success: () ->
-                    alert("Proposal submitted! Refreshing page...")
+                    alert("Goal saved! You may edit it now before you submit it. Refreshing page...")
                     window.location.reload()
 
                 failure: (response) ->
-                    alert("There was an error when submitting your proposed goal: " + response.responseText)
+                    alert("There was an error when saving your proposed goal: " + response.responseText)
 
         @close_propose_goal = () =>
             $.apptools.widgets.modal.get("propose-project-goal").close()

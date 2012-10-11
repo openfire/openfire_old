@@ -1,0 +1,52 @@
+<h2>openfire goals</h2>
+<div class="content">
+    <table id="bbq-goal-table" class="bbq-datatable">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Funding Open</th>
+                <th>Description</th>
+                <th>Met</th>
+                <th>$ Pledged</th>
+                <th>$ Processed</th>
+                <th>Funding Day Limit</th>
+                <th>Funding Deadline</th>
+                <th>Funding Start</th>
+                <th>Funding End</th>
+                <th>Tiers</th>
+                <th>Next Steps</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for goal in goals %}
+            <tr>
+                <td><a href="/{{ goal.key.parent().get().get_custom_url() }}">{{ goal.key.parent().get().name }}</a></td>
+                <td>{{ goal.amount | currency }}</td>
+                <td>{{ goal.status | goal_status }}</td>
+                <td>{{ goal.funding_open }}</td>
+                <td>{{ goal.description }}</td>
+                <td>{{ goal.met }}</td>
+                <td>{{ goal.amount_pledged }}</td>
+                <td>{{ goal.amount_processed }}</td>
+                <td>{{ goal.funding_day_limit }}</td>
+                <td>{{ goal.funding_deadline and goal.funding_deadline.strftime("%m/%d/%Y") or "" }}</td>
+                <td>{{ goal.funding_start and goal.funding_start.strftime("%m/%d/%Y") or "" }}</td>
+                <td>{{ goal.funding_end and goal.funding_end.strftime("%m/%d/%Y") or "" }}</td>
+                <td>
+                    {% for tier_key in goal.tiers %}
+                        {{ tier_key.id() }}, &nbsp;
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for next_step_key in goal.next_steps %}
+                        {{ next_step_key.id() }}, &nbsp;
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+

@@ -67,6 +67,7 @@ config['apptools.project.assets'] = {
                 'jquery': {'min': True, 'version': '1.8.0'},                            # jQuery: Write Less, Do More!
                 'jquery-full': {'version': '1.8', 'min': True, 'name': 'jquery.full'},  # jQuery Full (nothing compiled out)
                 'd3': {'name': 'd3.v2', 'min': True, 'version': '2.9.6'},               # D3 - Visualizations
+                'nvd3': {'name': 'nv.d3', 'min': True, 'version': '0.0.1a'},         # NVD3 - Easier Visualizations
                 'jacked': {'min': True, 'version': '1.0'},                              # Jacked - tweening animation engine
                 'datepickr': {'min': False, 'version': '1.0'},                          # datepickr - Picking dates
             }
@@ -201,7 +202,8 @@ config['apptools.project.assets'] = {
                 'profile': {'version': 0.3},   # styles for the profile page
                 'propose': {'version': 0.1},  # styles for the propose page & wizard
                 'account': {'version': 0.1},   # styles for the user account page
-                'about': {'version': 0.1}
+                'about': {'version': 0.1},
+                'bbq': {'version': 0.1}
             }
 
         },

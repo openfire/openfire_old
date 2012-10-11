@@ -1,4 +1,44 @@
 <h2>openfire admin dashboard</h2>
 <div class="content">
-    More to come!
+
+    <div id="bbq-awaiting-action">
+
+        <div class="awaiting-action-super-title">Objects waiting for us to act on them ({{ awaiting_action_count }})</div>
+
+        <div class="proposals{% if len(awaiting_action['proposals']) %} needs-attention{% endif %}">
+            {% if awaiting_action['proposals'] %}
+                <div class="awaiting-action-title">Submitted proposals awaiting approval ({{ len(awaiting_action['proposals']) }})</div>
+                <ul>
+                {% for proposal in awaiting_action['proposals'] %}
+                    <li>
+                        <a href="/proposal/{{ encrypt(proposal.key.urlsafe()) }}">{{ proposal.name }}</a>
+                        <span class='proposal-info'>Summary: {{ proposal.summary }}</span>
+                        <span class='proposal-info'>Creator: {{ proposal.creator.id() }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="no-action-needed">No submitted proposals.</div>
+            {% endif %}
+        </div>
+
+        <div class="goals{% if len(awaiting_action['goals']) %} needs-attention{% endif %}">
+            {% if awaiting_action['goals'] %}
+                <div class="awaiting-action-title">Submitted goals awaiting approval ({{ len(awaiting_action['goals']) }})</div>
+                <ul>
+                {% for goal in awaiting_action['goals'] %}
+                    <li>
+                        <a href="/{{ goal.key.parent().get().get_custom_url() }}">{{ goal.description }}</a>
+                        <span class='goal-info'>Amount: {{ goal.amount | currency }}</span>
+                        <span class='goal-info'>Description: {{ goal.description }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="no-action-needed">No submitted goals.</div>
+            {% endif %}
+        </div>
+
+    </div>
+
 </div>
