@@ -44,7 +44,7 @@ class SecurityConfigProvider(object):
                 return p
         return None
 
-    def build_authenticated_session(self, email, nickname, ukey, uid):
+    def build_authenticated_session(self, email, nickname, ukey, uid, provider='organic', mode=None, register=False):
 
         ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
 
@@ -62,6 +62,15 @@ class SecurityConfigProvider(object):
         else:
             self.session['ukey'] = ukey
         self.session['nickname'] = nickname
+
+        if provider != 'organic':
+            self.session['mode'] = 'federated'
+            self.session['provider'] = provider
+        else:
+            self.session['mode'] = 'organic'
+
+        if register:
+            self.session['register'] = True
 
         return self.session
 
@@ -120,7 +129,7 @@ class Login(WebHandler, SecurityConfigProvider):
                         'ofentry': base64.b64encode(self.force_hostname or self.request.host),
                         '_scheme': 'https' if not cfg.debug else 'http',
                         '_full': True,
-                        '_netloc': 'auth.openfi.re'
+                        '_netloc': 'auth.openfi.re' if not cfg.debug else 'localhost:8080'
                     })
 
                 )
@@ -139,7 +148,7 @@ class Login(WebHandler, SecurityConfigProvider):
                     'ofentry': base64.b64encode(self.force_hostname or self.request.host),
                     '_scheme': 'https' if not cfg.debug else 'http',
                     '_full': True,
-                    '_netloc': 'auth.openfi.re'
+                    '_netloc': 'auth.openfi.re' if not cfg.debug else 'localhost:8080'
                 }),
 
                 # federated identity endpoint
@@ -277,7 +286,8 @@ class Login(WebHandler, SecurityConfigProvider):
                             email=user.key.id(),
                             nickname=' '.join([user.firstname, user.lastname]),
                             ukey=user.key.urlsafe(),
-                            uid=user.key.id()
+                            uid=user.key.id(),
+                            provider='organic'
                         )
 
                         if 'bad_logon_count' in self.session:
@@ -321,18 +331,28 @@ class Logout(WebHandler, SecurityConfigProvider):
         ''' Logout page '''
 
         try:
-            self.session = {}
-            logout_url = self.api.users.create_logout_url(self.url_for('auth/login', **{
-                '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
-                '_netloc': self.force_hostname or self.request.host
-            }))
-            if logout_url is not None:
-                response = self.redirect(logout_url)
-            else:
-                raise Exception
+            tombstoned_session = {'destroy': True}
 
-        except:
+            # If this user logged in via google+, log them out
+            if 'mode' in self.session and self.session.get('mode') == 'googleplus':
+                logout_url = self.api.users.create_logout_url(self.url_for('auth/login', **{
+                    '_full': True,
+                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_netloc': self.force_hostname or self.request.host
+                }))
+                self.session = tombstoned_session
+                return self.redirect(logout_url)
+
+            else:
+                self.session = tombstoned_session
+                return self.redirect_to('auth/login', **{
+                    '_full': True,
+                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_netloc': self.force_hostname or self.request.host
+                })
+
+        except ValueError, e:
+            self.session = tombstoned_session
             return self.redirect_to('auth/login', **{
                 '_full': True,
                 '_scheme': 'https' if not cfg.debug else 'http',
@@ -537,7 +557,9 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                                 email=email,
                                 nickname=user_struct['name'],
                                 ukey=ukey.urlsafe(),
-                                uid=ukey.id()
+                                uid=ukey.id(),
+                                provider='facebook',
+                                mode='oauth'
                             )
                             return self.redirect_success()
                         else:
@@ -545,7 +567,10 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                                 email=email,
                                 nickname=user_struct['name'],
                                 ukey=None,
-                                uid=user_struct['id']
+                                uid=user_struct['id'],
+                                provider='facebook',
+                                mode='oauth',
+                                register=True
                             )
                             return self.redirect_to('auth/register', exi=base64.b64encode(user_struct['id']), state=hashlib.sha512(user_struct['id']).hexdigest())
 
@@ -599,7 +624,9 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     email=user.email[0].id(),
                     nickname=user.firstname + ' ' + user.lastname,
                     ukey=user.key,
-                    uid=u.user_id()
+                    uid=u.user_id(),
+                    mode='openid',
+                    provider='googleplus'
                 )
                 return self.redirect_success(entrypoint)
             else:
@@ -607,7 +634,10 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     email=u.email(),
                     nickname=u.nickname(),
                     ukey=ndb.Key(user_models.User, u.email()),
-                    uid=u.user_id()
+                    uid=u.user_id(),
+                    provider='googleplus',
+                    mode='openid',
+                    register=True
                 )
                 return self.redirect_to('auth/register', **{
                     'exi': base64.b64encode(u.user_id()),
@@ -640,7 +670,9 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         email=user.email,
                         nickname=user.firstname + ' ' + user.lastname,
                         ukey=user.key,
-                        uid=u.user_id()
+                        uid=u.user_id(),
+                        provider='googleplus',
+                        mode='oauth'
                     )
                     return self.redirect_success(entrypoint)
                 else:
@@ -648,7 +680,10 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         email=u.email(),
                         nickname=u.email(),
                         ukey=None,
-                        uid=u.user_id()
+                        uid=u.user_id(),
+                        provider='googleplus',
+                        mode='oauth',
+                        register=True
                     )
                     return self.redirect_to('auth/register', **{
                         'exi': base64.b64encode(u.user_id()),
