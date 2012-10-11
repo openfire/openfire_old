@@ -46,14 +46,11 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
     # Resource/Template Preloading
     template = None
-
-    # Session Properties
-    session = {}
     
     transport = {
         'secure': True,
         'endpoint': 'staging.openfi.re',
-        'consumer': 'ofplaceholder'
+        'consumer': 'ofstaging'
     }
 
     sessions = True
@@ -169,6 +166,9 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
             self.initialize(request, response)
         else:
             self.initialize(webapp2.get_request(), webapp2.Response())
+
+        # Init sessions
+        super(SessionsBridge, self).__init__()
 
     def initialize(self, request, response):
 

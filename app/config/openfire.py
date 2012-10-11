@@ -372,7 +372,7 @@ config['openfire.sessions'] = {
             'ttl': '86400',
             'name': 'ofsession',
             'path': '/',
-            'domain': '*.openfi.re',
+            'domain': '.openfi.re',
             'secure': True
         },
 
@@ -398,7 +398,8 @@ config['openfire.sessions'] = {
 
         'datastore': {
             'ttl': '2400',
-            'enabled': False
+            'enabled': True,
+            'authenticated': True  # only store to datastore when the user is authenticated
         }
 
     }

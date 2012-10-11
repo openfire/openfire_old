@@ -67,8 +67,8 @@ config['apptools.project.output'] = {
 
     'assets': {  # Asset API
         'minified': True,        # whether to switch to minified assets or not
-        'serving_mode': 'cdn',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
-        'cdn_prefix': ['beta.openfi.re']          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
+        'serving_mode': 'local',  # 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
+        'cdn_prefix': ['staging.openfi.re']          # CDN prefix/prefixes - a string is used globally, a list of hostnames is selected from randomly for each asset
     },
 
     'headers': {  # Default Headers (only supported headers are shown)

@@ -21,6 +21,7 @@ from openfire.core import CoreAPI
 from openfire.core.sessions import manager
 
 # AppTools Imports
+from apptools.util import datastructures
 from apptools.util.debug import AppToolsLogger
 
 try:
@@ -29,9 +30,44 @@ try:
 except ImportError:
     _crypto = None
 
+
+# Contants
 _SIMPLE_ENCRYPTION_FLAG = 'b'
 _ADVANCED_ENCRYPTION_FLAG = 's'
 _ENCRYPTION_PAD_CHARACTER = ':'
+
+
+## SessionContainer - tracked dictionary that can asynchronously be laid on top of a deferred session
+class SessionContainer(datastructures.TrackedDictionary):
+
+    ''' Emulates a dictionary, but with a mutation pool, `dirty` state, and deferred reconciliation. '''
+
+    def reconcile(self, target):
+
+        ''' Lay this object's changes on top of an attributed target object, in the order mutations were made. '''
+
+        if not self.dirty():
+            return target
+        else:
+            for k, v in self.mutations():
+                if v == datastructures._TOMBSTONE:
+                    if hasattr(target, k):
+                        delattr(target, k)
+                elif v == datastructures._EMPTY:
+                    setattr(target, k, None)
+                else:
+                    setattr(target, k, v)
+            return target
+
+    def to_cookie(self):
+
+        ''' Serialize to a structure appropriate for storage in a cookie. '''
+
+        return {
+            'sid': self.get('sid'),
+            'mts': self.get('timestamp'),
+            'ath': self.get('authenticated', False)
+        }
 
 
 ## CoreSessionAPI - manages, loads and resolves user sessions
@@ -180,12 +216,12 @@ class CoreSessionAPI(CoreAPI):
 
             name = self.config['frontends']['cookies']['name']
             self.logging.info('Cookies enabled. Setting secure cookie at name "%s".' % name)
-            serialized_cookie = self.serializer.serialize(name, session)
+            serialized_cookie = self.serializer.serialize(name, session.to_cookie())
             if not gc.debug:
                 handler.response.set_cookie(name, serialized_cookie, **{
                     'max_age': int(self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)),
                     'path': self.config.get('frontends', {}).get('cookies', {}).get('path', '/'),
-                    'domain': self.config.get('frontends', {}).get('cookies', {}).get('domain', '*.openfi.re'),
+                    'domain': self.config.get('frontends', {}).get('cookies', {}).get('domain', '.openfi.re'),
                     'secure': self.config.get('frontends', {}).get('cookies', {}).get('secure', False)
                 })
             else:
@@ -242,7 +278,10 @@ class SessionsBridge(object):
         if session is not None:
             self.__session_id = session['sid']
 
-        return session
+        container = SessionContainer()
+        container.update(session)
+
+        return container
 
     def save_session(self):
 
@@ -302,18 +341,18 @@ class SessionsBridge(object):
             return self.session  # somehow we already have a session, wtf?
 
         else:
-            self.session = self.get_session()
+            session = self.get_session()
 
-            if self.session.get('authenticated', False) == True:
+            if session.get('authenticated', False) == True:
 
                 ## we've authenticated
                 self.authenticated = True
 
-                if self.session.get('ukey'):
+                if session.get('ukey'):
                     try:
                         self.user, self.permissions = tuple(ndb.get_multi([
-                                ndb.Key(urlsafe=self.session.get('ukey')),
-                                ndb.Key(user.Permissions, 'global', parent=ndb.Key(user.User, self.session['uid']))],
+                                ndb.Key(urlsafe=session.get('ukey')),
+                                ndb.Key(user.Permissions, 'global', parent=ndb.Key(user.User, session['uid']))],
                                 use_cache=True, use_memcache=True, use_datastore=True))
 
                     except:
@@ -325,15 +364,15 @@ class SessionsBridge(object):
                     if self.user is None:
 
                         # if they have a continue url, use it
-                        if self.session.get('continue_url'):
-                            registration_url = self.url_for('auth/register', go=self.session.get('continue_url'))
+                        if session.get('continue_url'):
+                            registration_url = self.url_for('auth/register', go=session.get('continue_url'))
 
                         # otherwise bring them back here afterwards
                         else:
                             registration_url = self.url_for('auth/register', go=self.request.path_qs)
 
-                        self.session['redirect'] = self.url_for('auth/register')
-                        self.session['returnto'] = self.request.url
-                        self.session['register'] = True
+                        session['redirect'] = self.url_for('auth/register')
+                        session['returnto'] = self.request.url
+                        session['register'] = True
 
-        return self.session
+        return session

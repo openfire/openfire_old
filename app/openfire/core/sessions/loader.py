@@ -19,6 +19,8 @@ from google.appengine.ext import ndb
 from google.appengine.api import memcache
 
 
+## OpenfireSessionLoader
+# Abstract parent to all openfire session loader classes.
 class OpenfireSessionLoader(object):
 
     ''' Abstract parent to openfire session loaders '''
@@ -70,6 +72,8 @@ class OpenfireSessionLoader(object):
         raise NotImplemented
 
 
+## ThreadcacheSessionLoader
+# Manages storage and retrieval of session data from instance memory.
 class ThreadcacheSessionLoader(OpenfireSessionLoader):
 
     ''' Session loader that loads and saves sessions with local threadcache '''
@@ -87,6 +91,8 @@ class ThreadcacheSessionLoader(OpenfireSessionLoader):
         raise NotImplemented  # @TODO
 
 
+## MemcacheSessionLoader
+# Manages storage and retrieval of session data from memcache.
 class MemcacheSessionLoader(OpenfireSessionLoader):
 
     ''' Session loader that loads and saves sessions with memcache '''
@@ -119,12 +125,14 @@ class MemcacheSessionLoader(OpenfireSessionLoader):
 
         self.logging.info('Timeout set to: "%s".' % timeout)
 
-        memcache.set(self._en(id), struct, int(timeout))
+        memcache.set(self._en(id), struct.__json__(), int(timeout))
 
         self.logging.info('Struct saved TTL(%s): "%s"' % (timeout, struct))
         return
 
 
+## PersistentSessionLoader
+# Manages storage and retrieval of session data from the datastore.
 class PersistentSessionLoader(OpenfireSessionLoader):
 
     ''' Session loader that loads and saves sessions with NDB and the AppEngine Datastore '''
@@ -166,14 +174,33 @@ class PersistentSessionLoader(OpenfireSessionLoader):
                 if gc.debug:
                     raise
                 else:
-	                return {}
+                    return {}
             else:
                 self.logging.info('Session destroyed successfully.')
                 return {}
 
-        skey = ndb.Key(sessions.Session, id)
-        session_o = sessions.Session(key=skey, sid=id, data=struct, user=None, addr=handler.request.environ.get('REMOTE_ADDR', '__NULL__'))
-        session_key = session_o.put(use_memcache=True, use_datastore=True)
+        if not self.config.get('backends', {}).get('datastore', {}).get('authenticated', False) or struct.get('authenticated') != None and struct.get('ukey') != None:
 
-        self.logging.info('Session stored at key: "%s"' % session_key.urlsafe())
-        return session_o.data  # @TODO: Fix user bridge
+            self.logging.debug('Authenticated datastore session storage off or the user is authenticated.')
+
+            skey = ndb.Key(sessions.Session, id)
+            session_params = {
+                'key': ndb.Key(sessions.Session, id),
+                'sid': id,
+                'data': struct.__json__(),
+                'mode': struct.get('mode'),
+                'provider': struct.get('provider'),
+                'addr': handler.request.environ.get('REMOTE_ADDR', None) if not handler.force_remoteip else getattr(handler, 'force_remoteip'),
+                'user': None if not (hasattr(handler, 'user') and getattr(handler, 'user') != None) else getattr(getattr(handler, 'user'), 'key'),
+                'agent': handler.request.headers.get('User-Agent', None) if not handler.uagent.get('original', False) else handler.uagent.get('original')
+            }
+            session_o = sessions.Session(**session_params)
+            session_key = session_o.put(use_cache=True, use_memcache=True, use_datastore=True)
+
+            self.logging.info('Session stored at key: "%s"' % session_key.urlsafe())
+            return session_o.data  # @TODO: Fix user bridge
+
+        else:
+
+            self.logging.debug('Authenticated datastore session storage on, and the user is not logged in. Continuing.')
+            return {}
