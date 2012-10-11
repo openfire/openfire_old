@@ -299,7 +299,11 @@
 
       .graph
         border: 1px solid #000
-        height: 165px
+        height: 200px
+
+        svg
+          width: 315px
+          height: 200px
 
 #spark-graph
   rect
@@ -310,14 +314,24 @@
 
 #activity-metrics div
   display: inline-block
-  margin-top: 8px
+  margin-top: 5px
   .project-count
     font-size: 2em
-    color: #ff8800
+    color: #FF7300
+    position: relative
+    top: 4px
   .total-raised
     font-size: 3em
-    color: green
-    margin-top: 15px
+    color: #05A40D
+    margin-top: 5px
+  .total-donations
+    font-size: 2.5em
+    color: #00747A
+    position: relative
+    top: 6px
+  .metric-lbl
+    padding: 0px
+    margin: 0px
 
 #login_trigger
   color: white !important

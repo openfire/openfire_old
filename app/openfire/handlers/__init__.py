@@ -49,7 +49,13 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
 
     # Session Properties
     session = {}
-    transport = {}
+    
+    transport = {
+        'secure': True,
+        'endpoint': 'staging.openfi.re',
+        'consumer': 'ofplaceholder'
+    }
+
     sessions = True
     force_session = True
     apply_redirect = True

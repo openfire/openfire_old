@@ -390,7 +390,12 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                 if error_reason == 'user_denied':
                     self.logging.critical('Looks like the user shafted us. Redirecting.')
 
-                    return self.redirect('/login?fder=authorization_denied')
+                    return self.redirect(self.url_for('auth/login', **{
+                        'fder': 'authorization_denied',
+                        '_full': True,
+                        '_scheme': 'https' if not cfg.debug else 'http',
+                        '_netloc': self.force_hostname or self.request.host
+                    }))
 
             # no errors
             else:
@@ -489,7 +494,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                 else:
                     self.logging.critical('FB: ERROR! Failed to get persistent auth token.')
                     self.logging.critical('FB: Response from facebook: "%s".' % access_token.content)
-                    return self.redirect('/login?fder=access_token_fail')
+
+                    return self.redirect(self.url_for('auth/login', **{
+                        'fder': 'access_token_fail',
+                        '_full': True,
+                        '_scheme': 'https' if not cfg.debug else 'http',
+                        '_netloc': self.force_hostname or self.request.host
+                    }))
 
         else:
             self.logging.critical('WARNING! POSSIBLE SECURITY BREACH.')

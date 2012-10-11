@@ -2,6 +2,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset.style('landing', 'openfire') }}">
+    <link rel="stylesheet" href="/assets/style/static/compiled/nv.d3.css">
 {% endblock stylesheets %}
 
 {# These blocks intentionally left empty to disable the tinylogo and leftnav on the homepage. #}
@@ -70,28 +71,33 @@
                     <div class='activity-row'>
                         <div class='activity-cell dropshadow'>
                             <label>Spark Lines</label>
-                            <div class="graph" id="spark-graph"></div>
+                            <div class="graph" id="spark-graph"><svg></svg></div>
                         </div>
                         <div class='activity-cell dropshadow'>
-                            <label>Where Donations are Going</label>
-                            <div class="graph" id="category-graph"></div>
+                            <label>Donations by Category</label>
+                            <div class="graph" id="category-graph"><svg></svg></div>
                         </div>
                     </div>
                     <div class='activity-row'>
                         <div class='activity-cell dropshadow'>
-                            <label>Recent Backers</label>
-                            <div class="graph" id="backers-graph"></div>
+                            <label>Projects Funded</label>
+                            <div class="graph" id="project-graph"><svg></svg></div>
                         </div>
                         <div class='activity-cell dropshadow'>
                             <label>Metrics</label>
                             <div class="graph" id="activity-metrics">
                                 <div>
-                                    <label class="projects-lbl">disrupting projects:</label>
+                                    <label class="metric-lbl">disrupting projects:</label>
                                     <div class="project-count">37</div>
                                 </div>
                                 <div>
-                                    <label class="raised-lbl">total raised for disruption:</label>
+                                    <label class="metric-lbl">total raised for disruption:</label>
                                     <div class="total-raised">$32,102,712</div>
+                                </div>
+                                <div>
+                                    <label class="metric-lbl">from a total of</label>
+                                    <div class="total-donations">1,352</div>
+                                    <label class="metric-post-lbl">individual donations</label>
                                 </div>
                             </div>
                         </div>

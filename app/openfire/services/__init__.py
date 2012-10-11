@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # protorpc/webapp2
+import config
 import webapp2
 from protorpc import remote
 
@@ -57,6 +58,11 @@ class RemoteService(BaseService, SessionsBridge, ContentBridge, NamespaceBridge)
     def after_request_hook(self):
 
         ''' Response callback hook. '''
+
         if hasattr(self, 'session'):
             if self.session:
                 self.save_session()
+
+        if hasattr(self, 'handler'):
+            if hasattr(self.handler, 'response'):
+                self.handler.response.headers['Access-Control-Allow-Origin'] = config.config.get('apptools.project.output', {}).get('headers', {}).get('Access-Control-Allow-Origin', 'https://staging.openfi.re https://beta.openfi.re https://m.openfi.re https://www.openfi.re https://openfi.re')
