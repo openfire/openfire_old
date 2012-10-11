@@ -436,29 +436,11 @@
   };
 
 </script>
-
-<script type="text/javascript">
-
-	function follow(ev) {
-		$.apptools.api.project.follow({subject: {key: window._cp.ke, kind: 'PROJECT'}}).fulfill({
-			success: function (r) {
-				document.getElementById('follow').classList.add('following');
-				$.apptools.dev.log('Project:Follow', 'Follow operation succeeded!', r);
-				$.apptools.analytics.track.social("Project", "Follow", "{{ project.name }}");
-			},
-			failure: function (e) {
-				document.getElementById('follow').classList.add('error');
-				$.apptools.dev.error('Project:Follow', 'An error was encountered trying to follow the specified project.', e);
-			}
-		});
-	}
-
-	document.getElementById('follow').onclick = follow;
-	window.follow = follow;
-
-</script>
 {% endblock %}
 
-{% block postsouth %}
-    <script type="text/javascript" src="/assets/js/static/core/jquery/jquery.smartWizard-2.0.js"></script>
-{% endblock postsouth %}
+
+{% block jquery %}
+	<script type="text/javascript" src="{{ asset.script('jquery-full', 'core') }}"></script>
+	<script type="text/javascript" src="{{ asset.script('datepickr', 'core') }}"></script>
+	<script type="text/javascript" src="{{ asset.script('smartwizard', 'jquery') }}"></script>
+{% endblock jquery %}

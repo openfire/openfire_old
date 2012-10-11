@@ -144,8 +144,8 @@
 	<script src="{{ asset.script('d3', 'core') }}"></script>
 	<script src="{{ asset.script('nvd3', 'core') }}"></script>
 	<script src="{{ asset.script('jacked', 'core') }}"></script>
-	<script src="{{ asset.script('jquery-full', 'core') }}"></script>
-	<script src="{{ asset.script('datepickr', 'core') }}"></script>
+	{# DO NOT MODIFY THESE SCRIPTS. EVER #}
+	{% block jquery %}{# THIS IS OVERRIDDEN. DO NOT MODIFY #}{% endblock %}
 	{% endblock jscore %}
 
 	{% block jsbase %}

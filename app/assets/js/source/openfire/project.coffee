@@ -755,20 +755,28 @@ class ProjectController extends OpenfireController
         @follow = () =>
 
             ## follow a project
-            @log('following functionality currently stubbed.')
-            alert('You tried to follow a project! We\'re working on it :)')
+            $.apptools.dev.log('OF:Follow', "User clicked 'Follow'...")
 
-            ###
-            $.apptools.api.project.follow(target: @project_key).fulfill
+            follow_r =
+                subject:
+                    key: @project_key
+                    kind: 'PROJECT'
+
+            return $.apptools.api.project.follow(follow_r).fulfill({
 
                 success: (response) =>
-                    document.getElementById('follow').classList.add('following')
-                    alert 'follow() success'
+                    $.apptools.dev.log('OF:Follow', "Follow request successful.", response)
+                    f_button = document.getElementById('follow')
+                    f_button.classList.add('following')
 
-                failure: (error) =>
-                    alert 'follow() failure'
-            ###
+                    $.apptools.analytics.track.social("Project", "Follow", @project.name)
 
+                failure: (response) =>
+                    $.apptools.dev.error('OF:Follow', "Follow request failed.", response)
+                    f_button = document.getElementById('follow')
+                    f_button.classList.add('error')
+
+            })
 
         @share = (sm_service) =>
 

@@ -6,7 +6,6 @@
 
 
 {% block main %}
-
     {% if security.permissions.admin %}
     <div id="proposal-explanation" data-keyname="proposal_explanation" data-namespace="_system_" data-options="{'bundle':'rich'}" class="dynamic mini-editable">
     {% else %}
@@ -34,11 +33,10 @@
             <a id="a-proposal-wizard-dialog" class="start-proposal-btn login-required-btn" href="/login">log in or sign up to start your proposal now!</a>
         {% endif %}
     </div>
-
-
 {% endblock %}
 
-
-{% block postsouth %}
-    <script type="text/javascript" src="/assets/js/static/core/jquery/jquery.smartWizard-2.0.js"></script>
-{% endblock postsouth %}
+{% block jquery %}
+	<script type="text/javascript" src="{{ asset.script('jquery-full', 'core') }}"></script>
+	<script type="text/javascript" src="{{ asset.script('datepickr', 'core') }}"></script>
+	<script type="text/javascript" src="{{ asset.script('smartwizard', 'jquery') }}"></script>
+{% endblock jquery %}

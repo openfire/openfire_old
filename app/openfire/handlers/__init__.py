@@ -48,8 +48,6 @@ class WebHandler(BaseHandler, SessionsBridge, ContentBridge, NamespaceBridge):
     template = None
     
     transport = {
-        'secure': True,
-        'endpoint': 'staging.openfi.re',
         'consumer': 'ofstaging'
     }
 

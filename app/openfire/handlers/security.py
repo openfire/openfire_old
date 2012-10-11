@@ -132,7 +132,7 @@ class Login(WebHandler, SecurityConfigProvider):
                         'csrf': hashlib.sha256(self.session.get('sid')).hexdigest(),
                         'ofsid': self.encrypt(self.session.get('sid')),
                         'ofentry': base64.b64encode(self.force_hostname or self.request.host),
-                        '_scheme': 'https' if not cfg.debug else 'http',
+                        '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                         '_full': True,
                         '_netloc': 'auth.openfi.re' if not cfg.debug else 'localhost:8080'
                     })
@@ -151,7 +151,7 @@ class Login(WebHandler, SecurityConfigProvider):
                     'csrf': hashlib.sha256(self.session.get('sid')).hexdigest(),
                     'ofsid': self.encrypt(self.session.get('sid')),
                     'ofentry': base64.b64encode(self.force_hostname or self.request.host),
-                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                     '_full': True,
                     '_netloc': 'auth.openfi.re' if not cfg.debug else 'localhost:8080'
                 }),
@@ -306,7 +306,7 @@ class Login(WebHandler, SecurityConfigProvider):
                             self.logging.info('AUTH: No continue URL found. Redirecting to landing.')
                             return self.redirect_to('landing', **{
                                 '_full': True,
-                                '_scheme': 'https' if not cfg.debug else 'http',
+                                '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                                 '_netloc': self.force_hostname or self.request.host
                             })
 
@@ -342,7 +342,7 @@ class Logout(WebHandler, SecurityConfigProvider):
             if 'mode' in self.session and self.session.get('mode') == 'googleplus':
                 logout_url = self.api.users.create_logout_url(self.url_for('auth/login', **{
                     '_full': True,
-                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                     '_netloc': self.force_hostname or self.request.host
                 }))
                 self.session = tombstoned_session
@@ -352,7 +352,7 @@ class Logout(WebHandler, SecurityConfigProvider):
                 self.session = tombstoned_session
                 return self.redirect_to('auth/login', **{
                     '_full': True,
-                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                     '_netloc': self.force_hostname or self.request.host
                 })
 
@@ -360,7 +360,7 @@ class Logout(WebHandler, SecurityConfigProvider):
             self.session = tombstoned_session
             return self.redirect_to('auth/login', **{
                 '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
+                '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                 '_netloc': self.force_hostname or self.request.host
             })
 
@@ -407,7 +407,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             redirect_url = self.url_for('auth/login', **{
                 'fdmg': error_message,
                 '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
+                '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                 '_netloc': entrypoint
             })
         elif error_code:
@@ -415,7 +415,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             redirect_url = self.url_for('auth/login', **{
                 'fder': error_code,
                 '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
+                '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                 '_netloc': entrypoint
             })
         else:
@@ -423,7 +423,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             redirect_url = self.url_for('auth/login', **{
                 'fder': 'generic',
                 '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
+                '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                 '_netloc': entrypoint
             })
         return self.redirect(redirect_url)
@@ -439,7 +439,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         else:
             continue_url = self.url_for('landing', **{
                 '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
+                '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                 '_netloc': entrypoint
             })
 
@@ -476,7 +476,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     return self.redirect(self.url_for('auth/login', **{
                         'fder': 'authorization_denied',
                         '_full': True,
-                        '_scheme': 'https' if not cfg.debug else 'http',
+                        '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                         '_netloc': self.force_hostname or self.request.host
                     }))
 
@@ -606,7 +606,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     return self.redirect(self.url_for('auth/login', **{
                         'fder': 'access_token_fail',
                         '_full': True,
-                        '_scheme': 'https' if not cfg.debug else 'http',
+                        '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                         '_netloc': self.force_hostname or self.request.host
                     }))
 
@@ -615,7 +615,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             self.logging.critical('State variable did not match in callback.')
         return self.redirect(self.url_for('auth/login', **{
             '_full': True,
-            '_scheme': 'https' if not cfg.debug else 'http',
+            '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
             '_netloc': self.force_hostname or self.request.host
         }))
 
@@ -671,7 +671,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     'state': hashlib.sha512(u.user_id()).hexdigest(),
                     'provider': 'googleplus',
                     '_full': True,
-                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                     '_netloc': entrypoint
                 })
         else:
@@ -718,7 +718,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         'state': hashlib.sha512(u.user_id()).hexdigest(),
                         'provider': 'googleplus',
                         '_full': True,
-                        '_scheme': 'https' if not cfg.debug else 'http',
+                        '_scheme': 'https' if ((self.request.environ.get('HTTP_SCHEME', 'http').lower() == 'https' or self.force_https_assets) and not cfg.debug) else 'http',
                         '_netloc': entrypoint
                     })
 

@@ -117,7 +117,8 @@ config['apptools.project.assets'] = {
                 'easing': {'path': 'interaction/easing.min.js'},          # Easing transitions for smoother animations
                 'mousewheel': {'path': 'interaction/mousewheel.min.js'},  # jQuery plugin for mousewheel events + interactions
                 'scrollsuite': {'path': 'interaction/scroller.min.js'},   # ScrollTo, LocalScroll & SerialScroll
-                'fancybox': {'path': 'interaction/fancybox2.min.js'}      # Clean + responsive CSS3 modals (note: needs a license for commercial apps)
+                'fancybox': {'path': 'interaction/fancybox2.min.js'},      # Clean + responsive CSS3 modals (note: needs a license for commercial apps)
+                'smartwizard': {'path': 'interaction/smartwizard2.min.js'}
             }
 
         },
