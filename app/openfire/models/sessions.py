@@ -18,6 +18,10 @@ class Session(AppModel):
     data = ndb.JsonProperty('d', compressed=True)
     addr = ndb.StringProperty('a', required=True, indexed=True)
     user = ndb.KeyProperty('u', required=False, indexed=True, default=None)
+    agent = ndb.TextProperty('ua', compressed=True, required=False, default=None)
+    authenticated = ndb.BooleanProperty('at', default=False, indexed=True)
+    mode = ndb.StringProperty('am', choices=frozenset(['organic', 'federated']))
+    provider = ndb.StringProperty('ap', indexed=True)
 
 
 ## SessionData - stores an opaque blob of data attached to a user session

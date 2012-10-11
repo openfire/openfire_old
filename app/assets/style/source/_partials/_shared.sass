@@ -289,6 +289,12 @@
             font-size: 11pt
             text-transform: uppercase
 
+        .bbq-message
+            float: left
+            margin-top: 10px
+            font-size: 14pt
+            color: #FFFFFF
+
     #promote
         background-color: #ccc
 
@@ -498,10 +504,13 @@
         font-family: Karla
 
     #active_goal,
+    #initial_goal,
     #completed_goals,
     #project_next_steps,
+    #proposal_next_steps,
     #future_goal,
-    #project_tiers
+    #project_tiers,
+    #proposal_tiers
 
         margin: 10px
 
@@ -710,6 +719,22 @@
         &.backed
             +background(linear-gradient(top center, #bada55, green))
 
+    #cannot-back,
+    #proposal-status
+        font-family: Karla
+        font-size: 18px
+        font-weight: 700
+        line-height: 40px
+        color: white
+        margin: 0 10px
+        width: 80%
+        border-radius: 10px
+        padding: 10px
+        +background(linear-gradient(top center, #aaaaaa, #555555))
+
+        &:hover
+            +background(linear-gradient(top center, #bbbbbb, #666666))
+
     #backer_summary
         margin-top: 15px
         height: 40px
@@ -865,30 +890,23 @@
         background-color: #ddd
         padding-bottom: 10px
 
-        .amount,
-        .description
+        .goal-field,
+        .tier-field
+            padding: 10px
             color: #666
+            font-family: "Karla"
 
             &:hover,
             &:focus
                 color: #222
 
-        .amount
-            display: block
-            width: 96%
-            margin: 0 auto
-            padding: 10px
-            background-color: #ccc
-            text-transform: uppercase
+        .amount,
+        .name
             font:
                 size: 14pt
                 weight: 700
 
         .description
-            background-color: #eee
-            margin: 10px
-            padding: 10px
-            border-radius: 10px
             font:
                 size: 11pt
                 weight: 400

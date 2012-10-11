@@ -189,6 +189,7 @@ def main():
         'json': json.dumps,
         'currency': lambda x: handler._format_as_currency(x, False),
         'percentage': lambda x: handler._format_as_percentage(x, True),
+        'goal_status': lambda x: project_models.Goal._status_choices.get(x, ''),
         'proposal_status': lambda x: project_models.Proposal._status_choices.get(x, ''),
         'project_status': lambda x: project_models.Project._status_choices.get(x, ''),
         'payment_status': lambda x: payment_models.Payment._status_choices.get(x, ''),

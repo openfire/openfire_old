@@ -67,16 +67,13 @@ class FormController extends OpenfireController
 
             forms = document.forms
 
-            for form in forms
+            @register = (form) =>
+                return false if not (form.name or form.hasAttribute('id'))
                 f = new FormObject(form)
                 @_state.index[f.name] = @_state.data.push(f) - 1
-                _f = form.find('input')
-                _t = form.find('textarea')
-                if not _.is_array(_f)
-                    _f = [_f]
-                if not _.is_array(_t)
-                    _t = [_t]
-                for input in _f.concat(_t)
+
+                inputs = _.join(form.find('input'), form.find('textarea'))
+                for input in inputs
                     if input
                         type = input.type or 'text'
                         type = 'text' if type is 'textarea'
@@ -86,7 +83,13 @@ class FormController extends OpenfireController
                             input.data('validation', type)
                         input.addEventListener('blur', @validate, false)
 
+                return @
+
+            @register(_form) for _form in forms
+
+            delete @_init
             @_state.init = true
+
             return @
 
         @validate = (e) =>

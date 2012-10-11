@@ -1,32 +1,44 @@
 {% extends "layout/bbq.html" %}
 
 {% block moderate %}
-<div style="padding-bottom: 75px;">
-    <h1>We decide all!</h1>
+<div id="bbq-moderation">
 
-    <div id="bbq-tabs-container" class="pre-tabs default widget" data-options='{"width":"800px"}'>
+    <div id="bbq-header">
+        <div id="header-text">
+            We decide all!
+        </div>
+        <div id="header-subtext">
+            You better be an admin to be viewing this page...
+        </div>
+    </div>
 
-        <a href="#bbq-tab-1">Dashboard</a>
-        <a href="#bbq-tab-2">Proposals</a>
-        <a href="#bbq-tab-3">Projects</a>
-        <a href="#bbq-tab-4">Users</a>
-        <a href="#bbq-tab-5">Categories</a>
-        <a href="#bbq-tab-6">Topics</a>
-        <a href="#bbq-tab-7">Payment Accounts</a>
-        <a href="#bbq-tab-8">Payments and Transactions</a>
-        <a href="#bbq-tab-9">Custom URLs</a>
-        <a href="#bbq-tab-10">Media Moderation</a>
+    <div id="bbq-tabs-container" class="pre-tabs default tabset">
 
-        <div id="bbq-tab-1" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/dashboard.html" %}</div>
-        <div id="bbq-tab-2" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/proposals.html" %}</div>
-        <div id="bbq-tab-3" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/projects.html" %}</div>
-        <div id="bbq-tab-4" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/users.html" %}</div>
-        <div id="bbq-tab-5" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/categories.html" %}</div>
-        <div id="bbq-tab-6" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/topics.html" %}</div>
-        <div id="bbq-tab-7" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/payment_accounts.html" %}</div>
-        <div id="bbq-tab-8" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/payments.html" %}</div>
-        <div id="bbq-tab-9" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/custom_urls.html" %}</div>
-        <div id="bbq-tab-10" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/media_moderation.html" %}</div>
+        <a class="tab-link" href="#bbq-tab-1">Dashboard ({{ awaiting_action_count }})</a>
+        <a class="tab-link" href="#bbq-tab-2">Proposals</a>
+        <a class="tab-link" href="#bbq-tab-3">Projects</a>
+        <a class="tab-link" href="#bbq-tab-4">Goals</a>
+        <a class="tab-link" href="#bbq-tab-5">Users</a>
+        <a class="tab-link" href="#bbq-tab-6">Categories</a>
+        <a class="tab-link" href="#bbq-tab-7">Topics</a>
+        <a class="tab-link" href="#bbq-tab-8">Payment Accounts</a>
+        <a class="tab-link" href="#bbq-tab-9">Payments and Transactions</a>
+        <a class="tab-link" href="#bbq-tab-10">Custom URLs</a>
+        <a class="tab-link" href="#bbq-tab-11">Media Moderation</a>
+
+        <div class="tab-wrapper">
+            <div id="bbq-tab-1" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/dashboard.html" %}</div>
+            <div id="bbq-tab-2" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/proposals.html" %}</div>
+            <div id="bbq-tab-3" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/projects.html" %}</div>
+            <div id="bbq-tab-4" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/goals.html" %}</div>
+            <div id="bbq-tab-5" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/users.html" %}</div>
+            <div id="bbq-tab-6" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/categories.html" %}</div>
+            <div id="bbq-tab-7" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/topics.html" %}</div>
+            <div id="bbq-tab-8" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/payment_accounts.html" %}</div>
+            <div id="bbq-tab-9" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/payments.html" %}</div>
+            <div id="bbq-tab-10" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/custom_urls.html" %}</div>
+            <div id="bbq-tab-11" style="opacity: 0;" class="none">{% include "bbq/bbq_tabs/media_moderation.html" %}</div>
+        </div>
 
     </div>
 

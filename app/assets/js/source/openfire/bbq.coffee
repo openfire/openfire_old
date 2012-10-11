@@ -258,7 +258,7 @@ class BBQController
         @customUrls = []
 
         @_init = () =>
-            $(document).ready ->
+            $(document).ready =>
                 if $('.bbq-datatable')?.length
                     $('.bbq-datatable').dataTable()
                     @initBbqNewInlines()

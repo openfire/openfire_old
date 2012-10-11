@@ -44,7 +44,7 @@ class SecurityConfigProvider(object):
                 return p
         return None
 
-    def build_authenticated_session(self, email, nickname, ukey, uid):
+    def build_authenticated_session(self, email, nickname, ukey, uid, provider='organic', mode=None, register=False):
 
         ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
 
@@ -62,6 +62,15 @@ class SecurityConfigProvider(object):
         else:
             self.session['ukey'] = ukey
         self.session['nickname'] = nickname
+
+        if provider != 'organic':
+            self.session['mode'] = 'federated'
+            self.session['provider'] = provider
+        else:
+            self.session['mode'] = 'organic'
+
+        if register:
+            self.session['register'] = True
 
         return self.session
 
@@ -87,6 +96,7 @@ class Login(WebHandler, SecurityConfigProvider):
             appid = self._metaConfig.get('opengraph', {}).get('facebook', {}).get('app_id', '__EMPTY_APP_ID__')
 
         return self.do_auth_redirect(
+
             "https://www.facebook.com/dialog/oauth?client_id=%(appid)s&redirect_uri=%(callback)s&scope=%(scope)s&state=%(state)s" % {
 
                 # appID and sessionID
@@ -96,9 +106,14 @@ class Login(WebHandler, SecurityConfigProvider):
                 # scopes and callback
                 'scope': ','.join([scope.get('name') for scope in self._resolveProvider('facebook').get('scopes', []) if scope.get('enabled', False)]),
                 'callback': ''.join([
-                                self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
-                                self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                                self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=hashlib.sha1(self.session.get('sid')).hexdigest(), ofsid=self.encrypt(self.session.get('sid')))
+                                'https' if (self.force_https and not cfg.debug) else self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
+                                self.force_hostname or self.request.environ.get('HTTP_HOST', 'localhost:8080'),
+                                self.url_for('auth/action-provider',
+                                    action='callback',
+                                    provider='facebook',
+                                    csrf=hashlib.sha1(self.session.get('sid')).hexdigest(),
+                                    ofsid=self.encrypt(self.session.get('sid'))
+                                )
                             ])
 
         })
@@ -117,9 +132,10 @@ class Login(WebHandler, SecurityConfigProvider):
                         'provider': 'googleplus',
                         'csrf': hashlib.sha256(self.session.get('sid')).hexdigest(),
                         'ofsid': self.encrypt(self.session.get('sid')),
+                        'ofentry': base64.b64encode(self.force_hostname or self.request.host),
                         '_scheme': 'https' if not cfg.debug else 'http',
                         '_full': True,
-                        '_netloc': self.force_hostname or self.request.host
+                        '_netloc': 'auth.openfi.re' if not cfg.debug else 'localhost:8080'
                     })
 
                 )
@@ -135,9 +151,10 @@ class Login(WebHandler, SecurityConfigProvider):
                     'provider': 'googleplus',
                     'csrf': hashlib.sha256(self.session.get('sid')).hexdigest(),
                     'ofsid': self.encrypt(self.session.get('sid')),
+                    'ofentry': base64.b64encode(self.force_hostname or self.request.host),
                     '_scheme': 'https' if not cfg.debug else 'http',
                     '_full': True,
-                    '_netloc': self.force_hostname or self.request.host
+                    '_netloc': 'auth.openfi.re' if not cfg.debug else 'localhost:8080'
                 }),
 
                 # federated identity endpoint
@@ -275,7 +292,8 @@ class Login(WebHandler, SecurityConfigProvider):
                             email=user.key.id(),
                             nickname=' '.join([user.firstname, user.lastname]),
                             ukey=user.key.urlsafe(),
-                            uid=user.key.id()
+                            uid=user.key.id(),
+                            provider='organic'
                         )
 
                         if 'bad_logon_count' in self.session:
@@ -319,16 +337,28 @@ class Logout(WebHandler, SecurityConfigProvider):
         ''' Logout page '''
 
         try:
-            self.session = {}
-            return self.api.users.create_logout_url(self.url_for('auth/login', **{
-                '_full': True,
-                '_scheme': 'https' if not cfg.debug else 'http',
-                '_netloc': self.force_hostname or self.request.host
-            }))
-            if logout_url is not None:
-                response = self.redirect(logout_url)
+            tombstoned_session = {'destroy': True}
 
-        except:
+            # If this user logged in via google+, log them out
+            if 'mode' in self.session and self.session.get('mode') == 'googleplus':
+                logout_url = self.api.users.create_logout_url(self.url_for('auth/login', **{
+                    '_full': True,
+                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_netloc': self.force_hostname or self.request.host
+                }))
+                self.session = tombstoned_session
+                return self.redirect(logout_url)
+
+            else:
+                self.session = tombstoned_session
+                return self.redirect_to('auth/login', **{
+                    '_full': True,
+                    '_scheme': 'https' if not cfg.debug else 'http',
+                    '_netloc': self.force_hostname or self.request.host
+                })
+
+        except ValueError, e:
+            self.session = tombstoned_session
             return self.redirect_to('auth/login', **{
                 '_full': True,
                 '_scheme': 'https' if not cfg.debug else 'http',
@@ -368,17 +398,18 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
     apply_redirect = False
 
     ### === Redirect Methods === ###
-    def redirect_failure(self, error_message=None, error_code=None):
+    def redirect_failure(self, entrypoint=None, error_message=None, error_code=None):
 
         ''' Redirect to login with an error message or code '''
 
+        if entrypoint is None: entrypoint = self.force_hostname or self.request.host
         if error_message:
             self.logging.error('AUTH: Redirecting back to logon with error_message "%s".' % error_message)
             redirect_url = self.url_for('auth/login', **{
                 'fdmg': error_message,
                 '_full': True,
                 '_scheme': 'https' if not cfg.debug else 'http',
-                '_netloc': self.force_hostname or self.request.host
+                '_netloc': entrypoint
             })
         elif error_code:
             self.logging.error('AUTH: Redirecting back to logon with error_code "%s".' % error_code)
@@ -386,7 +417,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                 'fder': error_code,
                 '_full': True,
                 '_scheme': 'https' if not cfg.debug else 'http',
-                '_netloc': self.force_hostname or self.request.host
+                '_netloc': entrypoint
             })
         else:
             self.logging.error('AUTH: Redirecting back to logon because of a generic failure.')
@@ -394,13 +425,15 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                 'fder': 'generic',
                 '_full': True,
                 '_scheme': 'https' if not cfg.debug else 'http',
-                '_netloc': self.force_hostname or self.request.host
+                '_netloc': entrypoint
             })
         return self.redirect(redirect_url)
 
-    def redirect_success(self):
+    def redirect_success(self, entrypoint=None):
 
         ''' Redirect to continue_url or homepage after successful logon '''
+
+        if entrypoint is None: entrypoint = self.force_hostname or self.request.host
 
         if self.session.get('continue_url') or 'continue' in self.request.params:
             continue_url = self.request.get('continue', self.session.get('continue_url'))
@@ -408,7 +441,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
             continue_url = self.url_for('landing', **{
                 '_full': True,
                 '_scheme': 'https' if not cfg.debug else 'http',
-                '_netloc': self.force_hostname or self.request.host
+                '_netloc': entrypoint
             })
 
         return self.redirect(continue_url)
@@ -462,9 +495,14 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
 
                     'client': client,
                     'redirect': ''.join([
-                            self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
-                            self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                            self.url_for('auth/action-provider', action='callback', provider='facebook', csrf=csrf)
+                            self.url_for('auth/action-provider',
+                                action='callback',
+                                provider='facebook',
+                                csrf=csrf,
+                                _full=True,
+                                _netloc=self.force_hostname or self.request.host,
+                                _scheme='https' if not cfg.debug else 'http'
+                            )
                     ]),
                     'secret': secret,
                     'code': code
@@ -530,7 +568,9 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                                 email=email,
                                 nickname=user_struct['name'],
                                 ukey=ukey.urlsafe(),
-                                uid=ukey.id()
+                                uid=ukey.id(),
+                                provider='facebook',
+                                mode='oauth'
                             )
                             return self.redirect_success()
                         else:
@@ -538,14 +578,16 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                                 email=email,
                                 nickname=user_struct['name'],
                                 ukey=None,
-                                uid=user_struct['id']
+                                uid=user_struct['id'],
+                                provider='facebook',
+                                mode='oauth',
+                                register=True
                             )
                             return self.redirect_to('auth/register', exi=base64.b64encode(user_struct['id']), state=hashlib.sha512(user_struct['id']).hexdigest())
 
                 else:
                     self.logging.critical('FB: ERROR! Failed to get persistent auth token.')
                     self.logging.critical('FB: Response from facebook: "%s".' % access_token.content)
-
                     return self.redirect(self.url_for('auth/login', **{
                         'fder': 'access_token_fail',
                         '_full': True,
@@ -567,6 +609,11 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
         ''' Finish processing Google auth. '''
 
         u = self.api.users.get_current_user()
+        entrypoint = self.request.get('ofentry', None)
+        if entrypoint:
+            entrypoint = base64.b64decode(entrypoint)
+        else:
+            entrypoint = self.force_hostname or self.request.host
 
         # federated/openid
         if u is not None:
@@ -588,15 +635,20 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     email=user.email[0].id(),
                     nickname=user.firstname + ' ' + user.lastname,
                     ukey=user.key,
-                    uid=u.user_id()
+                    uid=u.user_id(),
+                    mode='openid',
+                    provider='googleplus'
                 )
-                return self.redirect_success()
+                return self.redirect_success(entrypoint)
             else:
                 self.build_authenticated_session(
                     email=u.email(),
                     nickname=u.nickname(),
                     ukey=ndb.Key(user_models.User, u.email()),
-                    uid=u.user_id()
+                    uid=u.user_id(),
+                    provider='googleplus',
+                    mode='openid',
+                    register=True
                 )
                 return self.redirect_to('auth/register', **{
                     'exi': base64.b64encode(u.user_id()),
@@ -604,7 +656,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     'state': hashlib.sha512(u.user_id()).hexdigest(),
                     '_full': True,
                     '_scheme': 'https' if not cfg.debug else 'http',
-                    '_netloc': self.force_hostname or self.request.host
+                    '_netloc': entrypoint
                 })
         else:
 
@@ -629,15 +681,20 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         email=user.email,
                         nickname=user.firstname + ' ' + user.lastname,
                         ukey=user.key,
-                        uid=u.user_id()
+                        uid=u.user_id(),
+                        provider='googleplus',
+                        mode='oauth'
                     )
-                    return self.redirect_success()
+                    return self.redirect_success(entrypoint)
                 else:
                     self.build_authenticated_session(
                         email=u.email(),
                         nickname=u.email(),
                         ukey=None,
-                        uid=u.user_id()
+                        uid=u.user_id(),
+                        provider='googleplus',
+                        mode='oauth',
+                        register=True
                     )
                     return self.redirect_to('auth/register', **{
                         'exi': base64.b64encode(u.user_id()),
@@ -645,24 +702,24 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         'state': hashlib.sha512(u.user_id()).hexdigest(),
                         '_full': True,
                         '_scheme': 'https' if not cfg.debug else 'http',
-                        '_netloc': self.force_hostname or self.request.host
+                        '_netloc': entrypoint
                     })
 
             ## everything failed
             except AssertionError:
 
                 ## redirect to login page w/ error
-                return self.redirect_failure(error_code='hybrid_login_failed')
+                return self.redirect_failure(entrypoint, error_code='hybrid_login_failed')
 
             except Exception, e:
 
                 if not cfg.debug:
                     self.logging.error('Generic failure occured in hybrid logon routine. Exception: "%s".' % str(e))
-                    return self.redirect_failure(error_code='generic_failure')
+                    return self.redirect_failure(entrypoint, error_code='generic_failure')
                 else:
                     raise
         
-        return self.redirect_failure(error_code='generic_failure')
+        return self.redirect_failure(entrypoint, error_code='generic_failure')
 
     def callback_twitter(self):
 

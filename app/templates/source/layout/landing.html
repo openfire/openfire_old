@@ -2,6 +2,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset.style('landing', 'openfire') }}">
+    <link rel="stylesheet" href="/assets/style/static/compiled/nv.d3.css">
 {% endblock stylesheets %}
 
 {# These blocks intentionally left empty to disable the tinylogo and leftnav on the homepage. #}
@@ -70,28 +71,33 @@
                     <div class='activity-row'>
                         <div class='activity-cell dropshadow'>
                             <label>Spark Lines</label>
-                            <div class="graph" id="spark-graph"></div>
+                            <div class="graph" id="spark-graph"><svg></svg></div>
                         </div>
                         <div class='activity-cell dropshadow'>
-                            <label>Where Donations are Going</label>
-                            <div class="graph" id="category-graph"></div>
+                            <label>Donations by Category</label>
+                            <div class="graph" id="category-graph"><svg></svg></div>
                         </div>
                     </div>
                     <div class='activity-row'>
                         <div class='activity-cell dropshadow'>
-                            <label>Recent Backers</label>
-                            <div class="graph" id="backers-graph"></div>
+                            <label>Projects Funded</label>
+                            <div class="graph" id="project-graph"><svg></svg></div>
                         </div>
                         <div class='activity-cell dropshadow'>
                             <label>Metrics</label>
                             <div class="graph" id="activity-metrics">
                                 <div>
-                                    <label class="projects-lbl">disrupting projects:</label>
+                                    <label class="metric-lbl">disrupting projects:</label>
                                     <div class="project-count">37</div>
                                 </div>
                                 <div>
-                                    <label class="raised-lbl">total raised for disruption:</label>
+                                    <label class="metric-lbl">total raised for disruption:</label>
                                     <div class="total-raised">$32,102,712</div>
+                                </div>
+                                <div>
+                                    <label class="metric-lbl">from a total of</label>
+                                    <div class="total-donations">1,352</div>
+                                    <label class="metric-post-lbl">individual donations</label>
                                 </div>
                             </div>
                         </div>
@@ -103,14 +109,23 @@
      </div><!-- #content -->
 
 <div class="pre-modal" id="how-it-works" data-title="How it works!" data-options="{&quot;ratio&quot;:{&quot;x&quot;:0.6,&quot;y&quot;:0.6}}">
-    <div id="how-it-works-wrap" class="mini-editable">
-        <h1>Welcome to <span class="lightorange">open</span><span class="darkorange">fire</span>!</h1>
-        <p>hello, <a href="http://openfi.re">openfi.re</a> trusted tester!</p>
-        <p>we believe the beauty and power of technology lies in its ability to apply abstract models of efficiency to the very real world around us, often effecting radical positive change in the process.</p>
-        <p></p>
-        <p>what do <em>you</em> think?</p>
-        <p></p>
-        <p>love, the <span class="lightorange">open</span><span class="darkorange">fi.re</span> team</p>.
+
+    <div {{ {
+        'id': 'how-it-works-wrap',
+        'data-keyname': 'how-it-works-content' if security.permissions.admin else none,
+        'data-namespace': '_system_' if security.permissions.admin else none,
+        'class': 'dynamic mini-editable' if security.permissions.admin else 'dynamic'
+    }|xmlattr }}>
+        {% content "how-it-works-content", "_system_" %}
+            <h1>Welcome to <span class="lightorange">open</span><span class="darkorange">fire</span>!</h1>
+            <p>hello, <a href="http://openfi.re">openfi.re</a> trusted tester!</p>
+            <p>You must be interested in disruptive innovation... and boy, have you come to the right place.</p>
+            <p>
+                Every technologist, hacker or designer we meet has a secret project that they know can change the world. Usually, that project is more about creating public value than private investor value. But generally, the psychology &amp; logistics around their lack of investibility or positively-disruptive aims are enough to keep such projects from starting &amp; happening. But Kickstarter (and particular project successes, such as Diaspora) have proven that there is a public appetite for supporting hackers for a cause or a mission. We are making that process easier, and scaling it up.
+            </p>
+            <p>Won't that be cool?</p>
+            <p>love, the <span class="lightorange">open</span><span class="darkorange">fi.re</span> team</p>.
+        {% endcontent %}
     </div>
 </div>
 {% endblock %}

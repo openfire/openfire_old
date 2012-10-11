@@ -19,6 +19,8 @@ from google.appengine.ext import ndb
 from google.appengine.api import memcache
 
 
+## OpenfireSessionLoader
+# Abstract parent to all openfire session loader classes.
 class OpenfireSessionLoader(object):
 
     ''' Abstract parent to openfire session loaders '''
@@ -70,6 +72,8 @@ class OpenfireSessionLoader(object):
         raise NotImplemented
 
 
+## ThreadcacheSessionLoader
+# Manages storage and retrieval of session data from instance memory.
 class ThreadcacheSessionLoader(OpenfireSessionLoader):
 
     ''' Session loader that loads and saves sessions with local threadcache '''
@@ -87,6 +91,8 @@ class ThreadcacheSessionLoader(OpenfireSessionLoader):
         raise NotImplemented  # @TODO
 
 
+## MemcacheSessionLoader
+# Manages storage and retrieval of session data from memcache.
 class MemcacheSessionLoader(OpenfireSessionLoader):
 
     ''' Session loader that loads and saves sessions with memcache '''
@@ -110,16 +116,23 @@ class MemcacheSessionLoader(OpenfireSessionLoader):
         self.logging.info('Saving session in memcache at ID: "%s"' % id)
         self.logging.info('Saving session in memcache at encoded ID: "%s"' % self._en(id))
 
+        if struct.get('destroy', False) == True:
+            self.logging.info('Memcache loader received destroy signal...')
+            memcache.delete(self._en(id))
+            return
+
         timeout = self.config.get('backends', {}).get('memcache', {}).get('ttl', self.config.get('ttl', 1200))
 
         self.logging.info('Timeout set to: "%s".' % timeout)
 
-        memcache.set(self._en(id), struct, int(timeout))
+        memcache.set(self._en(id), struct.__json__(), int(timeout))
 
         self.logging.info('Struct saved TTL(%s): "%s"' % (timeout, struct))
         return
 
 
+## PersistentSessionLoader
+# Manages storage and retrieval of session data from the datastore.
 class PersistentSessionLoader(OpenfireSessionLoader):
 
     ''' Session loader that loads and saves sessions with NDB and the AppEngine Datastore '''
@@ -151,9 +164,43 @@ class PersistentSessionLoader(OpenfireSessionLoader):
 
         self.logging.info('Saving session in datastore at ID: "%s"' % id)
 
-        skey = ndb.Key(sessions.Session, id)
-        session_o = sessions.Session(key=skey, sid=id, data=struct, user=None, addr=handler.request.environ.get('REMOTE_ADDR', '__NULL__'))
-        session_key = session_o.put(use_memcache=True, use_datastore=True)
+        if struct.get('destroy', False) == True:
+            self.logging.info('Datastore loader received destroy signal...')
+            try:
+                skey = ndb.Key(sessions.Session, id)
+                skey.delete()
+            except Exception, e:
+                self.logging.error('Encountered unknown exception trying to destroy session at ID "%s". The uncaught exception was: "%s".' % (id, e))
+                if gc.debug:
+                    raise
+                else:
+                    return {}
+            else:
+                self.logging.info('Session destroyed successfully.')
+                return {}
 
-        self.logging.info('Session stored at key: "%s"' % session_key.urlsafe())
-        return session_o.data  # @TODO: Fix user bridge
+        if not self.config.get('backends', {}).get('datastore', {}).get('authenticated', False) or struct.get('authenticated') != None and struct.get('ukey') != None:
+
+            self.logging.debug('Authenticated datastore session storage off or the user is authenticated.')
+
+            skey = ndb.Key(sessions.Session, id)
+            session_params = {
+                'key': ndb.Key(sessions.Session, id),
+                'sid': id,
+                'data': struct.__json__(),
+                'mode': struct.get('mode'),
+                'provider': struct.get('provider'),
+                'addr': handler.request.environ.get('REMOTE_ADDR', None) if not handler.force_remoteip else getattr(handler, 'force_remoteip'),
+                'user': None if not (hasattr(handler, 'user') and getattr(handler, 'user') != None) else getattr(getattr(handler, 'user'), 'key'),
+                'agent': handler.request.headers.get('User-Agent', None) if not handler.uagent.get('original', False) else handler.uagent.get('original')
+            }
+            session_o = sessions.Session(**session_params)
+            session_key = session_o.put(use_cache=True, use_memcache=True, use_datastore=True)
+
+            self.logging.info('Session stored at key: "%s"' % session_key.urlsafe())
+            return session_o.data  # @TODO: Fix user bridge
+
+        else:
+
+            self.logging.debug('Authenticated datastore session storage on, and the user is not logged in. Continuing.')
+            return {}

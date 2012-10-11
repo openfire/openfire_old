@@ -197,51 +197,50 @@ class ProjectController extends OpenfireController
 
             process_goal: (goal) =>
 
-                template = window.GoalEditor ||= new Template('{{+TierEditModal}}', true, 'GoalEditor')
+                template = window.GoalEditor ||= new Template('{{+TierEditModalItem}}', true, 'GoalEditor')
                 ctx = _.extend({type: 'goal'}, goal)
                 ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
                 btnctx =
                     attributes:
-                        'data-index': '{{=index}}'
+                        'data-index': ctx.index
 
                 if !!ctx.new
                     axns = ['add']
                 else
                     axns = ['save', 'reset', 'delete']
 
-                ctx.buttons = [(_.extend(true, btnctx,
+                ctx.buttons = (_.extend(true, {}, btnctx,
                     attributes:
                         'data-action': axn
-                        class: '{{=type}}-button '+axn
-                    content: axn + ' {{=type]}}'
-                )) for axn in axns]
+                        class: 'goal-button '+axn
+                    content: axn + ' goal'
+                ) for axn in axns)
 
                 return template(ctx)
 
             process_tier: (tier) =>
 
-                template = window.TierEditor ||= new Template('{{+TierEditModal}}', true, 'TierEditor')
                 ctx = _.extend({type: 'tier'}, tier)
                 ctx.index = if tier.key? then @get_attached('tier', tier.key, true) else (ctx.new = true; 'new')
 
                 btnctx =
                     attributes:
-                        'data-index': '{{=index}}'
+                        'data-index': ctx.index
 
                 if !!ctx.new
                     axns = ['add']
                 else
                     axns = ['save', 'reset', 'delete']
 
-                ctx.buttons = [(_.extend(true, btnctx,
+                ctx.buttons = (_.extend(true, {}, btnctx,
                     attributes:
                         'data-action': axn
-                        class: '{{=type}}-button '+axn
-                    content: axn + ' {{=type]}}'
-                )) for axn in axns]
+                        class: 'tier-button '+axn
+                    content: axn + ' tier'
+                ) for axn in axns)
 
-                return template(ctx)
+                return ctx
 
             prep_dropped_modal_html: (name, ext) =>
                 # takes filename, returns [premodal_element, trigger_element]
@@ -342,12 +341,7 @@ class ProjectController extends OpenfireController
                 _tiers.push(@internal.process_tier(blank_tier))
                 _tiers.push(@internal.process_tier(t)) for t in tiers
 
-                pre_modal = _.create_element_string('div',
-                    id: 'project-tier-editor'
-                    class: 'pre-modal'
-                    style: 'opacity: 0;'
-                    'data-title': 'editing project tiers...'
-                , _tiers.join(''))
+                pre_modal = window.TierEditModal(false, tiers: _tiers)
 
                 trigger = _.create_element_string('a',
                     id: 'a-project-tier-editor',
@@ -429,7 +423,7 @@ class ProjectController extends OpenfireController
                     reader.onloadend = (e) =>
                         e.preventDefault()
                         e.stopPropagation()
-                        return _.get('project-image-drop-preview').setAttribute('src', e.target.result)
+                        return _.get('#project-image-drop-preview').setAttribute('src', e.target.result)
 
                     # simple check for allowed filetypes
                     if /^image\/(png|jpeg|gif)$/gi.test(filetype)
@@ -438,7 +432,7 @@ class ProjectController extends OpenfireController
                         reader.readAsDataURL(file)
 
                         # upload as image
-                        _.get('project-image-drop-image').addEventListener('click', (e) =>
+                        _.get('#project-image-drop-image').addEventListener('click', (e) =>
 
                             if e.preventDefault
                                 e.preventDefault()
@@ -494,7 +488,7 @@ class ProjectController extends OpenfireController
                         , false)
 
                         # upload as avatar
-                        _.get('project-image-drop-avatar').addEventListener('click', (e) =>
+                        _.get('#project-image-drop-avatar').addEventListener('click', (e) =>
 
                             if e.preventDefault
                                 e.preventDefault()
@@ -544,7 +538,7 @@ class ProjectController extends OpenfireController
                         , false)
 
                         # no thx
-                        _.get('project-image-drop-no').addEventListener('click', (e) =>
+                        _.get('#project-image-drop-no').addEventListener('click', (e) =>
 
                             if e.preventDefault
                                 e.preventDefault()
@@ -634,7 +628,7 @@ class ProjectController extends OpenfireController
                 type = "MasterCard"
             if /^6011/.test(val)
                 type = "Discover"
-            document.getElementById("back-project-cc-type-display").innerHTML = type
+            document.getElementById("back-project-cc-type-display")?.innerHTML = type
             return false
 
         @choose_donation_tier = () ->
@@ -738,6 +732,25 @@ class ProjectController extends OpenfireController
                     alert("Failed to start donation. Are you logged in?")
             return
 
+        @propose_goal = () =>
+            params =
+                project: @project_key
+                amount: parseFloat(document.getElementById("propose-goal-amount").value)
+                description: document.getElementById("propose-goal-description").value
+                funding_day_limit: parseInt(document.getElementById("propose-goal-funding_day_limit").value)
+                deliverable_description: document.getElementById("propose-goal-deliverable_description").value
+                deliverable_date: new Date(document.getElementById("propose-goal-deliverable_date").value).toISOString()
+
+            $.apptools.api.project.propose_goal(params).fulfill
+                success: () ->
+                    alert("Goal saved! You may edit it now before you submit it. Refreshing page...")
+                    window.location.reload()
+
+                failure: (response) ->
+                    alert("There was an error when saving your proposed goal: " + response.responseText)
+
+        @close_propose_goal = () =>
+            $.apptools.widgets.modal.get("propose-project-goal").close()
 
         @follow = () =>
 
@@ -986,7 +999,7 @@ class ProjectController extends OpenfireController
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _save, false)
 
-                        ), false) for save_button in _.get('save', editor)
+                        ), false) for save_button in _.get('.save', editor)
 
                         delete_button.addEventListener('click', (_delete = (e) =>
                             @log('Goal delete() click handler triggered. Confirming goal delete...')
@@ -1040,7 +1053,7 @@ class ProjectController extends OpenfireController
                                 btn.innerHTML = 'Delete goal'
                                 return btn.addEventListener('click', _delete, false)
 
-                        ), false) for delete_button in _.get('delete', editor)
+                        ), false) for delete_button in _.get('.delete', editor)
 
                         reset_button.addEventListener('click', (_reset = (e) =>
                             @log('Goal reset() click handler triggered. Confirming goal reset...')
@@ -1092,7 +1105,7 @@ class ProjectController extends OpenfireController
                                 btn.innerHTML = 'Reset goal'
                                 return btn.addEventListener('click', _reset, false)
 
-                        ), false) for reset_button in _.get('reset', editor)
+                        ), false) for reset_button in _.get('.reset', editor)
 
                         add_button.addEventListener('click', (_add = (e) =>
                             @log('Goal add() click handler triggered. Saving...')
@@ -1133,9 +1146,9 @@ class ProjectController extends OpenfireController
 
                                         added = document.getElementById('goal-editing-'+index)
 
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('delete', added)
+                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('.save', added)
+                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('.reset', added)
+                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('.delete', added)
 
                                         btn.style.backgroundColor = '#bada55'
                                         btn.innerHTML = 'Goal added!'
@@ -1150,7 +1163,7 @@ class ProjectController extends OpenfireController
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _add, false)
 
-                        ), false) for add_button in _.get('add', editor)
+                        ), false) for add_button in _.get('.add', editor)
 
                         set_focus = (g_f) =>
                             g_f.addEventListener('click', (_focus = (e) =>
@@ -1161,7 +1174,7 @@ class ProjectController extends OpenfireController
                                 return field.focus()
                             ), false)
 
-                        set_focus(goal_field) for goal_field in _.get('goal-field', editor)
+                        set_focus(goal_field) for goal_field in _.get('.goal-field', editor)
 
                         return m.open()
 
@@ -1243,7 +1256,7 @@ class ProjectController extends OpenfireController
                     $.apptools.api.project.list_tiers(goal: @project.active_goal).fulfill
                         success: (response) =>
                             tiers = []
-                            tiers.push(@attach(new Goal(target: @project_key).from_message(tier))) for tier in response.tiers
+                            tiers.push(@attach(new Tier(target: @project_key).from_message(tier))) for tier in response.tiers
 
                             return if callback? then callback.call(@, tiers) else tiers
 
@@ -1302,7 +1315,7 @@ class ProjectController extends OpenfireController
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-project-tier-editor')
                     )(), (m) =>
-                        editor = document.getElementById(m._state.element_id)
+                        editor = _('#'+m.id)
 
                         save_button.addEventListener('click', (_save = (e) =>
                             @log('Tier save() click handler triggered. Saving...')
@@ -1362,7 +1375,7 @@ class ProjectController extends OpenfireController
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _save, false)
 
-                        ), false) for save_button in _.get('save', editor)
+                        ), false) for save_button in _.get('.save', editor)
 
                         delete_button.addEventListener('click', (_delete = (e) =>
                             @log('Tier delete() click handler triggered. Confirming tier delete...')
@@ -1416,7 +1429,7 @@ class ProjectController extends OpenfireController
                                 btn.innerHTML = 'Delete tier'
                                 return btn.addEventListener('click', _delete, false)
 
-                        ), false) for delete_button in _.get('delete', editor)
+                        ), false) for delete_button in _.get('.delete', editor)
 
                         reset_button.addEventListener('click', (_reset = (e) =>
                             @log('Tier reset() click handler triggered. Confirming tier reset...')
@@ -1469,7 +1482,7 @@ class ProjectController extends OpenfireController
                                 btn.innerHTML = 'Reset tier'
                                 return btn.addEventListener('click', _reset, false)
 
-                        ), false) for reset_button in _.get('reset', editor)
+                        ), false) for reset_button in _.get('.reset', editor)
 
                         add_button.addEventListener('click', (_add = (e) =>
                             @log('Tier add() click handler triggered. Saving...')
@@ -1513,9 +1526,9 @@ class ProjectController extends OpenfireController
 
                                         added = document.getElementById('tier-editing-'+index)
 
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('delete', added)
+                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('.save', added)
+                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('.reset', added)
+                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('.delete', added)
 
                                         btn.style.backgroundColor = '#bada55'
                                         btn.innerHTML = 'Tier added!'
@@ -1530,18 +1543,20 @@ class ProjectController extends OpenfireController
                                     btn.innerHTML = ':( Try again?'
                                     return btn.addEventListener('click', _add, false)
 
-                        ), false) for add_button in _.get('add', editor)
+                        ), false) for add_button in _.get('.add', editor)
 
                         set_focus = (t_f) =>
                             t_f.addEventListener('click', (_focus = (e) =>
                                 e.preventDefault()
                                 e.stopPropagation()
                                 field = e.target
-                                field.innerHTML = ''
                                 return field.focus()
                                 ), false)
 
-                        set_focus(tier_field) for tier_field in _.get('tier-field', editor)
+                        set_focus(tier_field) for tier_field in _.get('.tier-field', editor)
+
+                        if (editorform = editor.find('form'))?
+                            $.openfire.forms.register(editorform)
 
                         return m.open()
 
@@ -1611,9 +1626,92 @@ class ProjectController extends OpenfireController
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.go_live(key: @project_key).fulfill
+            $.apptools.api.project.cancel(key: @project_key).fulfill
                 success: () ->
                     alert("Your project has been canceled. Refunding all payments. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+
+        @approve_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.approve_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been approved. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reject_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.reject_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been rejectd. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @review_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.review_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been sent for revisions. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @submit_proposed_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.submit_proposed_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been submitted for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @reopen_proposed_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            key = document.getElementById("proposed-goal-key").value
+            $.apptools.api.project.reopen_proposed_goal(key: key).fulfill
+                success: () ->
+                    alert("This goal has been submitted for approval. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @open_goal= (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.open_goal(key: @project.active_goal).fulfill
+                success: () ->
+                    alert("This goal has been opened. Refreshing page...")
+                    window.location.reload()
+                failure: (response) ->
+                    alert("Error:", response.error)
+
+        @close_goal = (e) =>
+            if e.preventDefault
+                e.preventDefault()
+                e.stopPropagation()
+            $.apptools.api.project.close_goal(key: @project.active_goal).fulfill
+                success: () ->
+                    alert("This goal has been closed. Refreshing page...")
                     window.location.reload()
                 failure: (response) ->
                     alert("Error:", response.error)
@@ -1630,16 +1728,16 @@ class ProjectController extends OpenfireController
                 # event listeners
                 document.getElementById('follow').addEventListener('click', @follow, false)
                 document.getElementById('share').addEventListener('click', @share, false)
-                document.getElementById('back').addEventListener('click', @back, false)
+                document.getElementById('back')?.addEventListener('click', @back, false)
 
                 # Event listeners in the back project dialog.
                 for el in document.getElementsByClassName('vote-plus')
                     el.addEventListener('click', @next_step_vote_plus, false)
                 for el in document.getElementsByClassName('vote-minus')
                     el.addEventListener('click', @next_step_vote_minus, false)
-                for el in document.getElementById('donate-step-1').find('input')
+                for el in document.getElementById('donate-step-1')?.find('input')?
                     el.addEventListener('click', @choose_donation_tier, false)
-                document.getElementById('back-project-money-source-input').addEventListener('change', @select_money_source)
+                document.getElementById('back-project-money-source-input')?.addEventListener('change', @select_money_source)
                 _.ready () =>
                     $("#donate-wizard").smartWizard
                         onFinish: @submit_payment
@@ -1647,30 +1745,56 @@ class ProjectController extends OpenfireController
                 if @_state.o and not /proposal/.test(window.location.href)
                     document.body.addEventListener('drop', @add_media, false)
 
-                    # Project Owner Actions
-                    document.getElementById('promote-tiers').addEventListener('click', @tiers.edit, false)
-                    document.getElementById('promote-live').addEventListener('click', @go_live, false)
-                    document.getElementById('promote-suspend').addEventListener('click', @suspend, false)
-                    document.getElementById('promote-shutdown').addEventListener('click', @shutdown, false)
-                    document.getElementById('promote-cancel').addEventListener('click', @cancel, false)
+                    # BBQ Actions
+                    document.getElementById('bbq-live')?.addEventListener('click', @go_live, false)
+                    document.getElementById('bbq-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('bbq-shutdown')?.addEventListener('click', @shutdown, false)
+                    document.getElementById('bbq-cancel')?.addEventListener('click', @cancel, false)
 
-                    document.getElementById('promote-dropzone').addEventListener('dragenter', d_on = (ev) ->
+                    # Project Owner Actions
+                    document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-live')?.addEventListener('click', @go_live, false)
+                    document.getElementById('promote-suspend')?.addEventListener('click', @suspend, false)
+                    document.getElementById('promote-shutdown')?.addEventListener('click', @shutdown, false)
+                    document.getElementById('promote-cancel')?.addEventListener('click', @cancel, false)
+
+                    # Propose a new goal
+                    document.getElementById('submit-proposed-goal')?.addEventListener('click', @propose_goal, false)
+                    document.getElementById('cancel-submit-proposed-goal')?.addEventListener('click', @close_propose_goal, false)
+                    if document.getElementById('propose-goal-deliverable_date')
+                        dpicker = new datepickr('propose-goal-deliverable_date', { dateFormat: 'm-d-Y' })
+
+                    # Owner goal actions
+                    document.getElementById('owner-open-goal')?.addEventListener('click', @open_goal, false)
+                    document.getElementById('owner-close-goal')?.addEventListener('click', @close_goal, false)
+                    document.getElementById('owner-submit-proposed-goal')?.addEventListener('click', @submit_proposed_goal, false)
+                    document.getElementById('owner-reopen-proposed-goal')?.addEventListener('click', @reopen_proposed_goal, false)
+                    document.getElementById('owner-edit-proposed-goal')?.addEventListener('click', @edit_goal, false)
+
+                    # BBQ goal actions
+                    document.getElementById('bbq-open-goal')?.addEventListener('click', @open_goal, false)
+                    document.getElementById('bbq-close-goal')?.addEventListener('click', @close_goal, false)
+                    document.getElementById('bbq-approve-proposed-goal')?.addEventListener('click', @approve_goal, false)
+                    document.getElementById('bbq-reject-proposed-goal')?.addEventListener('click', @reject_goal, false)
+                    document.getElementById('bbq-review-proposed-goal')?.addEventListener('click', @review_goal, false)
+
+                    document.getElementById('promote-dropzone')?.addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.classList.add('hover')
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragover', d_on, false)
-                    document.getElementById('promote-dropzone').addEventListener('dragleave', d_off = (ev) ->
+                    document.getElementById('promote-dropzone')?.addEventListener('dragover', d_on, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('dragleave', d_off = (ev) ->
                         if ev?.preventDefault
                             ev.preventDefault()
                             ev.stopPropagation()
 
                         ev.target.className = 'dropzone'
                     , false)
-                    document.getElementById('promote-dropzone').addEventListener('dragexit', d_off, false)
-                    document.getElementById('promote-dropzone').addEventListener('drop', ((ev) =>
+                    document.getElementById('promote-dropzone')?.addEventListener('dragexit', d_off, false)
+                    document.getElementById('promote-dropzone')?.addEventListener('drop', ((ev) =>
                         d_off(ev)
                         return @add_media(ev)
                     ), false)

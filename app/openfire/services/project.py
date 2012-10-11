@@ -168,7 +168,7 @@ class ProjectService(RemoteService):
         else:
             try:
                 subject = ndb.Key(urlsafe=request.subject.key).get()
-                
+
                 assert subject is not None
                 assert (not subject.is_private()) or (self.user in subject.viewers + subject.owners)
 
@@ -228,7 +228,7 @@ class ProjectService(RemoteService):
 
         try:
             subject = ndb.Key(urlsafe=request.subject.key).get()
-            
+
             assert subject is not None
             if hasattr(self, 'user'):
                 assert (not subject.is_private()) or (self.user in subject.owners + subject.viewers)
@@ -262,7 +262,7 @@ class ProjectService(RemoteService):
             raise self.exceptions.ProjectNotFound("Woops! It looks like that project doesn't exist!")
 
         except Exception, e:
-            raise self.exceptions.ProjectServiceBaseException("Woops! Something went wrong.")                
+            raise self.exceptions.ProjectServiceBaseException("Woops! Something went wrong.")
 
     @remote.method(message_types.VoidMessage, project_messages.Backers)
     def backers(self, request):
@@ -469,7 +469,8 @@ class ProjectService(RemoteService):
         if not project:
             raise remote.ApplicationError('Could not find project to propose goal for.')
 
-        goal = Goal(parent=project.key, approved=False)
+        key_id = Goal.allocate_ids(1, parent=project.key)[0]
+        goal = Goal(key=ndb.Key(Goal, key_id, parent=project.key))
         goal.mutate_from_message(request)
         goal.put()
         return goal.to_message()
@@ -486,7 +487,7 @@ class ProjectService(RemoteService):
             raise remote.ApplicationError('Failed to find project to list proposed goals for.')
 
         messages = []
-        goals = Goal.query(Goal.approved == False, ancestor=project_key).fetch()
+        goals = Goal.query(Goal.status in ['f', 's', 'r', 'd'], ancestor=project_key).fetch()
         for goal in goals:
             messages.append(goal.to_message())
         return common_messages.Goals(goals=messages)
@@ -500,7 +501,7 @@ class ProjectService(RemoteService):
         if not request.key:
             raise remote.ApplicationError('No goal to approve.')
         new_goal = ndb.Key(urlsafe=request.key).get()
-        project = new_goal.parent.get()
+        project = new_goal.key.parent().get()
         if not project:
             raise remote.ApplicationError('Failed to find project to approve goal for.')
 
@@ -514,7 +515,7 @@ class ProjectService(RemoteService):
                 active_goal.close_goal()
             project.completed_goals.append(project.active_goal)
 
-        new_goal.approved = True
+        new_goal.status = 'a'
         new_goal.put()
         project.active_goal = new_goal.key
         project.put()
@@ -529,9 +530,88 @@ class ProjectService(RemoteService):
         if not request.key:
             raise remote.ApplicationError('No goal to reject.')
         goal = ndb.Key(urlsafe=request.key).get()
-        goal.approved = False
-        goal.rejected = True
+        goal.status = 'd'
         goal.put()
+        return goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def review_goal(self, request):
+
+        ''' Send a goal for revisions. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('No goal to review.')
+        goal = ndb.Key(urlsafe=request.key).get()
+        goal.status = 'r'
+        goal.put()
+        return goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def submit_proposed_goal(self, request):
+
+        ''' Submit a proposed goal for approval. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('No goal to submit.')
+        goal = ndb.Key(urlsafe=request.key).get()
+        goal.status = 's'
+        goal.put()
+        return goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def reopen_proposed_goal(self, request):
+
+        ''' Reopen a proposed goal to be edited and resubmitted. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('No goal to reopen.')
+        goal = ndb.Key(urlsafe=request.key).get()
+        goal.status = 'f'
+        goal.put()
+        return goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def open_goal(self, request):
+
+        ''' Open a goal so it can be contributed to. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('No goal to open.')
+        goal = ndb.Key(urlsafe=request.key).get()
+        project = goal.key.parent().get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to open goal for.')
+
+        if not project.active_goal == goal.key:
+            raise remote.ApplicationError('Provided goal is not the active goal for this project.')
+
+        goal.open_goal()
+        return goal.to_message()
+
+    @remote.method(common_messages.GoalRequest, common_messages.Goal)
+    def close_goal(self, request):
+
+        ''' Close a goal and put it in completed goals. '''
+
+        # TODO: Permissions.
+        if not request.key:
+            raise remote.ApplicationError('No goal to close.')
+        goal = ndb.Key(urlsafe=request.key).get()
+        project = goal.key.parent().get()
+        if not project:
+            raise remote.ApplicationError('Failed to find project to close goal for.')
+
+        if project.active_goal == goal.key:
+            # If this was the project's active goal, clear the active goal and add this goal to the list.
+            project.completed_goals.append(project.active_goal)
+            project.active_goal = None
+            project.put()
+
+        goal.close_goal()
         return goal.to_message()
 
 

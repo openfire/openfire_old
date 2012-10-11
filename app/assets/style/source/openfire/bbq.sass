@@ -1,48 +1,97 @@
-#category-container,
-#proposal-container,
-#project-container,
-#custom-url-container
-    display: table
 
-#category-container .category-header,
-#proposal-container .proposal-header,
-#project-container .project-header,
-#custom-url-container .custom-url-header
-    display: table-row
+#bbq-moderation-page
+    text-align: center
+    padding: 0px 50px 50px 50px
 
-#category-container .category-header .bbq-col,
-#proposal-container .proposal-header .bbq-col,
-#project-container .project-header .bbq-col,
-#custom-url-container .custom-url-header .bbq-col
-    display: table-cell
+#bbq-moderation
+    width: 100%
+    margin-left: auto
+    margin-right: auto
 
-#category-container .category,
-#proposal-container .proposal,
-#project-container .project,
-#custom-url-container .custom-url
-    display: table-row
+.tab-wrapper
+    height: auto !important
+    min-height: 100px
+    text-align: left
 
-#category-container .category .category-info,
-#category-container .category .category-actions,
-#proposal-container .proposal .proposal-info,
-#proposal-container .proposal .proposal-actions,
-#project-container .project .project-info,
-#project-container .project .project-actions,
-#custom-url-container .custom-url .custom-url-info,
-#custom-url-container .custom-url .custom-url-actions
-    display: table-cell
-    padding: 5px
-    border: 1px solid #333333
+#bbq-header
+    padding-top: 100px
+    padding-bottom: 20px
 
+#header-text
+    font-size: 40pt
+    text-decoration: underline
+    color: #727272
+    line-height: 29pt
+
+#header-subtext
+    font-size: 10pt
+
+#bbq-tabs-container
+    max-width: 100%
+
+.login-redirect
+    padding-top: 60px
+    padding-left: 25px
+
+    a
+        color: #7D7D7D
 
 .bbq-dialog-content
     height: 300px
     overflow: auto
 
+.dataTables_wrapper
+    select
+        font-size: 10pt
+        margin: 0px
 
-#project-container .project .project-actions .drop-box
-    width: 100px
-    height: 100px
-    border: 1px solid red
-    display: inline-block
+    label
+        font-size: 10pt
+        margin: 0px
 
+    input[type="text"]
+        margin: 0px
+
+
+#bbq-awaiting-action
+    padding-top: 10px
+
+    .awaiting-action-super-title
+        font-size: 12pt
+        text-decoration: underline
+
+    .needs-attention
+        border: 2px solid #FF722D
+
+    .proposals, .goals
+        display: block
+        border-radius: 5px
+        background-color: #BFBFBF
+        padding: 10px
+        margin: 10px
+        width: 50%
+
+        .awaiting-action-title
+            font-size: 12pt
+
+        .no-action-needed
+            font-size: 14pt
+            color: black
+
+        ul
+            margin: 0px
+
+            li
+                margin: 0px
+                padding-top: 10px
+                font-size: 12pt
+
+                a
+                    color: black
+
+                span
+                    display: block
+
+                .proposal-info, .goal-info
+                    padding-top: 4px
+                    font-size: 10pt
