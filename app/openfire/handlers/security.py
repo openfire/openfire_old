@@ -105,16 +105,15 @@ class Login(WebHandler, SecurityConfigProvider):
 
                 # scopes and callback
                 'scope': ','.join([scope.get('name') for scope in self._resolveProvider('facebook').get('scopes', []) if scope.get('enabled', False)]),
-                'callback': ''.join([
-                                'https' if (self.force_https and not cfg.debug) else self.request.environ.get('HTTP_SCHEME', 'HTTP').lower(), '://',
-                                self.force_hostname or self.request.environ.get('HTTP_HOST', 'localhost:8080'),
-                                self.url_for('auth/action-provider',
-                                    action='callback',
-                                    provider='facebook',
-                                    csrf=hashlib.sha1(self.session.get('sid')).hexdigest(),
-                                    ofsid=self.encrypt(self.session.get('sid'))
-                                )
-                            ])
+                'callback': self.url_for('auth/action-provider',
+                                action='callback',
+                                provider='facebook',
+                                csrf=hashlib.sha1(self.session.get('sid')).hexdigest(),
+                                ofsid=self.encrypt(self.session.get('sid')),
+                                _full=True,
+                                _scheme='https' if not cfg.debug else 'http',
+                                _netloc=self.force_hostname or self.request.host
+                            )
 
         })
 
@@ -543,13 +542,22 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         email = self.session['fb_email'] = user_struct['email']
                         nickname = self.session['fullname'] = user_struct['name']
 
+                        self.logging.info('FB: Found user with ID "%s" and email "%s".' % (id, email))
+
                         ukey = ndb.Key(user_models.User, email)
-                        fb_id = user_models.FacebookAccount.query().filter(user_models.FacebookAccount.ext_id == id).get(keys_only=True, produce_cursors=False)
+
+                        em_q = user_models.EmailAddress.query().filter(user_models.EmailAddress.address == email)
+                        result = em_q.fetch(1, keys_only=True)
+
+                        if result:
+                            ukey = result[0].parent()
+
+                        fb_id = user_models.FacebookAccount.query().filter(user_models.FacebookAccount.ext_id == id).fetch(1, keys_only=True, produce_cursors=False)
 
                         if fb_id is not None:
                             ukey, fb_acct = tuple(ndb.get_multi([ukey, fb_id]))
                         else:
-                            user = ukey.get()
+                            user, fb_acct = ukey.get(), None
                             if user is None:
                                 ukey = None
                             else:
@@ -583,7 +591,14 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                                 mode='oauth',
                                 register=True
                             )
-                            return self.redirect_to('auth/register', exi=base64.b64encode(user_struct['id']), state=hashlib.sha512(user_struct['id']).hexdigest())
+                            return self.redirect_to('auth/register',
+                                exi=base64.b64encode(user_struct['id']),
+                                state=hashlib.sha512(user_struct['id']).hexdigest(),
+                                provider='facebook',
+                                _full=True,
+                                _scheme='https' if not cfg.debug else 'http',
+                                _netloc=self.force_hostname or self.request.host
+                            )
 
                 else:
                     self.logging.critical('FB: ERROR! Failed to get persistent auth token.')
@@ -654,6 +669,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     'exi': base64.b64encode(u.user_id()),
                     'p': 'gp',
                     'state': hashlib.sha512(u.user_id()).hexdigest(),
+                    'provider': 'googleplus',
                     '_full': True,
                     '_scheme': 'https' if not cfg.debug else 'http',
                     '_netloc': entrypoint
@@ -700,6 +716,7 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         'exi': base64.b64encode(u.user_id()),
                         'p': 'foa',
                         'state': hashlib.sha512(u.user_id()).hexdigest(),
+                        'provider': 'googleplus',
                         '_full': True,
                         '_scheme': 'https' if not cfg.debug else 'http',
                         '_netloc': entrypoint
