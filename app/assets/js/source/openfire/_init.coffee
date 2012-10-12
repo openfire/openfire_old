@@ -165,6 +165,70 @@ class Openfire
 
                 return @
 
+            notify: ((window) ->
+                sysn = window.SystemNotification
+
+                n = _.create_doc_frag(sysn(
+                    level: 'notify'
+                    title: 'hello'
+                    message: 'default'
+                ))
+                sysn.node = n.firstChild
+                sysn.node.__defineSetter__('outerHTML', (html) ->
+                    return $.apptools.templates.outerHTML.call(@, html, sysn)
+                )
+
+                document.body.appendChild(n)
+
+                sysn.hide = () ->
+                    return SystemNotification.node.fadeOut()
+
+                window.notify = (level, title, message, confirm_or_alert) ->
+
+                    context = {
+                        level: level
+                        title: title
+                        message: message
+                    }
+                    callbacks = {}
+                    linger = false
+
+                    if confirm_or_alert? and _.is_object(confirm_or_alert)
+
+                        callbacks = _.extend(callbacks, confirm_or_alert)
+
+                        if confirm_or_alert.yes
+                            context.confirm = true
+                        else if confirm_or_alert.ok
+                            context.alert = true
+
+                        callback = (e) =>
+                            e.preventDefault()
+                            e.stopPropagation()
+                            key = e.target.getAttribute('id').split('-').pop()
+                            SystemNotification.node.fadeOut()
+                            return callbacks[key]()
+
+                        linger = true
+
+                    if linger
+                        complete = () =>
+                            _('#notification-'+k).bind('click', callback, false) for k of callbacks
+                            return @
+                    else
+                        complete = () =>
+                            _('#openfire-notification').bind('click', sysn.hide, false)
+                            setTimeout(sysn.hide, 3000)
+                            return @
+
+                    sysn(context)
+                    sysn.node.fadeIn(callback: complete)
+
+                    return sysn.node
+
+                return window.notify
+            )(window)
+
         # consider preinit
         if window.__openfire_preinit?
             @sys.state.preinit = window.__openfire_preinit

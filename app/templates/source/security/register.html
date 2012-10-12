@@ -1,5 +1,25 @@
 {% extends "layout/security.html" %}
 
+{% block stylesheets %}
+	<link rel='stylesheet' href='{{ asset.style('register', 'openfire') }}' media='all' />
+{% endblock stylesheets %}
+
 {% block content %}
-	<b>REGISTER</b>
+
+	{% block registersplash %}
+	<div id='register' class="rounded-big center-all splash">
+
+		<div id="register_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}" data-csrf="{{ encrypt(security.session.get('sid', '__DEV__')) }}">
+			{% include "snippets/register_form.html" with context %}
+		</div><!-- end #register_wrapper -->
+
+	</div><!-- end #register -->
+	{% endblock %}
+
 {% endblock %}
+
+{% block jsready %}
+                _tbb = _.get('#thirdparty-buttons'), _gpb = _.get('#federated-google'), _gpf = _.get('#federated-facebook'), _gpt = _.get('#federated-twitter'),
+                _ = _gpb.onclick = _gpf.onclick = _gpt.onclick = function (e) { window.location.href = ["login", "with", e.target.getAttribute('data-provider')].join("/"); },
+
+{% endblock jsready %}

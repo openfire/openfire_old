@@ -6,7 +6,6 @@
 {% endblock postnorth %}
 
 {% block main %}
-
     <!-- Main Masthead -->
     <div id='masthead'></div>
     <!-- #masthead -->
@@ -259,12 +258,7 @@
             </article><!-- end #proposal -->
         </div><!-- end #content -->
     </div>
-
-
 {% endblock main %}
-
-
-
 
 {% block presouth %}
     <script>
@@ -301,3 +295,8 @@
     </script>
 {% endblock presouth %}
 
+{% block jquery %}
+	<script type="text/javascript" src="{{ asset.script('jquery-full', 'core') }}"></script>
+	<script type="text/javascript" src="{{ asset.script('datepickr', 'core') }}"></script>
+	<script type="text/javascript" src="{{ asset.script('smartwizard', 'jquery') }}"></script>
+{% endblock jquery %}

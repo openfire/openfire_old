@@ -99,7 +99,7 @@ config['apptools.project.services'] = {
 
         ## Beta service for signing up placeholder users
         'beta': {
-            'enabled': True,
+            'enabled': False,
             'service': 'openfire.services.beta.BetaService',
             'methods': ['signup'],
 

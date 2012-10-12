@@ -12,7 +12,13 @@ import webapp2
 from webapp2_extras import sessions
 
 # AppTools Imports
+from apptools import core
+from apptools import util
+from apptools import services
+
+# Util Imports
 from apptools.util import debug
+from apptools.util import datastructures
 
 # OpenFire Imports
 from openfire.core.sessions import loader
@@ -142,7 +148,13 @@ class OpenfireSessionManager(sessions.CustomBackendSessionFactory):
             for loader in callchain:
                 self.logging.info('Putting session using loader "%s".' % loader)
                 try:
-                    loader.put_session(sid, struct, handler)
+                    if isinstance(handler, core.BaseHandler):
+                        loader.put_session(sid, struct, handler)
+                    elif isinstance(handler, services.BaseService):
+                        loader.put_session(sid, struct, handler.handler)
+                    else:
+                        self.logging.warning('Unknown handler type. Saving session anyway.')
+                        loader.put_session(sid, struct, handler)
 
                 except:
                     if config.debug:

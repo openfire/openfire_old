@@ -1,0 +1,1 @@
+<button{{@attributes}} {{=_key}}="{{=_val}}"{{/attributes}}>{{=content}}</button>

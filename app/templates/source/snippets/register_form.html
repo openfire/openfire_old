@@ -1,0 +1,138 @@
+<form id='site-register' action='#' method='POST'>
+
+	<h1>Sign up</h1>
+
+	{% if federated %}
+	<section id='federated-account' class='linked account-selector' data-provider="{{ provider }}">
+
+		<h2>You've linked your {{ provider }} account</h2>
+
+		<div id='{{ provider }}-account'>
+
+			<div class='account badge'>
+
+				<img src="http://placehold.it/64x64" alt="that\'s you, silly!">
+
+				<div class='profile'>
+
+					<div class='nametag'>
+						<span class='fname'>John</span> <span class='lname'>Doe</span>
+					</div> <!-- end .nametag -->
+
+					<div class='link'>
+						<a href="blabs.com">http://google.com/coolguy</a>
+					</div> <!-- end .link -->
+
+				</div> <!-- end .profile -->
+
+			</div> <!-- end .account.badge -->
+
+		</div> <!-- end #{{ provider }}-account -->
+
+		<span class='smallnote'>You can attach other accounts later via your profile!</span>
+
+	</section> <!-- end #federated-account -->
+	{% else %}
+	<section id='federated-account' class='empty account-selector'>
+
+		<h2>Skip all this bullshit</h2>
+
+		<div id='thirdparty-buttons' class='social promo buttons'>
+			<button id='federated-google' data-provider='googleplus' class='left zocial googleplus button'>Signup with Google</button>
+			<button id='federated-facebook' data-provider='facebook' class='left zocial facebook icon'></button>
+			<button id='federated-twitter' data-provider='twitter' class='left zocial twitter icon'></button>
+			<div class='clear'></div>
+		</div> <!-- end #thirdparty-buttons -->
+
+	</section> <!-- end #federated-account -->
+
+	<section id='basic-details'>
+
+		<h2>Tell us a bit about yourself</h2>
+
+		<div id='personal' class='left formgroup'>
+			<input id='firstname' name='firstname' placeholder='first name' />
+			<input id='lastname' name='lastname' placeholder='last name' />
+		</div> <!-- end #personal -->
+
+		<div id='contact' class='right formgroup'>
+			<input id='email' name='email' placeholder='email address' /><label for="email">You can always add more later!</label>
+			<input id='phone' name='phone' placeholder='phone number' /><label for="phone">If you want, we can send you text notifications!</label>
+		</div> <!-- end #contact -->
+
+		<div class='clear'></div>
+
+	</section> <!-- end #basic-details -->
+	{% endif %}
+
+	<section id='organic-account'>
+
+		<h2>Pick a username</h2>
+
+		<div id='user' class='left formgroup'>
+			
+			<span id='oflink'>openfi.re/</span><input id='username' name='username' placeholder='username' /><label for="username">Pick a username!</label>
+
+			<div id='username-status' class='hidden transparent'>
+
+				<div id='username-checking'>
+					<span class='momentron loading spinner'>&#xf0043;</span>checking availability...
+				</div><!-- end .checking -->
+
+				<div id='username-success' class='hidden transparent'>
+					<span class='momentron'>&#xf000a;</span>Yay! It's available!
+				</div><!-- end .success -->
+
+				<div id='username-failure' class='hidden transparent'>
+					<span class='momentron'>&#xf000b;</span>
+				</div>
+
+			</div><!-- end #username-status -->
+
+		</div> <!-- end #user -->
+
+		<div id='topics' class='right formgroup'>
+			<b>Topic autocomplete will go here!</b>
+		</div> <!-- end #topics -->
+
+		<div class='clear'></div>
+
+	</section> <!-- end #organic-account -->
+
+	<section id='avatar-preferences'>
+
+		<h2>Pick an avatar</h2>
+
+		<div id='imgsource' class='formgroup'>
+
+			<div id='avatar-provider'>
+				<input type='radio' name='avatar_provider' value="organic"><span id='organic_mode' class='avatar_provider_mode'>Upload an image</span></input>
+
+				<input type='radio' name='avatar_provider'
+				value="oranic_url"><span id='organic_urlmode' class='avatar_provider_mode'>Upload by URL</span></input>
+
+				<input type='radio' name='avatar_provider' value="gravatar"><span id='gravatar_mode' class='avatar_provider_mode'>Use my Gravatar</span></input>
+			</div><!-- end #avatar-provider -->
+
+			<div id='avatar-selector'>
+				<div id='avatar-preview' class='empty'></div>
+			</div><!-- end #avatar-selector -->
+
+		</div> <!-- end #imgsource -->
+
+	</section> <!-- end #avatar-prefs -->
+
+	{# NOT IN USE YET
+	<section id='notification-preferences'>
+
+		<h2>Preferences</h2>
+
+	</section> <!-- end #notification-preferences -->#}
+
+	<div id='register-actions'>
+		<button id="register-button">
+		    <span id='register-button-label'>Sign me up!</span>
+		</button><!-- end #register-button -->
+	</div><!-- end #register-actions -->
+
+</form> <!-- end #site-register -->

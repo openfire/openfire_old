@@ -4,10 +4,18 @@
 @import _core/_base
 @import _core/config
 @import _core/_fonts
+@import _core/_forms
 @import _partials/social
 
 div.snapall
   -webkit-transform: translateZ(0)
+
+.transparent
+  opacity: 0
+
+.graceful
+  -webkit-transition-property: opacity
+  -webkit-transition-duration: 0.2s
 
 a
   color: #15C !important
@@ -65,18 +73,17 @@ h4
   -ms-border-radius: 20px
 
 .center-all
-  position: absolute
-  top: 55%
-  left: 50%
+  position: relative
+  margin-left: auto
+  margin-right: auto
+  margin-top: 15%
 
-#splash
+.splash
   background-color: #fff
-  height: 325px
+  min-height: 325px
   width: 800px
   text-align: center
   vertical-align: middle
-  margin-top: -175px
-  margin-left: -400px
   z-index: 500
 
   &:before
