@@ -133,15 +133,22 @@ class Project extends Model
 
         @get = (callback) =>
 
-            @log('Pulling most updated project version from server...')
             $.apptools.api.project.get(key: @key).fulfill
                 success: (response) =>
-                    @log('Project successfully synced.')
                     return if callback? then callback?(@from_message(response)) else @from_message(response)
 
                 failure: (error) =>
-                    @log('Error syncing project: '+error)
-                    alert 'project get() failure'
+                    notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+
+
+        @put = (callback) =>
+            $.apptools.api.project.get(key: @key).fulfill
+                success: (response) =>
+                    return if callback? then callback?(@from_message(response)) else @from_message(response)
+
+                failure: (error) =>
+                    notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+
 
 
 
@@ -172,7 +179,6 @@ class ProjectController extends OpenfireController
         if @_state.ke and not /proposal/.test(window.location.href)
             @project = new Project(@_state.ke)
             @project.get()
-            @project_key = @project.key
 
         @log = () => return console.log.apply(console, arguments)
 
@@ -455,7 +461,7 @@ class ProjectController extends OpenfireController
                                     return @project
 
                             $.apptools.api.media.attach_image(
-                                target: @project_key
+                                target: @project.key
                                 size: filesize
                                 name: filename
                             ).fulfill
@@ -508,7 +514,7 @@ class ProjectController extends OpenfireController
                                     return @project
 
                             $.apptools.api.media.attach_avatar(
-                                target: @project_key
+                                target: @project.key
                                 size: filesize
                                 name: filename
                             ).fulfill
@@ -559,14 +565,14 @@ class ProjectController extends OpenfireController
 
                     $.apptools.api.media.attach_video(
                         reference: url
-                        target: @project_key
+                        target: @project.key
                     ).fulfill
                         success: (response) =>
                             @attach(new Video(response))
                             $.apptools.events.trigger 'PROJECT_VIDEO_ADDED', @
 
                         failure: (error) =>
-                            alert 'attach_video() failure'
+                            notify('error', 'whoops', 'couldn\'t attach your video :(')
 
                 else throw new MediaError(@constructor.name, 'Unrecognized media kind linked.')
 
@@ -588,7 +594,7 @@ class ProjectController extends OpenfireController
 
             ###
             if @_state.o
-                $.apptools.api.project.post(target: @project_key).fulfill
+                $.apptools.api.project.post(target: @project.key).fulfill
                     success: () =>
                         # no response i think?
                         alert 'update() success'
@@ -682,7 +688,7 @@ class ProjectController extends OpenfireController
 
             params =
                 user: null # TODO: Get user so that we can double check with the session? Should we do that?
-                project: @project_key
+                project: @project.key
                 tier: tier
                 amount: document.getElementById("back-project-amount-input").value
                 next_step_votes: votes
@@ -705,7 +711,7 @@ class ProjectController extends OpenfireController
             # Submit the back request via the payment.back_project service.
             $.apptools.api.payment.back_project(params).fulfill
                 success: (response) =>
-                    alert("Success! " + response.message)
+                    notify('yay', "Success!", response.message)
                     $.apptools.widgets.modal.get("back-project-dialog").close()
                     document.getElementById('back-text').innerHTML = 'you rock.'
                     document.getElementById('back').classList.add('backed')
@@ -729,12 +735,12 @@ class ProjectController extends OpenfireController
                     selector.innerHTML = options
                     $.apptools.widgets.modal.get("back-project-dialog").open()
                 failure: (error) =>
-                    alert("Failed to start donation. Are you logged in?")
+                    notify('error', 'whoops', 'couldn\'t back project. are you logged in?')
             return
 
         @propose_goal = () =>
             params =
-                project: @project_key
+                project: @project.key
                 amount: parseFloat(document.getElementById("propose-goal-amount").value)
                 description: document.getElementById("propose-goal-description").value
                 funding_day_limit: parseInt(document.getElementById("propose-goal-funding_day_limit").value)
@@ -742,12 +748,13 @@ class ProjectController extends OpenfireController
                 deliverable_date: new Date(document.getElementById("propose-goal-deliverable_date").value).toISOString()
 
             $.apptools.api.project.propose_goal(params).fulfill
-                success: () ->
-                    alert("Goal saved! You may edit it now before you submit it. Refreshing page...")
-                    window.location.reload()
+                success: (response) ->
+                    notify('yay', 'goal saved!', 'refreshing page....')
+                    setTimeout(window.location.reload, 2000)
+                    return
 
-                failure: (response) ->
-                    alert("There was an error when saving your proposed goal: " + response.responseText)
+                failure: (error) ->
+                    notify('error', 'whoops', 'we couldn\'t save your goal:'+response.responseText)
 
         @close_propose_goal = () =>
             $.apptools.widgets.modal.get("propose-project-goal").close()
@@ -759,7 +766,7 @@ class ProjectController extends OpenfireController
 
             follow_r =
                 subject:
-                    key: @project_key
+                    key: @project.key
                     kind: 'PROJECT'
 
             return $.apptools.api.project.follow(follow_r).fulfill({
@@ -784,7 +791,7 @@ class ProjectController extends OpenfireController
             # what do?
 
             @log('sharing functionality currently stubbed.')
-            alert('You tried to share a project! We\'re working on it :)')
+            notify('warn', 'that tickled!', 'you tried to share a project! we\'re working on it :)')
 
 
         @get = (refresh, callback) =>
@@ -806,7 +813,7 @@ class ProjectController extends OpenfireController
         @get_backers = () =>
 
             ## get project backers
-            $.apptools.api.project.backers(target: @project_key).fulfill
+            $.apptools.api.project.backers(target: @project.key).fulfill
 
                 success: (response) =>
                     # response.users = []
@@ -819,27 +826,26 @@ class ProjectController extends OpenfireController
         @get_followers = () =>
 
             ## get project followers
-            $.apptools.api.project.followers(target: @project_key).fulfill
+            $.apptools.api.project.followers(target: @project.key).fulfill
 
                 success: (response) =>
-                    # response.profiles = []
                     alert 'get_followers() success'
 
                 failure: (error) =>
-                    alert 'get_followers() failure'
+                    notify('error', 'whoops', error.error)
 
 
         @get_updates = () =>
 
             ## get recent updates
-            $.apptools.api.project.posts(target: @project_key).fulfill
+            $.apptools.api.project.posts(target: @project.key).fulfill
 
                 success: (response) =>
                     # response.posts = []
                     alert 'get_updates() success'
 
                 failure: (error) =>
-                    alert 'get_updates() failure'
+                    notify('error', 'whoops', error.error)
 
         @edit_goal = () => return @tiers.edit.apply(@, arguments)
         @edit_tier = () => return @tiers.edit.apply(@, arguments)
@@ -864,10 +870,10 @@ class ProjectController extends OpenfireController
                     # get from the server
                     $.apptools.api.project.get_goal(
                         key: goal_key
-                        project: @project_key
+                        project: @project.key
                     ).fulfill
                         success: (response) =>
-                            goal = @attach(new Goal(target: @project_key).from_message(response.goal))
+                            goal = @attach(new Goal(target: @project.key).from_message(response.goal))
 
                             return if callback? then callback.call(@, goal) else goal
 
@@ -890,11 +896,11 @@ class ProjectController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.project.list_goals(project: @project_key).fulfill
+                    $.apptools.api.project.list_goals(project: @project.key).fulfill
 
                         success: (response) =>
                             goals = []
-                            goals.push(@attach(new Goal(target: @project_key).from_message(goal))) for goal in response.goals
+                            goals.push(@attach(new Goal(target: @project.key).from_message(goal))) for goal in response.goals
 
                             return if callback? then callback.call(@, goals) else goals
 
@@ -939,7 +945,7 @@ class ProjectController extends OpenfireController
                 ## coordinates editing goal properties
                 return @goals.list (goals) =>
 
-                    _g.target = @project_key for _g in goals
+                    _g.target = @project.key for _g in goals
 
                     goal_modal_parts = @internal.prep_goals_modal_html(goals)
 
@@ -965,7 +971,7 @@ class ProjectController extends OpenfireController
                             btn.innerHTML = 'Saving...'
                             idx = btn.getAttribute('data-index')
 
-                            goal = if idx isnt 'new' then @get_attached('goal', idx) else new Goal(target: @project_key)
+                            goal = if idx isnt 'new' then @get_attached('goal', idx) else new Goal(target: @project.key)
 
                             amt_edit_el = document.getElementById('goal-amount-'+idx)
                             desc_edit_el = document.getElementById('goal-description-'+idx)
@@ -1126,7 +1132,7 @@ class ProjectController extends OpenfireController
                             btn.innerHTML = 'Adding...'
                             idx = 'new'
 
-                            goal = new Goal(target: @project_key)
+                            goal = new Goal(target: @project.key)
 
                             amt_edit_el = document.getElementById('goal-amount-'+idx)
                             desc_edit_el = document.getElementById('goal-description-'+idx)
@@ -1146,8 +1152,8 @@ class ProjectController extends OpenfireController
                                         df = _.create_doc_frag(@internal.process_goal(_goal))
                                         new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
 
-                                        amt_edit_el.innerHTML = 0
-                                        desc_edit_el.innerHTML = 'Fill this out to add a goal!'
+                                        amount_el.innerHTML = 0
+                                        description_el.innerHTML = 'Fill this out to add a goal!'
 
                                         btn.innerHTML = 'Add goal'
                                         btn.addEventListener('click', _add, false)
@@ -1218,9 +1224,8 @@ class ProjectController extends OpenfireController
 
         @tiers =
 
-            get: (tier_key, callback, sync) =>
-
-                ## get tier by key
+            ## get single tier by key
+            get: (t_key, callback, sync) =>
 
                 if not sync?
                     if callback? and typeof callback is 'boolean'
@@ -1229,25 +1234,21 @@ class ProjectController extends OpenfireController
                     else sync is false
 
                 if not sync
-                    tier = @get_attached('tier', tier_key)
+                    tier = @get_attached('tier', t_key)
                     return if callback? then callback.call(@, tier) else tier
 
                 else
                     # get from the server
-                    $.apptools.api.project.get_tier(
-                        key: tier_key
-                        project: @project_key
-                    ).fulfill
+                    return $.apptools.api.project.get_tier(key: t_key).fulfill
                         success: (response) =>
-                            tier = @attach(new Tier(target: @project_key).from_message(response.tier))
+                            tier = @attach(new Tier().from_message(response))
                             return if callback? then callback.call(@, tier) else tier
 
                         failure: (error) =>
-                            alert 'tiers.get() failure'
+                            notify('error', 'whoops', 'couldn\'t get project tiers from server. refresh page?', {ok: -> window.location.reload()})
 
+            ## get all project tiers
             list: (callback, sync) =>
-
-                ## list tiers by project key
 
                 if not sync?
                     if callback? and typeof callback is 'boolean'
@@ -1256,46 +1257,45 @@ class ProjectController extends OpenfireController
                     else sync is false
 
                 if not sync
+                    # return cached
                     tiers = @get_attached('tier', true)
                     return if callback? then callback.call(@, tiers) else tiers
 
                 else
-                    # get from the server
-                    $.apptools.api.project.list_tiers(goal: @project.active_goal).fulfill
+                    # pull from the server
+                    return $.apptools.api.project.list_tiers(goal: @project.active_goal).fulfill
                         success: (response) =>
                             tiers = []
-                            tiers.push(@attach(new Tier(target: @project_key).from_message(tier))) for tier in response.tiers
+                            tiers.push(@attach(new Tier().from_message(tier))) for tier in response.tiers
 
                             return if callback? then callback.call(@, tiers) else tiers
 
                         failure: (error) =>
-                            alert 'tiers.list() failure'
-                            @log('Error listing tiers: ' + error)
+                            notify('error', 'whoops', 'couldn\'t get project tiers from server. refresh page?', {ok: -> window.location.reload()})
 
+            ## put tier by key
             put: (tier, callback) =>
 
-                ## put tier by key
-
-                $.apptools.api.project.put_tier(tier.to_message()).fulfill
+                return $.apptools.api.project.put_tier(tier.to_message()).fulfill
                     success: (response) =>
-                        alert 'tiers.put() success'
+                        notify('yay', 'tier saved', ':)')
                         return if callback? then callback.call(@, response) else response.key
 
                     failure: (error) =>
-                        alert 'tiers.put() failure'
+                        notify('error', 'whoops', 'couldn\'t save tier. refresh page?', {ok: -> window.location.reload()})
 
+            ## delete tier by key
             delete: (tier_key, callback) =>
 
-                ## delete tier by key
-
-                $.apptools.api.project.delete_tier({key: tier_key}).fulfill
+                return $.apptools.api.project.delete_tier({key: tier_key}).fulfill
                     success: (response) =>
-                        alert 'tiers.delete() success'
+                        notify('notify', 'tier deleted', 'bye bye')
                         return if callback? then callback.call(@, response) else response.key
 
                     failure: (error) =>
-                        alert 'tiers.delete() failure'
+                        notify('error', 'whoops', 'couldn\'t delete tier. refresh page?', {ok: -> window.location.reload()})
 
+            ## edit
             edit: (e) =>
 
                 ## coordinates editing tier properties
@@ -1310,7 +1310,7 @@ class ProjectController extends OpenfireController
 
                 return @tiers.list (tiers) =>
 
-                    _t.target = @project_key for _t in tiers
+                    _t.target = @project.key for _t in tiers
 
                     tier_modal_parts = @internal.prep_tiers_modal_html(tiers)
 
@@ -1326,230 +1326,223 @@ class ProjectController extends OpenfireController
                         editor = _('#'+m.id)
 
                         save_button.addEventListener('click', (_save = (e) =>
-                            @log('Tier save() click handler triggered. Saving...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Saving...'
                             idx = btn.getAttribute('data-index')
 
-                            tier = if idx isnt 'new' then @get_attached('tier', idx) else new Tier(target: @project_key)
+                            return notify('warn', 'saving tier', 'ready to save?', {
 
-                            amt_edit_el = document.getElementById('tier-amount-'+idx)
-                            desc_edit_el = document.getElementById('tier-description-'+idx)
-                            name_edit_el = document.getElementById('tier-name-'+idx)
+                                no: =>
 
-                            tier.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            tier.description = desc_edit_el.innerText
-                            tier.name = name_edit_el.innerText
+                                    notify('notify', 'tier not saved', 'keep on working :)')
+                                    btn.addEventListener('click', _save, false)
+                                    return
 
-                            return $.apptools.api.project.put_tier(tier.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Tier saved! Applying changes...')
+                                yes: =>
 
-                                    return @attach tier.from_message(response), (_tier) =>
-                                        k = _tier.key
+                                    amount_el = _('#tier-amount-'+idx)
+                                    description_el = _('#tier-description-'+idx)
+                                    name_el = _('#tier-name-'+idx)
 
-                                        name_and_amt_el = document.getElementById('a-'+k)
+                                    return $.apptools.api.project.put_tier(_.extend((if idx isnt 'new' then @get_attached('tier', idx) else new Tier()),
 
-                                        name_edit_el.innerHTML = _tier.name
-                                        amt_edit_el.innerHTML = _tier.amount
+                                        target: @project.key
+                                        amount: parseInt(amount_el.val())
+                                        description: _('#tier-description-'+idx).val()
+                                        name: _('#tier-name-'+idx).val()
 
-                                        name_and_amt_el.innerHTML = _tier.name + ' - ' + _.currency(_tier.amount)
+                                    ).to_message()).fulfill
 
-                                        desc_el = document.getElementById(k)
-                                        desc_edit_el.innerHTML = _tier.description
-                                        desc_el.innerHTML = '<p>'+_tier.description+'</p>'
+                                        success: (response) =>
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier saved!'
+                                            notify('yay', 'tier saved', 'updating info...')
 
-                                        setTimeout(() =>
-                                            btn.style.backgroundColor = 'transparent'
-                                            btn.innerHTML = 'Save tier'
-                                            btn.addEventListener('click', _save, false)
-                                        , 500)
+                                            return @attach new Tier().from_message(response), (tier) =>
 
-                                        return _tier
+                                                k = tier.key
 
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
+                                                _('#a-'+k).innerHTML = tier.name + ' - ' + _.currency(tier.amount)
+                                                _('#'+k).innerHTML = '<p>'+tier.description+'</p>'
 
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _save, false)
+                                                amount_el.val tier.amount
+                                                name_el.val tier.name
+                                                description_el.val tier.description
+
+                                                btn.innerHTML = 'save tier'
+                                                btn.bind('click', _save)
+
+                                                return tier
+
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t save tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.bind('click', _save)
+                                            return false
+
+                            })
 
                         ), false) for save_button in _.get('.save', editor)
 
                         delete_button.addEventListener('click', (_delete = (e) =>
-                            @log('Tier delete() click handler triggered. Confirming tier delete...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
                             idx = btn.getAttribute('data-index')
 
                             tier = @get_attached('tier', idx)
-                            tier_editing_el = document.getElementById('tier-editing-'+idx)
-                            tier_el = document.getElementById(tier.key)
-                            tier_trigger = document.getElementById('a-'+tier.key)
 
-                            if confirm('Really delete '+tier.amount+' tier?')
-                                @log('Tier delete() confirmed. Deleting tier...')
+                            return notify('warn', 'deleting tier', 'are you sure you want to delete "'+tier.name+'"?', {
 
-                                return $.apptools.api.project.delete_tier(key: tier.key).fulfill
-                                    success: (response) =>
-                                        @log('Tier deleted! Applying changes...')
+                                no: =>
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier deleted!'
+                                    notify('notify', 'tier not deleted', '')
+                                    btn.addEventListener('click', _delete)
+                                    return
 
-                                        setTimeout(() =>
-                                            tier_editing_el.style.opacity = 0
-                                            setTimeout(() =>
-                                                tier_editing_el.parentNode.removeChild(tier_editing_el)
-                                                tier_el.parentNode.removeChild(tier_el)
-                                                tier_trigger.parentNode.removeChild(tier_trigger)
-                                            , 500)
-                                        , 1000)
+                                yes: =>
 
-                                        return
+                                    tier_edit_el = _('#tier-editing-'+idx)
+                                    tier_trigger = _('#a-'+tier.key)
+                                    tier_el = _('#'+tier.key)
 
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
+                                    return $.apptools.api.project.delete_tier(key: tier.key).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'tier deleted', 'tier successfully deleted. updating page...')
+                                            tier_edit_el.fadeOut(
+                                                complete: ->
+                                                    tier_edit_el.remove()
+                                                    tier_trigger.remove()
+                                                    tier_el.remove()
+                                            )
+                                            return true
 
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t delete tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
 
-                                        return btn.addEventListener('click', _delete, false)
+                                            btn.bind('click', _delete)
+                                            return false
 
-                            else
-                                @log('Tier delete() canceled by user.')
-
-                                btn.innerHTML = 'Delete tier'
-                                return btn.addEventListener('click', _delete, false)
+                            })
 
                         ), false) for delete_button in _.get('.delete', editor)
 
                         reset_button.addEventListener('click', (_reset = (e) =>
-                            @log('Tier reset() click handler triggered. Confirming tier reset...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
                             idx = btn.getAttribute('data-index')
 
                             tier = @get_attached('tier', idx)
 
-                            if confirm('Really discard your changes and reset tier to saved version?')
-                                @log('Tier reset() confirmed. Resetting tier to saved values...')
+                            return notify('warn', 'resetting tier', 'Really discard your changes and reset tier to saved version?', {
 
-                                return $.apptools.api.project.get_tier(key: tier.key).fulfill
-                                    success: (response) =>
-                                        @log('Tier reset! Applying changes')
+                                no: =>
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier reset!'
+                                    notify('notify', 'tier not reset', 'keep on working :)')
+                                    btn.addEventListener('click', _reset)
+                                    return
 
-                                        return @attach tier.from_message(response), (_goal) =>
-                                            document.getElementById('tier-name-'+idx).innerHTML = _tier.name
-                                            document.getElementById('tier-amount-'+idx).innerHTML = _tier.amount
-                                            document.getElementById('tier-description-'+idx).innerHTML = _tier.description
+                                yes: =>
 
-                                            setTimeout(() =>
-                                                btn.style.backgroundColor = 'transparent'
-                                                btn.innerHTML = 'Reset tier'
-                                                return btn.addEventListener('click', _reset, false)
-                                            , 500)
+                                    return $.apptools.api.project.get_tier(key: tier.key).fulfill
 
-                                            return _tier
+                                        success: (response) =>
 
+                                            notify('yay', 'tier reset!', 'reset tier info. applying changes...')
 
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
+                                            return @attach new Tier().from_message(response), (_tier) =>
 
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
-                                        return btn.addEventListener('click', _reset, false)
+                                                _('#tier-name-'+idx).val _tier.name
+                                                _('#tier-amount-'+idx).val _tier.amount
+                                                _('#tier-description-'+idx).val _tier.description
 
-                            else
-                                @log('Tier reset() canceled by user.')
+                                                btn.addEventListener('click', _reset)
 
-                                btn.innerHTML = 'Reset tier'
-                                return btn.addEventListener('click', _reset, false)
+                                                return _tier
+
+                                        failure: (error) =>
+
+                                            notify('error', 'whoops', 'couldn\'t reset tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.bind('click', _reset)
+                                            return false
+
+                            })
 
                         ), false) for reset_button in _.get('.reset', editor)
 
                         add_button.addEventListener('click', (_add = (e) =>
-                            @log('Tier add() click handler triggered. Saving...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Adding...'
                             idx = 'new'
 
-                            tier = new Tier(target: @project_key)
+                            amount_el = _('#tier-amount-'+idx)
+                            description_el = _('#tier-description-'+idx)
+                            name_el = _('#tier-name-'+idx)
 
-                            name_edit_el = document.getElementById('tier-name-'+idx)
-                            amt_edit_el = document.getElementById('tier-amount-'+idx)
-                            desc_edit_el = document.getElementById('tier-description-'+idx)
-                            new_edit_el = amt_edit_el.parentNode
+                            new_edit_el = amount_el.parentNode.parentNode
 
-                            tier.name = name_edit_el.innerText
-                            tier.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            tier.description = desc_edit_el.innerText
+                            return notify('warn', 'add tier', 'ready to add tier to project?', {
 
-                            return $.apptools.api.project.put_tier(tier.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Tier added! Applying changes...')
+                                no: =>
 
-                                    return @attach tier.from_message(response), (_tier) =>
-                                        k = _tier.key
-                                        index = @get_attached('tier', k, true)
+                                    notify('notify', 'tier not added', 'keep on working :)')
+                                    btn.addEventListener('click', _add)
+                                    return
 
-                                        df = _.create_doc_frag(@internal.process_tier(_tier))
-                                        new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
+                                yes: =>
 
-                                        name_edit_el.innerText = 'New Tier'
-                                        amt_edit_el.innerHTML = 0
-                                        desc_edit_el.innerHTML = 'Fill this out to add a tier!'
+                                    return $.apptools.api.project.put_tier(new Tier(
 
-                                        btn.innerHTML = 'Add tier'
-                                        btn.addEventListener('click', _add, false)
+                                        target: @project.key
+                                        amount: parseInt(amount_el.val())
+                                        description: description_el.val()
+                                        name: name_el.val()
 
-                                        added = document.getElementById('tier-editing-'+index)
+                                    ).to_message()).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'tier added', 'hooray :)')
 
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('.save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('.reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('.delete', added)
+                                            return @attach new Tier(target: @project.key).from_message(response), (_tier) =>
+                                                k = _tier.key
+                                                index = @get_attached('tier', k, true)
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier added!'
-                                        return () =>
-                                            btn.addEventListener('click', _add, false)
+                                                df = _.create_doc_frag(TierEditModalItem(@internal.process_tier(_tier)))
+                                                new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
 
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
+                                                name_el.val 'New Tier'
+                                                amount_el.val 0
+                                                description_el.val 'Fill this out to add a tier!'
 
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _add, false)
+                                                btn.addEventListener('click', _add, false)
+
+                                                added = document.getElementById('tier-editing-'+index)
+
+                                                sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('.save', added)
+                                                rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('.reset', added)
+                                                del_btn.addEventListener('click', _delete, false) for del_btn in _.get('.delete', added)
+
+                                                return @project.put()
+
+
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t add tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.innerHTML = 'add tier'
+                                            btn.bind('click', _add)
+                                            return false
+
+                            })
 
                         ), false) for add_button in _.get('.add', editor)
 
@@ -1601,45 +1594,41 @@ class ProjectController extends OpenfireController
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.go_live(key: @project_key).fulfill
+            $.apptools.api.project.go_live(key: @project.key).fulfill
                 success: () ->
-                    alert("Your project is live! Refreshing page...")
-                    window.location.reload()
+                    notify('yay', 'your project is live!', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @suspend = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.suspend(key: @project_key).fulfill
+            $.apptools.api.project.suspend(key: @project.key).fulfill
                 success: () ->
-                    alert("Your project has been suspended. Refreshing page...")
-                    window.location.reload()
+                    notify('notify', 'project suspended', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @shutdown = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.shutdown(key: @project_key).fulfill
+            $.apptools.api.project.shutdown(key: @project.key).fulfill
                 success: () ->
-                    alert("Your project has been shut down. Refreshing page...")
-                    window.location.reload()
+                    notify('notify', 'project closed', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @cancel = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.project.cancel(key: @project_key).fulfill
+            $.apptools.api.project.cancel(key: @project.key).fulfill
                 success: () ->
-                    alert("Your project has been canceled. Refunding all payments. Refreshing page...")
-                    window.location.reload()
+                    notify('error', 'project canceled', 'all payments will be refunded. refreshing page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
 
         @approve_goal = (e) =>
@@ -1649,10 +1638,9 @@ class ProjectController extends OpenfireController
             key = document.getElementById("proposed-goal-key").value
             $.apptools.api.project.approve_goal(key: key).fulfill
                 success: () ->
-                    alert("This goal has been approved. Refreshing page...")
-                    window.location.reload()
+                    notify('yay', 'goal approved', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @reject_goal = (e) =>
             if e.preventDefault
@@ -1661,10 +1649,9 @@ class ProjectController extends OpenfireController
             key = document.getElementById("proposed-goal-key").value
             $.apptools.api.project.reject_goal(key: key).fulfill
                 success: () ->
-                    alert("This goal has been rejectd. Refreshing page...")
-                    window.location.reload()
+                    notify('notify', 'goal rejected', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @review_goal = (e) =>
             if e.preventDefault
@@ -1673,10 +1660,9 @@ class ProjectController extends OpenfireController
             key = document.getElementById("proposed-goal-key").value
             $.apptools.api.project.review_goal(key: key).fulfill
                 success: () ->
-                    alert("This goal has been sent for revisions. Refreshing page...")
-                    window.location.reload()
+                    notify('notify', 'goal returned', 'goal returned for review. refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @submit_proposed_goal = (e) =>
             if e.preventDefault
@@ -1685,10 +1671,9 @@ class ProjectController extends OpenfireController
             key = document.getElementById("proposed-goal-key").value
             $.apptools.api.project.submit_proposed_goal(key: key).fulfill
                 success: () ->
-                    alert("This goal has been submitted for approval. Refreshing page...")
-                    window.location.reload()
+                    notify('yay', 'goal submitted', 'goal submitted for approval. refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @reopen_proposed_goal = (e) =>
             if e.preventDefault
@@ -1697,10 +1682,9 @@ class ProjectController extends OpenfireController
             key = document.getElementById("proposed-goal-key").value
             $.apptools.api.project.reopen_proposed_goal(key: key).fulfill
                 success: () ->
-                    alert("This goal has been submitted for approval. Refreshing page...")
-                    window.location.reload()
+                    notify('yay', 'goal re-opened', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @open_goal= (e) =>
             if e.preventDefault
@@ -1708,10 +1692,9 @@ class ProjectController extends OpenfireController
                 e.stopPropagation()
             $.apptools.api.project.open_goal(key: @project.active_goal).fulfill
                 success: () ->
-                    alert("This goal has been opened. Refreshing page...")
-                    window.location.reload()
+                    notify('yay', 'goal opened', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @close_goal = (e) =>
             if e.preventDefault
@@ -1719,10 +1702,9 @@ class ProjectController extends OpenfireController
                 e.stopPropagation()
             $.apptools.api.project.close_goal(key: @project.active_goal).fulfill
                 success: () ->
-                    alert("This goal has been closed. Refreshing page...")
-                    window.location.reload()
+                    notify('notify', 'goal closed', 'refresh page?', {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    notify('error', 'whoops', response.error)
 
         @_init = () =>
 
