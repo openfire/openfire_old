@@ -7,7 +7,7 @@
 {% block content %}
 
 	{% block registersplash %}
-	<div id='splash' class="rounded-big center-all">
+	<div id='register' class="rounded-big center-all splash">
 
 		<div id="register_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}" data-csrf="{{ encrypt(security.session.get('sid', '__DEV__')) }}">
 			{% include "snippets/register_form.html" with context %}

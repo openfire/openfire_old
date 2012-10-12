@@ -38,9 +38,10 @@
 		<h2>Skip all this bullshit</h2>
 
 		<div id='thirdparty-buttons' class='social promo buttons'>
-			<button class='zocial googleplus button'>Signup with Google</button>
-			<button class='zocial facebook icon'></button>
-			<button class='zocial twitter icon'></button>
+			<button class='left zocial googleplus button'>Signup with Google</button>
+			<button class='left zocial facebook icon'></button>
+			<button class='left zocial twitter icon'></button>
+			<div class='clear'></div>
 		</div> <!-- end #thirdparty-buttons -->
 
 	</section> <!-- end #federated-account -->
@@ -49,51 +50,74 @@
 
 		<h2>Tell us a bit about yourself</h2>
 
-		<div id='personal' class='formgroup'>
-			<input id='firstname' name='firstname' placeholder='First Name' />
-			<input id='lastname' name='lastname' placeholder='Last Name' />
+		<div id='personal' class='left formgroup'>
+			<input id='firstname' name='firstname' placeholder='first name' />
+			<input id='lastname' name='lastname' placeholder='last name' />
 		</div> <!-- end #personal -->
 
-		<div id='contact' class='formgroup'>
-			<input id='email' name='email' placeholder='Email Address' /><label for="email">You can always add more later!</label>
-			<input id='phone' name='phone' placeholder='Phone Number' /><label for="phone">If you want, we can send you text notifications!</label>
+		<div id='contact' class='right formgroup'>
+			<input id='email' name='email' placeholder='email address' /><label for="email">You can always add more later!</label>
+			<input id='phone' name='phone' placeholder='phone number' /><label for="phone">If you want, we can send you text notifications!</label>
 		</div> <!-- end #contact -->
+
+		<div class='clear'></div>
 
 	</section> <!-- end #basic-details -->
 	{% endif %}
 
 	<section id='organic-account'>
 
-		<div id='user' class='formgroup'>
-			<input id='username' name='username' placeholder='Username' /><label for="username">Pick a username!</label>
+		<h2>Pick a username</h2>
+
+		<div id='user' class='left formgroup'>
+			<span id='oflink'>openfi.re/</span><input id='username' name='username' placeholder='username' /><label for="username">Pick a username!</label>
 			<div id='username-status'>
 				<b>STATUS</b>
 			</div><!-- end #username-status -->
 		</div> <!-- end #user -->
 
-		<div id='topics' class='formgroup'>
+		<div id='topics' class='right formgroup'>
 			<b>Topic autocomplete will go here!</b>
 		</div> <!-- end #topics -->
+
+		<div class='clear'></div>
 
 	</section> <!-- end #organic-account -->
 
 	<section id='avatar-preferences'>
 
+		<h2>Pick an avatar</h2>
+
 		<div id='imgsource' class='formgroup'>
 
 			<div id='avatar-provider'>
-				<input type='radio' name='avatar_provider' value="organic">Upload an image</input>
-				<input type='radio' name='avatar_provider' value="gravatar">Use Gravatar</label>
+				<input type='radio' name='avatar_provider' value="organic"><span id='organic_mode' class='avatar_provider_mode'>Upload an image</span></input>
+
+				<input type='radio' name='avatar_provider'
+				value="oranic_url"><span id='organic_urlmode' class='avatar_provider_mode'>Upload by URL</span></input>
+
+				<input type='radio' name='avatar_provider' value="gravatar"><span id='gravatar_mode' class='avatar_provider_mode'>Use my Gravatar</span></input>
 			</div><!-- end #avatar-provider -->
+
+			<div id='avatar-selector'>
+				<div id='avatar-preview' class='empty'></div>
+			</div><!-- end #avatar-selector -->
 
 		</div> <!-- end #imgsource -->
 
 	</section> <!-- end #avatar-prefs -->
 
+	{# NOT IN USE YET
 	<section id='notification-preferences'>
 
-		<b>Notification Prefs</b>
+		<h2>Preferences</h2>
 
-	</section> <!-- end #notification-preferences -->
+	</section> <!-- end #notification-preferences -->#}
+
+	<div id='register-actions'>
+		<button id="register-button">
+		    <span id='register-button-label'>Sign me up!</span>
+		</button><!-- end #register-button -->
+	</div><!-- end #register-actions -->
 
 </form> <!-- end #site-register -->
