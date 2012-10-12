@@ -1,5 +1,37 @@
 @import "../security.sass"
 
+body
+  background-color: #E0E0E0 !important
+
+.snapall
+  position: relative !important
+
+#oflink
+  color: #777
+  position: relative
+  margin-right: -7px
+  top: 2px
+  font-family: 'Karla'
+
+label
+  display: none
+
+.avatar_provider_mode
+  font-family: 'Karla' !important
+
+.right
+  width: 50%
+  text-align: center
+
+.left
+  width: 50%
+  text-align: center
+
+#register
+  min-height: 850px
+  margin-bottom: 55px
+  width: 665px !important
+
 #register_wrapper
   position: absolute
   top: 0
@@ -23,6 +55,7 @@ h1
   text-transform: uppercase
 
 section
+  padding-bottom: 5px
   background: #DDD
   margin-left: -15px
   padding-left: 15px
@@ -43,3 +76,70 @@ h2
   text-align: center
   button
     display: inline
+
+#avatar-preview
+  width: 256px
+  height: 256px
+  border: 1px dotted #333
+  margin-top: 10px
+  margin-left: auto
+  margin-right: auto
+
+#avatar-preferences
+  #imgsource
+    text-align: center
+
+    #avatar-provider
+      text-align: center
+
+    #avatar-selector
+      padding-bottom: 15px
+
+      #avatar-preview:after
+        display: block
+        content: 'drag / preview'
+        top: 100px
+        position: relative
+        font-family: 'Karla'
+        text-transform: uppercase
+
+#username
+  width: 128px
+
+#register-actions
+  text-align: center
+  height: 80px
+  line-height: 80px
+
+  #register-button
+    height: 50px
+    width: 150px
+    color: white
+    opacity: 0.85
+    border: none
+    border-radius: 5px
+    font-family: 'Karla'
+    text-transform: uppercase
+    font-size: 13pt
+    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f79331), color-stop(100%, #f57220))
+    background: -webkit-linear-gradient(top center, #f79331, #f57220)
+    background: -moz-linear-gradient(top center, #f79331, #f57220)
+    background: -o-linear-gradient(top center, #f79331, #f57220)
+    background: -ms-linear-gradient(top center, #f79331, #f57220)
+    background: linear-gradient(top center, #f79331, #f57220)
+    -webkit-transition-property: opacity, font-size
+    -webkit-transition-duration: 0.2s
+
+    &:hover
+      opacity: 1
+      font-size: 15pt
+
+    &:active
+      opacity: 1
+      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f57220), color-stop(100%, #f79331))
+      background: -webkit-linear-gradient(top center, #f57220, #f79331)
+      background: -moz-linear-gradient(top center, #f57220, #f79331)
+      background: -o-linear-gradient(top center, #f57220, #f79331)
+      background: -ms-linear-gradient(top center, #f57220, #f79331)
+      background: linear-gradient(top center, #f57220, #f79331)
+
