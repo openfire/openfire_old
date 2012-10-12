@@ -1,1 +1,1 @@
-<textarea {{@attributes}} {{=_key}}="{{=_val}}"{{/attributes}}>{{content}}{{=content}}{{/content}}</textarea>
+<textarea data-validation="text"{{@attributes}} {{=_key}}="{{=_val}}"{{/attributes}}>{{content}}{{=content}}{{/content}}</textarea>

@@ -864,3 +864,19 @@ task 'compile:templates', 'compile jinja2 templates to python modules', (options
 		compile_data(data)
 
 	out.spawn 'jinja2compile', defaults.python || options.python, [fixpath('tools', 'bin', 'compile_templates')], compile_done, compile_data, compile_err
+	invoke('compile:js')
+
+task 'compile:js', 'compile js templates to function modules', (options) ->
+
+	out.say 'templates', 'Compiling JS templates...'
+
+	compile_done = (code) =>
+		out.shout 'templates', 'JS template compilation complete. Exited with code '+code+'.'
+
+	compile_data = (data) =>
+		out.whisper data
+
+	compile_err = (data) =>
+		compile_data(data)
+
+	out.spawn 'jscompile', defaults.python || options.python, [fixpath('tools', 'bin', 'compile_js_templates')], compile_done, compile_data, compile_err
