@@ -38,11 +38,11 @@
 	<div class="securelogon">
 		{% if not error %}<h4>Sign in using your openfire account</h4>{% else %}<h4 class="woops">{{ error|safe }}</h4>{% endif %}
 		<form action="{{ link('auth/login') }}" method="POST" class="oflogon formcontainer">
-			<input type="text" name="username" placeholder="Email" />
-			<input type="password" name="password" placeholder="Password" />
-			<a class="lockedout" href="#">Locked out?</a>
-			<button class="login button">Log In</button>
-			<button class="signup button">Sign Up</button>
+			<input id='username' type="text" name="username" placeholder="Email / Username" />
+			<input id='password' type="password" name="password" placeholder="Password" />
+			<a id='lockedout' class="lockedout" href="#">Locked out?</a>
+			<button id='login_submit' class="login button">Log In</button>
+			<button id='signup_submit' class="signup button">Sign Up</button>
 		</form>
 	</div> <!-- end .securelogon -->
 

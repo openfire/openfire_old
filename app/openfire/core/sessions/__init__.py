@@ -217,19 +217,12 @@ class CoreSessionAPI(CoreAPI):
             name = self.config['frontends']['cookies']['name']
             self.logging.info('Cookies enabled. Setting secure cookie at name "%s".' % name)
             serialized_cookie = self.serializer.serialize(name, session.to_cookie())
-            if not gc.debug:
-                handler.response.set_cookie(name, serialized_cookie, **{
-                    'max_age': int(self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)),
-                    'path': self.config.get('frontends', {}).get('cookies', {}).get('path', '/'),
-                    'domain': self.config.get('frontends', {}).get('cookies', {}).get('domain', '.openfi.re'),
-                    'secure': self.config.get('frontends', {}).get('cookies', {}).get('secure', False)
-                })
-            else:
-                handler.response.set_cookie(name, serialized_cookie, **{
-                    'max_age': int(self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)),
-                    'path': self.config.get('frontends', {}).get('cookies', {}).get('path', '/'),
-                    'secure': False
-                })
+            handler.response.set_cookie(name, serialized_cookie, **{
+                'max_age': int(self.config.get('frontends', {}).get('cookies', {}).get('ttl', 600)),
+                'path': self.config.get('frontends', {}).get('cookies', {}).get('path', '/'),
+                'domain': self.config.get('frontends', {}).get('cookies', {}).get('domain', '.openfi.re') if not gc.debug else 'localhost',
+                'secure': self.config.get('frontends', {}).get('cookies', {}).get('secure', False) if not gc.debug else False
+            })
 
         if self.config.get('frontends', {}).get('localstorage', {}).get('enabled', False):
 

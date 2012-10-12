@@ -9,6 +9,12 @@
 
 div.snapall
   -webkit-transform: translateZ(0)
+  position: relative !important
+
+body
+  background-color: #E0E0E0 !important
+
+
 
 .transparent
   opacity: 0
@@ -279,16 +285,19 @@ math
         top: 45px
         bottom: 30px
         position: absolute
+        width: 345px
 
         input
           font-weight: bold
           display: block
           height: 30px
-          width: 300px
+          width: 315px
+          max-width: 315px !important
           margin-top: 10px
           padding-left: 10px
           padding-right: 10px
           font-size: 12pt
+          text-transform: lowercase
 
         a
           font-family: 'Arial'
