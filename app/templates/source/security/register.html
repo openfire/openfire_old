@@ -19,7 +19,8 @@
 {% endblock %}
 
 {% block jsready %}
-                _tbb = _.get('#thirdparty-buttons'), _gpb = _.get('#federated-google'), _gpf = _.get('#federated-facebook'), _gpt = _.get('#federated-twitter'),
-                _ = _gpb.onclick = _gpf.onclick = _gpt.onclick = function (e) { window.location.href = ["login", "with", e.target.getAttribute('data-provider')].join("/"); },
-
+                _tbb = _.get('#thirdparty-buttons'), _gpb = _.get('#federated-google'), _gpf = _.get('#federated-facebook'),
+                _gpt = _.get('#federated-twitter'), undefined = _gpb.onclick = _gpf.onclick = _gpt.onclick = function (e) {
+                e.preventDefault(); e.stopPropagation(); atu = ["login", "with", e.target.getAttribute('data-provider')].join("/"); 
+                $.apptools.dev.log('OF:Register', 'Redirecting user to federated authentication...', e, atu); window.location.href = atu; },
 {% endblock jsready %}
