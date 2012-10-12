@@ -61,6 +61,100 @@ class Proposal extends Model
 
             , 1000)
 
+        @edit = () =>
+
+            return @get (proposal) =>
+                fields = [{
+                    name: 'name'
+                    attributes:
+                        value: proposal['name']
+                        type: 'text'
+                        id: 'proposal-edit-input-name'
+                        'data-validation': 'alpha'
+                    }]
+
+                areas = []
+                for k, v of @constructor::model
+                    continue if k not in ['summary', 'pitch', 'tech', 'keywords']
+                    area = {}
+                    area.name = k
+                    area.content = proposal[k] or ''
+                    area.attributes =
+                        'data-validation': 'text'
+                        id: 'proposal-edit-input-'+k
+                        value: k
+                        style: 'width: 90%;margin: 10px auto'
+
+                    areas.push(area)
+
+                df = _.create_doc_frag(ProjectEditModal(fields: fields, areas: areas, kind: 'proposal'))
+                adf = _.create_doc_frag(_.create_element_string('a',
+                    id: 'a-proposal-editor'
+                    style: 'display: none'
+                , ''))
+                document.body.appendChild(df)
+                document.body.appendChild(adf)
+                editor = _('#proposal-editor')
+                trigger = _('#a-proposal-editor')
+
+                return $.apptools.widgets.modal.create(editor, trigger, (m) =>
+                    savebtn = _('#proposal-save')
+                    savebtn.bind('click', (_save = (e) =>
+                        e.preventDefault()
+                        e.stopPropagation()
+
+                        savebtn.unbind('click')
+                        return notify('warn', 'saving proposal', 'Are your proposal details correct?', {
+                                no: =>
+                                    notify('notify', 'no changes made', 'keep working :)')
+                                    savebtn.bind('click', _save)
+                                    return
+
+                                yes: =>
+                                    pjct = {}
+                                    editor = _('#proposal-editor-modal-dialog')
+                                    inputs = _.to_array(editor.find('input')) or []
+                                    texts = _.to_array(editor.find('textarea')) or []
+                                    fields = _.join(inputs, texts)
+                                    for field in fields
+                                        continue if not field.hasAttribute('id')
+                                        prop = field.getAttribute('id').split('-').pop()
+                                        pjct[prop] = field.val()
+
+                                    @from_message(pjct)
+
+                                    return $.apptools.api.proposal.put(@to_message()).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'proposal saved!', 'proposal saved successfully, click below to refresh & see updates :)', {ok: -> window.location.reload()})
+                                            document.body.style.overflow = 'auto'
+                                            return m.close()
+
+                                        failure: (error) =>
+                                            return notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+                            })
+                    ), false)
+
+                    set_focus = (t_f) =>
+                        t_f.addEventListener('click', (_focus = (e) =>
+                            e.preventDefault()
+                            e.stopPropagation()
+                            field = e.target
+                            return field.focus()
+                            ), false)
+
+                    set_focus(tier_field) for tier_field in _.get('.tier-field', editor)
+
+                    if (editorform = _('#proposal-editor-form'))?
+                        $.openfire.forms.register(editorform)
+
+                    document.body.style.overflow = 'hidden'
+                    return m.open()
+                ,
+                    ratio:
+                        x: 0.7
+                        y: 0.75
+                )
+
 
         @attach = (obj, callback) =>
 
@@ -126,15 +220,21 @@ class Proposal extends Model
 
         @get = (callback) =>
 
-            @log('Pulling most updated proposal version from server...')
             $.apptools.api.proposal.get(key: @key).fulfill
                 success: (response) =>
-                    @log('Proposal successfully synced.')
                     return if callback? then callback?(@from_message(response)) else @from_message(response)
 
                 failure: (error) =>
-                    @log('Error syncing proposal: '+error)
-                    alert 'proposal get() failure'
+                    return notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+
+        @put = (callback) =>
+
+            return $.apptools.api.proposal.put(@to_message()).fulfill
+                success: (response) =>
+                    return if callback? then callback?(@from_message(response)) else @from_message(response)
+
+                failure: (error) =>
+                    return notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
 
 
 # proposal controller
@@ -164,7 +264,6 @@ class ProposalController extends OpenfireController
         if /proposal/.test(window.location.href)
             @proposal = new Proposal(@_state.ke)
             @proposal.get()
-            @proposal_key = @proposal.key
 
         @log = () => return console.log.apply(console, arguments)
 
@@ -189,121 +288,49 @@ class ProposalController extends OpenfireController
 
             process_goal: (goal) =>
 
-                index = if goal.key? then @get_attached('goal', goal.key, true) else 'new'
+                ctx = _.extend({type: 'goal', kind: 'proposal'}, goal)
+                ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
-                amount = _.create_element_string('h3',
-                    id: 'goal-amount-' + index
-                    class: 'goal-field amount'
-                    contenteditable: true
-                , goal.amount)
+                btnctx =
+                    attributes:
+                        'data-index': ctx.index
 
-                description = _.create_element_string('p',
-                    id: 'goal-description-' + index
-                    class: 'rounded goal-field description'
-                    contenteditable: true
-                , if goal.description? then goal.description else 'default description')
-
-                if index isnt 'new'
-
-                    save_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'save'
-                        class: 'goal-button save'
-                    , 'save goal')
-
-                    reset_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'reset'
-                        class: 'goal-button reset'
-                    , 'reset goal')
-
-                    delete_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'delete'
-                        class: 'goal-button delete'
-                    , 'delete goal')
-
-                    buttons = [save_goal, reset_goal, delete_goal].join('&nbsp;')
-
+                if !!ctx.new
+                    axn = 'propose'
                 else
-                    add_goal = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'add'
-                        class: 'goal-button add'
-                    , 'add goal')
+                    axn = 'save'
 
-                    buttons = [add_goal]
+                ctx.buttons = [_.extend(true, {}, btnctx,
+                    attributes:
+                        'data-action': axn
+                        class: 'goal-button '+axn
+                    content: axn + ' goal'
+                )]
 
-                content = [amount, description, buttons].join('')
-
-                goal_wrapper = _.create_element_string('div',
-                    id: 'goal-editing-' + index
-                    class: 'goal'
-                , content)
-
-                return goal_wrapper
+                return ctx
 
             process_tier: (tier) =>
 
-                index = if tier.key? then @get_attached('tier', tier.key, true) else 'new'
+                ctx = _.extend({type: 'tier', kind: 'proposal'}, tier)
+                ctx.index = if tier.key? then @get_attached('tier', tier.key, true) else (ctx.new = true; 'new')
 
-                name = _.create_element_string('h3',
-                    id: 'tier-name' + index
-                    class: 'tier-field name'
-                    contenteditable: true
-                , if tier.name? then tier.name else 'tier name')
+                btnctx =
+                    attributes:
+                        'data-index': ctx.index
 
-                amount = _.create_element_string('h3',
-                    id: 'tier-amount-' + index
-                    class: 'tier-field amount'
-                    contenteditable: true
-                , if tier.amount? then tier.amount else '$0.02')
-
-                description = _.create_element_string('p',
-                    id: 'tier-description-' + index
-                    class: 'rounded tier-field description'
-                    contenteditable: true
-                , if tier.description? then tier.description else 'default description')
-
-                if index isnt 'new'
-
-                    save_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'save'
-                        class: 'tier-button save'
-                    , 'save tier')
-
-                    reset_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'reset'
-                        class: 'tier-button reset'
-                    , 'reset tier')
-
-                    delete_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'delete'
-                        class: 'tier-button delete'
-                    , 'delete tier')
-
-                    buttons = [save_tier, reset_tier, delete_tier].join('&nbsp;')
-
+                if !!ctx.new
+                    axns = ['add']
                 else
-                    add_tier = _.create_element_string('button',
-                        'data-index': index
-                        'data-action': 'add'
-                        class: 'tier-button add'
-                    , 'add tier')
+                    axns = ['save', 'reset', 'delete']
 
-                    buttons = [add_tier]
+                ctx.buttons = (_.extend(true, {}, btnctx,
+                    attributes:
+                        'data-action': axn
+                        class: 'tier-button '+axn
+                    content: axn + ' tier'
+                ) for axn in axns)
 
-                content = [name, amount, description, buttons].join('')
-
-                tier_wrapper = _.create_element_string('div',
-                    id: 'tier-editing-' + index
-                    class: 'tier'
-                , content)
-
-                return tier_wrapper
+                return ctx
 
             prep_dropped_modal_html: (name, ext) =>
                 # takes filename, returns [premodal_element, trigger_element]
@@ -371,18 +398,20 @@ class ProposalController extends OpenfireController
                 _goals = []
 
                 blank_goal = new Goal
+                    proposal: @proposal.key
                     amount: 0
-                    description: 'Fill this out to add a goal!'
+                    description: 'Fill this out to propose a new goal!'
+                    funding_day_limit: 30
+                    deliverable_description: 'Describe your proposed goal\'s deliberable'
+                    deliverable_date: '12/31/2013'
 
                 _goals.push(@internal.process_goal(blank_goal))
                 _goals.push(@internal.process_goal(g)) for g in goals
 
-                pre_modal = _.create_element_string('div',
-                    id: 'proposal-goal-editor'
-                    class: 'pre-modal'
-                    style: 'opacity: 0;'
-                    'data-title': 'editing proposal goals...'
-                , _goals.join(''))
+                pre_modal = window.TierEditModal(false,
+                    tiers: _goals
+                    type: 'goal'
+                )
 
                 trigger = _.create_element_string('a',
                     id: 'a-proposal-goal-editor'
@@ -404,12 +433,10 @@ class ProposalController extends OpenfireController
                 _tiers.push(@internal.process_tier(blank_tier))
                 _tiers.push(@internal.process_tier(t)) for t in tiers
 
-                pre_modal = _.create_element_string('div',
-                    id: 'proposal-tier-editor'
-                    class: 'pre-modal'
-                    style: 'opacity: 0;'
-                    'data-title': 'editing proposal tiers...'
-                , _tiers.join(''))
+                pre_modal = window.TierEditModal(false, 
+                    tiers: _tiers
+                    type: 'tier'
+                )
 
                 trigger = _.create_element_string('a',
                     id: 'a-proposal-tier-editor',
@@ -523,7 +550,7 @@ class ProposalController extends OpenfireController
                                     return @proposal
 
                             $.apptools.api.media.attach_image(
-                                target: @proposal_key
+                                target: @proposal.key
                                 size: filesize
                                 name: filename
                             ).fulfill
@@ -576,7 +603,7 @@ class ProposalController extends OpenfireController
                                     return @proposal
 
                             $.apptools.api.media.attach_avatar(
-                                target: @proposal_key
+                                target: @proposal.key
                                 size: filesize
                                 name: filename
                             ).fulfill
@@ -627,7 +654,7 @@ class ProposalController extends OpenfireController
 
                     $.apptools.api.media.attach_video(
                         reference: url
-                        target: @proposal_key
+                        target: @proposal.key
                     ).fulfill
                         success: (response) =>
                             @attach(new Video(response))
@@ -656,7 +683,7 @@ class ProposalController extends OpenfireController
 
             ###
             if @_state.o
-                $.apptools.api.proposal.post(target: @proposal_key).fulfill
+                $.apptools.api.proposal.post(target: @proposal.key).fulfill
                     success: () =>
                         # no response i think?
                         alert 'update() success'
@@ -672,7 +699,7 @@ class ProposalController extends OpenfireController
             ## back a proposal
             # to do - figure out how to get the user, create UI for backing
             $.apptools.api.proposal.back(
-                proposal: @proposal_key
+                proposal: @proposal.key
                 user: null
                 contribution: null
             ).fulfill
@@ -699,7 +726,7 @@ class ProposalController extends OpenfireController
             alert('You tried to follow a proposal! We\'re working on it :)')
 
             ###
-            $.apptools.api.proposal.follow(target: @proposal_key).fulfill
+            $.apptools.api.proposal.follow(target: @proposal.key).fulfill
 
                 success: (response) =>
                     document.getElementById('follow')?.classList.add('following')
@@ -738,7 +765,7 @@ class ProposalController extends OpenfireController
         @get_backers = () =>
 
             ## get proposal backers
-            $.apptools.api.proposal.backers(target: @proposal_key).fulfill
+            $.apptools.api.proposal.backers(target: @proposal.key).fulfill
 
                 success: (response) =>
                     # response.users = []
@@ -751,7 +778,7 @@ class ProposalController extends OpenfireController
         @get_followers = () =>
 
             ## get proposal followers
-            $.apptools.api.proposal.followers(target: @proposal_key).fulfill
+            $.apptools.api.proposal.followers(target: @proposal.key).fulfill
 
                 success: (response) =>
                     # response.profiles = []
@@ -764,7 +791,7 @@ class ProposalController extends OpenfireController
         @get_updates = () =>
 
             ## get recent updates
-            $.apptools.api.proposal.posts(target: @proposal_key).fulfill
+            $.apptools.api.proposal.posts(target: @proposal.key).fulfill
 
                 success: (response) =>
                     # response.posts = []
@@ -796,10 +823,10 @@ class ProposalController extends OpenfireController
                     # get from the server
                     $.apptools.api.proposal.get_goal(
                         key: goal_key
-                        proposal: @proposal_key
+                        proposal: @proposal.key
                     ).fulfill
                         success: (response) =>
-                            goal = @attach(new Goal(target: @proposal_key).from_message(response.goal))
+                            goal = @attach(new Goal(target: @proposal.key).from_message(response.goal))
 
                             return if callback? then callback.call(@, goal) else goal
 
@@ -822,11 +849,11 @@ class ProposalController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.proposal.list_goals(proposal: @proposal_key).fulfill
+                    $.apptools.api.proposal.get(key: @proposal.key).fulfill
 
                         success: (response) =>
                             goals = []
-                            goals.push(@attach(new Goal(target: @proposal_key).from_message(goal))) for goal in response.goals
+                            goals.push(@attach(new Goal(target: @proposal.key).from_message(goal))) for goal in response.goals
 
                             return if callback? then callback.call(@, goals) else goals
 
@@ -860,20 +887,12 @@ class ProposalController extends OpenfireController
 
             edit: (e) =>
 
-                if (trigger = e.target)?
-                    trigger.classList.add('init') if (sync = not _.has_class(trigger, 'init'))
+                sync = true
+                target = e.target
+                which = target.getAttribute('id').split('-').pop()+'_goal'
 
-                else if typeof e is 'boolean'
-                    sync = e
-
-                else sync = false
-
-                ## coordinates editing goal properties
-                return @goals.list (goals) =>
-
-                    _g.target = @proposal_key for _g in goals
-
-                    goal_modal_parts = @internal.prep_goals_modal_html(goals)
+                return @goals.get(which, (goal) =>
+                    goal_modal_parts = @internal.prep_goals_modal_html([goal])
 
                     return $.apptools.widgets.modal.create (() =>
                         docfrag = _.create_doc_frag(goal_modal_parts[0])
@@ -884,226 +903,115 @@ class ProposalController extends OpenfireController
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-proposal-goal-editor')
                     )(), ((m) =>
-                        editor = document.getElementById(m._state.element_id)
+                        editor = _('#'+m._state.element_id+'-modal-dialog')
+                        _('#'+m._state.element_id+'-modal-title').innerHTML = 'Editing '+which.split('_').shift()+' goal...'
+
+                        propose_button.addEventListener('click', (_propose = (e) =>
+                            e.preventDefault()
+                            e.stopPropagation()
+
+                            btn = e.target
+                            btn.removeEventListener('click')
+                            idx = btn.getAttribute('data-index')
+
+                            return notify('warn', 'proposing goal', 'ready to submit?', {
+
+                                no: =>
+
+                                    notify('notify', 'goal not submitted', 'take your time :)')
+                                    btn.addEventListener('click', _propose, false)
+                                    return
+
+                                yes: =>
+
+                                    description_el = _('#goal-description-'+idx)
+                                    name_el = _('#goal-name-'+idx)
+                                    amount_el = _('#goal-amount-'+idx) or document.createElement('input')
+
+                                    return $.apptools.api.proposal.propose_goal(new Goal(
+                                        proposal: @proposal.key
+                                        description: description_el.val()
+                                        amount: amount_el.val()
+                                        name: name_el.val()
+                                        deliverable_date: +Date()
+                                        deliverable_description: 'your deliverable from this goal'
+                                    ).to_message).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'goal proposed', 'we got your submission. you\'ll hear back soon!', {ok: -> m.close})
+                                            btn.addEventListener('click', _propose, false)
+                                            return
+
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t propose goal, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.bind('click', _propose)
+                                            return false
+                                })
+
+                        ), false) for propose_button in editor.find('.propose')
 
                         save_button.addEventListener('click', (_save = (e) =>
-                            @log('Goal save() click handler triggered. Saving...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Saving...'
                             idx = btn.getAttribute('data-index')
 
-                            goal = if idx isnt 'new' then @get_attached('goal', idx) else new Goal(target: @proposal_key)
+                            return notify('warn', 'saving goal', 'ready to save?', {
 
-                            amt_edit_el = document.getElementById('goal-amount-'+idx)
-                            desc_edit_el = document.getElementById('goal-description-'+idx)
+                                no: =>
 
-                            goal.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            goal.description = desc_edit_el.innerHTML
+                                    notify('notify', 'goal not saved', 'keep on working :)')
+                                    btn.addEventListener('click', _save, false)
+                                    return
 
-                            return $.apptools.api.proposal.put_goal(goal.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Goal saved! Applying changes...')
+                                yes: =>
 
-                                    return @attach goal.from_message(response), (_goal) =>
-                                        k = _goal.key
+                                    amount_el = _('#goal-amount-'+idx)
+                                    description_el = _('#goal-description-'+idx)
+                                    name_el = _('#goal-name-'+idx)
 
-                                        amt_el = document.getElementById('a-'+k)
-                                        desc_el = document.getElementById(k)
-                                        amt_edit_el.innerHTML = _goal.amount
-                                        amt_el.innerHTML = _.currency(_goal.amount)
-                                        desc_edit_el.innerHTML = _goal.description
-                                        desc_el.innerHTML = '<p>'+_goal.description+'</p>'
+                                    return $.apptools.api.proposal.put_goal(_.extend((if idx isnt 'new' then @get_attached('goal', idx) else new Goal()),
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal saved!'
+                                        target: @proposal.key
+                                        amount: parseInt(amount_el.val())
+                                        description: _('#goal-description-'+idx).val()
+                                        name: _('#goal-name-'+idx).val()
 
-                                        setTimeout(() =>
-                                            btn.style.backgroundColor = 'transparent'
-                                            btn.innerHTML = 'Save goal'
-                                            btn.addEventListener('click', _save, false)
-                                        , 500)
+                                    ).to_message()).fulfill
 
-                                        return _goal
+                                        success: (response) =>
 
+                                            notify('yay', 'goal saved', 'updating info...')
 
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
+                                            return @attach(new Goal().from_message(response), (goal) =>
 
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _save, false)
+                                                k = goal.key
 
-                        ), false) for save_button in _.get('save', editor)
+                                                _('#a-'+k).innerHTML = goal.name + ' - ' + _.currency(goal.amount)
+                                                _('#'+k).innerHTML = '<p>'+goal.description+'</p>'
 
-                        delete_button.addEventListener('click', (_delete = (e) =>
-                            @log('Goal delete() click handler triggered. Confirming goal delete...')
+                                                amount_el.val goal.amount
+                                                name_el.val goal.name
+                                                description_el.val goal.description
 
-                            e.preventDefault()
-                            e.stopPropagation()
+                                                btn.innerHTML = 'save goal'
+                                                btn.bind('click', _save)
 
-                            btn = e.target
-                            btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
-                            idx = btn.getAttribute('data-index')
+                                                return goal
 
-                            goal = @get_attached('goal', idx)
-                            goal_editing_el = document.getElementById('goal-editing-'+idx)
-                            goal_el = document.getElementById(goal.key)
-                            goal_trigger = document.getElementById('a-'+goal.key)
+                                            )
 
-                            if confirm('Really delete '+goal.amount+' goal?')
-                                @log('Goal delete() confirmed. Deleting goal...')
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t save goal, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
 
-                                return $.apptools.api.proposal.delete_goal(key: goal.key).fulfill
-                                    success: (response) =>
-                                        @log('Goal deleted! Applying changes...')
+                                            btn.bind('click', _save)
+                                            return false
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal deleted!'
+                            })
 
-                                        setTimeout(() =>
-                                            goal_editing_el.style.opacity = 0
-                                            setTimeout(() =>
-                                                goal_editing_el.parentNode.removeChild(goal_editing_el)
-                                                goal_el.parentNode.removeChild(goal_el)
-                                                goal_trigger.parentNode.removeChild(goal_trigger)
-                                            , 500)
-                                        , 1000)
-
-                                        return
-
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
-
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
-
-                                        return btn.addEventListener('click', _delete, false)
-
-                            else
-                                @log('Goal delete() canceled by user.')
-
-                                btn.innerHTML = 'Delete goal'
-                                return btn.addEventListener('click', _delete, false)
-
-                        ), false) for delete_button in _.get('delete', editor)
-
-                        reset_button.addEventListener('click', (_reset = (e) =>
-                            @log('Goal reset() click handler triggered. Confirming goal reset...')
-
-                            e.preventDefault()
-                            e.stopPropagation()
-
-                            btn = e.target
-                            btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
-                            idx = btn.getAttribute('data-index')
-
-                            goal = @get_attached('goal', idx)
-
-                            if confirm('Really discard your changes and reset goal to saved version?')
-                                @log('Goal reset() confirmed. Resetting goal to saved values...')
-
-                                return $.apptools.api.proposal.get_goal(key: goal.key).fulfill
-                                    success: (response) =>
-                                        @log('Goal reset! Applying changes')
-
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal reset!'
-
-                                        return @attach goal.from_message(response), (_goal) =>
-                                            document.getElementById('goal-amount-'+idx).innerHTML = _goal.amount
-                                            document.getElementById('goal-description-'+idx).innerHTML = _goal.description
-
-                                            setTimeout(() =>
-                                                btn.style.backgroundColor = 'transparent'
-                                                btn.innerHTML = 'Reset goal'
-                                                return btn.addEventListener('click', _reset, false)
-                                            , 500)
-
-                                            return _goal
-
-
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
-
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
-                                        return btn.addEventListener('click', _reset, false)
-
-                            else
-                                @log('Goal reset() canceled by user.')
-
-                                btn.innerHTML = 'Reset goal'
-                                return btn.addEventListener('click', _reset, false)
-
-                        ), false) for reset_button in _.get('reset', editor)
-
-                        add_button.addEventListener('click', (_add = (e) =>
-                            @log('Goal add() click handler triggered. Saving...')
-
-                            e.preventDefault()
-                            e.stopPropagation()
-
-                            btn = e.target
-                            btn.removeEventListener('click')
-                            btn.innerHTML = 'Adding...'
-                            idx = 'new'
-
-                            goal = new Goal(target: @proposal_key)
-
-                            amt_edit_el = document.getElementById('goal-amount-'+idx)
-                            desc_edit_el = document.getElementById('goal-description-'+idx)
-                            new_edit_el = amt_edit_el.parentNode
-
-                            goal.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            goal.description = desc_edit_el.innerText
-
-                            return $.apptools.api.proposal.put_goal(goal.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Goal added! Applying changes...')
-
-                                    return @attach goal.from_message(response), (_goal) =>
-                                        k = _goal.key
-                                        index = @get_attached('goal', k, true)
-
-                                        df = _.create_doc_frag(@internal.process_goal(_goal))
-                                        new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
-
-                                        amt_edit_el.innerHTML = 0
-                                        desc_edit_el.innerHTML = 'Fill this out to add a goal!'
-
-                                        btn.innerHTML = 'Add goal'
-                                        btn.addEventListener('click', _add, false)
-
-                                        added = document.getElementById('goal-editing-'+index)
-
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('delete', added)
-
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal added!'
-                                        return () =>
-                                            btn.addEventListener('click', _add, false)
-
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
-
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _add, false)
-
-                        ), false) for add_button in _.get('add', editor)
+                            ), false) for save_button in _.get('.save', editor)
 
                         set_focus = (g_f) =>
                             g_f.addEventListener('click', (_focus = (e) =>
@@ -1114,7 +1022,9 @@ class ProposalController extends OpenfireController
                                 return field.focus()
                             ), false)
 
-                        set_focus(goal_field) for goal_field in _.get('goal-field', editor)
+                        set_focus(goal_field) for goal_field in _.get('.goal-field', editor)
+
+
 
                         return m.open()
 
@@ -1145,14 +1055,13 @@ class ProposalController extends OpenfireController
 
                             return css
 
-                , sync
+                , true)
 
 
         @tiers =
 
-            get: (tier_key, callback, sync) =>
-
-                ## get tier by key
+            ## get single tier by key
+            get: (t_key, callback, sync) =>
 
                 if not sync?
                     if callback? and typeof callback is 'boolean'
@@ -1161,25 +1070,21 @@ class ProposalController extends OpenfireController
                     else sync is false
 
                 if not sync
-                    tier = @get_attached('tier', tier_key)
+                    tier = @get_attached('tier', t_key)
                     return if callback? then callback.call(@, tier) else tier
 
                 else
                     # get from the server
-                    $.apptools.api.proposal.get_tier(
-                        key: tier_key
-                        proposal: @proposal_key
-                    ).fulfill
+                    return $.apptools.api.proposal.get_tier(key: t_key).fulfill
                         success: (response) =>
-                            tier = @attach(new Tier(target: @proposal_key).from_message(response.tier))
+                            tier = @attach(new Tier().from_message(response))
                             return if callback? then callback.call(@, tier) else tier
 
                         failure: (error) =>
-                            alert 'tiers.get() failure'
+                            notify('error', 'whoops', 'couldn\'t get proposal tiers from server. refresh page?', {ok: -> window.location.reload()})
 
+            ## get all proposal tiers
             list: (callback, sync) =>
-
-                ## list tiers by proposal key
 
                 if not sync?
                     if callback? and typeof callback is 'boolean'
@@ -1188,46 +1093,45 @@ class ProposalController extends OpenfireController
                     else sync is false
 
                 if not sync
+                    # return cached
                     tiers = @get_attached('tier', true)
                     return if callback? then callback.call(@, tiers) else tiers
 
                 else
-                    # get from the server
-                    $.apptools.api.proposal.list_tiers(proposal: @proposal_key).fulfill
+                    # pull from the server
+                    return $.apptools.api.proposal.list_tiers(goal: @proposal.active_goal).fulfill
                         success: (response) =>
                             tiers = []
-                            tiers.push(@attach(new Goal(target: @proposal_key).from_message(tier))) for tier in response.tiers
+                            tiers.push(@attach(new Tier().from_message(tier))) for tier in response.tiers
 
                             return if callback? then callback.call(@, tiers) else tiers
 
                         failure: (error) =>
-                            alert 'tiers.list() failure'
-                            @log('Error listing tiers: ' + error)
+                            notify('error', 'whoops', 'couldn\'t get proposal tiers from server. refresh page?', {ok: -> window.location.reload()})
 
+            ## put tier by key
             put: (tier, callback) =>
 
-                ## put tier by key
-
-                $.apptools.api.proposal.put_tier(tier.to_message()).fulfill
+                return $.apptools.api.proposal.put_tier(tier.to_message()).fulfill
                     success: (response) =>
-                        alert 'tiers.put() success'
+                        notify('yay', 'tier saved', ':)')
                         return if callback? then callback.call(@, response) else response.key
 
                     failure: (error) =>
-                        alert 'tiers.put() failure'
+                        notify('error', 'whoops', 'couldn\'t save tier. refresh page?', {ok: -> window.location.reload()})
 
+            ## delete tier by key
             delete: (tier_key, callback) =>
 
-                ## delete tier by key
-
-                $.apptools.api.proposal.delete_tier({key: tier_key}).fulfill
+                return $.apptools.api.proposal.delete_tier({key: tier_key}).fulfill
                     success: (response) =>
-                        alert 'tiers.delete() success'
+                        notify('notify', 'tier deleted', 'bye bye')
                         return if callback? then callback.call(@, response) else response.key
 
                     failure: (error) =>
-                        alert 'tiers.delete() failure'
+                        notify('error', 'whoops', 'couldn\'t delete tier. refresh page?', {ok: -> window.location.reload()})
 
+            ## edit
             edit: (e) =>
 
                 ## coordinates editing tier properties
@@ -1242,7 +1146,7 @@ class ProposalController extends OpenfireController
 
                 return @tiers.list (tiers) =>
 
-                    _t.target = @proposal_key for _t in tiers
+                    _t.target = @proposal.key for _t in tiers
 
                     tier_modal_parts = @internal.prep_tiers_modal_html(tiers)
 
@@ -1255,246 +1159,241 @@ class ProposalController extends OpenfireController
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-proposal-tier-editor')
                     )(), (m) =>
-                        editor = document.getElementById(m._state.element_id)
+                        editor = _('#'+m.id)
 
                         save_button.addEventListener('click', (_save = (e) =>
-                            @log('Tier save() click handler triggered. Saving...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Saving...'
                             idx = btn.getAttribute('data-index')
 
-                            tier = if idx isnt 'new' then @get_attached('tier', idx) else new Tier(target: @proposal_key)
+                            return notify('warn', 'saving tier', 'ready to save?', {
 
-                            amt_edit_el = document.getElementById('tier-amount-'+idx)
-                            desc_edit_el = document.getElementById('tier-description-'+idx)
-                            name_edit_el = document.getElementById('tier-name-'+idx)
+                                no: =>
 
-                            tier.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            tier.description = desc_edit_el.innerText
-                            tier.name = name_edit_el.innerText
+                                    notify('notify', 'tier not saved', 'keep on working :)')
+                                    btn.addEventListener('click', _save, false)
+                                    return
 
-                            return $.apptools.api.proposal.put_tier(tier.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Tier saved! Applying changes...')
+                                yes: =>
 
-                                    return @attach tier.from_message(response), (_tier) =>
-                                        k = _tier.key
+                                    amount_el = _('#tier-amount-'+idx)
+                                    description_el = _('#tier-description-'+idx)
+                                    name_el = _('#tier-name-'+idx)
 
-                                        name_and_amt_el = document.getElementById('a-'+k)
+                                    return $.apptools.api.proposal.put_tier(_.extend((if idx isnt 'new' then @get_attached('tier', idx) else new Tier()),
 
-                                        name_edit_el.innerHTML = _tier.name
-                                        amt_edit_el.innerHTML = _tier.amount
+                                        target: @proposal.key
+                                        amount: parseInt(amount_el.val())
+                                        description: _('#tier-description-'+idx).val()
+                                        name: _('#tier-name-'+idx).val()
 
-                                        name_and_amt_el.innerHTML = _tier.name + ' - ' + _.currency(_tier.amount)
+                                    ).to_message()).fulfill
 
-                                        desc_el = document.getElementById(k)
-                                        desc_edit_el.innerHTML = _tier.description
-                                        desc_el.innerHTML = '<p>'+_tier.description+'</p>'
+                                        success: (response) =>
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier saved!'
+                                            notify('yay', 'tier saved', 'updating info...')
 
-                                        setTimeout(() =>
-                                            btn.style.backgroundColor = 'transparent'
-                                            btn.innerHTML = 'Save tier'
-                                            btn.addEventListener('click', _save, false)
-                                        , 500)
+                                            return @attach new Tier().from_message(response), (tier) =>
 
-                                        return _tier
+                                                k = tier.key
 
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
+                                                _('#a-'+k).innerHTML = tier.name + ' - ' + _.currency(tier.amount)
+                                                _('#'+k).innerHTML = '<p>'+tier.description+'</p>'
 
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _save, false)
+                                                amount_el.val tier.amount
+                                                name_el.val tier.name
+                                                description_el.val tier.description
 
-                        ), false) for save_button in _.get('save', editor)
+                                                btn.innerHTML = 'save tier'
+                                                btn.bind('click', _save)
+
+                                                return tier
+
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t save tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.bind('click', _save)
+                                            return false
+
+                            })
+
+                        ), false) for save_button in _.get('.save', editor)
 
                         delete_button.addEventListener('click', (_delete = (e) =>
-                            @log('Tier delete() click handler triggered. Confirming tier delete...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
                             idx = btn.getAttribute('data-index')
 
                             tier = @get_attached('tier', idx)
-                            tier_editing_el = document.getElementById('tier-editing-'+idx)
-                            tier_el = document.getElementById(tier.key)
-                            tier_trigger = document.getElementById('a-'+tier.key)
 
-                            if confirm('Really delete '+tier.amount+' tier?')
-                                @log('Tier delete() confirmed. Deleting tier...')
+                            return notify('warn', 'deleting tier', 'are you sure you want to delete "'+tier.name+'"?', {
 
-                                return $.apptools.api.proposal.delete_tier(key: tier.key).fulfill
-                                    success: (response) =>
-                                        @log('Tier deleted! Applying changes...')
+                                no: =>
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier deleted!'
+                                    notify('notify', 'tier not deleted', '')
+                                    btn.addEventListener('click', _delete)
+                                    return
 
-                                        setTimeout(() =>
-                                            tier_editing_el.style.opacity = 0
-                                            setTimeout(() =>
-                                                tier_editing_el.parentNode.removeChild(tier_editing_el)
-                                                tier_el.parentNode.removeChild(tier_el)
-                                                tier_trigger.parentNode.removeChild(tier_trigger)
-                                            , 500)
-                                        , 1000)
+                                yes: =>
 
-                                        return
+                                    tier_edit_el = _('#tier-editing-'+idx)
+                                    tier_trigger = _('#a-'+tier.key)
+                                    tier_el = _('#'+tier.key)
 
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
+                                    return $.apptools.api.proposal.delete_tier(key: tier.key).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'tier deleted', 'tier successfully deleted. updating page...')
+                                            tier_edit_el.fadeOut(
+                                                complete: ->
+                                                    tier_edit_el.remove()
+                                                    tier_trigger.remove()
+                                                    tier_el.remove()
+                                            )
+                                            return true
 
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t delete tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
 
-                                        return btn.addEventListener('click', _delete, false)
+                                            btn.bind('click', _delete)
+                                            return false
 
-                            else
-                                @log('Tier delete() canceled by user.')
+                            })
 
-                                btn.innerHTML = 'Delete tier'
-                                return btn.addEventListener('click', _delete, false)
-
-                        ), false) for delete_button in _.get('delete', editor)
+                        ), false) for delete_button in _.get('.delete', editor)
 
                         reset_button.addEventListener('click', (_reset = (e) =>
-                            @log('Tier reset() click handler triggered. Confirming tier reset...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
                             idx = btn.getAttribute('data-index')
 
                             tier = @get_attached('tier', idx)
 
-                            if confirm('Really discard your changes and reset tier to saved version?')
-                                @log('Tier reset() confirmed. Resetting tier to saved values...')
+                            return notify('warn', 'resetting tier', 'Really discard your changes and reset tier to saved version?', {
 
-                                return $.apptools.api.proposal.get_tier(key: tier.key).fulfill
-                                    success: (response) =>
-                                        @log('Tier reset! Applying changes')
+                                no: =>
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier reset!'
+                                    notify('notify', 'tier not reset', 'keep on working :)')
+                                    btn.addEventListener('click', _reset)
+                                    return
 
-                                        return @attach tier.from_message(response), (_goal) =>
-                                            document.getElementById('tier-name-'+idx).innerHTML = _tier.name
-                                            document.getElementById('tier-amount-'+idx).innerHTML = _tier.amount
-                                            document.getElementById('tier-description-'+idx).innerHTML = _tier.description
+                                yes: =>
 
-                                            setTimeout(() =>
-                                                btn.style.backgroundColor = 'transparent'
-                                                btn.innerHTML = 'Reset tier'
-                                                return btn.addEventListener('click', _reset, false)
-                                            , 500)
+                                    return $.apptools.api.proposal.get_tier(key: tier.key).fulfill
 
-                                            return _tier
+                                        success: (response) =>
 
+                                            notify('yay', 'tier reset!', 'reset tier info. applying changes...')
 
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
+                                            return @attach new Tier().from_message(response), (_tier) =>
 
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
-                                        return btn.addEventListener('click', _reset, false)
+                                                _('#tier-name-'+idx).val _tier.name
+                                                _('#tier-amount-'+idx).val _tier.amount
+                                                _('#tier-description-'+idx).val _tier.description
 
-                            else
-                                @log('Tier reset() canceled by user.')
+                                                btn.addEventListener('click', _reset)
 
-                                btn.innerHTML = 'Reset tier'
-                                return btn.addEventListener('click', _reset, false)
+                                                return _tier
 
-                        ), false) for reset_button in _.get('reset', editor)
+                                        failure: (error) =>
+
+                                            notify('error', 'whoops', 'couldn\'t reset tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.bind('click', _reset)
+                                            return false
+
+                            })
+
+                        ), false) for reset_button in _.get('.reset', editor)
 
                         add_button.addEventListener('click', (_add = (e) =>
-                            @log('Tier add() click handler triggered. Saving...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Adding...'
                             idx = 'new'
 
-                            tier = new Tier(target: @proposal_key)
+                            amount_el = _('#tier-amount-'+idx)
+                            description_el = _('#tier-description-'+idx)
+                            name_el = _('#tier-name-'+idx)
 
-                            name_edit_el = document.getElementById('tier-name-'+idx)
-                            amt_edit_el = document.getElementById('tier-amount-'+idx)
-                            desc_edit_el = document.getElementById('tier-description-'+idx)
-                            new_edit_el = amt_edit_el.parentNode
+                            new_edit_el = amount_el.parentNode.parentNode
 
-                            tier.name = name_edit_el.innerText
-                            tier.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            tier.description = desc_edit_el.innerText
+                            return notify('warn', 'add tier', 'ready to add tier to proposal?', {
 
-                            return $.apptools.api.proposal.put_tier(tier.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Tier added! Applying changes...')
+                                no: =>
 
-                                    return @attach tier.from_message(response), (_tier) =>
-                                        k = _tier.key
-                                        index = @get_attached('tier', k, true)
+                                    notify('notify', 'tier not added', 'keep on working :)')
+                                    btn.addEventListener('click', _add)
+                                    return
 
-                                        df = _.create_doc_frag(@internal.process_tier(_tier))
-                                        new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
+                                yes: =>
 
-                                        name_edit_el.innerText = 'New Tier'
-                                        amt_edit_el.innerHTML = 0
-                                        desc_edit_el.innerHTML = 'Fill this out to add a tier!'
+                                    return $.apptools.api.proposal.put_tier(new Tier(
 
-                                        btn.innerHTML = 'Add tier'
-                                        btn.addEventListener('click', _add, false)
+                                        target: @proposal.key
+                                        amount: parseInt(amount_el.val())
+                                        description: description_el.val()
+                                        name: name_el.val()
 
-                                        added = document.getElementById('tier-editing-'+index)
+                                    ).to_message()).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'tier added', 'hooray :)')
 
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('delete', added)
+                                            return @attach new Tier(target: @proposal.key).from_message(response), (_tier) =>
+                                                k = _tier.key
+                                                index = @get_attached('tier', k, true)
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Tier added!'
-                                        return () =>
-                                            btn.addEventListener('click', _add, false)
+                                                df = _.create_doc_frag(TierEditModalItem(@internal.process_tier(_tier)))
+                                                new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
 
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
+                                                name_el.val 'New Tier'
+                                                amount_el.val 0
+                                                description_el.val 'Fill this out to add a tier!'
 
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _add, false)
+                                                btn.addEventListener('click', _add, false)
 
-                        ), false) for add_button in _.get('add', editor)
+                                                added = document.getElementById('tier-editing-'+index)
+
+                                                sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('.save', added)
+                                                rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('.reset', added)
+                                                del_btn.addEventListener('click', _delete, false) for del_btn in _.get('.delete', added)
+
+                                                return @proposal.put()
+
+
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t add tier, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.innerHTML = 'add tier'
+                                            btn.bind('click', _add)
+                                            return false
+
+                            })
+
+                        ), false) for add_button in _.get('.add', editor)
 
                         set_focus = (t_f) =>
                             t_f.addEventListener('click', (_focus = (e) =>
                                 e.preventDefault()
                                 e.stopPropagation()
                                 field = e.target
-                                field.innerHTML = ''
                                 return field.focus()
                                 ), false)
 
-                        set_focus(tier_field) for tier_field in _.get('tier-field', editor)
+                        set_focus(tier_field) for tier_field in _.get('.tier-field', editor)
+
+                        if (editorform = editor.find('form'))?
+                            $.openfire.forms.register(editorform)
 
                         return m.open()
 
@@ -1527,84 +1426,77 @@ class ProposalController extends OpenfireController
 
                 , sync
 
-
         @bbq_promote = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.promote(key: @proposal_key).fulfill
+            $.apptools.api.proposal.promote(key: @proposal.key).fulfill
                 success: () ->
-                    alert("This project has been promoted to a project. Refreshing page...")
-                    window.location.reload()
+                    return notify("yay", "Proposal Promoted", "This proposal has been promoted to a proposal. Click to refresh", {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    return notify('error', 'an error occurred', response.error+". Click to refresh", {ok: -> window.location.reload()})
 
         @bbq_reject = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.reject(key: @proposal_key).fulfill
+            $.apptools.api.proposal.reject(key: @proposal.key).fulfill
                 success: () ->
-                    alert("This proposal has been rejected. Refreshing page...")
-                    window.location.reload()
+                    return notify("error", "Proposal rejected", "This proposal has been rejected. Click to refresh", {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    return notify('error', 'an error occurred', response.error+". Click to refresh", {ok: -> window.location.reload()})
 
         @submit = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.submit(key: @proposal_key).fulfill
+            $.apptools.api.proposal.submit(key: @proposal.key).fulfill
                 success: () ->
-                    alert("You have submitted your proposal for approval. Refreshing page...")
-                    window.location.reload()
+                    return notify("yay", "Proposal Submitted", "This proposal has been submitted for approval. Click to refresh", {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    return notify('error', 'an error occurred', response.error+". Click to refresh", {ok: -> window.location.reload()})
 
         @reopen = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.reopen(key: @proposal_key).fulfill
+            $.apptools.api.proposal.reopen(key: @proposal.key).fulfill
                 success: () ->
-                    alert("You have reopened your proposal as a draft, and it is no longer submitted for approval.  Refreshing page...")
-                    window.location.reload()
+                    return notify("notify", "Proposal Reopened", "This proposal has been reopened for editing and is not longer waiting for approval. Click to refresh", {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    return notify('error', 'an error occurred', response.error+". Click to refresh", {ok: -> window.location.reload()})
 
         @suspend = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.suspend(key: @proposal_key).fulfill
+            $.apptools.api.proposal.suspend(key: @proposal.key).fulfill
                 success: () ->
-                    alert("You have suspended this proposal. It may only be re-opened by an admin. Refreshing page...")
-                    window.location.reload()
+                    return notify("yay", "Proposal suspended", "This proposal has been suspended. It may only be re-opened by an admin. Click to refresh", {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    return notify('error', 'an error occurred', response.error+". Click to refresh", {ok: -> window.location.reload()})
 
         @review= (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            $.apptools.api.proposal.review(key: @proposal_key).fulfill
+            $.apptools.api.proposal.review(key: @proposal.key).fulfill
                 success: () ->
-                    alert("You have sent this proposal back for review. Refreshing page...")
-                    window.location.reload()
+                    return notify("yay", "Proposal returned", "This proposal has been returned for further review. Click to refresh", {ok: -> window.location.reload()})
                 failure: (response) ->
-                    alert("Error:", response.error)
+                    return notify('error', 'an error occurred', response.error+". Click to refresh", {ok: -> window.location.reload()})
 
         @add_viewers = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            alert("Coming soon.")
+            return notify('notify', "Coming soon.", ':)')
 
         @add_team_member = (e) =>
             if e.preventDefault
                 e.preventDefault()
                 e.stopPropagation()
-            alert("Coming soon.")
+            return notify('notify', "Coming soon.", ':)')
 
         @_init = () =>
 
@@ -1629,13 +1521,14 @@ class ProposalController extends OpenfireController
 
                     # Proposal Owner Actions
                     #document.getElementById('promote-goal').addEventListener('click', @active_goal.edit, false)
+                    document.getElementById('promote-proposal-deets')?.addEventListener('click', @proposal.edit, false)
                     document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
                     document.getElementById('promote-submit')?.addEventListener('click', @submit, false)
                     document.getElementById('promote-reopen')?.addEventListener('click', @reopen, false)
                     document.getElementById('promote-add-viewers')?.addEventListener('click', @add_viewers, false)
                     document.getElementById('promote-add-team-member')?.addEventListener('click', @add_team_member, false)
 
-                    # Project Owner Actions
+                    # Proposal Owner Actions
 
                     document.getElementById('promote-dropzone')?.addEventListener('dragenter', d_on = (ev) ->
                         if ev?.preventDefault

@@ -77,7 +77,14 @@ class Project extends Model
                         type: 'alphanum'
                         id: 'project-edit-input-name'
                         'data-validation': 'alpha'
-                    }]
+                }, {
+                    name: 'analytics'
+                    attributes:
+                        placeholder: 'analytics id'
+                        type: 'text'
+                        id: 'proposal-edit-input-analytics'
+                        'data-validation': 'alphanum'
+                }]
 
                 areas = []
                 for k, v of @constructor::model
@@ -93,7 +100,7 @@ class Project extends Model
 
                     areas.push(area)
 
-                df = _.create_doc_frag(ProjectEditModal(fields: fields, areas: areas))
+                df = _.create_doc_frag(ProjectEditModal(fields: fields, areas: areas, kind: 'project'))
                 adf = _.create_doc_frag(_.create_element_string('a',
                     id: 'a-project-editor'
                     style: 'display: none'
@@ -297,7 +304,7 @@ class ProjectController extends OpenfireController
 
             process_goal: (goal) =>
 
-                ctx = _.extend({type: 'goal'}, goal)
+                ctx = _.extend({type: 'goal', kind: 'project'}, goal)
                 ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
                 btnctx =
@@ -305,7 +312,7 @@ class ProjectController extends OpenfireController
                         'data-index': ctx.index
 
                 if !!ctx.new
-                    axn = 'add'
+                    axn = 'propose'
                 else
                     axn = 'save'
 
@@ -320,7 +327,7 @@ class ProjectController extends OpenfireController
 
             process_tier: (tier) =>
 
-                ctx = _.extend({type: 'tier'}, tier)
+                ctx = _.extend({type: 'tier', kind: 'project'}, tier)
                 ctx.index = if tier.key? then @get_attached('tier', tier.key, true) else (ctx.new = true; 'new')
 
                 btnctx =
@@ -407,8 +414,12 @@ class ProjectController extends OpenfireController
                 _goals = []
 
                 blank_goal = new Goal
+                    project: @project.key
                     amount: 0
-                    description: 'Fill this out to add a goal!'
+                    description: 'Fill this out to propose a new goal!'
+                    funding_day_limit: 30
+                    deliverable_description: 'Describe your proposed goal\'s deliberable'
+                    deliverable_date: '12/31/2013'
 
                 _goals.push(@internal.process_goal(blank_goal))
                 _goals.push(@internal.process_goal(g)) for g in goals
@@ -946,7 +957,7 @@ class ProjectController extends OpenfireController
 
         @goals =
 
-            get: (goal_key, callback, sync) =>
+            get: (which, callback, sync) =>
 
                 ## get goal by key
 
@@ -962,12 +973,11 @@ class ProjectController extends OpenfireController
 
                 else
                     # get from the server
-                    $.apptools.api.project.get_goal(
-                        key: goal_key
+                    $.apptools.api.project[which](
                         project: @project.key
                     ).fulfill
                         success: (response) =>
-                            goal = @attach(new Goal(target: @project.key).from_message(response.goal))
+                            goal = @attach(new Goal(target: @project.key).from_message(response))
 
                             return if callback? then callback.call(@, goal) else goal
 
@@ -1026,21 +1036,16 @@ class ProjectController extends OpenfireController
                     failure: (error) =>
                         alert 'goals.delete() failure'
 
-            edit_current: (e) =>
+            edit: (e) =>
 
-                if (trigger = e.target)?
-                    trigger.classList.add('init') if (sync = not trigger.classList.contains('init'))
+                sync = true
+                target = e.target
+                which = target.getAttribute('id').split('-').pop()+'_goal'
 
-                else if typeof e is 'boolean'
-                    sync = e
+                return @goals.get(which, (goal) =>
+                    goal_modal_parts = @internal.prep_goals_modal_html([goal])
 
-                else sync = false
-
-                current = @project.active_goal
-                return @goals.get(current, (goal) =>
-                    goal_modal_parts = @internal.prep_goals_modal_html(goal, '')
-
-                    return @goals.return $.apptools.widgets.modal.create (() =>
+                    return $.apptools.widgets.modal.create (() =>
                         docfrag = _.create_doc_frag(goal_modal_parts[0])
                         document.body.appendChild(docfrag)
                         return document.getElementById('project-goal-editor')
@@ -1049,7 +1054,52 @@ class ProjectController extends OpenfireController
                         document.body.appendChild(docfrag)
                         return document.getElementById('a-project-goal-editor')
                     )(), ((m) =>
-                        editor = document.getElementById(m._state.element_id)
+                        editor = _('#'+m._state.element_id+'-modal-dialog')
+                        _('#'+m._state.element_id+'-modal-title').innerHTML = 'Editing '+which.split('_').shift()+' goal...'
+
+                        propose_button.addEventListener('click', (_propose = (e) =>
+                            e.preventDefault()
+                            e.stopPropagation()
+
+                            btn = e.target
+                            btn.removeEventListener('click')
+                            idx = btn.getAttribute('data-index')
+
+                            return notify('warn', 'proposing goal', 'ready to submit?', {
+
+                                no: =>
+
+                                    notify('notify', 'goal not submitted', 'take your time :)')
+                                    btn.addEventListener('click', _propose, false)
+                                    return
+
+                                yes: =>
+
+                                    description_el = _('#goal-description-'+idx)
+                                    name_el = _('#goal-name-'+idx)
+                                    amount_el = _('#goal-amount-'+idx) or document.createElement('input')
+
+                                    return $.apptools.api.project.propose_goal(new Goal(
+                                        project: @project.key
+                                        description: description_el.val()
+                                        amount: amount_el.val()
+                                        name: name_el.val()
+                                        deliverable_date: +Date()
+                                        deliverable_description: 'your deliverable from this goal'
+                                    ).to_message).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'goal proposed', 'we got your submission. you\'ll hear back soon!', {ok: -> m.close})
+                                            btn.addEventListener('click', _propose, false)
+                                            return
+
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t propose goal, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
+
+                                            btn.bind('click', _propose)
+                                            return false
+                                })
+
+                        ), false) for propose_button in editor.find('.propose')
 
                         save_button.addEventListener('click', (_save = (e) =>
                             e.preventDefault()
@@ -1086,7 +1136,7 @@ class ProjectController extends OpenfireController
 
                                             notify('yay', 'goal saved', 'updating info...')
 
-                                            return @attach new Goal().from_message(response), (goal) =>
+                                            return @attach(new Goal().from_message(response), (goal) =>
 
                                                 k = goal.key
 
@@ -1101,6 +1151,8 @@ class ProjectController extends OpenfireController
                                                 btn.bind('click', _save)
 
                                                 return goal
+
+                                            )
 
                                         failure: (error) =>
                                             notify('error', 'whoops', 'couldn\'t save goal, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
@@ -1122,6 +1174,8 @@ class ProjectController extends OpenfireController
                             ), false)
 
                         set_focus(goal_field) for goal_field in _.get('.goal-field', editor)
+
+
 
                         return m.open()
 
@@ -1677,7 +1731,8 @@ class ProjectController extends OpenfireController
                     # Project Owner Actions
                     document.getElementById('promote-project')?.addEventListener('click', @project.edit, false)
                     document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
-                    document.getElementById('promote-goals')?.addEventListener('click', @goals.edit, false)
+                    document.getElementById('promote-active')?.addEventListener('click', @goals.edit, false)
+                    document.getElementById('promote-future')?.addEventListener('click', @goals.edit, false)
                     document.getElementById('promote-live')?.addEventListener('click', @go_live, false)
                     document.getElementById('promote-suspend')?.addEventListener('click', @suspend, false)
                     document.getElementById('promote-shutdown')?.addEventListener('click', @shutdown, false)

@@ -15,6 +15,7 @@
                 <div id="bbq" data-section-title="bbq">
                     {% if proposed_goals and proposed_goals[0].status == 's' %}
                         <span class="bbq-message">This project has a goal that is awaiting admin action.</span>
+                        <button id="bbq-moderate">moderate</button>
                     {% endif %}
                     {% if project.status in ['p', 'c', 'x', 's'] %}
                         <button id="bbq-live" value="go live">go live</button>
@@ -37,7 +38,9 @@
                         <button id='promote-project' value="project">edit project</button>
                     {% if project.status != 's' %}
                         <button id='promote-tiers' value="tiers">edit tiers</button>
-                        <button id='promote-goals' value="goals">edit goals</button>
+                        <button id='promote-active' value="active">active goal</button>
+                        <button id='promote-nextsteps' value="nextsteps">next steps</button>
+                        <button id='promote-future' value="future">future goal</button>
                     {% endif %}
                     {% if project.status in ['p', 'c'] %}
                         <button id='promote-live' value="go live">go live</button>
@@ -349,7 +352,7 @@
 
                 <!-- project title -->
                 <div id='projecttitle'>
-                    <h1 data-href="#project" class="target-link{% if security.current_user.key in project.owners %} mini-editable{% endif %}" id="project-title-header" data-options='{"bundle":"rich"}'>{{ project.name }}</h1>
+                    <h1 data-href="#project" class="target-link" id="project-title-header">{{ project.name }}</h1>
                     <div id='deetactions'>
                         <div class='buttongroup' data-action="Share This">
                             <div id="fblike" class="fb-like" data-send="false" data-width="250" data-show-faces="false" data-font="trebuchet ms"></div>

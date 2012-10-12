@@ -18,6 +18,7 @@
                 <div id="bbq" data-section-title="bbq">
                     {% if proposal.status == 's' %}
                         <span class="bbq-message">This proposal is awaiting admin action.</span>
+                        <button id="bbq-moderate" value="moderate">moderate</button>
                     {% endif %}
                     {% if proposal.status in ['s', 'r', 'd'] %}
                         <button id="bbq-promote" value="promote">promote to project</button>
@@ -36,6 +37,7 @@
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
                     {% if proposal.status in ['f', 'r', 'd'] %}
+                        <button id="promote-proposal-deets" value="proposal">edit proposal details</button>
                         <button id='promote-goal' value="goals">edit goal</button>
                         <button id='promote-tiers' value="tiers">edit tiers</button>
                         <button id='promote-submit' value="submit" type="button">submit</button>

@@ -16,15 +16,15 @@
         <input[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</input>
     </script>
     <script type="text/template" id="ProjectEditModal">
-        <div id="project-editor" class="pre-modal" style="opacity: 0;" data-title="editing project ...">
-            <form id="project-editor-form">
+        <div id="[[[=kind]]]-editor" class="pre-modal" style="opacity: 0;" data-title="editing [[[=kind]]] ...">
+            <form id="[[[=kind]]]-editor-form">
                 [[[>fields]]]
                     [[[=name]]]:<br>[[[+Input]]]<br>
                 [[[/fields]]]
                 [[[>areas]]]
                     [[[=name]]]:<br>[[[+TextArea]]]<br>
                 [[[/areas]]]
-                <button id="project-save">save project</button>
+                <button id="[[[=kind]]]-save">save [[[=kind]]]</button>
             </form>
         </div>
     </script>

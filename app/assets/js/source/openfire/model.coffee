@@ -46,30 +46,6 @@ class Asset extends Model
 
 # Classes common to proposals and projects.
 
-class Goal extends Model
-
-    model:
-        key: String()
-        target: String()
-        contribution_type: String()
-        approved: Boolean()
-        rejected: Boolean()
-        amount: Number()
-        description: String()
-        backer_count: Number()
-        progress: Number()
-        met: Boolean()
-        created: String()
-        modified: String()
-        amount_pledged: Number()
-        amount_processed: Number()
-        funding_day_limit: Number()
-        funding_deadline: String()
-        deliverable_description: String()
-        deliverable_date: String()
-        tiers: ListField(Tier)
-        next_steps: ListField(NextStep)
-
 
 class Tier extends Model
 
@@ -93,6 +69,30 @@ class NextStep extends Model
         summary: String()
         description: String()
         votes: Number()
+
+class Goal extends Model
+
+    model:
+        key: String()
+        target: String()
+        contribution_type: String()
+        approved: Boolean()
+        rejected: Boolean()
+        amount: Number()
+        description: String()
+        backer_count: Number()
+        progress: Number()
+        met: Boolean()
+        created: String()
+        modified: String()
+        amount_pledged: Number()
+        amount_processed: Number()
+        funding_day_limit: Number()
+        funding_deadline: String()
+        deliverable_description: String()
+        deliverable_date: String()
+        tiers: ListField(Tier)
+        next_steps: ListField(NextStep)
 
 
 
