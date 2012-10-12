@@ -7,26 +7,47 @@
 
 {% block jstemplates %}
     <script type="text/template" id="Button">
-        <button[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[=content]]]</button>
+        <button[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</button>
+    </script>
+    <script type="text/template" id="TextArea">
+        <textarea data-validation="text"[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</textarea>
+    </script>
+    <script type="text/template" id="Input">
+        <input[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</input>
+    </script>
+    <script type="text/template" id="ProjectEditModal">
+        <div id="[[[=kind]]]-editor" class="pre-modal" style="opacity: 0;" data-title="editing [[[=kind]]] ...">
+            <form id="[[[=kind]]]-editor-form">
+                [[[>fields]]]
+                    [[[=name]]]:<br>[[[+Input]]]<br>
+                [[[/fields]]]
+                [[[>areas]]]
+                    [[[=name]]]:<br>[[[+TextArea]]]<br>
+                [[[/areas]]]
+                <button id="[[[=kind]]]-save">save [[[=kind]]]</button>
+            </form>
+        </div>
     </script>
     <script type="text/template" id="TierEditModal">
-        <div id="project-tier-editor" class="pre-modal" style="opacity: 0;" data-title="editing project tiers...">
-            <form id="project-tier-editor-form">
-                [[[>tiers]]][[[+TierEditModalItem]]][[[/tiers]]]
+        <div id="project-[[[<type]]]-editor" class="pre-modal" style="opacity: 0;" data-title="editing project [[[&1]]]s...">
+            <form id="project-[[[&1]]]-editor-form">
+                [[[>tiers]]]
+                    [[[+TierEditModalItem]]]
+                [[[/tiers]]]
             </form>
         </div>
     </script>
     <script type="text/template" id="TierEditModalItem">
         <div id="[[[<type]]]-editing-[[[<index]]]" class="[[[&1]]]">
             <div class="left" style="margin-right: 10px; max-width: 35%">
-                amount: <input type="text" id="[[[&1]]]-amount-[[[&2]]]" class="[[[&1]]]-field amount" data-validation="number" data-label="amount" contenteditable=true placeholder="[[[=amount]]]"></input>
-                <br>
+                [[[amount]]]amount: <input type="text" id="[[[&1]]]-amount-[[[&2]]]" class="[[[&1]]]-field amount" data-validation="number" data-label="amount" contenteditable=true placeholder="[[[=amount]]]"></input>
+                <br>[[[/amount]]]
                 name: <input type="text" id="[[[&1]]]-name-[[[&2]]]" class="[[[&1]]]-field name" data-validation="alpha" data-label="name" contenteditable=true placeholder="[[[=name]]]"></input>
                 <br>
             </div>
             description:
             <br>
-            <textarea id="[[[&1]]]-description-[[[&2]]]" class="rounded [[[&1]]]-field description" data-label="description" contenteditable=true>[[[description]]][[[=description]]][[[:description]]]default description[[[/description]]]</textarea>
+            <textarea id="[[[&1]]]-description-[[[&2]]]" class="rounded [[[&1]]]-field description" data-label="description" contenteditable=true>[[[description]]][[[=description]]][[[/description]]][[[summary]]][[[=summary]]][[[/summary]]]</textarea>
             <br>
             [[[>buttons]]]
                 [[[+Button]]]

@@ -1,5 +1,5 @@
-<div id="project-tier-editor" class="pre-modal" style="opacity: 0;" data-title="editing project tiers...">
-	<form id="project-tier-editor-form">
+<div id="{{=kind}}-{{<type}}-editor" class="pre-modal" style="opacity: 0;" data-title="editing {{=kind}} {{&1}}s...">
+	<form id="{{=kind}}-{{&1}}-editor-form">
 		{{>tiers}}
 			{{+TierEditModalItem}}
 		{{/tiers}}
