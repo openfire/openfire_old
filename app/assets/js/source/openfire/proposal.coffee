@@ -286,9 +286,9 @@ class ProposalController extends OpenfireController
                 remove(_l) while _l = _list.shift()
                 return _list
 
-            process_goal: (goal) =>
+            process_goal: (goal, w) =>
 
-                ctx = _.extend({type: 'goal', kind: 'proposal'}, goal)
+                ctx = _.extend({type: 'goal', kind: 'proposal', which: w}, goal)
                 ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
                 btnctx =
@@ -391,13 +391,14 @@ class ProposalController extends OpenfireController
 
                 return [pre_modal, trigger]
 
-            prep_goals_modal_html: (goals) =>
+            prep_goals_modal_html: (goals, which) =>
 
                 @internal.cleanup('proposal-goal-editor')
 
                 _goals = []
 
                 blank_goal = new Goal
+                    which: which
                     proposal: @proposal.key
                     amount: 0
                     description: 'Fill this out to propose a new goal!'
@@ -406,7 +407,7 @@ class ProposalController extends OpenfireController
                     deliverable_date: '12/31/2013'
 
                 _goals.push(@internal.process_goal(blank_goal))
-                _goals.push(@internal.process_goal(g)) for g in goals
+                _goals.push(@internal.process_goal(g, which)) for g in goals
 
                 pre_modal = window.TierEditModal(false,
                     tiers: _goals
@@ -1099,7 +1100,7 @@ class ProposalController extends OpenfireController
 
                 else
                     # pull from the server
-                    return $.apptools.api.proposal.list_tiers(goal: @proposal.active_goal).fulfill
+                    return $.apptools.api.proposal.get(key: @proposal.key).fulfill
                         success: (response) =>
                             tiers = []
                             tiers.push(@attach(new Tier().from_message(tier))) for tier in response.tiers

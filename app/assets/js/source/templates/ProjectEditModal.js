@@ -1,8 +1,11 @@
-<div id="project-editor" class="pre-modal" style="opacity: 0;" data-title="editing project ...">
-    <form id="project-editor-form">
+<div id="{{=kind}}-editor" class="pre-modal" style="opacity: 0;" data-title="editing {{=kind}} ...">
+    <form id="{{=kind}}-editor-form">
         {{>fields}}
-            {{=name}}: {{+Input}}
+            {{=name}}:<br>{{+Input}}<br>
         {{/fields}}
-        <button id="project-save">save project</button>
+        {{>areas}}
+            {{=name}}:<br>{{+TextArea}}<br>
+        {{/areas}}
+        <button id="{{=kind}}-save">save {{=kind}}</button>
     </form>
 </div>

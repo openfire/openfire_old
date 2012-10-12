@@ -1,1 +1,1 @@
-<input{{@attributes}} {{=_key}}="{{=_val}}"{{/attributes}}>{{=content}}</input>
+<input{{@attributes}} {{=_key}}="{{=_val}}"{{/attributes}}>{{content}}{{=content}}{{/content}}</input>

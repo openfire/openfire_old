@@ -104,6 +104,18 @@ config['apptools.project.assets'] = {
 
         },
 
+        ### JS Templates ###
+        ('templates', 'templates'): {
+
+            'config': {
+                'version_mode': 'getvar',
+                'bundle': 'templates.bundle.min.js'
+            },
+            'assets': {
+                'core': {'min': False, 'version': 0.1}  # JS templates
+            }
+        },
+
         ### jQuery Plugins ###
         ('jquery', 'core/jquery'): {
 
