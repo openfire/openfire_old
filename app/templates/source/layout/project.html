@@ -11,7 +11,7 @@
     <div id='content'>
         <div id='project'>
 
-            {% if security.permissions.admin %}
+            {# {% if security.permissions.admin %} #}
                 <div id="bbq" data-section-title="bbq">
                     {% if proposed_goals and proposed_goals[0].status == 's' %}
                         <span class="bbq-message">This project has a goal that is awaiting admin action.</span>
@@ -29,13 +29,15 @@
                         <button id="bbq-cancel" value="cancel">cancel</button>
                     {% endif %}
                 </div>
-            {% endif %}
+            {# {% endif %} #}
 
             {% if security.current_user.key in project.owners %}
                 <div id='promote' data-section-title="admin">
                     <div id='promote-dropzone' class='dropzone'>drop images here</div>
+                        <button id='promote-project' value="project">edit project</button>
                     {% if project.status != 's' %}
                         <button id='promote-tiers' value="tiers">edit tiers</button>
+                        <button id='promote-goals' value="goals">edit goals</button>
                     {% endif %}
                     {% if project.status in ['p', 'c'] %}
                         <button id='promote-live' value="go live">go live</button>

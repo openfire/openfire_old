@@ -68,6 +68,99 @@ class Project extends Model
 
             , 1000)
 
+        @edit = () =>
+            return @get (project) =>
+                fields = [{
+                    name: 'name'
+                    attributes:
+                        value: project['name']
+                        type: 'alphanum'
+                        id: 'project-edit-input-name'
+                        'data-validation': 'alpha'
+                    }]
+
+                areas = []
+                for k, v of @constructor::model
+                    continue if k not in ['summary', 'pitch', 'tech', 'keywords']
+                    area = {}
+                    area.name = k
+                    area.content = project[k] or ''
+                    area.attributes =
+                        'data-validation': 'text'
+                        id: 'project-edit-input-'+k
+                        value: k
+                        style: 'width: 90%;margin: 10px auto'
+
+                    areas.push(area)
+
+                df = _.create_doc_frag(ProjectEditModal(fields: fields, areas: areas))
+                adf = _.create_doc_frag(_.create_element_string('a',
+                    id: 'a-project-editor'
+                    style: 'display: none'
+                , ''))
+                document.body.appendChild(df)
+                document.body.appendChild(adf)
+                editor = _('#project-editor')
+                trigger = _('#a-project-editor')
+
+                return $.apptools.widgets.modal.create(editor, trigger, (m) =>
+                    savebtn = _('#project-save')
+                    savebtn.bind('click', (_save = (e) =>
+                        e.preventDefault()
+                        e.stopPropagation()
+
+                        savebtn.unbind('click')
+                        return notify('warn', 'saving project', 'Are your project details correct?', {
+                                no: =>
+                                    notify('notify', 'no changes made', 'keep working :)')
+                                    savebtn.bind('click', _save)
+                                    return
+
+                                yes: =>
+                                    pjct = {}
+                                    editor = _('#project-editor-modal-dialog')
+                                    inputs = _.to_array(editor.find('input')) or []
+                                    texts = _.to_array(editor.find('textarea')) or []
+                                    fields = _.join(inputs, texts)
+                                    for field in fields
+                                        continue if not field.hasAttribute('id')
+                                        prop = field.getAttribute('id').split('-').pop()
+                                        pjct[prop] = field.val()
+
+                                    @from_message(pjct)
+
+                                    return $.apptools.api.project.put(@to_message()).fulfill
+                                        success: (response) =>
+                                            notify('yay', 'project saved!', 'project saved successfully, click below to refresh & see updates :)', {ok: -> window.location.reload()})
+                                            document.body.style.overflow = 'auto'
+                                            return m.close()
+
+                                        failure: (error) =>
+                                            return notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+                            })
+                    ), false)
+
+                    set_focus = (t_f) =>
+                        t_f.addEventListener('click', (_focus = (e) =>
+                            e.preventDefault()
+                            e.stopPropagation()
+                            field = e.target
+                            return field.focus()
+                            ), false)
+
+                    set_focus(tier_field) for tier_field in _.get('.tier-field', editor)
+
+                    if (editorform = _('#project-editor-form'))?
+                        $.openfire.forms.register(editorform)
+
+                    document.body.style.overflow = 'hidden'
+                    return m.open()
+                ,
+                    ratio:
+                        x: 0.7
+                        y: 0.75
+                )
+
 
         @attach = (obj, callback) =>
 
@@ -133,21 +226,22 @@ class Project extends Model
 
         @get = (callback) =>
 
-            $.apptools.api.project.get(key: @key).fulfill
+            return $.apptools.api.project.get(key: @key).fulfill
                 success: (response) =>
                     return if callback? then callback?(@from_message(response)) else @from_message(response)
 
                 failure: (error) =>
-                    notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+                    return notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
 
 
         @put = (callback) =>
-            $.apptools.api.project.get(key: @key).fulfill
+
+            return $.apptools.api.project.put(@to_message()).fulfill
                 success: (response) =>
                     return if callback? then callback?(@from_message(response)) else @from_message(response)
 
                 failure: (error) =>
-                    notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
+                    return notify('error','whoops', 'something went wrong :( refresh?', {ok: -> window.location.reload()})
 
 
 
@@ -203,7 +297,6 @@ class ProjectController extends OpenfireController
 
             process_goal: (goal) =>
 
-                template = window.GoalEditor ||= new Template('{{+TierEditModalItem}}', true, 'GoalEditor')
                 ctx = _.extend({type: 'goal'}, goal)
                 ctx.index = if goal.key? then @get_attached('goal', goal.key, true) else (ctx.new = true; 'new')
 
@@ -212,18 +305,18 @@ class ProjectController extends OpenfireController
                         'data-index': ctx.index
 
                 if !!ctx.new
-                    axns = ['add']
+                    axn = 'add'
                 else
-                    axns = ['save', 'reset', 'delete']
+                    axn = 'save'
 
-                ctx.buttons = (_.extend(true, {}, btnctx,
+                ctx.buttons = [_.extend(true, {}, btnctx,
                     attributes:
                         'data-action': axn
                         class: 'goal-button '+axn
                     content: axn + ' goal'
-                ) for axn in axns)
+                )]
 
-                return template(ctx)
+                return ctx
 
             process_tier: (tier) =>
 
@@ -320,12 +413,10 @@ class ProjectController extends OpenfireController
                 _goals.push(@internal.process_goal(blank_goal))
                 _goals.push(@internal.process_goal(g)) for g in goals
 
-                pre_modal = _.create_element_string('div',
-                    id: 'project-goal-editor'
-                    class: 'pre-modal'
-                    style: 'opacity: 0;'
-                    'data-title': 'editing project goals...'
-                , _goals.join(''))
+                pre_modal = window.TierEditModal(false,
+                    tiers: _goals
+                    type: 'goal'
+                )
 
                 trigger = _.create_element_string('a',
                     id: 'a-project-goal-editor'
@@ -347,7 +438,10 @@ class ProjectController extends OpenfireController
                 _tiers.push(@internal.process_tier(blank_tier))
                 _tiers.push(@internal.process_tier(t)) for t in tiers
 
-                pre_modal = window.TierEditModal(false, tiers: _tiers)
+                pre_modal = window.TierEditModal(false, 
+                    tiers: _tiers
+                    type: 'tier'
+                )
 
                 trigger = _.create_element_string('a',
                     id: 'a-project-tier-editor',
@@ -932,24 +1026,21 @@ class ProjectController extends OpenfireController
                     failure: (error) =>
                         alert 'goals.delete() failure'
 
-            edit: (e) =>
+            edit_current: (e) =>
 
                 if (trigger = e.target)?
-                    trigger.classList.add('init') if (sync = not _.has_class(trigger, 'init'))
+                    trigger.classList.add('init') if (sync = not trigger.classList.contains('init'))
 
                 else if typeof e is 'boolean'
                     sync = e
 
                 else sync = false
 
-                ## coordinates editing goal properties
-                return @goals.list (goals) =>
+                current = @project.active_goal
+                return @goals.get(current, (goal) =>
+                    goal_modal_parts = @internal.prep_goals_modal_html(goal, '')
 
-                    _g.target = @project.key for _g in goals
-
-                    goal_modal_parts = @internal.prep_goals_modal_html(goals)
-
-                    return $.apptools.widgets.modal.create (() =>
+                    return @goals.return $.apptools.widgets.modal.create (() =>
                         docfrag = _.create_doc_frag(goal_modal_parts[0])
                         document.body.appendChild(docfrag)
                         return document.getElementById('project-goal-editor')
@@ -961,223 +1052,65 @@ class ProjectController extends OpenfireController
                         editor = document.getElementById(m._state.element_id)
 
                         save_button.addEventListener('click', (_save = (e) =>
-                            @log('Goal save() click handler triggered. Saving...')
-
                             e.preventDefault()
                             e.stopPropagation()
 
                             btn = e.target
                             btn.removeEventListener('click')
-                            btn.innerHTML = 'Saving...'
                             idx = btn.getAttribute('data-index')
 
-                            goal = if idx isnt 'new' then @get_attached('goal', idx) else new Goal(target: @project.key)
+                            return notify('warn', 'saving goal', 'ready to save?', {
 
-                            amt_edit_el = document.getElementById('goal-amount-'+idx)
-                            desc_edit_el = document.getElementById('goal-description-'+idx)
+                                no: =>
 
-                            goal.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            goal.description = desc_edit_el.innerHTML
+                                    notify('notify', 'goal not saved', 'keep on working :)')
+                                    btn.addEventListener('click', _save, false)
+                                    return
 
-                            return $.apptools.api.project.put_goal(goal.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Goal saved! Applying changes...')
+                                yes: =>
 
-                                    return @attach goal.from_message(response), (_goal) =>
-                                        k = _goal.key
+                                    amount_el = _('#goal-amount-'+idx)
+                                    description_el = _('#goal-description-'+idx)
+                                    name_el = _('#goal-name-'+idx)
 
-                                        amt_el = document.getElementById('a-'+k)
-                                        desc_el = document.getElementById(k)
-                                        amt_edit_el.innerHTML = _goal.amount
-                                        amt_el.innerHTML = _.currency(_goal.amount)
-                                        desc_edit_el.innerHTML = _goal.description
-                                        desc_el.innerHTML = '<p>'+_goal.description+'</p>'
+                                    return $.apptools.api.project.put_goal(_.extend((if idx isnt 'new' then @get_attached('goal', idx) else new Goal()),
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal saved!'
+                                        target: @project.key
+                                        amount: parseInt(amount_el.val())
+                                        description: _('#goal-description-'+idx).val()
+                                        name: _('#goal-name-'+idx).val()
 
-                                        setTimeout(() =>
-                                            btn.style.backgroundColor = 'transparent'
-                                            btn.innerHTML = 'Save goal'
-                                            btn.addEventListener('click', _save, false)
-                                        , 500)
+                                    ).to_message()).fulfill
 
-                                        return _goal
+                                        success: (response) =>
 
+                                            notify('yay', 'goal saved', 'updating info...')
 
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
+                                            return @attach new Goal().from_message(response), (goal) =>
 
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _save, false)
+                                                k = goal.key
 
-                        ), false) for save_button in _.get('.save', editor)
+                                                _('#a-'+k).innerHTML = goal.name + ' - ' + _.currency(goal.amount)
+                                                _('#'+k).innerHTML = '<p>'+goal.description+'</p>'
 
-                        delete_button.addEventListener('click', (_delete = (e) =>
-                            @log('Goal delete() click handler triggered. Confirming goal delete...')
+                                                amount_el.val goal.amount
+                                                name_el.val goal.name
+                                                description_el.val goal.description
 
-                            e.preventDefault()
-                            e.stopPropagation()
+                                                btn.innerHTML = 'save goal'
+                                                btn.bind('click', _save)
 
-                            btn = e.target
-                            btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
-                            idx = btn.getAttribute('data-index')
+                                                return goal
 
-                            goal = @get_attached('goal', idx)
-                            goal_editing_el = document.getElementById('goal-editing-'+idx)
-                            goal_el = document.getElementById(goal.key)
-                            goal_trigger = document.getElementById('a-'+goal.key)
+                                        failure: (error) =>
+                                            notify('error', 'whoops', 'couldn\'t save goal, sorry :(. try again, or hit OK to refresh', {ok: -> window.location.reload()})
 
-                            if confirm('Really delete '+goal.amount+' goal?')
-                                @log('Goal delete() confirmed. Deleting goal...')
+                                            btn.bind('click', _save)
+                                            return false
 
-                                return $.apptools.api.project.delete_goal(key: goal.key).fulfill
-                                    success: (response) =>
-                                        @log('Goal deleted! Applying changes...')
+                            })
 
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal deleted!'
-
-                                        setTimeout(() =>
-                                            goal_editing_el.style.opacity = 0
-                                            setTimeout(() =>
-                                                goal_editing_el.parentNode.removeChild(goal_editing_el)
-                                                goal_el.parentNode.removeChild(goal_el)
-                                                goal_trigger.parentNode.removeChild(goal_trigger)
-                                            , 500)
-                                        , 1000)
-
-                                        return
-
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
-
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
-
-                                        return btn.addEventListener('click', _delete, false)
-
-                            else
-                                @log('Goal delete() canceled by user.')
-
-                                btn.innerHTML = 'Delete goal'
-                                return btn.addEventListener('click', _delete, false)
-
-                        ), false) for delete_button in _.get('.delete', editor)
-
-                        reset_button.addEventListener('click', (_reset = (e) =>
-                            @log('Goal reset() click handler triggered. Confirming goal reset...')
-
-                            e.preventDefault()
-                            e.stopPropagation()
-
-                            btn = e.target
-                            btn.removeEventListener('click')
-                            btn.innerHTML = 'Really?'
-                            idx = btn.getAttribute('data-index')
-
-                            goal = @get_attached('goal', idx)
-
-                            if confirm('Really discard your changes and reset goal to saved version?')
-                                @log('Goal reset() confirmed. Resetting goal to saved values...')
-
-                                return $.apptools.api.project.get_goal(key: goal.key).fulfill
-                                    success: (response) =>
-                                        @log('Goal reset! Applying changes')
-
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal reset!'
-
-                                        return @attach goal.from_message(response), (_goal) =>
-                                            document.getElementById('goal-amount-'+idx).innerHTML = _goal.amount
-                                            document.getElementById('goal-description-'+idx).innerHTML = _goal.description
-
-                                            setTimeout(() =>
-                                                btn.style.backgroundColor = 'transparent'
-                                                btn.innerHTML = 'Reset goal'
-                                                return btn.addEventListener('click', _reset, false)
-                                            , 500)
-
-                                            return _goal
-
-
-                                    failure: (error) =>
-                                        @log('Sorry, something went wrong :( Try again?')
-                                        @log(error)
-
-                                        btn.style.backgroundColor = '#ff9e9e'
-                                        btn.innerHTML = ':( Try again?'
-                                        return btn.addEventListener('click', _reset, false)
-
-                            else
-                                @log('Goal reset() canceled by user.')
-
-                                btn.innerHTML = 'Reset goal'
-                                return btn.addEventListener('click', _reset, false)
-
-                        ), false) for reset_button in _.get('.reset', editor)
-
-                        add_button.addEventListener('click', (_add = (e) =>
-                            @log('Goal add() click handler triggered. Saving...')
-
-                            e.preventDefault()
-                            e.stopPropagation()
-
-                            btn = e.target
-                            btn.removeEventListener('click')
-                            btn.innerHTML = 'Adding...'
-                            idx = 'new'
-
-                            goal = new Goal(target: @project.key)
-
-                            amt_edit_el = document.getElementById('goal-amount-'+idx)
-                            desc_edit_el = document.getElementById('goal-description-'+idx)
-                            new_edit_el = amt_edit_el.parentNode
-
-                            goal.amount = parseInt(amt_edit_el.innerHTML, 10)
-                            goal.description = desc_edit_el.innerText
-
-                            return $.apptools.api.project.put_goal(goal.to_message()).fulfill
-                                success: (response) =>
-                                    @log('Goal added! Applying changes...')
-
-                                    return @attach goal.from_message(response), (_goal) =>
-                                        k = _goal.key
-                                        index = @get_attached('goal', k, true)
-
-                                        df = _.create_doc_frag(@internal.process_goal(_goal))
-                                        new_edit_el.parentNode.insertBefore(df, new_edit_el.nextSibling)
-
-                                        amount_el.innerHTML = 0
-                                        description_el.innerHTML = 'Fill this out to add a goal!'
-
-                                        btn.innerHTML = 'Add goal'
-                                        btn.addEventListener('click', _add, false)
-
-                                        added = document.getElementById('goal-editing-'+index)
-
-                                        sv_btn.addEventListener('click', _save, false) for sv_btn in _.get('.save', added)
-                                        rst_btn.addEventListener('click', _reset, false) for rst_btn in _.get('.reset', added)
-                                        del_btn.addEventListener('click', _delete, false) for del_btn in _.get('.delete', added)
-
-                                        btn.style.backgroundColor = '#bada55'
-                                        btn.innerHTML = 'Goal added!'
-                                        return () =>
-                                            btn.addEventListener('click', _add, false)
-
-                                failure: (error) =>
-                                    @log('Sorry, something went wrong :( Try again?')
-                                    @log(error)
-
-                                    btn.style.backgroundColor = '#ff9e9e'
-                                    btn.innerHTML = ':( Try again?'
-                                    return btn.addEventListener('click', _add, false)
-
-                        ), false) for add_button in _.get('.add', editor)
+                            ), false) for save_button in _.get('.save', editor)
 
                         set_focus = (g_f) =>
                             g_f.addEventListener('click', (_focus = (e) =>
@@ -1219,7 +1152,7 @@ class ProjectController extends OpenfireController
 
                             return css
 
-                , sync
+                , true)
 
 
         @tiers =
@@ -1742,7 +1675,9 @@ class ProjectController extends OpenfireController
                     document.getElementById('bbq-cancel')?.addEventListener('click', @cancel, false)
 
                     # Project Owner Actions
+                    document.getElementById('promote-project')?.addEventListener('click', @project.edit, false)
                     document.getElementById('promote-tiers')?.addEventListener('click', @tiers.edit, false)
+                    document.getElementById('promote-goals')?.addEventListener('click', @goals.edit, false)
                     document.getElementById('promote-live')?.addEventListener('click', @go_live, false)
                     document.getElementById('promote-suspend')?.addEventListener('click', @suspend, false)
                     document.getElementById('promote-shutdown')?.addEventListener('click', @shutdown, false)
