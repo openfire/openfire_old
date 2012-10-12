@@ -1,0 +1,99 @@
+<form id='site-register' action='#' method='POST'>
+
+	<h1>Sign up</h1>
+
+	{% if federated %}
+	<section id='federated-account' class='linked account-selector' data-provider="{{ provider }}">
+
+		<h2>You've linked your {{ provider }} account</h2>
+
+		<div id='{{ provider }}-account'>
+
+			<div class='account badge'>
+
+				<img src="http://placehold.it/64x64" alt="that\'s you, silly!">
+
+				<div class='profile'>
+
+					<div class='nametag'>
+						<span class='fname'>John</span> <span class='lname'>Doe</span>
+					</div> <!-- end .nametag -->
+
+					<div class='link'>
+						<a href="blabs.com">http://google.com/coolguy</a>
+					</div> <!-- end .link -->
+
+				</div> <!-- end .profile -->
+
+			</div> <!-- end .account.badge -->
+
+		</div> <!-- end #{{ provider }}-account -->
+
+		<span class='smallnote'>You can attach other accounts later via your profile!</span>
+
+	</section> <!-- end #federated-account -->
+	{% else %}
+	<section id='federated-account' class='empty account-selector'>
+
+		<h2>Skip all this bullshit</h2>
+
+		<div id='thirdparty-buttons' class='social promo buttons'>
+			<button class='zocial googleplus button'>Signup with Google</button>
+			<button class='zocial facebook icon'></button>
+			<button class='zocial twitter icon'></button>
+		</div> <!-- end #thirdparty-buttons -->
+
+	</section> <!-- end #federated-account -->
+
+	<section id='basic-details'>
+
+		<h2>Tell us a bit about yourself</h2>
+
+		<div id='personal' class='formgroup'>
+			<input id='firstname' name='firstname' placeholder='First Name' />
+			<input id='lastname' name='lastname' placeholder='Last Name' />
+		</div> <!-- end #personal -->
+
+		<div id='contact' class='formgroup'>
+			<input id='email' name='email' placeholder='Email Address' /><label for="email">You can always add more later!</label>
+			<input id='phone' name='phone' placeholder='Phone Number' /><label for="phone">If you want, we can send you text notifications!</label>
+		</div> <!-- end #contact -->
+
+	</section> <!-- end #basic-details -->
+	{% endif %}
+
+	<section id='organic-account'>
+
+		<div id='user' class='formgroup'>
+			<input id='username' name='username' placeholder='Username' /><label for="username">Pick a username!</label>
+			<div id='username-status'>
+				<b>STATUS</b>
+			</div><!-- end #username-status -->
+		</div> <!-- end #user -->
+
+		<div id='topics' class='formgroup'>
+			<b>Topic autocomplete will go here!</b>
+		</div> <!-- end #topics -->
+
+	</section> <!-- end #organic-account -->
+
+	<section id='avatar-preferences'>
+
+		<div id='imgsource' class='formgroup'>
+
+			<div id='avatar-provider'>
+				<input type='radio' name='avatar_provider' value="organic">Upload an image</input>
+				<input type='radio' name='avatar_provider' value="gravatar">Use Gravatar</label>
+			</div><!-- end #avatar-provider -->
+
+		</div> <!-- end #imgsource -->
+
+	</section> <!-- end #avatar-prefs -->
+
+	<section id='notification-preferences'>
+
+		<b>Notification Prefs</b>
+
+	</section> <!-- end #notification-preferences -->
+
+</form> <!-- end #site-register -->

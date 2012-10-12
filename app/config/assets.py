@@ -156,6 +156,7 @@ config['apptools.project.assets'] = {
                 'profile': {'name': 'profile.sass', 'module': 'openfire', 'version': 0.1},
                 'project': {'name': 'project.sass', 'module': 'openfire', 'version': 0.1},
                 'about': {'name': 'about.sass', 'module': 'openfire', 'version': 0.1},
+                'register': {'name': 'register.sass', 'module': 'openfire', 'version': 0.1},
 
                 ## Main
                 'ie': {'name': 'ie.sass', 'version': 0.2},
@@ -197,14 +198,15 @@ config['apptools.project.assets'] = {
             },
 
             'assets': {
-                'landing': {'version': 0.5},  # styles for the landing
+                'landing': {'version': 0.5},   # styles for the landing
                 'proposal': {'version': 0.2},  # styles for the proposal page
-                'project': {'version': 0.4},  # styles for the project page
+                'project': {'version': 0.4},   # styles for the project page
                 'profile': {'version': 0.3},   # styles for the profile page
-                'propose': {'version': 0.1},  # styles for the propose page & wizard
+                'propose': {'version': 0.1},   # styles for the propose page & wizard
                 'account': {'version': 0.1},   # styles for the user account page
-                'about': {'version': 0.1},
-                'bbq': {'version': 0.1}
+                'about': {'version': 0.1},     # styles for the about page
+                'bbq': {'version': 0.1},       # styles for the BBQ admin page
+                'register': {'version': 0.1}   # styles for the registration page
             }
 
         },

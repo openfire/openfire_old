@@ -1,5 +1,19 @@
 {% extends "layout/security.html" %}
 
+{% block stylesheets %}
+	<link rel='stylesheet' href='{{ asset.style('register', 'openfire') }}' media='all' />
+{% endblock stylesheets %}
+
 {% block content %}
-	<b>REGISTER</b>
+
+	{% block registersplash %}
+	<div id='splash' class="rounded-big center-all">
+
+		<div id="register_wrapper" data-federated="{%- if federated -%}true{%- else -%}false{%- endif -%}" data-csrf="{{ encrypt(security.session.get('sid', '__DEV__')) }}">
+			{% include "snippets/register_form.html" with context %}
+		</div><!-- end #register_wrapper -->
+
+	</div><!-- end #register -->
+	{% endblock %}
+
 {% endblock %}
