@@ -110,6 +110,44 @@ h2
 #username
   width: 128px
 
+#username-status
+  margin-left: auto
+  margin-right: auto
+  font-family: 'Karla'
+  text-transform: uppercase
+  font-size: 8pt
+  padding: 5px
+  margin-left: 10px
+  -webkit-transition-property: opacity
+  -webkit-transition-duration: 0.2s
+  opacity: 1
+
+  span
+    font-size: 10pt !important
+    height: 25px
+    line-height: 25px
+    font-family: 'momentron' !important
+    -webkit-transition-property: background-color, border-color, color
+    -webkit-transition-duration: 0.3s
+
+    &.loading
+      position: relative
+      left: -6px !important
+      top: -1px !important
+
+    &.checkmark
+      position: relative
+      left: -5px
+      top: 1px
+      height: 25px
+      line-height: 25px
+      border-radius: 5px
+
+    &.exmark
+      position: relative
+      left: -3px
+      top: 1px
+
 #register-actions
   text-align: center
   height: 80px

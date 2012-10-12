@@ -44,7 +44,7 @@ class SecurityConfigProvider(object):
                 return p
         return None
 
-    def build_authenticated_session(self, email, nickname, ukey, uid, provider='organic', mode=None, register=False):
+    def build_authenticated_session(self, email, nickname, ukey, uid, provider='organic', mode=None, register=False, extra={}):
 
         ''' Build an authenticated session struct, to be picked up by handler dispatch on the next pageload '''
 
@@ -71,6 +71,8 @@ class SecurityConfigProvider(object):
 
         if register:
             self.session['register'] = True
+
+        self.session.update(extra)
 
         return self.session
 
@@ -376,7 +378,27 @@ class Register(WebHandler, SecurityConfigProvider):
 
         ''' Dev signup handler. Will need to be rewritten with an actual registration form. '''
 
-        return self.render('security/register.html')
+        if 'mode' in self.session and self.session.get('mode', False) == 'federated':
+            federated_account = {
+                'mode': self.session.get('mode'),
+                'provider': self.session.get('provider'),
+                'avatar': self.session.get('ext_avatar'),
+                'firstname': self.session.get('firstname'),
+                'lastname': self.session.get('lastname'),
+                'email': self.session.get('ext_email'),
+                'ext_id': self.session.get('ext_id'),
+                'profile': 'http://google.com'
+            }
+        else:
+            federated_account = {}
+
+        return self.render('security/register.html', federated=federated_account, provider=federated_account.get('provider'))
+
+    def post(self):
+
+        ''' Accept user signups and properly manage redirects. '''
+
+        return self.redirect_to('auth/register')
 
 
 class Provider(WebHandler, SecurityConfigProvider):
@@ -589,7 +611,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                                 uid=user_struct['id'],
                                 provider='facebook',
                                 mode='oauth',
-                                register=True
+                                register=True,
+                                extra={
+                                    'ext_id': user_struct['id'],
+                                    'ext_email': user_struct['email'],
+                                    'ext_name': user_struct['fullname'],
+                                    'ext_avatar': user_struct['avatar']
+                                }
                             )
                             return self.redirect_to('auth/register',
                                 exi=base64.b64encode(user_struct['id']),
@@ -663,7 +691,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                     uid=u.user_id(),
                     provider='googleplus',
                     mode='openid',
-                    register=True
+                    register=True,
+                    extra={
+                        'ext_id': u.user_id(),
+                        'ext_email': u.email(),
+                        'ext_name': u.nickname(),
+                        'ext_avatar': False
+                    }
                 )
                 return self.redirect_to('auth/register', **{
                     'exi': base64.b64encode(u.user_id()),
@@ -710,7 +744,13 @@ class FederatedAction(WebHandler, SecurityConfigProvider):
                         uid=u.user_id(),
                         provider='googleplus',
                         mode='oauth',
-                        register=True
+                        register=True,
+                        extra={
+                            'ext_id': u.user_id(),
+                            'ext_email': u.email(),
+                            'ext_name': u.nickname(),
+                            'ext_avatar': False
+                        }
                     )
                     return self.redirect_to('auth/register', **{
                         'exi': base64.b64encode(u.user_id()),

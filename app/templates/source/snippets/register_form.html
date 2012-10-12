@@ -38,9 +38,9 @@
 		<h2>Skip all this bullshit</h2>
 
 		<div id='thirdparty-buttons' class='social promo buttons'>
-			<button class='left zocial googleplus button'>Signup with Google</button>
-			<button class='left zocial facebook icon'></button>
-			<button class='left zocial twitter icon'></button>
+			<button id='federated-google' data-provider='googleplus' class='left zocial googleplus button'>Signup with Google</button>
+			<button id='federated-facebook' data-provider='facebook' class='left zocial facebook icon'></button>
+			<button id='federated-twitter' data-provider='twitter' class='left zocial twitter icon'></button>
 			<div class='clear'></div>
 		</div> <!-- end #thirdparty-buttons -->
 
@@ -70,10 +70,25 @@
 		<h2>Pick a username</h2>
 
 		<div id='user' class='left formgroup'>
+			
 			<span id='oflink'>openfi.re/</span><input id='username' name='username' placeholder='username' /><label for="username">Pick a username!</label>
-			<div id='username-status'>
-				<b>STATUS</b>
+
+			<div id='username-status' class='hidden transparent'>
+
+				<div id='username-checking'>
+					<span class='momentron loading spinner'>&#xf0043;</span>checking availability...
+				</div><!-- end .checking -->
+
+				<div id='username-success' class='hidden transparent'>
+					<span class='momentron'>&#xf000a;</span>Yay! It's available!
+				</div><!-- end .success -->
+
+				<div id='username-failure' class='hidden transparent'>
+					<span class='momentron'>&#xf000b;</span>
+				</div>
+
 			</div><!-- end #username-status -->
+
 		</div> <!-- end #user -->
 
 		<div id='topics' class='right formgroup'>

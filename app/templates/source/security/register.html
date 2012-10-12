@@ -17,3 +17,9 @@
 	{% endblock %}
 
 {% endblock %}
+
+{% block jsready %}
+                _tbb = _.get('#thirdparty-buttons'), _gpb = _.get('#federated-google'), _gpf = _.get('#federated-facebook'), _gpt = _.get('#federated-twitter'),
+                _ = _gpb.onclick = _gpf.onclick = _gpt.onclick = function (e) { window.location.href = ["login", "with", e.target.getAttribute('data-provider')].join("/"); },
+
+{% endblock jsready %}
