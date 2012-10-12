@@ -29,10 +29,11 @@ class FormController extends OpenfireController
         url: /^(https?|s?ftp|wss?|git|ssh|rtmp|smb):\/\/((?:\w+\.?)+)(\w{2,4})$/i       # (_, protocol, inner, suffix)
         date: /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/                               # (_, day, month, year)
         ssn: /^(\d{3})[\-\s](\d{2})[\-\s](\d{4})$/                                      # (_, #{3}, #{2}, #{4})
-        alpha: /^[a-z]+$/i
+        alpha: /^[a-z\s]+$/i
         alphanum: /^\w+$/
         number: /^-?\d+$/
         text: /^[\w\W]*$/
+        any: /^[\w\W.]*$/
 
     errors =
         email: 'youruser@email.com'
@@ -75,9 +76,12 @@ class FormController extends OpenfireController
                 inputs = _.join(form.find('input'), form.find('textarea'))
                 for input in inputs
                     if input
-                        type = input.type or 'text'
+                        type = input.data('validation')
+                        type ?= input.type or 'text'
                         type = 'text' if type is 'textarea'
                         type = 'multi' if type is 'radio' or type is 'checkbox'
+
+                        continue if type is 'none'
 
                         if not input.data('validation')?
                             input.data('validation', type)
