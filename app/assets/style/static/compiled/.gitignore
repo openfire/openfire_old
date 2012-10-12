@@ -1,4 +1,5 @@
 *.css
 !jquery.dataTables.css
+!nv.d3.css
 
 openfire
