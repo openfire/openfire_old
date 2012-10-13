@@ -19,12 +19,12 @@
         for (lbi=0, lbl=lbbs.length; lbi < lbl; lbi++) { lbb = lbbs[lbi]; lbb.addEventListener("click", function (e) {
         var lbp = e.target, undefined = e.stopPropagation(), undefined = e.preventDefault(), lbd = lbp.getAttribute("disabled"),
         lbc = lbp.getAttribute("data-action"); $.apptools.dev.log('OF:Logon', 'Redirecting to logon partner.', e);
-        if (lbd != "disabled") { window.location.href = lbc; }})}}, pral = document.getElementById("lockedout"),
+        if (lbd != "disabled") { window.location.href = lbc; }}, false)}}, pral = document.getElementById("lockedout"),
         undefined = pral.addEventListener("click", function (e) { var pwtl = 'Password recovery', pwlv = 'warn',
-        pwms = 'Please contact an openfire! staff member for account help during the private beta.', 
-        res = $.openfire.sys.notify(pwlv, pwtl, pwms); }), lbsid = 'signup_submit', lbsl = document.getElementById(lbsid),
+        pwms = 'Please contact an openfire! staff member for account help during the private beta.',
+        res = $.openfire.sys.notify(pwlv, pwtl, pwms); }, true), lbsid = 'signup_submit', lbsl = document.getElementById(lbsid),
         undefined = lbsl.addEventListener("click", function (e) { var lusi = 'username', lusp = 'password',
-        lusr = document.getElementById(lusi).value, luspw = document.getElementById(lusp).value, 
+        lusr = document.getElementById(lusi).value, luspw = document.getElementById(lusp).value,
         lurb = "{{ link('auth/register', sr='login', exi='empty') }}", lurusr = (lusr != '') ? window.btoa(lusr) : 'nusr',
         rrrl = lurb += "&" += ["iusr", lurusr].join("="), undefined = $.apptools.dev.log('OF:Logon', 'Redirecting to signup.', e, rrrl);
         window.location.href = rrrl;}), undefined = lbsetup(lbi, lbl, lbb, lbbs), undefined = $.apptools.dev.log('OF:Logon', 'Logon ready.'),

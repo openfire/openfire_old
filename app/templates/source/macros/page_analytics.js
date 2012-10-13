@@ -18,8 +18,8 @@
         _gac = {multitrack: {% if multitrack %}true{%- else -%}false{%- endif -%}, anonymize: {% if anonymize %}true{%- else -%}false{%- endif -%}, account_ids: {{ util.converters.json.dumps(account_ids)|safe }}{%- if config.sitespeed.enable -%}, samplerate: {{ config.sitespeed.sample }}}{%- endif -%},
         undefined = _ofinject.appendChild(_.create_doc_frag(_.create_element_string(_dfeln, {'id': 'js-analytics', 'async': '', 'type': _dfelt,
         'src': '{{ config.selected_client }}', 'data-hostname':{%- if util.handler.force_hostname -%} '{{ util.handler.force_hostname }}'{%- else -%} '{{ util.request.host }}'{%- endif -%}}, ''))),
-        _gacol = _ofinject.lastChild.onload = function (ev) { var ofan = $.apptools.analytics.internal.initialize(window._gaq, window._gat, _gac, ev); },
-        tofpr = window.__track_ofpr = function (w) { window.__clock.clockpoint('JavaScript', 'Page Ready', window.__clock.ts[0], 'Staging', 100); },
+        _gacl = _ofinject.lastChild.onload = function (e) {var ofan = $.apptools.analytics.internal.initialize(window._gaq, window._gat, _gac, e);},
+        tofpr = window.__track_ofpr = function (w) {window.__clock.clockpoint('JavaScript', 'Page Ready', window.__clock.ts[0], 'Staging', 100);},
 {%- endif -%}
 {% endmacro %}
 {% macro google_analytics_async(config, multitrack=false, anonymize=false, account_ids={}) %}
