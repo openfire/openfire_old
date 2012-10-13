@@ -11,16 +11,22 @@
 
 			<div class='account badge'>
 
-				<img src="http://placehold.it/64x64" alt="that\'s you, silly!">
+				<div id='federated_icon'>
+					{% if federated.avatar %}
+						<img src="{{ federated.avatar }}" alt="that\'s you, silly!">
+					{% else %}
+						<div class='zocial {{ provider }} icon'></div>
+					{% endif %}
+				</div>
 
 				<div class='profile'>
 
 					<div class='nametag'>
-						<span class='fname'>John</span> <span class='lname'>Doe</span>
+						<span class='fname'>{{ federated.firstname }}</span> <span class='lname'>{{ federated.lastname }}</span>
 					</div> <!-- end .nametag -->
 
 					<div class='link'>
-						<a href="blabs.com">http://google.com/coolguy</a>
+						<a href="blabs.com">{{ federated.profile }}</a>
 					</div> <!-- end .link -->
 
 				</div> <!-- end .profile -->
@@ -45,8 +51,8 @@
 		</div> <!-- end #thirdparty-buttons -->
 
 	</section> <!-- end #federated-account -->
-
-	<section id='basic-details'>
+	{% endif %}
+	<section id='basic-details'{% if federated %} class="hidden"{% endif %}>
 
 		<h2>Tell us a bit about yourself</h2>
 
@@ -63,11 +69,10 @@
 		<div class='clear'></div>
 
 	</section> <!-- end #basic-details -->
-	{% endif %}
 
 	<section id='organic-account'>
 
-		<h2>Pick a username</h2>
+		<h2>Pick a username and password</h2>
 
 		<div id='user' class='left formgroup'>
 			
@@ -109,7 +114,7 @@
 		<div id='imgsource' class='formgroup'>
 
 			<div id='avatar-provider'>
-				<input type='radio' name='avatar_provider' value="organic"><span id='organic_mode' class='avatar_provider_mode'>Upload an image</span></input>
+				<input type='radio' selected='selected' name='avatar_provider' value="organic"><span id='organic_mode' class='avatar_provider_mode'>Upload an image</span></input>
 
 				<input type='radio' name='avatar_provider'
 				value="oranic_url"><span id='organic_urlmode' class='avatar_provider_mode'>Upload by URL</span></input>
@@ -118,7 +123,11 @@
 			</div><!-- end #avatar-provider -->
 
 			<div id='avatar-selector'>
-				<div id='avatar-preview' class='empty'></div>
+				<div id='avatar-preview' class='empty'>
+					<div id='avatar-url-retrieve' class='hidden'>
+						<input id='avatar_url' name='avatar_href' type='text' placeholder='paste an image URL' />
+					</div>
+				</div>
 			</div><!-- end #avatar-selector -->
 
 		</div> <!-- end #imgsource -->
@@ -137,5 +146,8 @@
 		    <span id='register-button-label'>Sign me up!</span>
 		</button><!-- end #register-button -->
 	</div><!-- end #register-actions -->
+
+	<input name='action' type='hidden' value='exi_register' />
+	<input name='csrf' type='hidden' value='{{ csrf }}' />
 
 </form> <!-- end #site-register -->

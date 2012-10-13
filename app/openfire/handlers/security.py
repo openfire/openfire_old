@@ -3,6 +3,7 @@ import time
 import base64
 import webapp2
 import hashlib
+import datetime
 import config as cfg
 from config import config
 
@@ -392,13 +393,25 @@ class Register(WebHandler, SecurityConfigProvider):
         else:
             federated_account = {}
 
-        return self.render('security/register.html', federated=federated_account, provider=federated_account.get('provider'))
+        if federated_account.get('provider') == 'googleplus':
+            federated_account['provider'] = 'google'  # we can switch it back later, need it without the "+" for proper branding
+
+        return self.render('security/register.html',
+                    federated=federated_account,
+                    provider=federated_account.get('provider'),
+                    csrf=hashlib.sha256(base64.b64encode(json.dumps({
+                        'token': ':'.join([self.session.get('sid'), 'exi', 'register']),
+                        'timestamp': str(datetime.datetime.now()),
+                        'action': 'register'
+                    })))
+                )
 
     def post(self):
 
         ''' Accept user signups and properly manage redirects. '''
 
-        return self.redirect_to('auth/register')
+        self.response.write("".join(["<pre>", str(self.request), "</pre>"]))
+        return
 
 
 class Provider(WebHandler, SecurityConfigProvider):
