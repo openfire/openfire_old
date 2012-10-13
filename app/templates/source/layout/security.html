@@ -4,6 +4,10 @@
 <link rel="stylesheet" href="{{ asset.style('security', 'compiled') }}">
 {% endblock stylesheets %}
 
+{% block jstemplates %}
+	{% include "snippets/jstemplates/system.html" with context %}
+{% endblock jstemplates %}
+
 {% block body %}
 
 <div class="snapall page-bg">
