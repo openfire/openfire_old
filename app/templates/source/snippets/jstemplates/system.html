@@ -1,0 +1,101 @@
+    <script type="text/template" id="Button">
+        <button[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</button>
+    </script>
+    <script type="text/template" id="TextArea">
+        <textarea data-validation="text"[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</textarea>
+    </script>
+    <script type="text/template" id="Input">
+        <input[[[@attributes]]] [[[=_key]]]="[[[=_val]]]"[[[/attributes]]]>[[[content]]][[[=content]]][[[/content]]]</input>
+    </script>
+    <script type="text/template" id="ProjectEditModal">
+        <div id="[[[=kind]]]-editor" class="pre-modal" style="opacity: 0;" data-title="editing [[[=kind]]] ...">
+            <form id="[[[=kind]]]-editor-form">
+                [[[>fields]]]
+                    [[[=name]]]:<br>[[[+Input]]]<br>
+                [[[/fields]]]
+                [[[>areas]]]
+                    [[[=name]]]:<br>[[[+TextArea]]]<br>
+                [[[/areas]]]
+                <button id="[[[=kind]]]-save">save [[[=kind]]]</button>
+            </form>
+        </div>
+    </script>
+    <script type="text/template" id="TierEditModal">
+        <div id="project-[[[<type]]]-editor" class="pre-modal" style="opacity: 0;" data-title="editing project [[[&1]]]s...">
+            <form id="project-[[[&1]]]-editor-form">
+                [[[>tiers]]]
+                    [[[+TierEditModalItem]]]
+                [[[/tiers]]]
+            </form>
+        </div>
+    </script>
+    <script type="text/template" id="TierEditModalItem">
+        <div id="[[[<type]]]-editing-[[[<index]]]" class="[[[&1]]]">
+            <div class="left" style="margin-right: 10px; max-width: 35%">
+                [[[amount]]]amount: <input type="text" id="[[[&1]]]-amount-[[[&2]]]" class="[[[&1]]]-field amount" data-validation="number" data-label="amount" contenteditable=true placeholder="[[[=amount]]]"></input>
+                <br>[[[/amount]]]
+                name: <input type="text" id="[[[&1]]]-name-[[[&2]]]" class="[[[&1]]]-field name" data-validation="alpha" data-label="name" contenteditable=true placeholder="[[[=name]]]"></input>
+                <br>
+            </div>
+            description:
+            <br>
+            <textarea id="[[[&1]]]-description-[[[&2]]]" class="rounded [[[&1]]]-field description" data-label="description" contenteditable=true>[[[description]]][[[=description]]][[[/description]]][[[summary]]][[[=summary]]][[[/summary]]]</textarea>
+            <br>
+            [[[>buttons]]]
+                [[[+Button]]]
+            [[[/buttons]]]
+        </div>
+    </script>
+    <script type="text/template" id="CommentItem">
+        <div class="comment" id="">
+            <span class="avatar-small"><img src="https://kittensplace.com/32/32" width="32" height="32"></span>
+            <span class="comment-content">
+                <a href="https://openfi.re/[[[<username]]]">[[[&1]]]</a>&nbsp;
+                [[[=content]]]<br>
+                <span class="shh">[[[=created]]]</span>
+            </span>
+        </div>
+    </script>
+    <script type="text/template" id="ProfileCard">
+        <div class="profile-card">
+            <a href="[[[=url]]]">
+                <div class="avatar" data-name="[[[=name]]]">
+                    <img src="[[[=avatar_url]]]">
+                </div>
+            </a>
+            <div class="accounts">
+            [[[>accounts]]]
+                <a class="icon [[[=service]]]" href="[[[=url]]]"></a>
+            [[[/accounts]]]
+            </div>
+        </div>
+    </script>
+    <script type="text/template" id="TopicEditItem">
+        <span class="interest topic-edit clear" data-topic="[[[=key]]]">
+            <div class="right">
+                <span class="ctrl promote">&#xf0020;</span>
+                <span class="ctrl demote">&#xf001f;</span>
+                <span class="ctrl remove">&#xf0016;</span>
+            </div>
+            [[[=name]]]
+        </span>
+    </script>
+    <script type="text/template" id="TopicTag">
+        <span class="interest topic tag" data-topic-slug="[[[=slug]]]">
+            [[[=name]]]
+            <span class="delete-tag">x</span>
+        </span>
+    </script>
+    <script type="text/template" id="SystemNotification" data-singleton='true'>
+        <div id="openfire-notification" class="notification [[[=level]]]" style="opacity: 0; display: none;">
+            <h1>[[[=title]]]</h1>
+            <p>[[[=message]]]</p>
+            [[[confirm]]]
+                <button id="notification-yes">yes</button>
+                <button id="notification-no">no</button>
+            [[[/confirm]]]
+            [[[alert]]]
+                <button id="notification-ok">ok</button>
+            [[[/alert]]]
+        </div>
+    </script>
