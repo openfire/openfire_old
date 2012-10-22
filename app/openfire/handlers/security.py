@@ -7,14 +7,16 @@ import datetime
 import config as cfg
 from config import config
 
+from apptools.util import json
+from apptools.util import debug
+from apptools.util import datastructures
+
 from google.appengine.ext import ndb
 
 from openfire.models import assets
 from openfire.models import user as user_models
 
 from openfire.handlers import WebHandler
-
-from apptools.util import json
 from webapp2_extras import security as wsec
 
 
@@ -399,16 +401,103 @@ class Register(WebHandler, SecurityConfigProvider):
         return self.render('security/register.html',
                     federated=federated_account,
                     provider=federated_account.get('provider'),
-                    csrf=hashlib.sha256(base64.b64encode(json.dumps({
+                    csrf=hashlib.sha512(base64.b64encode(json.dumps({
                         'token': ':'.join([self.session.get('sid'), 'exi', 'register']),
                         'timestamp': str(datetime.datetime.now()),
                         'action': 'register'
-                    })))
+                    }))).hexdigest()
                 )
 
     def post(self):
 
         ''' Accept user signups and properly manage redirects. '''
+
+        # Process form
+        if self.request.get('action', False) == 'exi_register':
+            
+            try:
+
+                # Grab form values
+                registration = datastructures.DictProxy({
+                    'firstname': self.request.get('firstname').strip(),
+                    'lastname': self.request.get('lastname').strip(),
+                    'email': self.request.get('email').strip(),
+                    'username': self.request.get('username').strip(),
+                    'password': self.request.get('password'),
+                    'avatar_provider': self.request.get('avatar_provider'),
+                    'avatar_href': self.request.get('avatar_href'),
+                    'action': self.request.get('action'),
+                    'csrf': self.request.get('csrf')
+                })
+
+                # Validate function
+                validate = lambda v, m: isinstance(v, basestring) and len(v) > m and all(map(lambda c: c not in string.punctuation, list(v)))
+
+                # Validate form values
+                assert validate(registration.username, 2)
+                assert validate(registration.password, 5)
+                assert validate(registration.lastname, 1) and registration.lastname.lower() not in ['last name', 'lastname']
+                assert validate(registration.firstname, 1) and registration.firstname.lower() not in ['first name', 'firstname']
+                assert validate(registration.email, 5) and '@' in registration.email and self.api.mail.is_email_valid(registration.email)
+                assert validate(registration.csrf, 127) and len(registration.csrf) == 128
+
+                # Check username and email
+                usr_k = self.api.ndb.Key(user_models.User, registration.username)
+
+                if usr_k is not None:
+                    usr = usr.get()
+
+                    # If a user already exists at this username...
+                    if usr is not None:
+                        return self.redirect_to('auth/register', **dict([(k, v) for k, v in self.request.GET] + {
+                            'sts': 'error',
+                            'err': 'user_exists',
+                            'token': registration.csrf
+                        }.items()))
+
+                else:
+
+                    em = user_models.EmailAddress.query().filter(user_models.EmailAddress.address == registration.email)
+                    if em.count() > 0:
+                        return self.redirect_to('auth/register', **dict([(k, v) for k, v in self.request.GET] + {
+                            'sts': 'error',
+                            'err': 'email_exists',
+                            'token': registration.csrf
+                        }))
+
+                    else:
+                        try:
+                            if 'provider' self.session and self.session['provider'] == 'googleplus':
+	                            if self.session.get('mode', 'openid') == 'oauth':
+                                    authuser = self.api.oauth.get_current_user()
+                                    admin = False
+                                else:
+	                                authuser = self.api.users.get_current_user()
+	                                if authuser:
+	                                    admin = self.api.users.is_current_user_admin()
+
+                        except Exception, e:
+                            authuser = None
+
+                        # User and email are valid and not taken. Create user.
+                        u = user_models.User(**{
+                            'firstname': registration.firstname,
+                            'lastname': registration.lastname,
+                            'password': registration.password,
+                            'user': authuser,
+                            'activated': True if admin else False,
+
+
+                        })
+
+            except AssertionError, e:
+
+                self.logging.error("Validation error encountered during registration. Redirecting back.")
+                self.logging.debug("Exception: '%s'." % str(e))
+                return self.redirect_to('auth/register', **dict([(k, v) for k, v in self.request.GET] + {
+                        'sts': 'error',
+                        'err': 'validation'
+                    }.items()))
 
         self.response.write("".join(["<pre>", str(self.request), "</pre>"]))
         return

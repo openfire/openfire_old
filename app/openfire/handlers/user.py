@@ -54,7 +54,11 @@ class UserProfile(WebHandler):
 
                 # forward to login page, with /me as a continue URL
                 self.session['continue_url'] = self.url_for('user/me')
-                return self.redirect_to('auth/login')
+                return self.redirect_to('auth/login', **{
+                    '_full': True,
+                    '_secure': True,
+                    '_netloc': self.force_hostname or self.request.host
+                })
 
             else:
 
